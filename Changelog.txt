@@ -1,3 +1,12 @@
+* 2007-06-10-Shefki
+  - Right clicking on an item in a built in bank slot wasn't moving
+    the item to the bag.  Somehow the frame wasn't inheriting 
+    the proper events, added them back in.
+  - Hopefully fixed the stacking problem where the item would get
+    stuck in the cursor.  Stacking is still somewhat slow but it
+    shouldn't get stuck anymore.  Removed the issue from the
+    Todo/Known issues list.
+
 * 2007-06-09-Shefki
   - Fix crash from items with cooldowns in some bank slots.
   - Offline (not at bank) viewing now properly displays items with

@@ -46,11 +46,6 @@ that shift click.  I'll look for a better fix in the future.
 However, they are generally very buggy, picking up a key ends up picking up another
 inventory item.  Shouldn't be too hard to fix...
 
-* Stacking issue.  When you go to pickup a lot of items say from the mailbox you tend
-to have issues with it stacking.  It'll get and stop stacking properly and cause 
-inventory to fill up even if it shouldn't.  Haven't started looking for solutions 
-to this yet.  High on my priority list...
-
 * Searching.  Text results alone suck.  Should be able to use the highlighting 
 like we have for new items for searches.  
 

@@ -3997,8 +3997,10 @@ function TBag_Stack(itmcache, sa)
             -- If one stack will fit on the other, drop it onto it
             if (sa[k_n][TBAG_I_COUNT] <= sa[k_c][TBAG_I_NEED]) then
               -- Drop one onto the other
+	      ClearCursor();
               PickupContainerItem(sa[k_n][TBAG_I_BAG], sa[k_n][TBAG_I_SLOT]);
               PickupContainerItem(sa[k_c][TBAG_I_BAG], sa[k_c][TBAG_I_SLOT]);
+	      ClearCursor();
 
               -- Update the count totals
               sa[k_c][TBAG_I_COUNT] = sa[k_c][TBAG_I_COUNT] + sa[k_n][TBAG_I_COUNT];
@@ -4012,8 +4014,10 @@ function TBag_Stack(itmcache, sa)
             -- Otherwise, split the smaller stack to complete the larger
             elseif (sa[k_n][TBAG_I_COUNT] > sa[k_c][TBAG_I_NEED]) then
               -- Split one and drop onto the other
+	      ClearCursor();
               SplitContainerItem(sa[k_n][TBAG_I_BAG], sa[k_n][TBAG_I_SLOT], sa[k_c][TBAG_I_NEED]);
               PickupContainerItem(sa[k_c][TBAG_I_BAG], sa[k_c][TBAG_I_SLOT]);
+	      ClearCursor();
 
               -- Update the count totals
               sa[k_n][TBAG_I_COUNT] = sa[k_n][TBAG_I_COUNT] - sa[k_c][TBAG_I_NEED];
