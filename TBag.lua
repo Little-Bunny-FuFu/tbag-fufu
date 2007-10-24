@@ -31,10 +31,12 @@ TBAG_REQ_MUST = 2;	-- it's never been sorted, the window is in an unstable state
 -- String constants
 TBAG_CAT_BAR = "catbar";
 TBAG_COLORS = "colors";
+TBAG_CONTAINERS = "containers";
 
 -- Groups
 TBAG_G_BAR_SORT = "bar_sort";
 TBAG_G_USE_NEW  = "use_new";
+TBAG_G_BAR_HIDE = "bar_hide";
 
 -- Used for indexing - MUST BE DISTINCT
 TBAG_I_BAG       = "b";
@@ -65,6 +67,11 @@ TBAG_V_NEWON     = "newY";
 TBAG_V_NEWOFF    = "newN";
 TBAG_V_NEWPLUS   = "newP";
 TBAG_V_NEWMINUS  = "newM";
+
+-- Used to track slots that can't be hidden until the next resort
+TBAG_FORCED_SHOW = {}
+
+TBAG_NEW_STACK = 1;
 
 -- Local graphics settings
 local TBAG_PAD_BOTTOM_EDIT = 30;
@@ -99,1218 +106,7 @@ TBAG_S_BANKFULL  = "bankF";
 TBAG_S_EQUIPPED  = "equip";
 
 TBAG_G_BASIC     = "basic";
-TBAG_S_LEVEL     = "lvl";
 TBAG_S_CLASS     = "class";
-TBAG_S_RACE      = "race";
-TBAG_S_GENDER    = "gnd";
-TBAG_S_ZONE      = "zone";
-TBAG_S_SUBZONE   = "subz";
-TBAG_S_GUILD     = "guild";
-TBAG_S_RANK      = "rank";
-
-TBAG_G_XP        = "xp";
-TBAG_S_REST      = "rest";
-TBAG_S_XPCURR    = "xp";
-TBAG_S_XPMAX     = "max";
-TBAG_S_BONUS     = "bonus";
-
-TBAG_G_PVP       = "pvp";
-TBAG_S_HK        = "HK";
-TBAG_S_HP        = "HP";
-TBAG_S_DK        = "DK";
-
-TBAG_S_NAME      = "name";
-
-TBAG_G_STATS     = "stat";
-TBAG_G_RESISTS   = "resist";
-
-TBAG_G_COMBAT    = "combat";
-TBAG_S_HEALTH    = "hp";
-TBAG_S_MANA      = "mana";
-TBAG_S_ARMOR     = "armor";
-TBAG_S_DEFENSE   = "def";
-TBAG_S_PARRY     = "parry";
-TBAG_S_DODGE     = "dodge";
-TBAG_S_BLOCK     = "block";
-
-TBAG_G_MELEE     = "melee";
-TBAG_S_CRIT      = "crit";
-TBAG_S_DPS       = "dps";
-
-TBAG_G_RANGE     = "range";
-
-TBAG_G_SPELL     = "spell";
-
------------------------------------------------------------------------
--- Large Default Initialization Arrays
------------------------------------------------------------------------
-
-local TBag_DefaultTrades = {
-		["Alchemy"] = {
-			["created"] = {
-				["3825"] = 1,
-				["6050"] = 1,
-				["3386"] = 1,
-				["13444"] = 1,
-				["13455"] = 1,
-				["4596"] = 1,
-				["5996"] = 1,
-				["7080"] = 1,
-				["13456"] = 1,
-				["7068"] = 1,
-				["6051"] = 1,
-				["13459"] = 1,
-				["7076"] = 1,
-				["9210"] = 1,
-				["7078"] = 1,
-				["3826"] = 1,
-				["2455"] = 1,
-				["6662"] = 1,
-				["9061"] = 1,
-				["13462"] = 1,
-				["9172"] = 1,
-				["3382"] = 1,
-				["13443"] = 1,
-				["1710"] = 1,
-				["12360"] = 1,
-				["8951"] = 1,
-				["9154"] = 1,
-				["18294"] = 1,
-				["6049"] = 1,
-				["929"] = 1,
-				["6052"] = 1,
-				["3384"] = 1,
-				["7082"] = 1,
-				["3388"] = 1,
-				["9179"] = 1,
-				["9206"] = 1,
-				["3577"] = 1,
-				["9264"] = 1,
-				["10592"] = 1,
-				["3389"] = 1,
-				["12808"] = 1,
-				["3387"] = 1,
-				["4623"] = 1,
-				["6373"] = 1,
-				["118"] = 1,
-				["5997"] = 1,
-				["9149"] = 1,
-				["9088"] = 1,
-				["2457"] = 1,
-				["2454"] = 1,
-				["8956"] = 1,
-				["6370"] = 1,
-				["9144"] = 1,
-				["858"] = 1,
-				["13457"] = 1,
-				["2458"] = 1,
-				["3928"] = 1,
-				["3827"] = 1,
-				["3383"] = 1,
-				["6048"] = 1,
-				["3385"] = 1,
-				["6037"] = 1,
-				["8949"] = 1,
-				["9233"] = 1,
-				["20002"] = 1,
-				["5631"] = 1,
-				["6371"] = 1,
-				["13445"] = 1,
-				["2456"] = 1,
-				["6372"] = 1,
-				["3390"] = 1,
-				["9030"] = 1,
-				["2459"] = 1,
-				["9224"] = 1,
-				["21546"] = 1,
-				["13442"] = 1,
-				["3824"] = 1,
-				["6149"] = 1,
-				["13452"] = 1,
-				["3391"] = 1,
-				["9187"] = 1,
-				["13447"] = 1,
-				["13461"] = 1,
-				["3823"] = 1,
-				["13423"] = 1,
-				["5634"] = 1,
-				["5633"] = 1,
-				["3829"] = 1,
-				["9155"] = 1,
-				["9036"] = 1,
-				["12190"] = 1,
-				["13446"] = 1,
-			},
-			["reagent"] = {
-				["13465"] = 1,
-				["6371"] = 1,
-				["12363"] = 1,
-				["13467"] = 1,
-				["3356"] = 1,
-				["7068"] = 1,
-				["10620"] = 1,
-				["3369"] = 1,
-				["7076"] = 1,
-				["3818"] = 1,
-				["7078"] = 1,
-				["8831"] = 1,
-				["6522"] = 1,
-				["3821"] = 1,
-				["2450"] = 1,
-				["5637"] = 1,
-				["8839"] = 1,
-				["2449"] = 1,
-				["3355"] = 1,
-				["4342"] = 1,
-				["9262"] = 1,
-				["7972"] = 1,
-				["765"] = 1,
-				["3358"] = 1,
-				["6358"] = 1,
-				["7082"] = 1,
-				["11176"] = 1,
-				["4625"] = 1,
-				["3820"] = 1,
-				["5635"] = 1,
-				["7067"] = 1,
-				["3164"] = 1,
-				["2453"] = 1,
-				["8836"] = 1,
-				["6359"] = 1,
-				["6370"] = 1,
-				["9260"] = 1,
-				["3858"] = 1,
-				["2452"] = 1,
-				["13463"] = 1,
-				["7070"] = 1,
-				["13464"] = 1,
-				["3371"] = 1,
-				["4402"] = 1,
-				["2447"] = 1,
-				["13422"] = 1,
-				["3575"] = 1,
-				["3372"] = 1,
-				["7077"] = 1,
-				["3824"] = 1,
-				["8845"] = 1,
-				["785"] = 1,
-				["8838"] = 1,
-				["7080"] = 1,
-				["118"] = 1,
-				["12359"] = 1,
-				["1288"] = 1,
-				["13423"] = 1,
-				["13466"] = 1,
-				["8925"] = 1,
-				["3819"] = 1,
-				["3860"] = 1,
-				["8846"] = 1,
-				["3357"] = 1,
-				["8153"] = 1,
-			},
-		},
-		["Blacksmithing"] = {
-			["created"] = {
-				["12406"] = 1,
-				["6731"] = 1,
-				["11128"] = 1,
-				["3840"] = 1,
-				["3835"] = 1,
-				["6040"] = 1,
-				["15871"] = 1,
-				["9060"] = 1,
-				["3855"] = 1,
-				["3492"] = 1,
-				["3484"] = 1,
-				["2851"] = 1,
-				["7916"] = 1,
-				["3473"] = 1,
-				["7969"] = 1,
-				["7917"] = 1,
-				["12404"] = 1,
-				["7922"] = 1,
-				["7963"] = 1,
-				["7958"] = 1,
-				["2871"] = 1,
-				["5540"] = 1,
-				["7934"] = 1,
-				["7071"] = 1,
-				["3471"] = 1,
-				["2868"] = 1,
-				["7918"] = 1,
-				["3469"] = 1,
-				["2865"] = 1,
-				["7966"] = 1,
-				["3845"] = 1,
-				["12643"] = 1,
-				["6043"] = 1,
-				["12410"] = 1,
-				["11144"] = 1,
-				["2870"] = 1,
-				["10421"] = 1,
-				["15869"] = 1,
-				["7919"] = 1,
-				["3470"] = 1,
-				["3483"] = 1,
-				["3851"] = 1,
-				["3485"] = 1,
-				["2853"] = 1,
-				["2857"] = 1,
-				["3854"] = 1,
-				["12409"] = 1,
-				["3472"] = 1,
-				["6042"] = 1,
-				["3478"] = 1,
-				["2864"] = 1,
-				["3487"] = 1,
-				["7956"] = 1,
-				["7913"] = 1,
-				["3474"] = 1,
-				["3852"] = 1,
-				["2863"] = 1,
-				["3842"] = 1,
-				["3482"] = 1,
-				["7967"] = 1,
-				["12644"] = 1,
-				["7924"] = 1,
-				["7964"] = 1,
-				["2848"] = 1,
-				["3836"] = 1,
-				["7941"] = 1,
-				["3489"] = 1,
-				["2852"] = 1,
-				["2854"] = 1,
-				["12645"] = 1,
-				["5541"] = 1,
-				["7933"] = 1,
-				["3481"] = 1,
-				["3848"] = 1,
-				["3239"] = 1,
-				["3486"] = 1,
-				["3846"] = 1,
-				["3488"] = 1,
-				["2862"] = 1,
-				["7920"] = 1,
-				["12420"] = 1,
-				["6338"] = 1,
-				["6214"] = 1,
-				["3856"] = 1,
-				["3241"] = 1,
-				["3490"] = 1,
-				["3853"] = 1,
-				["2847"] = 1,
-				["7965"] = 1,
-				["7931"] = 1,
-				["7914"] = 1,
-				["7915"] = 1,
-				["7930"] = 1,
-				["6350"] = 1,
-				["3844"] = 1,
-				["3240"] = 1,
-				["3849"] = 1,
-				["7944"] = 1,
-				["15870"] = 1,
-				["2869"] = 1,
-				["7957"] = 1,
-				["3491"] = 1,
-				["7945"] = 1,
-				["12259"] = 1,
-				["3843"] = 1,
-			},
-			["reagent"] = {
-				["2321"] = 1,
-				["5635"] = 1,
-				["7971"] = 1,
-				["3577"] = 1,
-				["2840"] = 1,
-				["2838"] = 1,
-				["7067"] = 1,
-				["12365"] = 1,
-				["1206"] = 1,
-				["3864"] = 1,
-				["4255"] = 1,
-				["7912"] = 1,
-				["2605"] = 1,
-				["12644"] = 1,
-				["7076"] = 1,
-				["2318"] = 1,
-				["5498"] = 1,
-				["2319"] = 1,
-				["8170"] = 1,
-				["2835"] = 1,
-				["1529"] = 1,
-				["2842"] = 1,
-				["7966"] = 1,
-				["11188"] = 1,
-				["2589"] = 1,
-				["7909"] = 1,
-				["4234"] = 1,
-				["7077"] = 1,
-				["3486"] = 1,
-				["4306"] = 1,
-				["2880"] = 1,
-				["6037"] = 1,
-				["2841"] = 1,
-				["4304"] = 1,
-				["2836"] = 1,
-				["7910"] = 1,
-				["5637"] = 1,
-				["3824"] = 1,
-				["2459"] = 1,
-				["3575"] = 1,
-				["4338"] = 1,
-				["818"] = 1,
-				["1705"] = 1,
-				["3859"] = 1,
-				["3466"] = 1,
-				["3391"] = 1,
-				["3860"] = 1,
-				["774"] = 1,
-				["1210"] = 1,
-				["5500"] = 1,
-				["3478"] = 1,
-				["11186"] = 1,
-				["2592"] = 1,
-				["3829"] = 1,
-				["12359"] = 1,
-				["11185"] = 1,
-				["3470"] = 1,
-				["14047"] = 1,
-			},
-		},
-		["Enchanting"] = {
-			["created"] = {
-			},
-			["reagent"] = {
-				["7082"] = 1,
-				["11176"] = 1,
-				["4625"] = 1,
-				["1210"] = 1,
-				["11128"] = 1,
-				["12803"] = 1,
-				["6370"] = 1,
-				["7067"] = 1,
-				["11139"] = 1,
-				["16203"] = 1,
-				["11135"] = 1,
-				["11082"] = 1,
-				["13467"] = 1,
-				["7080"] = 1,
-				["11174"] = 1,
-				["11084"] = 1,
-				["8925"] = 1,
-				["8153"] = 1,
-				["16204"] = 1,
-				["13926"] = 1,
-				["7068"] = 1,
-				["12359"] = 1,
-				["7392"] = 1,
-				["11177"] = 1,
-				["6217"] = 1,
-				["16206"] = 1,
-				["7971"] = 1,
-				["7078"] = 1,
-				["14344"] = 1,
-				["7909"] = 1,
-				["3371"] = 1,
-				["4470"] = 1,
-				["6371"] = 1,
-				["11137"] = 1,
-				["10938"] = 1,
-				["6037"] = 1,
-				["10940"] = 1,
-				["11083"] = 1,
-				["6338"] = 1,
-				["17034"] = 1,
-				["5637"] = 1,
-				["11291"] = 1,
-				["11178"] = 1,
-				["11134"] = 1,
-				["3372"] = 1,
-				["10998"] = 1,
-				["10939"] = 1,
-				["9224"] = 1,
-				["14343"] = 1,
-				["8170"] = 1,
-				["8831"] = 1,
-				["12811"] = 1,
-				["11175"] = 1,
-				["5500"] = 1,
-				["8838"] = 1,
-				["11144"] = 1,
-				["12808"] = 1,
-				["16202"] = 1,
-				["11138"] = 1,
-				["10978"] = 1,
-				["17035"] = 1,
-				["11382"] = 1,
-			},
-		},
-		["Engineering"] = {
-			["created"] = {
-				["7148"] = 1,
-				["10514"] = 1,
-				["4406"] = 1,
-				["10510"] = 1,
-				["10559"] = 1,
-				["4374"] = 1,
-				["4377"] = 1,
-				["4404"] = 1,
-				["8069"] = 1,
-				["10546"] = 1,
-				["4364"] = 1,
-				["8068"] = 1,
-				["10499"] = 1,
-				["4369"] = 1,
-				["4360"] = 1,
-				["4367"] = 1,
-				["10558"] = 1,
-				["4375"] = 1,
-				["4394"] = 1,
-				["4382"] = 1,
-				["4378"] = 1,
-				["6219"] = 1,
-				["4387"] = 1,
-				["5507"] = 1,
-				["4395"] = 1,
-				["4357"] = 1,
-				["4358"] = 1,
-				["4384"] = 1,
-				["10512"] = 1,
-				["4366"] = 1,
-				["8067"] = 1,
-				["4396"] = 1,
-				["4389"] = 1,
-				["4380"] = 1,
-				["6712"] = 1,
-				["18588"] = 1,
-				["4359"] = 1,
-				["4407"] = 1,
-				["4370"] = 1,
-				["4365"] = 1,
-				["4401"] = 1,
-				["4392"] = 1,
-				["4385"] = 1,
-				["4363"] = 1,
-				["4361"] = 1,
-				["10507"] = 1,
-				["10498"] = 1,
-				["10518"] = 1,
-				["7506"] = 1,
-				["11590"] = 1,
-				["10508"] = 1,
-				["9313"] = 1,
-				["4372"] = 1,
-				["4371"] = 1,
-				["10560"] = 1,
-				["4391"] = 1,
-				["4386"] = 1,
-				["4398"] = 1,
-				["4403"] = 1,
-				["4405"] = 1,
-				["9318"] = 1,
-				["4397"] = 1,
-				["6714"] = 1,
-				["10501"] = 1,
-				["4368"] = 1,
-				["6533"] = 1,
-				["10561"] = 1,
-				["10505"] = 1,
-				["4390"] = 1,
-			},
-			["reagent"] = {
-				["4371"] = 1,
-				["2880"] = 1,
-				["6530"] = 1,
-				["10559"] = 1,
-				["3577"] = 1,
-				["2840"] = 1,
-				["2589"] = 1,
-				["10592"] = 1,
-				["4377"] = 1,
-				["4404"] = 1,
-				["1206"] = 1,
-				["3864"] = 1,
-				["159"] = 1,
-				["7912"] = 1,
-				["4368"] = 1,
-				["7068"] = 1,
-				["4359"] = 1,
-				["4375"] = 1,
-				["4399"] = 1,
-				["1529"] = 1,
-				["2318"] = 1,
-				["7191"] = 1,
-				["2842"] = 1,
-				["4389"] = 1,
-				["7909"] = 1,
-				["2838"] = 1,
-				["10285"] = 1,
-				["1210"] = 1,
-				["4306"] = 1,
-				["4363"] = 1,
-				["4382"] = 1,
-				["2841"] = 1,
-				["4339"] = 1,
-				["2836"] = 1,
-				["10558"] = 1,
-				["774"] = 1,
-				["4364"] = 1,
-				["4361"] = 1,
-				["4304"] = 1,
-				["4338"] = 1,
-				["818"] = 1,
-				["3859"] = 1,
-				["10560"] = 1,
-				["4387"] = 1,
-				["2835"] = 1,
-				["3860"] = 1,
-				["1705"] = 1,
-				["3575"] = 1,
-				["4234"] = 1,
-				["814"] = 1,
-				["4357"] = 1,
-				["2592"] = 1,
-				["3829"] = 1,
-				["2319"] = 1,
-				["10561"] = 1,
-				["10505"] = 1,
-				["4400"] = 1,
-			},
-		},
-		["Leatherworking"] = {
-			["created"] = {
-				["7282"] = 1,
-				["4242"] = 1,
-				["7352"] = 1,
-				["15083"] = 1,
-				["7374"] = 1,
-				["7377"] = 1,
-				["2313"] = 1,
-				["8173"] = 1,
-				["8216"] = 1,
-				["7285"] = 1,
-				["7386"] = 1,
-				["5966"] = 1,
-				["20575"] = 1,
-				["2302"] = 1,
-				["8170"] = 1,
-				["4257"] = 1,
-				["8201"] = 1,
-				["4236"] = 1,
-				["8210"] = 1,
-				["4455"] = 1,
-				["4253"] = 1,
-				["2310"] = 1,
-				["4248"] = 1,
-				["8193"] = 1,
-				["8172"] = 1,
-				["6468"] = 1,
-				["5963"] = 1,
-				["7387"] = 1,
-				["4304"] = 1,
-				["7375"] = 1,
-				["7378"] = 1,
-				["8185"] = 1,
-				["4262"] = 1,
-				["4259"] = 1,
-				["4265"] = 1,
-				["5782"] = 1,
-				["7281"] = 1,
-				["4246"] = 1,
-				["6466"] = 1,
-				["8176"] = 1,
-				["8203"] = 1,
-				["8212"] = 1,
-				["2304"] = 1,
-				["8191"] = 1,
-				["7358"] = 1,
-				["8197"] = 1,
-				["8205"] = 1,
-				["4237"] = 1,
-				["6467"] = 1,
-				["7348"] = 1,
-				["5781"] = 1,
-				["4233"] = 1,
-				["15407"] = 1,
-				["4247"] = 1,
-				["4260"] = 1,
-				["7373"] = 1,
-				["2315"] = 1,
-				["7371"] = 1,
-				["15564"] = 1,
-				["7280"] = 1,
-				["18662"] = 1,
-				["5962"] = 1,
-				["5739"] = 1,
-				["2303"] = 1,
-				["8211"] = 1,
-				["4251"] = 1,
-				["3719"] = 1,
-				["8217"] = 1,
-				["18948"] = 1,
-				["8215"] = 1,
-				["8200"] = 1,
-				["7276"] = 1,
-				["2308"] = 1,
-				["8204"] = 1,
-				["8218"] = 1,
-				["7372"] = 1,
-				["15086"] = 1,
-				["18238"] = 1,
-				["5783"] = 1,
-				["4239"] = 1,
-				["8198"] = 1,
-				["4249"] = 1,
-				["4234"] = 1,
-				["2319"] = 1,
-				["4231"] = 1,
-				["4244"] = 1,
-				["7279"] = 1,
-				["2316"] = 1,
-				["7277"] = 1,
-				["5780"] = 1,
-				["8214"] = 1,
-				["5964"] = 1,
-				["8175"] = 1,
-				["4456"] = 1,
-				["7278"] = 1,
-				["8213"] = 1,
-				["2317"] = 1,
-				["2309"] = 1,
-				["15084"] = 1,
-				["5961"] = 1,
-				["8189"] = 1,
-				["2314"] = 1,
-				["4243"] = 1,
-				["2300"] = 1,
-				["4256"] = 1,
-				["5958"] = 1,
-				["8187"] = 1,
-				["2307"] = 1,
-				["5957"] = 1,
-				["2318"] = 1,
-				["7391"] = 1,
-			},
-			["reagent"] = {
-				["1210"] = 1,
-				["4234"] = 1,
-				["4232"] = 1,
-				["3864"] = 1,
-				["5498"] = 1,
-				["8170"] = 1,
-				["1529"] = 1,
-				["4236"] = 1,
-				["4233"] = 1,
-				["14341"] = 1,
-				["6471"] = 1,
-				["6470"] = 1,
-				["2325"] = 1,
-				["783"] = 1,
-				["2934"] = 1,
-				["5116"] = 1,
-				["2320"] = 1,
-				["4289"] = 1,
-				["7071"] = 1,
-				["8169"] = 1,
-				["8951"] = 1,
-				["7428"] = 1,
-				["2997"] = 1,
-				["7286"] = 1,
-				["4246"] = 1,
-				["5500"] = 1,
-				["5784"] = 1,
-				["8153"] = 1,
-				["8151"] = 1,
-				["2321"] = 1,
-				["7971"] = 1,
-				["7067"] = 1,
-				["3389"] = 1,
-				["1206"] = 1,
-				["8171"] = 1,
-				["8343"] = 1,
-				["4291"] = 1,
-				["2457"] = 1,
-				["2319"] = 1,
-				["4305"] = 1,
-				["8152"] = 1,
-				["4235"] = 1,
-				["8949"] = 1,
-				["8150"] = 1,
-				["4231"] = 1,
-				["8167"] = 1,
-				["4340"] = 1,
-				["4304"] = 1,
-				["5637"] = 1,
-				["3824"] = 1,
-				["3182"] = 1,
-				["2459"] = 1,
-				["5785"] = 1,
-				["8154"] = 1,
-				["7070"] = 1,
-				["4337"] = 1,
-				["4243"] = 1,
-				["5373"] = 1,
-				["2605"] = 1,
-				["4461"] = 1,
-				["7392"] = 1,
-				["2312"] = 1,
-				["8172"] = 1,
-				["2318"] = 1,
-				["15409"] = 1,
-			},
-		},
-		["Tailoring"] = {
-			["created"] = {
-				["10040"] = 1,
-				["7050"] = 1,
-				["6242"] = 1,
-				["10023"] = 1,
-				["10034"] = 1,
-				["2996"] = 1,
-				["14342"] = 1,
-				["10029"] = 1,
-				["7026"] = 1,
-				["14042"] = 1,
-				["9999"] = 1,
-				["4328"] = 1,
-				["7051"] = 1,
-				["21340"] = 1,
-				["10004"] = 1,
-				["2576"] = 1,
-				["10024"] = 1,
-				["2583"] = 1,
-				["10041"] = 1,
-				["2585"] = 1,
-				["10055"] = 1,
-				["4327"] = 1,
-				["4320"] = 1,
-				["13868"] = 1,
-				["13870"] = 1,
-				["10026"] = 1,
-				["6384"] = 1,
-				["14108"] = 1,
-				["19056"] = 1,
-				["5762"] = 1,
-				["6238"] = 1,
-				["6264"] = 1,
-				["4321"] = 1,
-				["7058"] = 1,
-				["10027"] = 1,
-				["5765"] = 1,
-				["4343"] = 1,
-				["5766"] = 1,
-				["7053"] = 1,
-				["2569"] = 1,
-				["7048"] = 1,
-				["4312"] = 1,
-				["10048"] = 1,
-				["6239"] = 1,
-				["4322"] = 1,
-				["10003"] = 1,
-				["4241"] = 1,
-				["14153"] = 1,
-				["4315"] = 1,
-				["14100"] = 1,
-				["7062"] = 1,
-				["10002"] = 1,
-				["14103"] = 1,
-				["13863"] = 1,
-				["18408"] = 1,
-				["4318"] = 1,
-				["4307"] = 1,
-				["4344"] = 1,
-				["10036"] = 1,
-				["10042"] = 1,
-				["6786"] = 1,
-				["13869"] = 1,
-				["4331"] = 1,
-				["10001"] = 1,
-				["2587"] = 1,
-				["4308"] = 1,
-				["7054"] = 1,
-				["14155"] = 1,
-				["4324"] = 1,
-				["2580"] = 1,
-				["5764"] = 1,
-				["4325"] = 1,
-				["4326"] = 1,
-				["2997"] = 1,
-				["6795"] = 1,
-				["4311"] = 1,
-				["6787"] = 1,
-				["10045"] = 1,
-				["22248"] = 1,
-				["10050"] = 1,
-				["7049"] = 1,
-				["4333"] = 1,
-				["10028"] = 1,
-				["4240"] = 1,
-				["6385"] = 1,
-				["2579"] = 1,
-				["13865"] = 1,
-				["18486"] = 1,
-				["4330"] = 1,
-				["10051"] = 1,
-				["4314"] = 1,
-				["2577"] = 1,
-				["10008"] = 1,
-				["4245"] = 1,
-				["10031"] = 1,
-				["21341"] = 1,
-				["6796"] = 1,
-				["22246"] = 1,
-				["7052"] = 1,
-				["7055"] = 1,
-				["7057"] = 1,
-				["14046"] = 1,
-				["13871"] = 1,
-				["10044"] = 1,
-				["14111"] = 1,
-				["2582"] = 1,
-				["4238"] = 1,
-				["14112"] = 1,
-				["4305"] = 1,
-				["10033"] = 1,
-				["2584"] = 1,
-				["22249"] = 1,
-				["10035"] = 1,
-				["10021"] = 1,
-				["2570"] = 1,
-				["7061"] = 1,
-				["13867"] = 1,
-				["13856"] = 1,
-				["10052"] = 1,
-				["10025"] = 1,
-				["4339"] = 1,
-				["7065"] = 1,
-				["14048"] = 1,
-				["10046"] = 1,
-				["2578"] = 1,
-				["6263"] = 1,
-				["10053"] = 1,
-				["4316"] = 1,
-				["7064"] = 1,
-				["7056"] = 1,
-				["10018"] = 1,
-				["4334"] = 1,
-				["4309"] = 1,
-				["7046"] = 1,
-				["5763"] = 1,
-				["4310"] = 1,
-				["10019"] = 1,
-				["2572"] = 1,
-				["5542"] = 1,
-				["9998"] = 1,
-				["4336"] = 1,
-				["7063"] = 1,
-				["2568"] = 1,
-				["6240"] = 1,
-				["10054"] = 1,
-				["2575"] = 1,
-				["6241"] = 1,
-				["10047"] = 1,
-			},
-			["reagent"] = {
-				["6371"] = 1,
-				["4339"] = 1,
-				["4234"] = 1,
-				["10290"] = 1,
-				["2589"] = 1,
-				["2996"] = 1,
-				["14342"] = 1,
-				["13926"] = 1,
-				["7069"] = 1,
-				["7068"] = 1,
-				["8170"] = 1,
-				["14047"] = 1,
-				["6261"] = 1,
-				["20520"] = 1,
-				["14341"] = 1,
-				["7077"] = 1,
-				["4306"] = 1,
-				["2325"] = 1,
-				["2320"] = 1,
-				["4304"] = 1,
-				["7071"] = 1,
-				["2997"] = 1,
-				["4342"] = 1,
-				["7972"] = 1,
-				["7070"] = 1,
-				["8153"] = 1,
-				["12808"] = 1,
-				["929"] = 1,
-				["16203"] = 1,
-				["10286"] = 1,
-				["2321"] = 1,
-				["3577"] = 1,
-				["2604"] = 1,
-				["7067"] = 1,
-				["4337"] = 1,
-				["12662"] = 1,
-				["4291"] = 1,
-				["2319"] = 1,
-				["4305"] = 1,
-				["6260"] = 1,
-				["3827"] = 1,
-				["3383"] = 1,
-				["14256"] = 1,
-				["6037"] = 1,
-				["14048"] = 1,
-				["12810"] = 1,
-				["5500"] = 1,
-				["4338"] = 1,
-				["4340"] = 1,
-				["11137"] = 1,
-				["7910"] = 1,
-				["10285"] = 1,
-				["7078"] = 1,
-				["14344"] = 1,
-				["2324"] = 1,
-				["7080"] = 1,
-				["12809"] = 1,
-				["8343"] = 1,
-				["2605"] = 1,
-				["5498"] = 1,
-				["14227"] = 1,
-				["1529"] = 1,
-				["3829"] = 1,
-				["7079"] = 1,
-				["3182"] = 1,
-				["2318"] = 1,
-				["2592"] = 1,
-			},
-		},
-	};
-
-local TBag_DefaultSecond = {
-		["Cooking"] = {
-			["created"] = {
-				["2685"] = 1,
-				["12218"] = 1,
-				["6290"] = 1,
-				["3220"] = 1,
-				["3663"] = 1,
-				["5472"] = 1,
-				["13932"] = 1,
-				["20452"] = 1,
-				["2682"] = 1,
-				["13934"] = 1,
-				["5095"] = 1,
-				["12212"] = 1,
-				["12217"] = 1,
-				["12209"] = 1,
-				["1017"] = 1,
-				["12216"] = 1,
-				["6657"] = 1,
-				["16766"] = 1,
-				["3662"] = 1,
-				["2681"] = 1,
-				["12213"] = 1,
-				["2687"] = 1,
-				["5477"] = 1,
-				["13851"] = 1,
-				["18045"] = 1,
-				["12214"] = 1,
-				["13929"] = 1,
-				["21217"] = 1,
-				["3727"] = 1,
-				["5476"] = 1,
-				["13930"] = 1,
-				["3726"] = 1,
-				["13935"] = 1,
-				["2680"] = 1,
-				["3664"] = 1,
-				["21072"] = 1,
-				["2684"] = 1,
-				["6890"] = 1,
-				["6887"] = 1,
-				["4457"] = 1,
-				["13931"] = 1,
-				["5527"] = 1,
-				["6888"] = 1,
-				["724"] = 1,
-				["2683"] = 1,
-				["2888"] = 1,
-				["6038"] = 1,
-				["4594"] = 1,
-				["12215"] = 1,
-				["13933"] = 1,
-				["787"] = 1,
-				["12224"] = 1,
-				["12210"] = 1,
-				["733"] = 1,
-				["17222"] = 1,
-				["8364"] = 1,
-				["3666"] = 1,
-				["17197"] = 1,
-				["3729"] = 1,
-				["18254"] = 1,
-				["4593"] = 1,
-				["1082"] = 1,
-				["13927"] = 1,
-				["3665"] = 1,
-				["2679"] = 1,
-				["10841"] = 1,
-				["5479"] = 1,
-				["20074"] = 1,
-				["5525"] = 1,
-				["7676"] = 1,
-				["13928"] = 1,
-				["4592"] = 1,
-			},
-			["reagent"] = {
-				["5503"] = 1,
-				["3685"] = 1,
-				["3667"] = 1,
-				["12205"] = 1,
-				["13760"] = 1,
-				["21153"] = 1,
-				["3713"] = 1,
-				["2674"] = 1,
-				["3404"] = 1,
-				["159"] = 1,
-				["7974"] = 1,
-				["6308"] = 1,
-				["21071"] = 1,
-				["17194"] = 1,
-				["2894"] = 1,
-				["20424"] = 1,
-				["6522"] = 1,
-				["4603"] = 1,
-				["1015"] = 1,
-				["12207"] = 1,
-				["6289"] = 1,
-				["1080"] = 1,
-				["5468"] = 1,
-				["729"] = 1,
-				["4402"] = 1,
-				["12203"] = 1,
-				["5469"] = 1,
-				["1468"] = 1,
-				["769"] = 1,
-				["13889"] = 1,
-				["6362"] = 1,
-				["3174"] = 1,
-				["1179"] = 1,
-				["12204"] = 1,
-				["12208"] = 1,
-				["2675"] = 1,
-				["6291"] = 1,
-				["12206"] = 1,
-				["6303"] = 1,
-				["12037"] = 1,
-				["4536"] = 1,
-				["2692"] = 1,
-				["3172"] = 1,
-				["3173"] = 1,
-				["13758"] = 1,
-				["731"] = 1,
-				["3730"] = 1,
-				["2452"] = 1,
-				["13755"] = 1,
-				["2673"] = 1,
-				["3731"] = 1,
-				["5504"] = 1,
-				["730"] = 1,
-				["2678"] = 1,
-				["13756"] = 1,
-				["2886"] = 1,
-				["6889"] = 1,
-				["5470"] = 1,
-				["2665"] = 1,
-				["12184"] = 1,
-				["2596"] = 1,
-				["1081"] = 1,
-				["723"] = 1,
-				["3712"] = 1,
-				["13888"] = 1,
-				["8365"] = 1,
-				["18255"] = 1,
-				["13759"] = 1,
-				["4655"] = 1,
-				["2251"] = 1,
-				["12223"] = 1,
-				["13754"] = 1,
-				["12202"] = 1,
-				["2672"] = 1,
-				["6361"] = 1,
-				["2924"] = 1,
-				["13893"] = 1,
-				["2677"] = 1,
-				["3821"] = 1,
-				["5465"] = 1,
-			},
-		},
-		["First Aid"] = {
-			["created"] = {
-				["14530"] = 1,
-				["1251"] = 1,
-				["6451"] = 1,
-				["6450"] = 1,
-				["2581"] = 1,
-				["3530"] = 1,
-				["8545"] = 1,
-				["3531"] = 1,
-				["6452"] = 1,
-				["14529"] = 1,
-				["19440"] = 1,
-				["8544"] = 1,
-			},
-			["reagent"] = {
-				["19441"] = 1,
-				["2589"] = 1,
-				["2592"] = 1,
-				["14047"] = 1,
-				["4306"] = 1,
-				["4338"] = 1,
-				["1475"] = 1,
-			},
-		},
-	};
-
-local TBag_DefaultSkills = {
-		["Mining"] = {
-			["created"] = {
-				["3859"] = 1,
-				["2842"] = 1,
-				["3860"] = 1,
-				["2841"] = 1,
-				["2840"] = 1,
-				["3576"] = 1,
-				["3575"] = 1,
-				["3577"] = 1,
-			},
-			["reagent"] = {
-				["2772"] = 1,
-				["2840"] = 1,
-				["2775"] = 1,
-				["2776"] = 1,
-				["3576"] = 1,
-				["3858"] = 1,
-				["2770"] = 1,
-				["2771"] = 1,
-				["3857"] = 1,
-				["3575"] = 1,
-			},
-		},
-		["Poisons"] = {
-			["created"] = {
-				["6949"] = 1,
-				["10918"] = 1,
-				["5237"] = 1,
-				["6947"] = 1,
-				["3775"] = 1,
-			},
-			["reagent"] = {
-				["3371"] = 1,
-				["2928"] = 1,
-				["5173"] = 1,
-				["2930"] = 1,
-				["3372"] = 1,
-			},
-		},
-	};
 
 
 -----------------------------------------------------------------------
@@ -1344,7 +140,6 @@ TBody_Slots = {
 };
 
 local TBAG_D_BAG = 69;    -- A dummy bag number for search format
-local TBAG_D_ITEMID = "6948";  -- A dummy itemlink for searching mail
 
 --[[ New data layout:
 
@@ -1367,12 +162,10 @@ function TBag_Init()
     TBagCfg = {};
     TBagCfg["Bnk"] = {};
     TBagCfg["Inv"] = {};
-    TBagCfg["Body"] = {};
-    TBagCfg[TBAG_S_TRADES] = TBag_DefaultTrades;
-    TBagCfg[TBAG_S_SECOND] = TBag_DefaultSecond;
-    TBagCfg[TBAG_S_SKILLS] = TBag_DefaultSkills;
   end
-
+  TBag_RefreshCreations(TBagCfg);
+  TBag_RefreshReagents(TBagCfg);
+  
   if (TBagInfo == nil) then
     TBagInfo = {};
   end
@@ -1388,11 +181,9 @@ function TBag_Init()
   if (TBodyItm == nil) then
     TBodyItm = {};
   end
-  if (TMailItm == nil) then
+  if (TMailItm == nil or TMailItm[TBAG_S_VERSION] ~= 1) then
     TMailItm = {};
-  end
-  if (TItmNameIDMap == nil) then
-    TItmNameIDMap = {};
+    TMailItm[TBAG_S_VERSION] = 1;
   end
 
   -- Set up the main player arrays
@@ -1422,7 +213,6 @@ function TBag_Init()
   end
   if (TMailItm[TBAG_PLAYERID] == nil) then
     TMailItm[TBAG_PLAYERID] = {};
-    TMailItm[TBAG_PLAYERID][TBAG_D_BAG] = {};
   end
 
   -- Force the KEYRING_CONTAINER frame's id to -2.  Can't set frames to
@@ -1434,6 +224,9 @@ function TBag_Init()
   group = TBagInfo[TBAG_PLAYERID][TBAG_G_BASIC];
   _, group[TBAG_S_CLASS] = UnitClass("player");
 
+  -- Cleanout old trash
+  TBag_CleanConfig();
+  
   -- And reset the keybinding, if need be
   LoadAddOn("Blizzard_BindingUI");
 end
@@ -1498,7 +291,7 @@ function TBag_ReverseString(strtorev,toggle)
 
   if toggle==2 then
   repeat
-    s1, s2 = TBag_SplitSpace(s2);
+    s1, s2 = TBag_SplitStr(s2," ");
     if out == "" then
       out = s1..out;
     else
@@ -1530,14 +323,6 @@ function TBag_InitPlayerInfo(playerid)
   TBagInfo[playerid][TBAG_S_SKILLS] = {};
 
   TBagInfo[playerid][TBAG_G_BASIC] = {};
-  TBagInfo[playerid][TBAG_G_XP] = {};
-  TBagInfo[playerid][TBAG_G_PVP] = {};
-  TBagInfo[playerid][TBAG_G_STATS] = {};
-  TBagInfo[playerid][TBAG_G_RESISTS] = {};
-  TBagInfo[playerid][TBAG_G_COMBAT] = {};
-  TBagInfo[playerid][TBAG_G_MELEE] = {};
-  TBagInfo[playerid][TBAG_G_RANGE] = {};
-  TBagInfo[playerid][TBAG_G_SPELL] = {};
 end
 
 function TBag_GetPlayer(playerid)
@@ -1588,11 +373,11 @@ function TBag_SetPlayerBagCfg(playerid, bag, name, val)
   TBag_GetPlayerBag(playerid, bag)[name] = val;
 end
 
-function TBag_SplitSpace(strtosplit)
+function TBag_SplitStr(strtosplit,splitchar)
   if (strtosplit) then
     local str1 = strtosplit;
     local str2 = "";
-    local idx = strfind(strtosplit, " ");
+    local idx = strfind(strtosplit, splitchar, 1, true);
 
     if ( idx ) then
       str1 = strsub(strtosplit, 1, idx-1);
@@ -1727,34 +512,35 @@ function TBag_GetItemID(link)
   end
 end
 
-function TBag_GetItemIDFromName(name)
-  -- First raid ItemSync if we can
-  if (ISyncDB_Names) then
-    for itemid, itemname in pairs(ISyncDB_Names) do
-      if (itemname and name == itemname) then
-        return tostring(itemid);
-      end
-    end
+function TBag_CleanConfig()
+  TBagCfg["Body"] = nil;
+  TBagCfg["TInv_RegisterHooks"] = nil;
+  TBagCfg["Inv"]["show_top_gfx"] = nil;
+  TBagCfg["Inv"]["show_top_graphics"] = nil;
+  TBagCfg["Bnk"]["show_top_gfx"] = nil;
+  TBagCfg["Bnk"]["show_top_graphics"] = nil;
+  for player,_ in pairs(TBagInfo) do
+    TBagInfo[player]["spell"] = nil;
+    TBagInfo[player]["combat"] = nil;
+    TBagInfo[player]["xp"] = nil;
+    TBagInfo[player]["resist"] = nil;
+    TBagInfo[player]["range"] = nil;
+    TBagInfo[player]["melee"] = nil;
+    TBagInfo[player]["stat"] = nil;
+    TBagInfo[player]["pvp"] = nil;
   end
-
-  -- Then check our homebrewed cache if need be
-  if (TItmNameIDMap[name]) then
-    return TItmNameIDMap[name];
-  end
-
-  -- Do a brute force search over all items, and cache the result
-  for itemid = 1, 30000 do
-    itemname = GetItemInfo(itemid)
-      if (itemname and name == itemname) then
-        TItmNameIDMap[name] = tostring(itemid);
-        return tostring(itemid);
-	  end
-  end
-
-  -- Well, return something
-  return TBAG_D_ITEMID;
 end
 
+function TBag_BagSlotToString(bag,slot)
+  return bag.."."..slot;
+end
+
+function TBag_StringToBagSlot(string)
+  local bag,slot;
+
+  bag,slot = TBag_SplitStr(string,'.');
+  return tonumber(bag),tonumber(slot);
+end
 
 -----------------------------------------------------------------------
 -- Searching
@@ -2012,7 +798,9 @@ function TBag_SetDefLayout(cfg, bagarr, row1offset, reset)
 
 -- Eighth default line (top) - Empty and Act Ons
   TBag_SetCatBar(cfg, "EMPTY_AMMO_SLOTS", 32, reset);
+  TBag_SetCatBar(cfg, "EMPTY_QUIV_SLOTS", 32, reset);
   TBag_SetCatBar(cfg, "IN_AMMO_BAG", 32, reset);
+  TBag_SetCatBar(cfg, "IN_QUIV_BAG", 32, reset);
   TBag_SetCatBar(cfg, "EMPTY_SOUL_SLOTS", 32, reset);
   TBag_SetCatBar(cfg, "IN_SOUL_BAG", 32, reset);
   -- arrows and bullets that AREN'T in your shot bags
@@ -2043,6 +831,8 @@ function TBag_SetDefLayout(cfg, bagarr, row1offset, reset)
   TBag_SetCatBar(cfg, "THORIUM_BROTHER", 27, reset);
   TBag_SetCatBar(cfg, "TIMBERMAW", 27, reset);
   TBag_SetCatBar(cfg, "KEY_QUEST", 27, reset);
+  TBag_SetCatBar(cfg, "CENARION_EXPEDITION", 27, reset);
+  TBag_SetCatBar(cfg, "SPOREGGAR", 27, reset);
 
   TBag_SetCatBar(cfg, "IN_KEYRING_BAG", 26, reset);
   TBag_SetCatBar(cfg, "EMPTY_KEYRING_SLOTS", 26, reset);
@@ -2060,15 +850,23 @@ function TBag_SetDefLayout(cfg, bagarr, row1offset, reset)
 
 -- Sixth default line - Collectibles 
   TBag_SetCatBar(cfg, "ARGENT_DAWN", 24, reset);
+  TBag_SetCatBar(cfg, "ALDOR", 24, reset);
+  TBag_SetCatBar(cfg, "SCRYER", 24, reset);
+  TBag_SetCatBar(cfg, "SHA'TAR", 24, reset);
+  TBag_SetCatBar(cfg, "LOWER_CITY", 24, reset);
 
   TBag_SetCatBar(cfg, "AHN_QIRAJ", 23, reset);
   TBag_SetCatBar(cfg, "CENARION_CIRCLE", 23, reset);
+  TBag_SetCatBar(cfg, "NETHERWING", 23, reset);
 
   TBag_SetCatBar(cfg, "BLACKWING_LAIR", 22, reset);
   TBag_SetCatBar(cfg, "DARKMOON_FAIRE", 22, reset);
+  TBag_SetCatBar(cfg, "OGRI'LA", 22, reset);
 
   TBag_SetCatBar(cfg, "MOLTEN_CORE", 21, reset);
   TBag_SetCatBar(cfg, "ZUL_GURUB", 21, reset);
+  TBag_SetCatBar(cfg, "CONSORTIUM", 21, reset);
+  TBag_SetCatBar(cfg, "HALAA", 21, reset);
 
 -- Fifth default line - To Sell
   TBag_SetCatBar(cfg, "REAGENT", 20, reset);
@@ -2080,6 +878,7 @@ function TBag_SetDefLayout(cfg, bagarr, row1offset, reset)
   TBag_SetCatBar(cfg, "ENGINEERING", 19, reset);
   TBag_SetCatBar(cfg, "JEWELCRAFTING", 19, reset);
   TBag_SetCatBar(cfg, "LEATHERWORKING", 19, reset);
+  TBag_SetCatBar(cfg, "MINING", 19, reset);
   TBag_SetCatBar(cfg, "POISONS", 19, reset);
   TBag_SetCatBar(cfg, "TAILORING", 19, reset);
 
@@ -2087,14 +886,35 @@ function TBag_SetDefLayout(cfg, bagarr, row1offset, reset)
   TBag_SetCatBar(cfg, "RING", 18, reset);
   TBag_SetCatBar(cfg, "TRINKET", 18, reset);
 
+  TBag_SetCatBar(cfg, "01_HEAD", 17, reset);
+  TBag_SetCatBar(cfg, "02_NECK", 17, reset);
+  TBag_SetCatBar(cfg, "03_SHOULDER", 17, reset);
+  TBag_SetCatBar(cfg, "04_BACK", 17, reset);
+  TBag_SetCatBar(cfg, "05_CHEST", 17, reset);
+  TBag_SetCatBar(cfg, "06_SHIRT", 17, reset);
+  TBag_SetCatBar(cfg, "07_TABARD", 17, reset);
+  TBag_SetCatBar(cfg, "08_WRIST", 17, reset);
+  TBag_SetCatBar(cfg, "09_HANDS", 17, reset);
+  TBag_SetCatBar(cfg, "10_WAIST", 17, reset);
+  TBag_SetCatBar(cfg, "11_LEGS", 17, reset);
+  TBag_SetCatBar(cfg, "12_FEET", 17, reset);
+  TBag_SetCatBar(cfg, "13_OFFHAND", 17, reset);
   TBag_SetCatBar(cfg, "ARMOR", 17, reset);
   TBag_SetCatBar(cfg, "WEAPON", 17, reset);
 
 -- Fourth default line - To Use or Sell
   TBag_SetCatBar(cfg, "TRADE1", 16, reset);
   TBag_SetCatBar(cfg, "TRADE2", 16, reset);
-  TBag_SetCatBar(cfg, "EMPTY_PROF_SLOTS", 16, reset);
-  TBag_SetCatBar(cfg, "IN_PROF_BAG", 16, reset);
+  TBag_SetCatBar(cfg, "IN_ENCH_BAG", 16, reset);
+  TBag_SetCatBar(cfg, "IN_ENG_BAG", 16, reset);
+  TBag_SetCatBar(cfg, "IN_GEM_BAG", 16, reset);
+  TBag_SetCatBar(cfg, "IN_HERB_BAG", 16, reset);
+  TBag_SetCatBar(cfg, "IN_MINE_BAG", 16, reset);
+  TBag_SetCatBar(cfg, "EMPTY_ENCH_SLOTS", 16, reset);
+  TBag_SetCatBar(cfg, "EMPTY_ENG_SLOTS", 16, reset);
+  TBag_SetCatBar(cfg, "EMPTY_GEM_SLOTS", 16, reset);
+  TBag_SetCatBar(cfg, "EMPTY_HERB_SLOTS", 16, reset);
+  TBag_SetCatBar(cfg, "EMPTY_MINE_SLOTS", 16, reset);
 
   TBag_SetCatBar(cfg, "CLOTH", 15, reset);
   TBag_SetCatBar(cfg, "FIRST_AID", 15, reset);
@@ -2104,6 +924,19 @@ function TBag_SetDefLayout(cfg, bagarr, row1offset, reset)
   TBag_SetCatBar(cfg, "SOULBOUND_RING", 14, reset);
   TBag_SetCatBar(cfg, "SOULBOUND_TRINKET", 14, reset);
 
+  TBag_SetCatBar(cfg, "SOULBOUND_01_HEAD", 13, reset);
+  TBag_SetCatBar(cfg, "SOULBOUND_02_NECK", 13, reset);
+  TBag_SetCatBar(cfg, "SOULBOUND_03_SHOULDER", 13, reset);
+  TBag_SetCatBar(cfg, "SOULBOUND_04_BACK", 13, reset);
+  TBag_SetCatBar(cfg, "SOULBOUND_05_CHEST", 13, reset);
+  TBag_SetCatBar(cfg, "SOULBOUND_06_SHIRT", 13, reset);
+  TBag_SetCatBar(cfg, "SOULBOUND_07_TABARD", 13, reset);
+  TBag_SetCatBar(cfg, "SOULBOUND_08_WRIST", 13, reset);
+  TBag_SetCatBar(cfg, "SOULBOUND_09_HANDS", 13, reset);
+  TBag_SetCatBar(cfg, "SOULBOUND_10_WAIST", 13, reset);
+  TBag_SetCatBar(cfg, "SOULBOUND_11_LEGS", 13, reset);
+  TBag_SetCatBar(cfg, "SOULBOUND_12_FEET", 13, reset);
+  TBag_SetCatBar(cfg, "SOULBOUND_13_OFFHAND", 13, reset);
   TBag_SetCatBar(cfg, "SOULBOUND_ARMOR", 13, reset);
   TBag_SetCatBar(cfg, "SOULBOUND_WEAPON", 13, reset);
   TBag_SetCatBar(cfg, "TRADE1_CREATED", 13, reset);
@@ -2122,6 +955,19 @@ function TBag_SetDefLayout(cfg, bagarr, row1offset, reset)
   TBag_SetCatBar(cfg, "EQUIPPED_TRINKET", 10, reset);
   TBag_SetCatBar(cfg, "EQUIPPED_OTHER", 10, reset);
 
+  TBag_SetCatBar(cfg, "EQUIPPED_01_HEAD", 9, reset);
+  TBag_SetCatBar(cfg, "EQUIPPED_02_NECK", 9, reset);
+  TBag_SetCatBar(cfg, "EQUIPPED_03_SHOULDER", 9, reset);
+  TBag_SetCatBar(cfg, "EQUIPPED_04_BACK", 9, reset);
+  TBag_SetCatBar(cfg, "EQUIPPED_05_CHEST", 9, reset);
+  TBag_SetCatBar(cfg, "EQUIPPED_06_SHIRT", 9, reset);
+  TBag_SetCatBar(cfg, "EQUIPPED_07_TABARD", 9, reset);
+  TBag_SetCatBar(cfg, "EQUIPPED_08_WRIST", 9, reset);
+  TBag_SetCatBar(cfg, "EQUIPPED_09_HANDS", 9, reset);
+  TBag_SetCatBar(cfg, "EQUIPPED_10_WAIST", 9, reset);
+  TBag_SetCatBar(cfg, "EQUIPPED_11_LEGS", 9, reset);
+  TBag_SetCatBar(cfg, "EQUIPPED_12_FEET", 9, reset);
+  TBag_SetCatBar(cfg, "EQUIPPED_13_OFFHAND", 9, reset);
   TBag_SetCatBar(cfg, "EQUIPPED_ARMOR", 9, reset);
   TBag_SetCatBar(cfg, "EQUIPPED_WEAPON", 9, reset);
 
@@ -2220,6 +1066,20 @@ function TBag_SetDefColors(cfg, reset)
   TBag_SetColor(cfg, "brdr_28", 0.8, 0.3, 0.9, TBAG_BRDR_A, reset);
 end
 
+function TBag_ResetSorts(cfg)
+  cfg["item_overrides"] = {};
+  cfg["item_search_list"] = TBag_DefaultSearchList;
+  
+  for key, value in ipairs(cfg["item_search_list"]) do
+    -- Localize all the string
+    cfg["item_search_list"][key][1] = TBag_Cat(value[1]);
+    cfg["item_search_list"][key][2] = TBag_Cat(value[2]);
+    cfg["item_search_list"][key][3] = TBag_Loc(value[3]);
+    cfg["item_search_list"][key][4] = TBag_Loc(value[4]);
+    cfg["item_search_list"][key][5] = TBag_Loc(value[5]);
+  end
+end
+
 -- set reset to 1 to restore all default values
 function TBag_InitDefVals(cfg, bagarr, row1offset, reset)
   local i, key, value;
@@ -2229,6 +1089,7 @@ function TBag_InitDefVals(cfg, bagarr, row1offset, reset)
   TBag_SetDef(cfg, "spotlight_open", 1, reset, TBag_NumFunc, 0, 1);
   TBag_SetDef(cfg, "spotlight_hover", 1, reset, TBag_NumFunc, 0, 1);
   TBag_SetDef(cfg, "show_blizzard_frames", 0, reset, TBag_NumFunc, 0, 1);
+  TBag_SetDef(cfg, "show_rarity_color", 1, reset, TBag_NumFunc, 0, 1);
 
   TBag_SetDef(cfg, "stack_auto", 1, reset, TBag_NumFunc, 0, 1);
   TBag_SetDef(cfg, "stack_resort", 1, reset, TBag_NumFunc, 0, 1);
@@ -2247,7 +1108,6 @@ function TBag_InitDefVals(cfg, bagarr, row1offset, reset)
   TBag_SetDef(cfg, "count_font_y", 2, reset, TBag_NumFunc, 0, TBAG_N_BUTTON_MAX);
   TBag_SetDef(cfg, "new_font", 12, reset, TBag_NumFunc, TBAG_N_FONT_MIN, TBAG_N_FONT_MAX);
 
-  TBag_SetDef(cfg, "show_top_gfx", 0, reset, TBag_NumFunc, 0, 1);
   TBag_SetDef(cfg, "show_bag_sizes", 0, reset, TBag_NumFunc, 0, 1);
   TBag_SetDef(cfg, "special_bag_sort", 1, reset, TBag_NumFunc, 0, 1);
   TBag_SetDef(cfg, "trade_created_sort", 0, reset, TBag_NumFunc, 0, 1);
@@ -2258,6 +1118,16 @@ function TBag_InitDefVals(cfg, bagarr, row1offset, reset)
   TBag_SetDef(cfg, TBAG_V_NEWOFF, "", reset);
   TBag_SetDef(cfg, "newItemTimeout", 60*3 , reset, TBag_NumFunc);   -- 3 hours for an item to lose "new" status
   TBag_SetDef(cfg, "recentTimeout", 10 , reset, TBag_NumFunc);  -- 10 minutes
+
+  TBag_SetDef(cfg, "show_userdropdown", 1, reset, TBag_NumFunc, 0, 1);
+  TBag_SetDef(cfg, "show_reloadbutton", 1, reset, TBag_NumFunc, 0, 1);
+  TBag_SetDef(cfg, "show_editbutton", 1, reset, TBag_NumFunc, 0, 1);
+  TBag_SetDef(cfg, "show_hilightbutton", 1, reset, TBag_NumFunc, 0, 1);
+  TBag_SetDef(cfg, "show_lockbutton", 1, reset, TBag_NumFunc, 0, 1);
+  TBag_SetDef(cfg, "show_closebutton", 1, reset, TBag_NumFunc, 0, 1);
+  TBag_SetDef(cfg, "show_total", 1, reset, TBag_NumFunc, 0, 1);
+  TBag_SetDef(cfg, "show_bagbuttons", 1, reset, TBag_NumFunc, 0, 1);
+  TBag_SetDef(cfg, "show_money", 1, reset, TBag_NumFunc, 0, 1);
 
   -- Do the layout
   TBag_SetDefLayout(cfg, bagarr, row1offset, reset);
@@ -2276,18 +1146,7 @@ function TBag_InitDefVals(cfg, bagarr, row1offset, reset)
   -- default item overrides
   TBag_SetDef(cfg, "itemoverride_loaddefaults", 1, reset, TBag_NumFunc, 0, 1);
   if (cfg["itemoverride_loaddefaults"] == 1) then
-    cfg["item_overrides"] = {};
-    cfg["item_search_list"] = TBag_DefaultSearchList;
-
-    for key, value in ipairs(cfg["item_search_list"]) do
-      -- Localize all the string
-      cfg["item_search_list"][key][1] = TBag_Cat(value[1]);
-      cfg["item_search_list"][key][2] = TBag_Cat(value[2]);
-      cfg["item_search_list"][key][3] = TBag_Loc(value[3]);
-      cfg["item_search_list"][key][4] = TBag_Loc(value[4]);
-      cfg["item_search_list"][key][5] = TBag_Loc(value[5]);
-    end
-
+    TBag_ResetSorts(cfg);
     cfg["itemoverride_loaddefaults"] = 0;
   end
 
@@ -2305,6 +1164,7 @@ function TBag_InitDefVals(cfg, bagarr, row1offset, reset)
   for i = 1, TBAG_BAR_MAX do
     TBag_SetGrpDef(cfg, TBAG_G_BAR_SORT, i, TBAG_SORTBY_NORM, reset, TBag_NumFunc, TBAG_SORTBY_MIN, TBAG_SORTBY_MAX);
     TBag_SetGrpDef(cfg, TBAG_G_USE_NEW, i, 1, reset, TBag_NumFunc, 0, 1);  
+    TBag_SetGrpDef(cfg, TBAG_G_BAR_HIDE, i, 0, reset, TBag_NumFunc, 0, 1);
   end
 
   if (reset == 1) then
@@ -2370,6 +1230,32 @@ function TBag_SetClassCats(cfg, playerid, reset)
   TBag_SetCatBar(cfg, "SHAMAN_TOOL", c["SHAMAN"], reset);
 end
 
+function TBag_PrintCachedCharacters()
+  DEFAULT_CHAT_FRAME:AddMessage(TBAG_SCP.."Character data cached for:", 1, 1, 1);
+  for key, value in pairs(TInvItm) do 
+    local player,realm = TBag_SplitStr(key,"|");
+    DEFAULT_CHAT_FRAME:AddMessage(player.." "..realm);
+  end
+end
+
+function TBag_DeleteCachedCharacter(char,realm)
+  local playerid = char.."|"..realm;
+  local found = 0;
+  if (TInvItm[playerid]) then
+    found = 1;
+  end 
+  TInvItm[playerid] = nil;
+  TBnkItm[playerid] = nil;
+  TContItm[playerid] = nil;
+  TBodyItm[playerid] = nil;
+  TMailItm[playerid] = nil;
+  TBagInfo[playerid] = nil;
+  if (found == 1 and TInvItm[playerid] == nil) then
+    DEFAULT_CHAT_FRAME:AddMessage(TBAG_SCP.."Removed cache for '"..playerid.."'", 1, 1, 1);
+  else
+    DEFAULT_CHAT_FRAME:AddMessage(TBAG_SCP.."Couldn't find and remove cache for '"..playerid.."'", 1, 1, 1);
+  end
+end
 
 -----------------------------------------------------------------------
 -- Categories and Bars
@@ -2497,12 +1383,24 @@ function TBag_GetBagType(playerid, bag)
       if (id) then 
 	    local name, itemType, subType = TBag_GetItemInfo(id);
         if (itemType == "Quiver") then 
-          type = "AMMO";
+	  if (subType == "Quiver") then
+	    type = "QUIV";
+	  elseif (subType == "Ammo Pouch") then
+            type = "AMMO";
+	  end
         elseif (itemType == "Container") then
           if (subType == "Soul Bag") then 
             type = "SOUL";
-          elseif (subType ~= "Bag") then
-            type = "PROF";
+	  elseif (subType == "Engineering Bag") then
+	    type = "ENG";
+	  elseif (subType == "Gem Bag") then
+	    type = "GEM";
+	  elseif (subType == "Herb Bag") then
+            type = "HERB";
+	  elseif (subType == "Mining Bag") then
+	    type = "MINE";
+	  elseif (subType == "Enchanting Bag") then
+            type = "ENCH";
           end
         end
         TBag_SetPlayerBagCfg(playerid, bag, TBAG_I_ITEMLINK, itemlink);
@@ -3245,6 +2143,66 @@ function TBag_MakeEmptySlot(itm)
   end
 end
 
+function TBag_InsertEmptySpec(emptyspec,itm)
+  if (itm == nil or type(itm) ~= "table") then
+    return;
+  end
+  if (emptyspec == nil) then
+    emptyspec = {};
+  end
+  if (itm[TBAG_I_BAGTYPE] and itm[TBAG_I_BAGTYPE] ~= "") then
+    table.insert(emptyspec, TBag_BagSlotToString(itm[TBAG_I_BAG],itm[TBAG_I_SLOT]));
+  end
+  return emptyspec
+end
+
+function TBag_InsertSpecItem(specitems,itm)
+  if (itm == nil or type(itm) ~= "table") then
+    return;
+  end
+  if (specitems == nil) then
+    specitems = {};
+  end
+  local bagtype = itm[TBAG_I_BAGTYPE];
+  if (bagtype == nil or bagtype == "") then
+    if (TBag_ContainerItems) then
+      for _,items in pairs(TBag_ContainerItems) do
+        if (type(items) == "table") then
+          if (items[itm[TBAG_I_ITEMID]] == 1) then
+            table.insert(specitems, TBag_BagSlotToString(itm[TBAG_I_BAG],itm[TBAG_I_SLOT]));
+          end
+        end
+      end
+    end
+  end
+  return specitems;
+end
+
+function TBag_InsertStackArr(stackarr,itm)
+  if (itm == nil or type(itm) ~= "table") then
+    return;
+  end
+  if (stackarr == nil) then
+    stackarr = {};
+  end
+  if (itm[TBAG_I_NEED] > 0) then
+    -- Check that we aren't on the skip list
+    if (TBag_GetStackSkip(itm[TBAG_I_BAG], itm[TBAG_I_SLOT]) == nil) then
+        TBag_PrintDEBUG("Stack inserting ("..itm[TBAG_I_BAG]..", "
+        ..itm[TBAG_I_SLOT]..") with need="..itm[TBAG_I_NEED]);
+      if (TBAG_NEW_STACK == 0) then
+        table.insert(stackarr, itm);
+      else
+        if (stackarr[itm[TBAG_I_ITEMID]] == nil) then
+          stackarr[itm[TBAG_I_ITEMID]] = {};
+        end
+	table.insert(stackarr[itm[TBAG_I_ITEMID]],itm);
+      end
+    end
+  end
+  return stackarr;
+end
+
 function TBag_UpdateItmCache(cfg, playerid, itmcache, bagarr, atbank)
   local bag, slot;  -- used as "for loop" counters
   local itm;    -- entry that will be written to the cache
@@ -3252,6 +2210,8 @@ function TBag_UpdateItmCache(cfg, playerid, itmcache, bagarr, atbank)
   local resort_suggested = 0;
   local resort_mandatory = 0;
   local stackarr = {};
+  local emptyspec = {};
+  local specitems = {};
 
   -- variables used in outer loop, bag:
   local size;
@@ -3297,6 +2257,7 @@ function TBag_UpdateItmCache(cfg, playerid, itmcache, bagarr, atbank)
             [TBAG_I_NEWSTR] = itmcache[bag][slot][TBAG_I_NEWSTR],
             [TBAG_I_CAT] = itmcache[bag][slot][TBAG_I_CAT],
             [TBAG_I_KEYWORD] = itmcache[bag][slot][TBAG_I_KEYWORD],
+	    [TBAG_I_SOULBOUND] = itmcache[bag][slot][TBAG_I_SOULBOUND],
             };
 
           if (itm[TBAG_I_ITEMLINK] ~= nil) then
@@ -3304,10 +2265,6 @@ function TBag_UpdateItmCache(cfg, playerid, itmcache, bagarr, atbank)
             itm[TBAG_I_ITEMID], itm[TBAG_I_ITEMLINK] = 
               TBag_GetItemID(itm[TBAG_I_ITEMLINK]);
 
-            local tooltip = TBag_MakeToolTipStr(playerid, itm[TBAG_I_ITEMLINK], bag, slot);
-            if (string.find(tooltip, "Soulbound")) then
-              itm[TBAG_I_SOULBOUND] = 1;
-            end
 
             local stacksize;
             itm[TBAG_I_NAME], itm[TBAG_I_TYPE], itm[TBAG_I_SUBTYPE], itm[TBAG_I_RARITY], _, stacksize = TBag_GetItemInfo(itm[TBAG_I_ITEMLINK]);
@@ -3317,23 +2274,25 @@ function TBag_UpdateItmCache(cfg, playerid, itmcache, bagarr, atbank)
             else
               itm[TBAG_I_NEED] = 0;
             end
+
+	    -- Items not in a special bag but that can go into one need to be
+	    -- added to the specitems table.
+	    specitems = TBag_InsertSpecItem(specitems,itm);
           else
             -- no item in bag, set it as empty
             TBag_MakeEmptySlot(itm);
 
             -- And always remove it from the stack skip list
             TBag_SetStackSkip(itm[TBAG_I_BAG], itm[TBAG_I_SLOT], nil);
+            TBag_SetCompSkip(itm[TBAG_I_BAG], itm[TBAG_I_SLOT], nil);
+
+	    -- Empty slots in special bags need to be added to the 
+	    -- compress arg.
+	    emptyspec = TBag_InsertEmptySpec(emptyspec,itm);
           end
 
           -- Put on the stack array if we need more to stack
-          if (itm[TBAG_I_NEED] > 0) then
-            -- Check that we aren't on the skip list
-            if (TBag_GetStackSkip(itm[TBAG_I_BAG], itm[TBAG_I_SLOT]) == nil) then
-              TBag_PrintDEBUG("Stack inserting ("..itm[TBAG_I_BAG]..", "
-                ..itm[TBAG_I_SLOT]..") with need="..itm[TBAG_I_NEED]);
-              table.insert(stackarr, itm);
-            end
-          end
+	  stackarr = TBag_InsertStackArr(stackarr,itm);
 
           if (itm[TBAG_I_BAR] == nil) then
             resort_mandatory = 1;
@@ -3349,8 +2308,13 @@ function TBag_UpdateItmCache(cfg, playerid, itmcache, bagarr, atbank)
             -- the item changed
             if (itm[TBAG_I_TIMESTAMP] ~= nil) then
               resort_suggested = 1;
-              itm[TBAG_I_TIMESTAMP] = GetTime();
+              itm[TBAG_I_TIMESTAMP] = time();
               itm[TBAG_I_NEWSTR] = TBAG_V_NEWON;
+	      TBAG_FORCED_SHOW[TBag_BagSlotToString(itm[TBAG_I_BAG],itm[TBAG_I_SLOT])] = 1
+            end
+            local tooltip = TBag_MakeToolTipStr(playerid, itm[TBAG_I_ITEMLINK], bag, slot);
+            if (string.find(tooltip, "Soulbound")) then
+              itm[TBAG_I_SOULBOUND] = 1;
             end
           else
             -- item has not changed, maybe the count did?
@@ -3361,7 +2325,7 @@ function TBag_UpdateItmCache(cfg, playerid, itmcache, bagarr, atbank)
               else
                 itm[TBAG_I_NEWSTR] = TBAG_V_NEWPLUS;
               end
-              itm[TBAG_I_TIMESTAMP] = GetTime();
+              itm[TBAG_I_TIMESTAMP] = time();
             end
           end
 
@@ -3382,11 +2346,11 @@ function TBag_UpdateItmCache(cfg, playerid, itmcache, bagarr, atbank)
   end
 
   if (resort_mandatory == 1) then
-    return TBAG_REQ_MUST, stackarr;
+    return TBAG_REQ_MUST, stackarr,emptyspec,specitems;
   elseif (resort_suggested == 1) then
-    return TBAG_REQ_PART, stackarr;
+    return TBAG_REQ_PART, stackarr,emptyspec,specitems;
   else
-    return TBAG_REQ_NONE, stackarr;
+    return TBAG_REQ_NONE, stackarr,emptyspec,specitems;
   end
 end
 
@@ -3400,6 +2364,11 @@ function TBag_SortItmCache(cfg, playerid, itmcache, baritm, bagarr)
   local barnum;
   local trade1, trade2 = TBag_GetTwoProfessions(playerid);
 
+  -- wipe the forced show table
+  for key,_ in pairs (TBAG_FORCED_SHOW) do
+    TBAG_FORCED_SHOW[key] = nil
+  end
+  
   -- wipe the current bar positions table
   baritm = {};
   for i = 1, TBAG_BAR_MAX do
@@ -3503,7 +2472,7 @@ function TBag_PickBar(cfg, playerid, itm, trade1, trade2)
     itm[TBAG_I_KEYWORD][TBAG_S_RARITY..itm[TBAG_I_RARITY]] = 1;
   end
 
-  TBag_MakeAllTradeKeywords(itm, cfg["trade_created_sort"]);
+  TBag_MakeAllTradeKeywords(itm, cfg["trade_created_sort"], trade1, trade2);
 
   if (trade1 ~= "") then
     TBag_SetCatBar(cfg, TBag_Cat(trade1), TBag_Cat("TRADE1"), 1);
@@ -3512,8 +2481,6 @@ function TBag_PickBar(cfg, playerid, itm, trade1, trade2)
     else
       TBag_SetCatBar(cfg, TBag_Cat(trade1).."_CREATED", nil, 1);
     end
-    TBag_MakeTradeKeyword(itm, TBag_Loc(trade1), TBag_Cat("TRADE1"), 
-      cfg["trade_created_sort"]);
   end
   if (trade2 ~= "") then
     TBag_SetCatBar(cfg, TBag_Cat(trade2), TBag_Cat("TRADE2"), 1);
@@ -3522,8 +2489,6 @@ function TBag_PickBar(cfg, playerid, itm, trade1, trade2)
     else
       TBag_SetCatBar(cfg, TBag_Cat(trade2).."_CREATED", nil, 1);
     end
-    TBag_MakeTradeKeyword(itm, TBag_Loc(trade2), TBag_Cat("TRADE2"), 
-      cfg["trade_created_sort"]);
   end
 
   if (itm[TBAG_I_SOULBOUND] == 1) then
@@ -3648,7 +2613,7 @@ function TBag_ScanMail()
   local itemLink, idx;
 
   -- Only scan if the number cached is different than the in our inbox
-  if (GetInboxNumItems() == table.getn(TMailItm[TBAG_PLAYERID][TBAG_D_BAG])) then
+  if (GetInboxNumItems() == table.getn(TMailItm[TBAG_PLAYERID])) then
 --    TBag_PrintDEBUG( "Aborting Mail Scan");
     return;
   end
@@ -3656,22 +2621,23 @@ function TBag_ScanMail()
 --  TBag_Print( "Scanning Mail: ");
 
   -- Arrange by player (for TMail)
---  CheckInbox();
-  TMailItm[TBAG_PLAYERID][TBAG_D_BAG] = {};
+  TMailItm[TBAG_PLAYERID] = {};
   for idx = 1, GetInboxNumItems() do
-    TMailItm[TBAG_PLAYERID][TBAG_D_BAG][idx] = {};
-    local itm = TMailItm[TBAG_PLAYERID][TBAG_D_BAG][idx];
-
-    local name, itemTexture, count, quality, canUse = GetInboxItem(idx);
-
-    -- Only count those mails with attachments
-    if ((name) and (count) and (count > 0)) then
-      itm[TBAG_I_NAME] = name;
-      itm[TBAG_I_COUNT] = count;
-
-      local itemid = TBag_GetItemIDFromName(name);
-      itm[TBAG_I_ITEMID] = itemid;
-      itm[TBAG_I_ITEMLINK] = "item:"..itemid..":0:0:0";
+    local _,_,_,_,_,_,_,itemCount,_,_,_,_,_ = GetInboxHeaderInfo(idx);
+    -- Only scan mail with attachments.
+    if (itemCount) then
+      TMailItm[TBAG_PLAYERID][idx] = {};
+      for slot = 1, itemCount do
+	TMailItm[TBAG_PLAYERID][idx][slot] = {};
+        local itm = TMailItm[TBAG_PLAYERID][idx][slot];
+        local name, itemTexture, count, quality, canUse = GetInboxItem(idx,slot);
+        local itemid,itemlink = TBag_GetItemID(GetInboxItemLink(idx,slot));
+         
+        itm[TBAG_I_NAME] = name;
+        itm[TBAG_I_COUNT] = count;
+        itm[TBAG_I_ITEMID] = itemid;
+        itm[TBAG_I_ITEMLINK] = itemlink; 
+      end
     end
   end
 end
@@ -3680,6 +2646,18 @@ end
 -----------------------------------------------------------------------
 -- Main Display
 -----------------------------------------------------------------------
+
+function TBag_UpdateLockedItem(playerid, button)
+  -- Another player's view never appears locked
+  local locked;
+  if (not button) then
+    return;
+  end
+  if (playerid == TBAG_PLAYERID) then
+    _, _, locked, _, _ = GetContainerItemInfo(button:GetParent():GetID(), button:GetID());
+  end
+  SetItemButtonDesaturated(button, locked, 0.5, 0.5, 0.5);
+end
 
 -- Make an inventory slot usable with the item specified in itm
 -- cache entry is the array that comes directly from the cache
@@ -3700,6 +2678,14 @@ function TBag_UpdateButton(cfg, playerid, framename, edit_mode,
 
   local texture;
 
+  if ( TBag_GetGrp(cfg, TBAG_G_BAR_HIDE, itm[TBAG_I_BAR]) == 1 and
+       TBAG_FORCED_SHOW[TBag_BagSlotToString(itm[TBAG_I_BAG],itm[TBAG_I_SLOT])] ~= 1) then
+    frame:Hide()
+    return
+  else
+    frame:Show()
+  end
+  
   if (itm[TBAG_I_ITEMLINK] ~= nil) then
     ic_start, ic_duration, ic_enable = GetContainerItemCooldown(itm[TBAG_I_BAG], itm[TBAG_I_SLOT]);
     texture  = TBag_GetItemTexture(itm[TBAG_I_ITEMLINK]);
@@ -3738,10 +2724,10 @@ function TBag_UpdateButton(cfg, playerid, framename, edit_mode,
     if ( TBag_GetGrp(cfg, TBAG_G_USE_NEW, itm[TBAG_I_BAR]) == 1 
     and (itm[TBAG_I_ITEMLINK] ~= nil) 
     and (itm[TBAG_I_TIMESTAMP]>1) 
-    and ((GetTime()-itm[TBAG_I_TIMESTAMP]) < 60*cfg["newItemTimeout"]) ) then
+    and ((time()-itm[TBAG_I_TIMESTAMP]) < 60*cfg["newItemTimeout"]) ) then
       -- item is still new, display the "new" text.
       frame_stock:SetText( cfg[itm[TBAG_I_NEWSTR]] );
-      if ( (GetTime()-itm[TBAG_I_TIMESTAMP]) < 60*cfg["recentTimeout"]) then
+      if ( (time()-itm[TBAG_I_TIMESTAMP]) < 60*cfg["recentTimeout"]) then
         TBag_ColorFont(cfg, frame_stock, frame_font, "recentitem");
       else
         TBag_ColorFont(cfg, frame_stock, frame_font, "newitem");
@@ -3764,15 +2750,15 @@ function TBag_UpdateButton(cfg, playerid, framename, edit_mode,
       end
     end
 
-    TBag_SetRarityColor(itm[TBAG_I_RARITY], framename);
+    if (cfg["show_rarity_color"] == 1) then
+      TBag_SetRarityColor(itm[TBAG_I_RARITY], framename);
+    else
+      TBag_SetRarityColor(nil, framename);
+    end
   end
 
-  -- Another player's view never appears locked
-  local locked;
-  if (playerid == TBAG_PLAYERID) then
-    _, _, locked, _, _ = GetContainerItemInfo(itm[TBAG_I_BAG], itm[TBAG_I_SLOT]);
-  end
-  SetItemButtonDesaturated(frame, locked, 0.5, 0.5, 0.5);
+  -- Handle desaturation update for locked status
+  TBag_UpdateLockedItem(playerid, frame);
 
   -- resize and position fonts
   frame_font:SetTextHeight( math.ceil(cfg["count_font"]) );  -- count, bottomright
@@ -3952,12 +2938,7 @@ function TBag_LayoutWindow(cfg, framename, baritm, bar_x, edit_mode, buttonmax, 
   end
 
   local new_height;
-  
-  if (cfg["show_top_graphics"] == 1) then
-    new_height = cur_y + TBAG_PAD_TOP_GFX + sy(1) + py(1) + TBAG_BORDER;
-  else
-    new_height = cur_y + TBAG_PAD_TOP_NORM + sy(1) + py(1) + TBAG_BORDER;
-  end
+  new_height = cur_y + TBAG_PAD_TOP_NORM + sy(1) + py(1) + TBAG_BORDER;
 
   frame:SetWidth( available_width );
   frame:SetHeight( new_height );
@@ -3976,77 +2957,184 @@ function TBag_IsStacking()
 end
 
 -- sa = stackarr, shortened to make the code manageable
-function TBag_Stack(itmcache, sa)
+function TBag_Stack(itmcache, sa, emptyspec, specitems)
   local hasstacked;
-  if (sa) then
-    local sn = table.getn(sa);
-    TBag_PrintDEBUG("Stacking!  Array size = "..sn);
-
-    TBAG_ISSTACKING = 1;
-
-    -- For every need, try to find a count that matches it
-    for k_c = 1, sn do
-      for k_n = 1, sn do
-        if (k_n ~= k_c) and (sa[k_c]) and (sa[k_n]) then
-          -- Find matching items
-          if (sa[k_c][TBAG_I_ITEMID]) and (sa[k_n][TBAG_I_ITEMID]) 
-            and (sa[k_n][TBAG_I_ITEMID] == sa[k_c][TBAG_I_ITEMID]) 
-            -- That aren't on the skip list
-            and (not TBag_GetStackSkip(sa[k_c][TBAG_I_BAG], sa[k_c][TBAG_I_SLOT])) 
-            and (not TBag_GetStackSkip(sa[k_n][TBAG_I_BAG], sa[k_n][TBAG_I_SLOT])) then
-
-          if (sa[k_n][TBAG_I_NEED] <= sa[k_c][TBAG_I_NEED]) 
-            and (sa[k_n][TBAG_I_NEED] > 0) then
-
-            -- If one stack will fit on the other, drop it onto it
-            if (sa[k_n][TBAG_I_COUNT] <= sa[k_c][TBAG_I_NEED]) then
-              -- Drop one onto the other
-	      ClearCursor();
-              PickupContainerItem(sa[k_n][TBAG_I_BAG], sa[k_n][TBAG_I_SLOT]);
-              PickupContainerItem(sa[k_c][TBAG_I_BAG], sa[k_c][TBAG_I_SLOT]);
-	      ClearCursor();
-
-              -- Update the count totals
-              sa[k_c][TBAG_I_COUNT] = sa[k_c][TBAG_I_COUNT] + sa[k_n][TBAG_I_COUNT];
-              sa[k_c][TBAG_I_NEED] = sa[k_c][TBAG_I_NEED] - sa[k_n][TBAG_I_COUNT];
-              
-              -- And empty out the dropped slot
-              TBag_MakeEmptySlot(itmcache[sa[k_n][TBAG_I_BAG]][sa[k_n][TBAG_I_SLOT]]);
-              TBag_SetStackSkip(sa[k_n][TBAG_I_BAG], sa[k_n][TBAG_I_SLOT], nil);
-              sa[k_n] = nil;
-              
-            -- Otherwise, split the smaller stack to complete the larger
-            elseif (sa[k_n][TBAG_I_COUNT] > sa[k_c][TBAG_I_NEED]) then
-              -- Split one and drop onto the other
-	      ClearCursor();
-              SplitContainerItem(sa[k_n][TBAG_I_BAG], sa[k_n][TBAG_I_SLOT], sa[k_c][TBAG_I_NEED]);
-              PickupContainerItem(sa[k_c][TBAG_I_BAG], sa[k_c][TBAG_I_SLOT]);
-	      ClearCursor();
-
-              -- Update the count totals
-              sa[k_n][TBAG_I_COUNT] = sa[k_n][TBAG_I_COUNT] - sa[k_c][TBAG_I_NEED];
-              sa[k_n][TBAG_I_NEED] = sa[k_n][TBAG_I_NEED] + sa[k_c][TBAG_I_NEED];
-              sa[k_c][TBAG_I_COUNT] = sa[k_c][TBAG_I_COUNT] + sa[k_c][TBAG_I_NEED];
-              sa[k_c][TBAG_I_NEED] = sa[k_c][TBAG_I_NEED] - sa[k_c][TBAG_I_NEED];
-            end
+  
+  if TBAG_NEW_STACK == 0 then
+    if (sa) then
+      local sn = table.getn(sa);
+      TBag_PrintDEBUG("Stacking!  Array size = "..sn);
+    
+      TBAG_ISSTACKING = 1;
+    
+      -- For every need, try to find a count that matches it
+      for k_c = 1, sn do
+        for k_n = 1, sn do
+          if (k_n ~= k_c) and (sa[k_c]) and (sa[k_n]) then
+            -- Find matching items
+            if (sa[k_c][TBAG_I_ITEMID]) and (sa[k_n][TBAG_I_ITEMID])
+              and (sa[k_n][TBAG_I_ITEMID] == sa[k_c][TBAG_I_ITEMID])
+              -- That aren't on the skip list
+              and (not TBag_GetStackSkip(sa[k_c][TBAG_I_BAG], sa[k_c][TBAG_I_SLOT]))
+              and (not TBag_GetStackSkip(sa[k_n][TBAG_I_BAG], sa[k_n][TBAG_I_SLOT])) then
             
-            -- Make sure to clear the skip list
-            TBag_SetStackSkip(sa[k_c][TBAG_I_BAG], sa[k_c][TBAG_I_SLOT], nil);
-
-            -- If we've completed this stack, remove it from consideration
-            if (sa[k_c][TBAG_I_NEED] == 0) then
-              sa[k_c] = nil;
+            if (sa[k_n][TBAG_I_NEED] <= sa[k_c][TBAG_I_NEED])
+              and (sa[k_n][TBAG_I_NEED] > 0) then
+            
+              -- If one stack will fit on the other, drop it onto it
+              if (sa[k_n][TBAG_I_COUNT] <= sa[k_c][TBAG_I_NEED]) then
+                -- Drop one onto the other 
+                ClearCursor();
+                PickupContainerItem(sa[k_n][TBAG_I_BAG], sa[k_n][TBAG_I_SLOT]);
+                PickupContainerItem(sa[k_c][TBAG_I_BAG], sa[k_c][TBAG_I_SLOT]);
+                ClearCursor();
+              
+                -- Update the count totals
+                sa[k_c][TBAG_I_COUNT] = sa[k_c][TBAG_I_COUNT] + sa[k_n][TBAG_I_COUNT];
+                sa[k_c][TBAG_I_NEED] = sa[k_c][TBAG_I_NEED] - sa[k_n][TBAG_I_COUNT];
+              
+                -- And empty out the dropped slot
+                TBag_MakeEmptySlot(itmcache[sa[k_n][TBAG_I_BAG]][sa[k_n][TBAG_I_SLOT]]);
+                TBag_SetStackSkip(sa[k_n][TBAG_I_BAG], sa[k_n][TBAG_I_SLOT], nil);
+                sa[k_n] = nil;
+              
+              -- Otherwise, split the smaller stack to complete the larger
+              elseif (sa[k_n][TBAG_I_COUNT] > sa[k_c][TBAG_I_NEED]) then
+                -- Split one and drop onto the other
+                ClearCursor();
+                SplitContainerItem(sa[k_n][TBAG_I_BAG], sa[k_n][TBAG_I_SLOT], sa[k_c][TBAG_I_NEED]);
+                PickupContainerItem(sa[k_c][TBAG_I_BAG], sa[k_c][TBAG_I_SLOT]);
+                ClearCursor();
+              
+                -- Update the count totals
+                sa[k_n][TBAG_I_COUNT] = sa[k_n][TBAG_I_COUNT] - sa[k_c][TBAG_I_NEED];
+                sa[k_n][TBAG_I_NEED] = sa[k_n][TBAG_I_NEED] + sa[k_c][TBAG_I_NEED];
+                sa[k_c][TBAG_I_COUNT] = sa[k_c][TBAG_I_COUNT] + sa[k_c][TBAG_I_NEED];
+                sa[k_c][TBAG_I_NEED] = sa[k_c][TBAG_I_NEED] - sa[k_c][TBAG_I_NEED];
+              end
+            
+              -- Make sure to clear the skip list
+              TBag_SetStackSkip(sa[k_c][TBAG_I_BAG], sa[k_c][TBAG_I_SLOT], nil);
+            
+              -- If we've completed this stack, remove it from consideration
+              if (sa[k_c][TBAG_I_NEED] == 0) then
+                sa[k_c] = nil;
+              end
+            
+              hasstacked = 1;
             end
-
-            hasstacked = 1;
           end
         end
       end
     end
-  end 
-  end
+    end
+    TBAG_ISSTACKING = nil;
+  else 
+    -- BEGIN NEW STACK ALGORITHM. /cheer
+    TBAG_ISSTACKING = 1;
+    -- Iterate the list of items that can be stacked
+    for itemid,itms in pairs(sa) do
+      -- Sort the list of slots with the item in it by how
+      -- big the stack is in descending order give
+      -- precedence to items in special bags.
+      table.sort(itms,
+        function(a,b)
+	  if (a[TBAG_I_COUNT] == b[TBAG_I_COUNT]) then
+	    return (a[TBAG_I_BAGTYPE] or "") > (b[TBAG_I_BAGTYPE] or "")
+	  else
+            return a[TBAG_I_COUNT] > b[TBAG_I_COUNT];
+	  end
+	end);
+      
+      -- We start filling the largest stacks and pulling
+      -- from the smallest stacks
+      local dest = 1;
+      local src = #itms;
+    
+      -- Unless there's more than one entry there's nothing to do.
+      if (src > 1) then
+	-- If the src and the dest are equal or have crossed each
+	-- other we're done.
+        while (src > dest) do
+          local srcitm = itms[src];
+          local destitm = itms[dest];
 
-  TBAG_ISSTACKING = nil;
+          if (destitm[TBAG_I_NEED] >= srcitm[TBAG_I_COUNT]) then
+            -- Source will be used up filling dest. 
+            TBag_ItemMover(srcitm[TBAG_I_BAG], srcitm[TBAG_I_SLOT],
+                           destitm[TBAG_I_BAG], destitm[TBAG_I_SLOT]);
+            
+            -- Update counts
+            destitm[TBAG_I_NEED] = destitm[TBAG_I_NEED] - srcitm[TBAG_I_COUNT];
+	    destitm[TBAG_I_COUNT] = destitm[TBAG_I_COUNT] + srcitm[TBAG_I_COUNT];
+
+	    -- source is now empty
+	    TBag_MakeEmptySlot(srcitm);
+            -- Push empty slots onto the empty list for possible compression 
+            emptyspec = TBag_InsertEmptySpec(emptyspec,srcitm);
+	    -- Move on to the next source stack
+	    src = src - 1;
+          else 
+	    -- Source is larger than the destination need
+	    TBag_ItemMover(srcitm[TBAG_I_BAG], srcitm[TBAG_I_SLOT],
+	                   destitm[TBAG_I_BAG], destitm[TBAG_I_SLOT],
+	  		   destitm[TBAG_I_NEED]);
+
+	    -- Update counts
+	    destitm[TBAG_I_NEED] = 0;
+	    destitm[TBAG_I_COUNT] = destitm[TBAG_I_COUNT] + destitm[TBAG_I_NEED];
+	    srcitm[TBAG_I_NEED] = srcitm[TBAG_I_NEED] + destitm[TBAG_I_NEED];
+	    srcitm[TBAG_I_NEED] = srcitm[TBAG_I_COUNT] - destitm[TBAG_I_NEED];
+          end
+	  -- Destination full move to the next one.
+	  if (destitm[TBAG_I_NEED] == 0) then
+	    dest = dest + 1;
+	  end
+	  hasstacked = 1;
+        end
+      end
+    end
+    if (emptyspec and type(emptyspec) == "table" and
+        specitems and type(specitems) == "table") then
+      local empty_size = table.getn(emptyspec);
+      local items_size = table.getn(specitems);
+
+      for empty = 1, empty_size do
+        if (emptyspec[empty]) then
+	  local emptybag,emptyslot = TBag_StringToBagSlot(emptyspec[empty]);
+          local emptyitm = itmcache[emptybag][emptyslot];
+          for item = 1, items_size do
+            if (specitems[item]) then
+	      local itembag,itemslot = TBag_StringToBagSlot(specitems[item]);
+              local itemitm = itmcache[itembag][itemslot]; 
+  	      if (not TBag_GetCompSkip(emptybag,emptyslot) and
+                  not TBag_GetCompSkip(itembag,itemslot)) then
+	        local bagtype = emptyitm[TBAG_I_BAGTYPE];
+                if (TBag_ContainerItems and TBag_ContainerItems[bagtype]) then
+	          -- Does the item go into this bag type?
+	          if (TBag_ContainerItems[bagtype][itemitm[TBAG_I_ITEMID]]) then
+                    -- Drop one onto the other
+		    TBag_ItemMover(itembag,itemslot,emptybag,emptyslot);
+            
+                    -- Empty out the dropped slot in the itmcache
+                    TBag_MakeEmptySlot(itmcache[itemitm[TBAG_I_BAG]][itemitm[TBAG_I_SLOT]]);
+
+		    -- Remove the item from consideration
+	            specitems[item] = nil; 
+		    break;
+	          end
+	        end
+	      end
+            end
+          end
+        end
+      end
+    end
+
+    -- TAB_ISSTACKING gets cleared by the item mover coroutine for us.
+    -- Has to stay on until coroutine finishes otherwise we end up with
+    -- the stack and compress fighting each other.
+  end
 
   return hasstacked;
 end
@@ -4076,6 +3164,26 @@ function TBag_SetStackSkip(bag, slot, val)
 --  end
 end
 
+local TBAG_COMPSKIP = {};
+
+function TBag_ClearCompSkip(bagarr)
+  TBag_ClearItmCache(TBAG_COMPSKIP, bagarr);
+end
+
+function TBag_GetCompSkip(bag, slot)
+  if (TBAG_COMPSKIP[bag] == nil) then
+    TBAG_COMPSKIP[bag] = {};
+  end
+  return TBAG_COMPSKIP[bag][slot];
+end
+
+function TBag_SetCompSkip(bag, slot, val)
+  if (TBAG_COMPSKIP[bag] == nil) then
+    TBAG_COMPSKIP[bag] = {};
+  end
+  TBAG_COMPSKIP[bag][slot] = val;
+end
+
 function TBag_SplitContainerItem(bag, slot, split)
   -- Put this slot on the black list
   TBag_SetStackSkip(bag, slot, 1);
@@ -4090,10 +3198,81 @@ function TBag_PickupContainerItem(bag, slot)
   if (TBAG_STACKSPLIT) then
     TBag_SetStackSkip(bag, slot, 1);
   end
+  TBag_SetCompSkip(bag, slot, 1);
   TBAG_STACKSPLIT = nil;
 end
 
 hooksecurefunc('PickupContainerItem', TBag_PickupContainerItem);
+
+-- array to hold the instructions
+-- don't edit this directly use TBag_ItemMover.
+local TBag_ItemMover__instructions = {};
+
+-- Insert a move instruction into the list to do.
+-- If count is not > 0 then it will just pickup everything
+-- in bag1, slot1 otherwise it will split count off.
+function TBag_ItemMover(bag1, slot1, bag2, slot2, count)
+  local inst = {
+    ["from_bag"]  = bag1,
+    ["from_slot"] = slot1,
+    ["to_bag"]    = bag2,
+    ["to_slot"]   = slot2,
+    ["count"] = count
+  };
+  table.insert(TBag_ItemMover__instructions,1,inst);
+end
+
+-- Main function for the mover coroutine.  This is an infinite loop
+-- that runs the whole time the addon is up.  If there is nothing to
+-- do it yields back.
+function TBag__ItemMover__main(instructions)
+  local instructions = instructions;
+  while true do
+    instruction_count = table.getn(instructions);
+    if (instruction_count > 0) then
+      for index = instruction_count, 1, -1 do 
+        local inst = instructions[index];
+        local _,_,locked1 = GetContainerItemInfo(inst.from_bag,inst.from_slot);
+        local _,_,locked2 = GetContainerItemInfo(inst.to_bag,inst.to_slot);
+
+        if ((not locked1) and (not locked2)) then
+          ClearCursor();
+          if (inst.count and inst.count > 0) then
+            SplitContainerItem(inst.from_bag,inst.from_slot,inst.count);
+	  else
+            PickupContainerItem(inst.from_bag,inst.from_slot);
+	    TBag_SetStackSkip(inst.from_bag,inst.from_slot,nil);
+	    TBag_SetCompSkip(inst.from_bag,inst.from_slot,nil);
+          end
+          PickupContainerItem(inst.to_bag,inst.to_slot);
+          TBag_SetStackSkip(inst.to_bag,inst.to_slot,nil);
+          TBag_SetCompSkip(inst.to_bag,inst.to_slot,nil);
+	  ClearCursor();
+	  table.remove(instructions,index);
+        end
+      end
+    else
+      -- Done stacking
+      TBAG_ISSTACKING = nil;
+    end
+    instructions = coroutine.yield(instructions);
+  end
+end
+
+-- Create the coroutine for handling moves.
+local TBag_ItemMover__co = coroutine.create(TBag__ItemMover__main);
+
+-- resume the coroutine
+function TBag_ItemMover_Resume()
+  if (coroutine.status(TBag_ItemMover__co) == "suspended") then
+    _,instructions = coroutine.resume(TBag_ItemMover__co,TBag_ItemMover__instructions);
+  end
+end
+
+function TBag_OnUpdate()
+  TBag_ItemMover_Resume();
+end
+
 
 -----------------------------------------------------------------------
 -- Inits and Events
@@ -4119,7 +3298,7 @@ function TBag_RealmDropdown_Init(onclickfunc, TItm)
   end
 end
 
-function TBag_UserDropdown_Init(onclickfunc, TItm, selRealm)
+function TBag_UserDropdown_Init(onclickfunc, TItm, curplayer, selRealm,level)
   local info;
   local users = {};
 
@@ -4138,7 +3317,10 @@ function TBag_UserDropdown_Init(onclickfunc, TItm, selRealm)
     info.text = TBag_Split(value, "|")[1];
     info.value = value;
     info.func = onclickfunc;
-    UIDropDownMenu_AddButton(info);
+    if (value == curplayer) then
+      info.checked = 1;
+    end
+    UIDropDownMenu_AddButton(info,level);
   end
 end
 

@@ -7,13 +7,15 @@ TInvHooks_funcs = {
   "OpenBag",
   "CloseBag",
   "ToggleBag",
+  "ToggleKeyRing",
   "ContainerFrame_OnShow", 
   "ContainerFrame_OnHide",
   "ContainerFrameItemButton_OnModifiedClick",
   "BagSlotButton_OnClick",
   "BagSlotButton_OnModifiedClick",
   "BagSlotButton_OnDrag",
-  "BackpackButton_OnClick"
+  "BackpackButton_OnClick",
+  "BackpackButton_OnModifiedClick"
 };
 
 TInvHooks_savedfuncs = {};
@@ -62,8 +64,6 @@ function TInvHooks_Register(reg)
       end
     end
   end
-
-  TBagCfg["TInv_RegisterHooks"] = reg;
 end
 
 local TINV_KEYBINDCHECK = 1;
@@ -71,10 +71,12 @@ local TINV_KEYBINDCHECK = 1;
 function TInv_Open()
   if (not TInvFrame:IsVisible()) then
     -- Always default to the current player
-    TInv_SetPlayer(TBAG_PLAYERID);
+    if (TIVN_PLAYERID ~= TBAG_PLAYERID) then
+      TInv_SetPlayer(TBAG_PLAYERID)
+      TINV_CACHE_REQ = TBAG_REQ_MUST
+    end
     TInv_edit_mode = 0;
     TInv_Button_ChangeEditMode:SetText(TBag_Loc("TBag_ChangeEditMode_off"));
-    SetPortraitTexture(TInvFramePortrait, "player");
 
     -- Check the keybinding
     if (TINV_KEYBINDCHECK) then
@@ -83,7 +85,6 @@ function TInv_Open()
     end
 
     TInvFrame:Show();
-    TInv_UpdateWindow(TBAG_REQ_MUST);
   end
   TINV_ALLOWOPENBACKPACK = 0;
 end
@@ -207,51 +208,120 @@ end
 
 function TInvHooks_ToggleBackpack()
   TBag_PrintDEBUG("event: ToggleBackpack()");
-  if (TInvFrame:IsVisible() and TInvCfg["show_blizzard_frames"] == 1) then
+  if (TInvCfg["show_Bag0"] == 0) then
     TInvHooks_savedfuncs["ToggleBackpack"]();
   else
-    TInv_Toggle();
-    MainMenuBarBackpackButton:SetChecked(0);
+    if ((TInvFrame:IsVisible() and TInvCfg["show_blizzard_frames"] == 1)) then
+      TInvHooks_savedfuncs["ToggleBackpack"]();
+    else
+      TInv_Toggle();
+      MainMenuBarBackpackButton:SetChecked(0);
+    end
   end
 end
 
-function TInvHooks_BagSlotButton_OnClick()
-  TBag_PrintDEBUG("event: BagSlotButton_OnClick()");
-  if (TInvCfg["show_blizzard_frames"] == 0 or TINV_PLAYERID ~= TBAG_PLAYERID) then
-    local id = this:GetID();
-    local hadItem = PutItemInBag(id);
-    if (not hadItem) then
-      TBag_UpdateButtonHighlights();
-    end
-    if (this:GetParent() ~= TInvFrame) then
-      TInv_Toggle();
+function TInvHooks_ToggleKeyRing()
+  if (TInvCfg["show_Bag"..KEYRING_CONTAINER] == 0) then
+    if (TINV_PLAYERID == TBAG_PLAYERID) then
+      TInvHooks_savedfuncs["ToggleKeyRing"]();
+    else
       this:SetChecked(0);
     end
   else
-    if (TInvFrame:IsVisible()) then
-      TInvHooks_savedfuncs["BagSlotButton_OnClick"]();
-      TInv_UpdateWindow(TBAG_REQ_MUST);
-    else 
-      TInv_Toggle();
-      this:SetChecked(0);
-    end
-  end
-end
-
-function TInvHooks_BagSlotButton_OnModifiedClick()
-  if (TInvCfg["show_blizzard_frames"] == 1 and TBAG_PLAYERID == TINV_PLAYERID) then
+    if (TInvCfg["show_blizzard_frames"] == 1 and TINV_PLAYERID == TBAG_PLAYERID) then
       if (TInvFrame:IsVisible()) then
-        OpenAllBags();
+        TInvHooks_savedfuncs["ToggleKeyRing"]();
       else
         TInv_Toggle();
 	this:SetChecked(0);
       end
-  else
-    if (this:GetParent() ~= TInvFrame) then
-      TInv_Toggle();
-      this:SetChecked(0);
     else
+      if (this:GetParent() ~= TInvFrame) then
+        if (TInvingButton:GetChecked()) then
+          TInvingButton:SetChecked(0);
+        else
+          TInvingButton:SetChecked(1);
+        end
+      end
       TBag_UpdateButtonHighlights();
+    end
+  end
+end
+
+
+function TInvHooks_BagSlotButton_OnClick()
+  TBag_PrintDEBUG("event: BagSlotButton_OnClick()");
+  local bag = this:GetID() - CharacterBag0Slot:GetID() + 1;
+  if (TInvCfg["show_Bag"..bag] == 1) then
+    if (TInvCfg["show_blizzard_frames"] == 0 or TINV_PLAYERID ~= TBAG_PLAYERID) then
+      local id = this:GetID();
+      local hadItem = PutItemInBag(id);
+      if (not hadItem) then
+        TBag_UpdateButtonHighlights();
+      end
+      if (this:GetParent() ~= TInvFrame) then
+        TInv_Toggle();
+        this:SetChecked(0);
+      end
+    else
+      if (TInvFrame:IsVisible()) then
+        TInvHooks_savedfuncs["BagSlotButton_OnClick"]();
+        TInv_UpdateWindow(TBAG_REQ_MUST);
+      else 
+        TInv_Toggle();
+        this:SetChecked(0);
+      end
+    end
+  else
+    if (TINV_PLAYERID == TBAG_PLAYERID) then
+      TInvHooks_savedfuncs["BagSlotButton_OnClick"]();
+    else
+      if (this:GetParent() ~= TInvFrame) then
+        TInv_Toggle();
+      end
+      this:SetChecked(0);
+    end
+  end
+end
+
+
+function TInvHooks_BagSlotButton_OnModifiedClick()
+  local bag = this:GetID() - CharacterBag0Slot:GetID() + 1;
+  if (IsModifiedClick("CHATLINK")) then
+    local bag_itemlink = TBag_GetPlayerBag(TINV_PLAYERID,bag)[TBAG_I_ITEMLINK];
+    if (bag_itemlink and ChatEdit_InsertLink(TBag_MakeHyperlink(bag_itemlink))) then
+      this:SetChecked(0);
+      return true;
+    end
+  end
+  if (TInvCfg["show_Bag"..bag] == 1) then
+    if (TInvCfg["show_blizzard_frames"] == 1 and TBAG_PLAYERID == TINV_PLAYERID) then
+        if (TInvFrame:IsVisible()) then
+          if (IsModifiedClick("OPENALLBAGS")) then
+            TInvHooks_savedfuncs["OpenAllBags"]();
+          else
+            TInvHooks_savedfuncs["BagSlotButton_OnClick"]();
+          end
+        else
+          TInv_Toggle();
+  	  this:SetChecked(0);
+        end
+    else
+      if (this:GetParent() ~= TInvFrame) then
+        TInv_Toggle();
+        this:SetChecked(0);
+      else
+        TBag_UpdateButtonHighlights();
+      end
+    end
+  else
+    if (TINV_PLAYERID == TBAG_PLAYERID) then
+      TInvHooks_savedfuncs["BagSlotButton_OnClick"]();
+    else
+      if (this:GetParent() ~= TInvFrame) then
+        TInv_Toggle();
+      end
+      this:SetChecked(0);
     end
   end
 end
@@ -273,19 +343,61 @@ end
 
 function TInvHooks_BackpackButton_OnClick()
   TBag_PrintDEBUG("event: BackpackButton_OnClick()");
-  if (TInvCfg["show_blizzard_frames"] == 0 or TINV_PLAYERID ~= TBAG_PLAYERID) then
-    if (not PutItemInBackpack()) then
-      TBag_UpdateButtonHighlights();
+  if (TInvCfg["show_Bag0"] == 1) then
+    if (TInvCfg["show_blizzard_frames"] == 0 or TINV_PLAYERID ~= TBAG_PLAYERID) then
+      if (not PutItemInBackpack()) then
+        TBag_UpdateButtonHighlights();
+      end
+      if (this:GetParent() ~= TInvFrame) then
+        TInv_Toggle();
+        this:SetChecked(0);
+      end
+    else
+      TInvHooks_savedfuncs["BackpackButton_OnClick"]();
+      TInv_UpdateWindow(TBAG_REQ_MUST);
     end
-    if (this:GetParent() ~= TInvFrame) then
-      TInv_Toggle();
-      MainMenuBarBackpackButton:SetChecked(0);
-    end
-  elseif (IsModifiedClick("OPENALLBAGS")) then
-    OpenAllBags();
   else
-    TInvHooks_savedfuncs["BackpackButton_OnClick"]();
-    TInv_UpdateWindow(TBAG_REQ_MUST);
+    if (TBAG_PLAYERID == TINV_PLAYERID) then
+      TInvHooks_savedfuncs["BackpackButton_OnClick"]();
+    else
+      if (this:GetParent() ~= TInvFrame) then
+        TInv_Toggle();
+      end
+      this:SetChecked(0);
+    end
+  end
+end
+
+function TInvHooks_BackpackButton_OnModifiedClick()
+  if (TInvCfg["show_Bag0"] == 1) then
+    if (TInvCfg["show_blizzard_frames"] == 1 and TBAG_PLAYERID == TINV_PLAYERID) then
+        if (TInvFrame:IsVisible()) then
+            if (IsModifiedClick("OPENALLBAGS")) then
+              TInvHooks_savedfuncs["OpenAllBags"]();
+            else
+              TInvHooks_savedfuncs["BackpackButton_OnClick"]();
+            end
+        else
+          TInv_Toggle();
+  	  this:SetChecked(0);
+        end
+    else
+      if (this:GetParent() ~= TInvFrame) then
+        TInv_Toggle();
+        MainMenuBarBackpackButton:SetChecked(0);
+      else
+        TBag_UpdateButtonHighlights();
+      end
+    end
+  else
+    if (TBAG_PLAYERID == TINV_PLAYERID) then
+      TInvHooks_savedfuncs["BackpackButton_OnClick"]();
+    else
+      if (this:GetParent() ~= TInvFrame) then
+        TInv_Toggle();
+      end
+      this:SetChecked(0);
+    end
   end
 end
 

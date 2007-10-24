@@ -239,8 +239,6 @@ function TBagOpt_CreateCfgOpt(cfgopt, cfg, bagarr, updatefunc, resizefunc, force
   end
 
   TBagOpt_MakeHeader(cfgopt, "General Display Preferences");
-  TBagOpt_MakeCheck(cfgopt, "Show Graphics: (Reopen Window)",
-    cfg, "show_top_gfx", updatefunc);
   TBagOpt_MakeCheck(cfgopt, "Show Size on Bag Count:",
     cfg, "show_bag_sizes", updatefunc);
   TBagOpt_MakeCheck(cfgopt, "Show Bag Icons on Empty Slots:",
@@ -251,6 +249,8 @@ function TBagOpt_CreateCfgOpt(cfgopt, cfg, bagarr, updatefunc, resizefunc, force
     cfg, "spotlight_open", updatefunc);
   TBagOpt_MakeCheck(cfgopt, "Spotlight Mouseover:",
     cfg, "spotlight_hover", updatefunc);
+  TBagOpt_MakeCheck(cfgopt, "Show Item Rarity Color:",
+    cfg, "show_rarity_color", updatefunc);
 
   TBagOpt_MakeCheck(cfgopt, "Auto Stack:",
     cfg, "stack_auto", updatefunc);

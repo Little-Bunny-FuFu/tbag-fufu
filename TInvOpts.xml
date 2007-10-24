@@ -229,6 +229,7 @@
         <Scripts>
           <OnClick>
             TBag_AssignCats(TInvCfg, 1);
+            TBag_BuildBarClassList(TINV_BC_LIST, TInvCfg); 
           </OnClick>
         </Scripts>
       </Button>

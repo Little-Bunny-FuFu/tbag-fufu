@@ -5,8 +5,7 @@ function TBag_ShowHelp(arr)
 end
 
 function TBnk_cmd(msg)
-  local cmd, params = TBag_SplitSpace(msg);
-  local param2;
+  local cmd, params = TBag_SplitStr(msg," ");
   
   cmd = string.lower(cmd);
 
@@ -28,6 +27,14 @@ function TBnk_cmd(msg)
     TBagCfg["Bnk"] = {};
     TBnk_init(1);
     TBnkOpt_ResizeUpdate();
+  elseif (cmd == "resetsorts") then
+    TBag_ResetSorts(TBnkCfg);
+    TBnk_UpdateWindow(TBAG_REQ_MUST);
+  elseif (cmd == "printchars") then
+    TBag_PrintCachedCharacters();
+  elseif (cmd == "deletechar") then
+    local char, realm = TBag_SplitStr(params," ");
+    TBag_DeleteCachedCharacter(char,realm); 
   elseif (cmd == "config") then
     TBnk_OptsFrame:Show();
   else
@@ -37,8 +44,7 @@ end
 
 
 function TInv_cmd(msg)
-  local cmd, params = TBag_SplitSpace(msg);
-  local param2;
+  local cmd, params = TBag_SplitStr(msg," ");
   
   cmd = string.lower(cmd);
 
@@ -60,6 +66,14 @@ function TInv_cmd(msg)
     TBagCfg["Inv"] = {};
     TInv_init(1);
     TInvOpt_ResizeUpdate();
+  elseif (cmd == "resetsorts") then
+    TBag_ResetSorts(TInvCfg);
+    TInv_UpdateWindow(TBAG_REQ_MUST);
+  elseif (cmd == "printchars") then
+    TBag_PrintCachedCharacters();
+  elseif (cmd == "deletechar") then
+    local char, realm = TBag_SplitStr(params," ");
+    TBag_DeleteCachedCharacter(char,realm); 
   elseif (cmd == "config") then
     TInv_OptsFrame:Show();
   else

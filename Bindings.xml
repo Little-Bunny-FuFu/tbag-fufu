@@ -2,7 +2,7 @@
   <Binding name="TINV_TOGGLE" header="TBag">
     TInv_Toggle();
   </Binding>
-  <Binding name="TBNK_TOGGLE" header="TBag">
+  <Binding name="TBNK_TOGGLE">
     TBnk_Toggle();
   </Binding>
 </Bindings>

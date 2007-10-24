@@ -1,3 +1,148 @@
+* 2007-10-22-Shefki
+  NOTE: THIS IS A MAJOR UPDATE.  YOU MUST DELETE THE TBag FOLDER IN YOUR 
+  ADDONS FOLDER AND REPLACE IT WITH A NEW ONE.  SOME FILES HAVE BEEN
+  DELETED AND NEW ONES ADDED.  YOU MUST ALSO COMPLETELY QUIT WOW.
+  BACKING UP YOUR WTF FOLDER IS RECOMMENDED FOR THIS RELEASE.
+  SOME OF THE ENHANCEMENTS IN THIS UPDATE ONLY APPLY TO THE DEFAULT
+  CONFIGURATION.  YOU CAN KEEP MOST OF YOUR CONFIGURATION AND ONLY 
+  RESET THE SEARCH LIST THAT IS NEEDED TO GET THESE ENCHANCEMENTS BY DOING
+  /tinv resetsorts
+  /tbnk resetsorts
+  YOU MAY WISH TO SCREENSHOT YOUR SORT SETTINGS UNDER ADVANCED CONFIGURATION
+  IF YOU HAVE CUSTOMIZED THEM AS THIS WILL WIPE THEM.
+
+  PERFORMANCE & MEMORY USE:
+  - Noticeable optimization has been done to the event handling.  Items
+    when received should display slightly faster than in the past.
+    Users using addons to swap large amounts of gear should notice
+    almost no lag over the default UI when swapping large amounts of gear.
+    The inventory window will also display quicker than before most of the 
+    time.  The same optimizations also will lower memory usage some in 
+    cases, though not necessarily by a huge amount.
+  - Reviewed all entries output in the config file and removed obsolete
+    entries.  These obsolete entries will be cleaned from every config
+    file when TBag loads which should lower memory use, though probably
+    not to a noticeable degree.
+  - Removed code for portraits and window frames that was no longer
+    functional.  Also removed the graphics that were shipped with the
+    addon for this that were not being used.  Since these won't be loaded
+    should help lower some memory usage.
+
+  UI IMPROVEMENTS:
+  - You can now set a bar to be hidden.  This will allow you to hide any
+    categories assigned to the bar (e.g. empty bag slots).  Go into edit mode
+    right click on a numbered slot and choose the hide option.  Note slots
+    that have had their contents changed will be shown despite the setting
+    until the next full resort occurs.  This means hidden empty slots will
+    show their contents when you put stuff in them and when the resort happens
+    they'll get reassigned to a bar and will be visible based upon that bars
+  - The button to toggle the interface for buying new bag slots in the bank
+    will only appear when at the bank (though the setting is still
+    available from the right click menu away from the bank).  It
+    will also never appear for characters that have already 
+    purchased all the bank slots.
+  - All UI elements in the inventory and bank windows can be hidden from
+    the right click menu for the given frame.
+  - You can select the character to display inventory or bank items from
+    the right click menu.
+  - Added option in Advanced Configuration to turn off rarity coloring.
+  - Search box now show Search until you click on it like the search boxes
+    for trade skills to make the UI a little more obvious.
+  - Hidden bags/keychains will show the blizzard frames when the bag icon
+    is clicked on regardless of the show blizzard frames setting.
+  - Allow bags in the bank or inventory to be linked by shift clicking on them
+    while typing in a chat box again, blizzard removed this from their UI
+    which removed it from mine but we like it so implement it ourselves.
+  - Added /tinv printchars and /tinv deletechar to allow users to remove
+    caches for characters they no longer have.  deletechar takes two arguments
+    the character and the realm separated by a space just like printchars
+    outputs them.    
+
+  SORTING & STACKING:
+  - Rewrote the stacking algorithm to be more efficient.  The new algorithm
+    should result in fewer moves to complete the stack, will always end
+    in full stack with a single pass and will prefer moving items into larger
+    stacks and profession bags (if they can go into such bags).
+  - Stacking will also now compress your inventory maximizing the number of
+    slots that are empty.  This means items that can go in special bags
+    (e.g. herb bags, mining bags, engineering bags, enchanting bags) will be
+    moved there if there are empty slots.  
+  - When moving items while stacking in your inventory is now done in a safe
+    way.  Previously the addon would not check the locked state of items.  While
+    this would never cause the loss of an item it could cause an item to be
+    stuck in locked state until the UI was reloaded.  The problem wasn't very
+    common because it required a lot of small stacks that needed combining to
+    show up but did present itself ocassionally when taking AH purchases from
+    the mailbox.
+  - Updated the categorization rules to include a number of new items and
+    added categories for various "collectables" for various factions.
+  - Added new categories for each armor slot to to default categorization
+    list that makes the armor items sort by slot as well as by name now.
+    This should make it easier to find armor items.  As well as giving
+    a much more organized look.
+  - Profession bags now have their own category for each type of Profession
+    bag.  This allows people with multiple profession bags of differing
+    professions to keep them more orgaanized.
+  - Quivers and Ammmo pouches are now categorized separately.  Again should
+    allow people with both to have things more organized.
+  - The item information on which items belong to which tradeskills has
+    been updated to be current.  It has been restructured to allow automated
+    updated from a data file included with future releases that will merge
+    with any locally collected data from your own tradeskills.  This should
+    result in categorization for items used in crafting that stays current.
+  - Reagents for crafting no longer receive the keyword for every craft
+    they are used for.  This prevents leather from sorting into tailoring
+    and gems from sorting into say alchemy simply becuase a few recipes
+    from these crafts happen to use these items and these trades were
+    the last to be categorized.  Keywords are now set by the  craft that
+    uses an item in the most recipes.  If multiple trades use the item
+    the same number of times both keywords will be set.
+  - Added explicit rules for some reagents that are used by many trades
+    (e.g. motes and primals) so that they don't get pushed into a particular
+    trade.
+  - Added two new command line options to drop the sort rules and replace
+    them by the default included one.  /tinv resetsorts and /tbnk resetsorts
+    Highly recommend users backup their configs before doing this in case
+    they missed something they liked.  This will not clear any other
+    configuration.
+
+  MISC:
+  - Updated mail item cache to work with 2.3 mailboxes.  This changes is
+    backwards compatable with older versions of the mailbox API and as
+    a result this will still work with 2.2.  However, the format of the
+    mailbox cache has changed as so you will have to reopen mailboxes on
+    all characters to refresh the data.
+  - Remove some items from the ToDo list and add others.
+
+  BUG FIXES:
+  - Fixed: New categories that are user created will now show on the right
+    click menu for the slot box in edit mode without forcing a reload of the
+    UI.
+  - Fixed: Improper tooltip display while in edit mode on the bank window
+    and mousing over the slot target buttons.  2.2.0 compatabilty issue
+    I missed.
+  - Fixed: Properly cache mailbox itemlinks.  TBag was guessing an items link
+    from the name which could cause the game to crash when linking mailbox
+    items shown in the item link or for items in the mailbox to show incorrect
+    info when searched.  Should improve performance when opening the mailboox
+    too because it was brute force searching all items looking for one that
+    had the same name.  
+  - Fixed: New tags were at times turning themselves on for no apparent
+    reason.  The wrong function to retrieve the time had been used for
+    setting timestamps which was creating odd behavior at times between
+    sessions.  Some of this may still happen until the bad timestamps
+    are cleared (reset NEW tag from right click menu) or replaced by new
+    timestamps through normal operation.  Could also show up as items that
+    are not new hilighting.
+  - Fixed: The highlight around the backpack button on the main menu bar
+    will now stay in sync properly.  Yay for Blizzard for finally changing
+    their code so I could fix this.
+  - Fixed: An extra header entry in the Bindings.xml that was causing an error
+    output in the Logs/FrameXML.log file.  TBag is now officially free of any
+    FrameXML.log error outputs. Hurray.
+  - Fixed: The sub menus under the right click menu will no longer disappear
+    making them difficult to click on.
+
 * 2007-09-25-Shefki
   - Bump interface version to match 2.2.0.
   - Changes required to make tooltips function properly with 2.2.0.

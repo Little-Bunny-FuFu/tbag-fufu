@@ -3,8 +3,8 @@
   <Script file="TBagCmd.lua"/>
   <Script file="TBagHook.lua"/>
   <Script file="TBagOpt.lua"/>
-  <Script file="TBagTooltip.lua"/>
   <Script file="TBagTrade.lua"/>
+  <Script file="TBagItemInfo.lua"/>
 
   <GameTooltip name="TBag_tt" frameStrata="TOOLTIP" visible="false" hidden="true" parent="UIParent" inherits="GameTooltipTemplate">
     <Scripts>
@@ -91,13 +91,33 @@
   <EditBox name="TBag_SearchBoxTemplate" inherits="InputBoxTemplate" hidden="false" virtual="true" autoFocus="false">
     <Size><AbsDimension x="140" y="30"/></Size>
     <Scripts>
+      <OnShow>
+        this:SetText(SEARCH);   
+      </OnShow>
       <OnTabPressed>
         this:ClearFocus();
       </OnTabPressed>
+      <OnEscapePressed>
+        this:ClearFocus();
+      </OnEscapePressed>
       <OnEnterPressed>
-        TBag_DoSearch(this:GetText());
+        if (this:GetText() ~= "") then    
+	  TBag_DoSearch(this:GetText());
+	end
         this:ClearFocus();
       </OnEnterPressed>
+      <OnEditFocusLost>
+        this:HighlightText(0, 0);
+        if ( this:GetText() == "" ) then
+          this:SetText(SEARCH);
+        end
+      </OnEditFocusLost>
+      <OnEditFocusGained>
+        this:HighlightText(0, 0);
+        if ( this:GetText() == SEARCH ) then
+          this:SetText("");
+        end
+      </OnEditFocusGained>
     </Scripts>
   </EditBox>
 </Ui>

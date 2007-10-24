@@ -5,6 +5,15 @@ TINV_DEBUGMESSAGES = 0;   -- 0 = off, 1 = on
 TINV_SHOWITEMDEBUGINFO = 0;
 local TINV_WIPECONFIGONLOAD = 0;  -- for debugging, test it out on a new config every load
 
+TINV_BUTTONS = {
+  "TInv_Button_Close",
+  "TInv_Button_MoveLockToggle",
+  "TInv_Button_HighlightToggle",
+  "TInv_Button_ChangeEditMode",
+  "TInv_Button_ShowBank",
+  "TInv_Button_Reload",
+}
+
 -- View switching
 TINV_PLAYERID = "";
 
@@ -13,6 +22,8 @@ TINV_BUTTON_MAX = 109;
 TINV_PAD_TOP_GFX = 63;
 TINV_PAD_TOP_NORM = 25;
 TINV_BORDER = 2;
+
+TINV_CACHE_REQ = TBAG_REQ_NONE;
 
 TInvCfg = nil;
 TINV_BARITM = {};
@@ -112,6 +123,9 @@ function TInv_InitDefVals(reset)
   TBag_SetDef(cfg, "frameXRelativeTo", "LEFT", reset, TBag_StrFunc, {"RIGHT","LEFT"} );
   TBag_SetDef(cfg, "frameYRelativeTo", "BOTTOM", reset, TBag_StrFunc, {"TOP","BOTTOM"} );
 
+  TBag_SetDef(cfg, "show_searchbox", 1, reset, TBag_NumFunc, 0, 1);
+  TBag_SetDef(cfg, "show_bankbutton", 1, reset, TBag_NumFunc, 0, 1);
+  
   TInv_CalcButtonSize(TInvCfg["frameButtonSize"], TInvCfg["framePad"]);
 end
 
@@ -174,8 +188,6 @@ function TInv_init(reset)
     TBag_GetBagNumFrame(bag):SetScale(1.3);
   end
 
-  SetPortraitTexture(TInvFramePortrait, "player");
-
   TInv_SearchBox:SetMaxLetters(25);
 
   -- setup hooks
@@ -189,6 +201,52 @@ function TInv_init(reset)
     TInv_Button_MoveLockToggle:SetText(TBag_Loc("TBag_MoveLock_locked"));
   else
     TInv_Button_MoveLockToggle:SetText(TBag_Loc("TBag_MoveLock_unlocked"));
+  end
+
+  
+  if (TInvCfg["show_bagbuttons"] == 0) then
+    TInvacterBag0Slot:Hide();
+    TInvacterBag1Slot:Hide();
+    TInvacterBag2Slot:Hide();
+    TInvacterBag3Slot:Hide();
+    TInvMenuBarBackpackButton:Hide();
+    TInvingButton:Hide();
+  end
+  if (TInvCfg["show_searchbox"] == 0) then
+    TInv_SearchBox:Hide();
+  end
+  if (TInvCfg["show_userdropdown"] == 0) then
+    TInv_UserDropdown:Hide();
+    TInv_SearchBox:ClearAllPoints();
+    TInv_SearchBox:SetPoint("TOPLEFT",TInvFrame,"TOPLEFT",6,27);
+  end
+  if (TInvCfg["show_reloadbutton"] == 0) then
+    TInv_Button_Reload:Hide();
+  end
+  if (TInvCfg["show_bankbutton"] == 0) then
+    TInv_Button_ShowBank:Hide();
+  end
+  if (TInvCfg["show_editbutton"] == 0) then
+    TInv_Button_ChangeEditMode:Hide();
+  end
+  if (TInvCfg["show_editbutton"] == 0) then
+    TInv_Button_ChangeEditMode:Hide();
+  end
+  if (TInvCfg["show_hilightbutton"] == 0) then
+    TInv_Button_HighlightToggle:Hide();
+  end
+  if (TInvCfg["show_lockbutton"] == 0) then
+    TInv_Button_MoveLockToggle:Hide();
+  end
+  if (TInvCfg["show_closebutton"] == 0) then
+    TInv_Button_Close:Hide();
+  end
+  if (TInvCfg["show_total"] == 0) then
+    TInvNumTotal:Hide();
+  end
+  if (TInvCfg["show_money"] == 0) then
+    TInv_MoneyViewFrame:Hide();
+    TInv_MoneyFrame:Hide();
   end
 
   TBag_BuildBarClassList(TINV_BC_LIST, TInvCfg);
@@ -232,21 +290,30 @@ function TInv_OnEvent(event)
 
   if ( TInvFrame:IsVisible() ) then
     if ( event == "BAG_UPDATE" ) then
-      -- Stack the bags if we are in a state to
-      if (CursorHasItem() == nil and CursorHasMoney() == nil and CursorHasSpell() == nil and TBag_IsStacking() == nil) then
-        -- Stack the bags if configured to
-        if (TInvCfg["stack_auto"] == 1) then
-          if (TINV_PLAYERID == TBAG_PLAYERID) then
-            -- Send a message to restack
-            TInvCfg["stack_once"] = 1;
+      -- Only process events related to the inventory window
+      if (arg1 and TBag_Member(TInv_Bags, arg1)) then
+        -- Stack the bags if we are in a state to
+        if (CursorHasItem() == nil and CursorHasMoney() == nil and CursorHasSpell() == nil and TBag_IsStacking() == nil) then
+          -- Stack the bags if configured to
+          if (TInvCfg["stack_auto"] == 1) then
+            if (TINV_PLAYERID == TBAG_PLAYERID) then
+              -- Send a message to restack
+              TInvCfg["stack_once"] = 1;
+            end
           end
         end
+        TInv_UpdateWindow();
       end
-      TInv_UpdateWindow();
     elseif ( event == "BAG_UPDATE_COOLDOWN" ) then
-      TInv_UpdateWindow();
+      -- Only process events related to the inventory window
+      if (arg1 and TBag_Member(TInv_Bags, arg1)) then
+        TInv_UpdateWindow();
+      end
     elseif ( event == "ITEM_LOCK_CHANGED" ) then
-      TInv_UpdateWindow();
+      -- arg1 = bag, arg2 = slot
+      if (arg1 and arg2 and TBag_Member(TInv_Bags, arg1)) then
+        TBag_UpdateLockedItem(TINV_PLAYERID,getglobal(TBag_GetBagItemButtonName(arg1,arg2)));
+      end
 --    elseif ( event == "AUCTION_HOUSE_CLOSED" ) then
 --      TInv_Close();
 --    elseif ( event == "BANKFRAME_CLOSED" ) then
@@ -281,10 +348,8 @@ function TInv_OnEvent(event)
     TBag_Trade();
   elseif ( event == "UPDATE_INVENTORY_ALERTS" ) then
     TBag_ScanEquipped();
-    TInv_UpdateWindow();
   elseif ( event == "UNIT_INVENTORY_CHANGED" ) then
     TBag_ScanEquipped();
-    TInv_UpdateWindow();
   elseif ( event == "MAIL_INBOX_UPDATE" ) then
     TBag_ScanMail();
   end
@@ -343,7 +408,7 @@ function TInv_ItemButton_OnEnter(self)
     bar = itm[TBAG_I_BAR];
   end
 
-  -- TBag_Print("TInv_ItemButton_OnEnter bag="..itm[TBAG_I_BAG]..", slot="..itm[TBAG_I_SLOT]);
+--  TBag_Print("TInv_ItemButton_OnEnter bag="..itm[TBAG_I_BAG]..", slot="..itm[TBAG_I_SLOT]..", name="..itm[TBAG_I_NAME]..", type="..itm[TBAG_I_TYPE]..", subtype="..itm[TBAG_I_SUBTYPE]);
 
   if (TInv_edit_selected == "") then
     TInv_edit_hilight = itm[TBAG_I_CAT];
@@ -553,6 +618,7 @@ function TInv_Button_Reload_OnClick()
   if (TINV_PLAYERID == TBAG_PLAYERID) then
     TBag_ClearItmCache(TInvItm[TINV_PLAYERID], TInv_Bags);
     TBag_ClearStackSkip(TInv_Bags);
+    TBag_ClearCompSkip(TInv_Bags);
 
     -- Send a message to restack
     if (TInvCfg["stack_resort"] == 1) then
@@ -579,9 +645,10 @@ function TInv_Button_ShowBank_OnClick()
   else
     TBnk_edit_mode = 0;
     TBnk_SetPlayer(TINV_PLAYERID);
-    TBnk_UserDropdown:Show();
+    if (TBnkCfg["show_userdropdown"] == 1) then
+      TBnk_UserDropdown:Show();
+    end
     TBnkFrame:Show();
-    TBnk_UpdateWindow();
   end
   TInv_SynchShowBank();
 end
@@ -693,6 +760,164 @@ function TInv_BagSlotButton_OnEnter(self)
   GameTooltip:Show();
 end
 
+function TInv_SetButton_Anchors()
+  local button_left = nil;
+ 
+  for _,button_name in ipairs(TINV_BUTTONS) do
+    local button = getglobal(button_name);
+    if (button) then 
+      if (button_left) then
+        button:SetPoint("TOPLEFT",button_left,"TOPRIGHT",4,0);
+      else
+        button:SetPoint("TOPLEFT",TInvFrame,"TOPLEFT",4,-2);
+      end
+      if (button:IsVisible()) then
+        button_left = button;
+      end
+    end
+  end
+
+ 
+end
+
+function TInv_Toggle_CloseButton()
+  if (TInvCfg["show_closebutton"] == 1) then
+    TInvCfg["show_closebutton"] = 0;
+    TInv_Button_Close:Hide();
+    TInv_SetButton_Anchors();
+  else
+    TInvCfg["show_closebutton"] = 1;
+    TInv_Button_Close:Show();
+    TInv_SetButton_Anchors();
+  end
+end
+
+function TInv_Toggle_LockButton()
+  if (TInvCfg["show_lockbutton"] == 1) then
+    TInvCfg["show_lockbutton"] = 0;
+    TInv_Button_MoveLockToggle:Hide();
+    TInv_SetButton_Anchors();
+  else
+    TInvCfg["show_lockbutton"] = 1;
+    TInv_Button_MoveLockToggle:Show();
+    TInv_SetButton_Anchors();
+  end
+end
+
+function TInv_Toggle_HighlightButton()
+  if (TInvCfg["show_hilightbutton"] == 1) then
+    TInvCfg["show_hilightbutton"] = 0;
+    TInv_Button_HighlightToggle:Hide();
+    TInv_SetButton_Anchors();
+  else
+    TInvCfg["show_hilightbutton"] = 1;
+    TInv_Button_HighlightToggle:Show();
+    TInv_SetButton_Anchors();
+  end
+end
+
+function TInv_Toggle_EditButton()
+  if (TInvCfg["show_editbutton"] == 1) then
+    TInvCfg["show_editbutton"] = 0;
+    TInv_Button_ChangeEditMode:Hide();
+    TInv_SetButton_Anchors();
+  else
+    TInvCfg["show_editbutton"] = 1;
+    TInv_Button_ChangeEditMode:Show();
+    TInv_SetButton_Anchors();
+  end
+end
+
+function TInv_Toggle_BankButton()
+  if (TInvCfg["show_bankbutton"] == 1) then
+    TInvCfg["show_bankbutton"] = 0;
+    TInv_Button_ShowBank:Hide();
+    TInv_SetButton_Anchors();
+  else
+    TInvCfg["show_bankbutton"] = 1;
+    TInv_Button_ShowBank:Show();
+    TInv_SetButton_Anchors();
+  end
+end
+
+function TInv_Toggle_ReloadButton()
+  if (TInvCfg["show_reloadbutton"] == 1) then
+    TInvCfg["show_reloadbutton"] = 0;
+    TInv_Button_Reload:Hide();
+    TInv_SetButton_Anchors();
+  else
+    TInvCfg["show_reloadbutton"] = 1;
+    TInv_Button_Reload:Show();
+    TInv_SetButton_Anchors();
+  end
+end
+
+function TInv_Toggle_SearchBox()
+  if (TInvCfg["show_searchbox"] == 1) then
+    TInvCfg["show_searchbox"] = 0;
+    TInv_SearchBox:Hide();
+  else
+    TInvCfg["show_searchbox"] = 1;
+    TInv_SearchBox:Show();
+  end
+end
+
+function TInv_Toggle_UserDropdown()
+  if (TInvCfg["show_userdropdown"] == 1) then
+    TInvCfg["show_userdropdown"] = 0;
+    TInv_UserDropdown:Hide();
+    TInv_SearchBox:ClearAllPoints();
+    TInv_SearchBox:SetPoint("TOPLEFT",TInvFrame,"TOPLEFT",6,27);
+  else
+    TInvCfg["show_userdropdown"] = 1;
+    TInv_UserDropdown:Show();
+    TInv_SearchBox:ClearAllPoints();
+    TInv_SearchBox:SetPoint("LEFT",TInv_UserDropdown,"RIGHT",5,0);
+  end
+end
+
+function TInv_Toggle_Money()
+  if (TInvCfg["show_money"] == 1) then
+    TInvCfg["show_money"] = 0;
+    TInv_MoneyViewFrame:Hide();
+    TInv_MoneyFrame:Hide();
+  else
+    TInvCfg["show_money"] = 1;
+    TInv_MoneyViewFrame:Show();
+    TInv_MoneyFrame:Show();
+  end
+end
+
+function TInv_Toggle_BagSlotButtons()
+  if (TInvCfg["show_bagbuttons"] == 1) then
+    TInvCfg["show_bagbuttons"] = 0;
+    TInvacterBag0Slot:Hide();
+    TInvacterBag1Slot:Hide();
+    TInvacterBag2Slot:Hide();
+    TInvacterBag3Slot:Hide();
+    TInvMenuBarBackpackButton:Hide();
+    TInvingButton:Hide();
+  else
+    TInvCfg["show_bagbuttons"] = 1;
+    TInvacterBag0Slot:Show();
+    TInvacterBag1Slot:Show();
+    TInvacterBag2Slot:Show();
+    TInvacterBag3Slot:Show();
+    TInvMenuBarBackpackButton:Show();
+    TInvingButton:Show();
+   end
+end
+
+function TInv_Toggle_Total()
+  if (TInvCfg["show_total"] == 1) then
+    TInvCfg["show_total"] = 0;
+    TInvNumTotal:Hide();
+  else
+    TInvCfg["show_total"] = 1;
+    TInvNumTotal:Show();
+  end
+end
+
 function TInv_RightClick_DeleteItemOverride()
   local bag, slot, itm;
 
@@ -785,7 +1010,7 @@ function TInvFrame_RightClickMenu_populate(level)
         UIDropDownMenu_AddButton(info, level);
       end
     elseif (level == 2) then
-      if ( this.value == "override_placement" ) then
+      if ( UIDROPDOWNMENU_MENU_VALUE == "override_placement" ) then
         for i = 1, TBAG_BAR_MAX do
           info = {
             ["text"] = "Categories within bar "..i;
@@ -799,7 +1024,7 @@ function TInvFrame_RightClickMenu_populate(level)
           end
           UIDropDownMenu_AddButton(info, level);
         end
-      elseif ( this.value == "show_debug" ) then
+      elseif ( UIDROPDOWNMENU_MENU_VALUE == "show_debug" ) then
         for key, value in pairs(itm) do
           if (value == nil) then
             info = { ["text"] = "|cFFFF7FFF"..key.."|r = |cFF007FFFNil|r", ["notClickable"] = 1 };
@@ -820,9 +1045,9 @@ function TInvFrame_RightClickMenu_populate(level)
         end
       end
     elseif (level == 3) then
-      if ( this.value ~= nil ) then
-        if ( this.value["opt"] == "override_placement_select" ) then
-          for key,barclass in pairs(TINV_BC_LIST[this.value["select_bar"]]) do
+      if ( UIDROPDOWNMENU_MENU_VALUE ~= nil ) then
+        if ( UIDROPDOWNMENU_MENU_VALUE["opt"] == "override_placement_select" ) then
+          for key,barclass in pairs(TINV_BC_LIST[UIDROPDOWNMENU_MENU_VALUE["select_bar"]]) do
             info = {
               ["text"] = barclass;
               ["value"] = { [TBAG_I_BAG]=bag, [TBAG_I_SLOT]=slot, ["barclass"]=barclass },
@@ -896,6 +1121,36 @@ function TInvFrame_RightClickMenu_populate(level)
 
     info = { ["disabled"] = 1 };
     UIDropDownMenu_AddButton(info, level);
+    
+    info = { ["text"] = "Hide Bar:", ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };  
+    UIDropDownMenu_AddButton(info, level);
+  
+    for key,value in pairs({
+      [0] = "Show items assigned to this bar",
+      [1] = "Hide items assigned to this bar"
+      }) do
+    
+      if (TBag_GetGrp(TInvCfg, TBAG_G_BAR_HIDE, bar) == key) then
+        checked = 1;
+      else
+        checked = nil;
+      end
+  
+      info = {
+        ["text"] = value;
+        ["value"] = { [TBAG_I_BAR]=bar, ["value"]=key };
+        ["func"] = function()
+          TBag_SetGrpDef(TInvCfg, TBAG_G_BAR_HIDE, this.value[TBAG_I_BAR], this.value["value"], 1);
+          TBnk_UpdateWindow();
+      end,
+    ["checked"] = checked
+    }; 
+      UIDropDownMenu_AddButton(info, level);
+    end
+
+
+    info = { ["disabled"] = 1 };
+    UIDropDownMenu_AddButton(info, level);
 
     info = { ["text"] = "Hilight new items:", ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
     UIDropDownMenu_AddButton(info, level);
@@ -946,6 +1201,15 @@ function TInvFrame_RightClickMenu_populate(level)
       info = { ["text"] = TBag_Loc("TBag_MenuTitle"), ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
       UIDropDownMenu_AddButton(info, level);
 
+      info = { ["disabled"] = 1 };
+      UIDropDownMenu_AddButton(info, level);
+
+      info = {
+        ["text"] = "Select Character";
+        ["value"] = { ["opt"]="select_character" },
+        ["hasArrow"] = 1
+        };
+      UIDropDownMenu_AddButton(info, level);
 
       info = { ["disabled"] = 1 };
       UIDropDownMenu_AddButton(info, level);
@@ -983,6 +1247,14 @@ function TInvFrame_RightClickMenu_populate(level)
         ["func"] = TInv_Button_ShowBank_OnClick
         };
       UIDropDownMenu_AddButton(info, level);
+
+      info = {
+        ["text"] = "Close Inventory",
+        ["value"] = nil,
+        ["func"] = TInv_Close
+        };
+      UIDropDownMenu_AddButton(info, level);
+
 
       info = { ["disabled"] = 1 };
       UIDropDownMenu_AddButton(info, level);
@@ -1052,9 +1324,22 @@ function TInvFrame_RightClickMenu_populate(level)
         };
       UIDropDownMenu_AddButton(info, level);
 
+      info = { ["disabled"] = 1 };
+      UIDropDownMenu_AddButton(info, level);
+
+      info = {
+        ["text"] = "Hide";
+        ["value"] = { ["opt"]="hide_frames" },
+        ["hasArrow"] = 1
+        };
+      UIDropDownMenu_AddButton(info, level);
+
+      info = { ["disabled"] = 1 };
+      UIDropDownMenu_AddButton(info, level);
+
     elseif (level == 2) then
-      if (this.value ~= nil) then
-        if (this.value["opt"] == "set_scale") then
+      if (UIDROPDOWNMENU_MENU_VALUE ~= nil) then
+        if (UIDROPDOWNMENU_MENU_VALUE["opt"] == "set_scale") then
           for _, value in ipairs(TBAG_A_BUTTONSIZE) do
             info = {
               ["text"] = value.."x"..value;
@@ -1076,8 +1361,99 @@ function TInvFrame_RightClickMenu_populate(level)
             end
             UIDropDownMenu_AddButton(info, level);
           end
-        elseif (this.value["opt"] == "set_colors") then
+        elseif (UIDROPDOWNMENU_MENU_VALUE["opt"] == "set_colors") then
           TBag_MakeColorMenu(TInvCfg, TInv_UpdateWindow, level, TInv_Bags);
+	elseif (UIDROPDOWNMENU_MENU_VALUE["opt"] == "hide_frames") then
+	  info = {
+            ["text"] = "Hide Player Dropdown";
+	    ["func"] = TInv_Toggle_UserDropdown;
+	    };
+          if (TInvCfg["show_userdropdown"] == 0) then
+            info["checked"] = 1;
+          end
+	  UIDropDownMenu_AddButton(info, level);
+	  info = {
+            ["text"] = "Hide Search Box";
+	    ["func"] = TInv_Toggle_SearchBox;
+	    };
+          if (TInvCfg["show_searchbox"] == 0) then
+            info["checked"] = 1;
+          end
+	  UIDropDownMenu_AddButton(info, level);
+	  info = {
+            ["text"] = "Hide Re-sort Button";
+	    ["func"] = TInv_Toggle_ReloadButton;
+	    };
+          if (TInvCfg["show_reloadbutton"] == 0) then
+            info["checked"] = 1;
+          end
+	  UIDropDownMenu_AddButton(info, level);
+	  info = {
+            ["text"] = "Hide Bank Button";
+	    ["func"] = TInv_Toggle_BankButton;
+	    };
+          if (TInvCfg["show_bankbutton"] == 0) then
+            info["checked"] = 1;
+          end
+	  UIDropDownMenu_AddButton(info, level);
+	  info = {
+            ["text"] = "Hide Edit Button";
+	    ["func"] = TInv_Toggle_EditButton;
+	    };
+          if (TInvCfg["show_editbutton"] == 0) then
+            info["checked"] = 1;
+          end
+	  UIDropDownMenu_AddButton(info, level);
+	  info = {
+            ["text"] = "Hide Hilight Button";
+	    ["func"] = TInv_Toggle_HighlightButton;
+	    };
+          if (TInvCfg["show_hilightbutton"] == 0) then
+            info["checked"] = 1;
+          end
+	  UIDropDownMenu_AddButton(info, level);
+	  info = {
+            ["text"] = "Hide Lock Button";
+	    ["func"] = TInv_Toggle_LockButton;
+	    };
+          if (TInvCfg["show_lockbutton"] == 0) then
+            info["checked"] = 1;
+          end
+	  UIDropDownMenu_AddButton(info, level);
+	  info = {
+            ["text"] = "Hide Close Button";
+	    ["func"] = TInv_Toggle_CloseButton;
+	    };
+          if (TInvCfg["show_closebutton"] == 0) then
+            info["checked"] = 1;
+          end
+	  UIDropDownMenu_AddButton(info, level);
+	  info = {
+            ["text"] = "Hide Total";
+	    ["func"] = TInv_Toggle_Total;
+	    };
+          if (TInvCfg["show_total"] == 0) then
+            info["checked"] = 1;
+          end
+	  UIDropDownMenu_AddButton(info, level);
+	  info = {
+            ["text"] = "Hide Bag Buttons";
+	    ["func"] = TInv_Toggle_BagSlotButtons;
+	    };
+          if (TInvCfg["show_bagbuttons"] == 0) then
+            info["checked"] = 1;
+          end
+	  UIDropDownMenu_AddButton(info, level);
+	  info = {
+            ["text"] = "Hide Money";
+	    ["func"] = TInv_Toggle_Money;
+	    };
+          if (TInvCfg["show_money"] == 0) then
+            info["checked"] = 1;
+          end
+	  UIDropDownMenu_AddButton(info, level);
+	elseif (UIDROPDOWNMENU_MENU_VALUE["opt"] == "select_character") then
+	  TInv_UserDropdown_Initialize(level);
         end
       end
     end
@@ -1208,23 +1584,30 @@ function TInv_UpdateWindow(resort_req)
 
   -- SORTING and ITEMCACHE
   if (resort_req == nil) then resort_req = TBAG_REQ_NONE; end
-  local cache_req, stackarr = TBag_UpdateItmCache(TInvCfg, TINV_PLAYERID, TInvItm[TINV_PLAYERID], TInv_Bags);
+  local cache_req, stackarr, emptyspec, specitems = TBag_UpdateItmCache(TInvCfg, TINV_PLAYERID, TInvItm[TINV_PLAYERID], TInv_Bags);
+  if (resort_req == TBAG_REQ_PART) then
+    resort_req = resort_req + TINV_CACHE_REQ;
+  end
   resort_req = resort_req + cache_req;
 
   -- Consume a message for bag stacking
   if (TInvCfg["stack_once"] == 1) then
     if (TINV_PLAYERID == TBAG_PLAYERID) then
-      TBag_Stack(TInvItm[TINV_PLAYERID], stackarr);
+      TBag_Stack(TInvItm[TINV_PLAYERID], stackarr, emptyspec, specitems);
     end
   end
   TInvCfg["stack_once"] = nil;
 
   if (resort_req >= TBAG_REQ_MUST) then
+    TINV_CACHE_REQ = TBAG_REQ_NONE 
     TINV_BARITM = TBag_SortItmCache(TInvCfg, 
       TINV_PLAYERID, TInvItm[TINV_PLAYERID], TINV_BARITM, TInv_Bags);
     TBag_LayoutWindow(TInvCfg, "TInvFrame", TINV_BARITM, TInvCfg["bar_x"], 
       TInv_edit_mode, TINV_BUTTON_MAX, TInv_AssignButtonsToFrame, 
       TInv_FrameX, TInv_FrameY, TInv_SpaceX, TInv_SpaceY, TInv_PoolX, TInv_PoolY)
+  else if (cache_req > TINV_CACHE_REQ) then
+      TINV_CACHE_REQ = cache_req
+    end
   end
 
   -- Relink the button map
@@ -1257,13 +1640,15 @@ function TInv_UpdateWindow(resort_req)
   end
 
   -- MONEY
-  MoneyFrame_Update("TInv_MoneyViewFrame", TBag_GetMoney(TINV_PLAYERID));
-  if (TINV_PLAYERID == TBAG_PLAYERID) then
-    TInv_MoneyViewFrame:Hide();
-    TInv_MoneyFrame:Show();
-  else
-    TInv_MoneyFrame:Hide();
-    TInv_MoneyViewFrame:Show();
+  if (TInvCfg["show_money"] == 1) then
+    MoneyFrame_Update("TInv_MoneyViewFrame", TBag_GetMoney(TINV_PLAYERID));
+    if (TINV_PLAYERID == TBAG_PLAYERID) then
+      TInv_MoneyViewFrame:Hide();
+      TInv_MoneyFrame:Show();
+    else
+      TInv_MoneyFrame:Hide();
+      TInv_MoneyViewFrame:Show();
+    end
   end
 
     frame:ClearAllPoints();
@@ -1285,29 +1670,10 @@ function TInv_UpdateWindow(resort_req)
       TInv_Button_ColumnsDel:Hide();
     end
 
-    if (TInvCfg["show_top_graphics"] == 1) then
-      TInvFramePortrait:Show();
-      TInvFrameTextureTopLeft:Show();
-      TInvFrameTextureTopCenter:Show();
-      TInvFrameTextureTopRight:Show();
-      TInvFrameTextureLeft:Show();
-      TInvFrameTextureRight:Show();
-      TInvFrameTextureBottomLeft:Show();
-      TInvFrameTextureBottomCenter:Show();
-      TInvFrameTextureBottomRight:Show();
-    else
-      TInvFramePortrait:Hide();
-      TInvFrameTextureTopLeft:Hide();
-      TInvFrameTextureTopCenter:Hide();
-      TInvFrameTextureTopRight:Hide();
-      TInvFrameTextureLeft:Hide();
-      TInvFrameTextureRight:Hide();
-      TInvFrameTextureBottomLeft:Hide();
-      TInvFrameTextureBottomCenter:Hide();
-      TInvFrameTextureBottomRight:Hide();
-    end
-
+  TInv_SetButton_Anchors();
+  
   TInv_WindowIsUpdating = 0;
+
 end
 
 function TInv_UserDropdown_GetValue()
@@ -1340,8 +1706,8 @@ function TInv_UserDropdown_OnClick()
   TInv_UpdateWindow(TBAG_REQ_MUST);
 end
 
-function TInv_UserDropdown_Initialize()
+function TInv_UserDropdown_Initialize(level)
   TBag_UserDropdown_Init(TInv_UserDropdown_OnClick,
-    TInvItm, TBAG_REALM);
+    TInvItm, TINV_PLAYERID,TBAG_REALM,level);
 end
 

@@ -3,8 +3,8 @@
 ## Notes: The last bag addon you'll ever need.  Autosorting, viewable anywhere, easy to use yet amazingly configurable
 ## Author: Talos, Modified by Shefki
 ## RequiredDeps: 
-## OptionalDeps: ItemSync, LootLink, Auctioneer, EquipCompare
-## SavedVariables: TBagCfg, TBagInfo, TBnkItm, TInvItm, TContItm, TBodyItm, TMailItm, TItmNameIDMap
+## OptionalDeps: Auctioneer
+## SavedVariables: TBagCfg, TBagInfo, TBnkItm, TInvItm, TContItm, TBodyItm, TMailItm
 ## Dependencies: 
 localization.xml
 TBag.xml

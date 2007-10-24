@@ -48,8 +48,6 @@ function TBnkHooks_Register(reg)
       end
     end
   end
-
-  TBagCfg["TInv_RegisterHooks"] = reg;
 end
 
 function TBnk_Open()
@@ -58,16 +56,15 @@ function TBnk_Open()
     TBnk_SetPlayer(TBAG_PLAYERID);
     TBnk_edit_mode = 0;
     TBnk_Button_ChangeEditMode:SetText(TBag_Loc("TBag_ChangeEditMode_off"));
-    TBnkFrameTitleText:SetText(UnitName("npc"));
-    SetPortraitTexture(TBnkFramePortrait, "npc");
     TBnkFrame:Show();
-    TBnk_UpdateWindow(TBAG_REQ_MUST);
 
     -- Also open the inventory, if it isn't showing already
     TInv_SynchShowBank();
     if (not TInvFrame:IsVisible()) then
       TInv_Open();
     end
+  else
+    TBnk_UpdateWindow(TBAG_REQ_MUST);
   end
 end
 
@@ -114,22 +111,28 @@ function TBnkHooks_BankFrameItemButtonBag_OnClick(arg1)
   local inventoryID = this:GetInventorySlot();
   local id = this:GetID();
   local hadItem = PutItemInBag(inventoryID);
-  if (TBnkCfg["show_blizzard_frames"] == 1) then
+  if (TBnkCfg["show_blizzard_frames"] == 1 or TBnkCfg["show_Bag"..id] == 0) then
     if (not hadItem and TBNK_ATBANK == 1) then
       -- open bag
       ToggleBag(id);
       PlaySound("BAGMENUBUTTONPRESS");
     end
   end
-  if (hadItem) then
+  if (hadItem or (TBNK_ATBANK == 0 and TBnkCfg["show_Bag"..id] == 0)) then
     this:SetChecked(0);
   end
-  TBnk_UpdateWindow(TBAG_REQ_MUST);
   TBag_UpdateButtonHighlights();
 end
 
 function TBnkHooks_BankFrameItemButtonBag_Pickup(arg1)
   this:SetChecked(0);
+  local id = this:GetID();
+  if (IsModifiedClick("CHATLINK")) then
+    local bag_itemlink = TBag_GetPlayerBag(TBNK_PLAYERID,id)[TBAG_I_ITEMLINK];
+    if (bag_itemlink and ChatEdit_InsertLink(TBag_MakeHyperlink(bag_itemlink))) then
+      return true;
+    end
+  end
   if (TBNK_ATBANK == 1) then
     TBnkHooks_savedfuncs["BankFrameItemButtonBag_Pickup"](arg1);
   end

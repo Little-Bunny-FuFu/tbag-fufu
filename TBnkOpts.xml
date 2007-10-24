@@ -229,6 +229,7 @@
         <Scripts>
           <OnClick>
             TBag_AssignCats(TBnkCfg, 1);
+	    TBag_BuildBarClassList(TBNK_BC_LIST, TBnkCfg);	  
           </OnClick>
         </Scripts>
       </Button>
