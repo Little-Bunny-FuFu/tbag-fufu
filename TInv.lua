@@ -116,7 +116,22 @@ function TInv_InitDefVals(reset)
 end
 
 function TInv_SetPlayer(playerid)
-  TINV_PLAYERID = playerid;
+   -- An ugly hack to get around the fact that we can't hook the
+   -- OnClick for the ContainerFrameItemButton.  The Blizzard
+   -- code uses the id of the frame to figure out what to pickup.
+   -- When we are showing another character's inventory we set
+   -- our bag frames id's to 100 to stop Blizzard's code from
+   -- actually doing anything.
+   if (playerid ~= TBAG_PLAYERID) then
+     for _, bag in ipairs(TInv_Bags) do
+       getglobal(TBag_GetDummyBagFrameName(bag)):SetID(100);
+     end
+   else
+     for _, bag in ipairs(TInv_Bags) do
+       getglobal(TBag_GetDummyBagFrameName(bag)):SetID(bag);
+     end
+   end
+   TINV_PLAYERID = playerid;
 end
 
 local TINV_FRAMENAME = "TInvFrame";
@@ -266,6 +281,7 @@ function TInv_OnEvent(event)
     TBag_Trade();
   elseif ( event == "UPDATE_INVENTORY_ALERTS" ) then
     TBag_ScanEquipped();
+    TInv_UpdateWindow();
   elseif ( event == "UNIT_INVENTORY_CHANGED" ) then
     TBag_ScanEquipped();
     TInv_UpdateWindow();
@@ -706,7 +722,7 @@ function TInv_BagSlotButton_OnEnter()
   GameTooltip:SetOwner(this, "ANCHOR_LEFT");
   GameTooltip:ClearLines();
 
-  if (itemlink) then
+  if (itemlink and itemlink ~= "") then
     GameTooltip:SetHyperlink(itemlink);
   else
     GameTooltip:AddLine("Equip Container", 1,1,1);

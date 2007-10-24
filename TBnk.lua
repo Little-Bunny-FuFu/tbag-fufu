@@ -751,7 +751,7 @@ function TBnk_BankBagButton_OnEnter()
   GameTooltip:SetOwner(this, "ANCHOR_LEFT");
   GameTooltip:ClearLines();
 
-  if (itemlink) then
+  if (itemlink and itemlink ~= "") then
     GameTooltip:SetHyperlink(itemlink);
   else
     local numSlots, _ = TBag_GetNumBankSlots(TBNK_PLAYERID);

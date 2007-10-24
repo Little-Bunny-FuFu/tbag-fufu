@@ -72,6 +72,7 @@ function TInv_Open()
     -- Always default to the current player
     TInv_SetPlayer(TBAG_PLAYERID);
     TInv_edit_mode = 0;
+    TInv_Button_ChangeEditMode:SetText(TBag_Loc("TBag_ChangeEditMode_off"));
     SetPortraitTexture(TInvFramePortrait, "player");
 
     -- Check the keybinding

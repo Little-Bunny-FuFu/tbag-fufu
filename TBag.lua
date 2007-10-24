@@ -1445,11 +1445,11 @@ function TBag_ChangeKeybind()
     if (key1) then
       SetBinding(key1, "TINV_TOGGLE");
       TBag_Print(TBAG_SCP.."Setting keybind to '"..key1.."'", 1, 1, 1);
-      SaveBindings(ACCOUNT_BINDINGS);
+      SaveBindings(GetCurrentBindingSet());
     elseif (key2) then
       SetBinding(key2, "TINV_TOGGLE");
       TBag_Print(TBAG_SCP.."Setting keybind to '"..key2.."'", 1, 1, 1);
-      SaveBindings(ACCOUNT_BINDINGS);
+      SaveBindings(GetCurrentBindingSet());
     end
   end
 end
@@ -4236,7 +4236,7 @@ function TBag_ItemButton_OnModifiedClick(button)
         end
       end
     elseif (TBNK_ATBANK == 0 or TBAG_PLAYERID ~= TINV_PLAYERID) then
-      if (button == "LeftButton") then
+      if (button == "LeftButton" and itm[TBAG_I_ITEMLINK] ~= nil) then
 	if (IsShiftKeyDown()) then
           ChatEdit_InsertLink(TBag_MakeHyperlink(itm[TBAG_I_ITEMLINK]))
   	  call_blizzard =false;
@@ -4256,3 +4256,30 @@ function TBag_ItemButton_OnModifiedClick(button)
     ContainerFrameItemButton_OnModifiedClick(button);
   end
 end
+
+-- Shit to bypass FluidFrames (Hook), very inefficient but FF works in this way.
+-- Borrowed from EngBags 1.25
+if (FluidFrames ~= nil) then
+        TBag_FF_Hook_Old = FluidFrames.InitTempDraggableFrames;
+        TBag_FF_Hook = function()
+                if (TBag_FF_Hook_Old ~= nil) then
+                        TBag_FF_Hook_Old();
+                        local titleRegion = TInvFrame:GetTitleRegion();
+                        if (titleRegion ~= nil) then
+                                titleRegion:SetPoint("BOTTOMLEFT", "TInvFrame", "BOTTOMLEFT", 0, 0);
+                                titleRegion:SetPoint("TOPLEFT", "TInvFrame", "BOTTOMLEFT", 0, 0);
+                                titleRegion:SetPoint("BOTTOMRIGHT", "TInvFrame", "BOTTOMLEFT", 0, 0);
+                                titleRegion:SetPoint("TOPRIGHT", "TInvFrame", "BOTTOMLEFT", 0, 0);
+                        end
+                        local titleRegion = TBnkFrame:GetTitleRegion();
+                        if (titleRegion ~= nil) then
+                                titleRegion:SetPoint("BOTTOMLEFT", "TBnkFrame", "BOTTOMLEFT", 0, 0);
+                                titleRegion:SetPoint("TOPLEFT", "TBnkFrame", "BOTTOMLEFT", 0, 0);
+                                titleRegion:SetPoint("BOTTOMRIGHT", "TBnkFrame", "BOTTOMLEFT", 0, 0);
+                                titleRegion:SetPoint("TOPRIGHT", "TBnkFrame", "BOTTOMLEFT", 0, 0);
+                        end
+                end
+        end
+        FluidFrames.InitTempDraggableFrames = TBag_FF_Hook;
+end
+

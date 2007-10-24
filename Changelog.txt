@@ -1,3 +1,29 @@
+* 2007-06-26-Shefki
+  - Fixed: When the bag or bank is closed in edit mode and then
+    reopened the edit mode button text would be out of sync and
+    say view when it should say edit.
+  - Fixed: When viewing inventory of another character, the bag
+    icons would sometimes revert to the current character's bag
+    icons.
+  - Moved the dropdown, search and various buttons at the
+    top of the inventory and bank windows to the left side and
+    reversed their order.  This avoids the user drop down menu
+    from cutting off the screen when a window is positioned at
+    the far right of the screen.  Really only had to move the
+    user drop down menu but it looked bad if I didn't move the rest.
+  - Fixed: Clicking on bag slots when viewing another character's
+    inventory will no longer pickup items on the current character.
+  - Fixed: Lua error when shift or ctrl clicking an empty slot
+    while viewing another character's bags or bank.
+  - Fixed: TBag would remove character specific keybindings on
+    the first run.
+  - Fixed: Lua errors when mousing over a bag slot that had
+    no bag in it.
+  - Fixed: The FluidFrames addon would prevent the right click
+    menu on the inventory or bank window from coming up and
+    if you moved the inventory or bank window it would not
+    remember it's location.
+
 * 2007-06-19-Shefki
   - Fixed: Ability to split stacks in bank.
   - Fixed: Backpack button not opening inventory window.

@@ -57,6 +57,7 @@ function TBnk_Open()
     -- Always default to the current player
     TBnk_SetPlayer(TBAG_PLAYERID);
     TBnk_edit_mode = 0;
+    TBnk_Button_ChangeEditMode:SetText(TBag_Loc("TBag_ChangeEditMode_off"));
     TBnkFrameTitleText:SetText(UnitName("npc"));
     SetPortraitTexture(TBnkFramePortrait, "npc");
     TBnkFrame:Show();

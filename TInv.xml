@@ -326,9 +326,9 @@
       <Button name="TInv_Button_Close" inherits="GameMenuButtonTemplate" text="X">
         <Size><AbsDimension x="22" y="25"/></Size>
         <Anchors>
-          <Anchor point="TOPRIGHT">
+          <Anchor point="TOPLEFT">
             <Offset>
-              <AbsDimension x="-4" y="-2"/>
+              <AbsDimension x="4" y="-2"/>
             </Offset>
           </Anchor>
         </Anchors>
@@ -342,9 +342,9 @@
       <Button name="TInv_Button_MoveLockToggle" inherits="GameMenuButtonTemplate" text="U">
         <Size><AbsDimension x="22" y="25"/></Size>
         <Anchors>
-          <Anchor point="TOPRIGHT" relativeTo="TInv_Button_Close" relativePoint="TOPLEFT">
+          <Anchor point="TOPLEFT" relativeTo="TInv_Button_Close" relativePoint="TOPRIGHT">
             <Offset>
-              <AbsDimension x="-2" y="0"/>
+              <AbsDimension x="2" y="0"/>
             </Offset>
           </Anchor>
         </Anchors>
@@ -369,9 +369,9 @@
       <Button name="TInv_Button_HighlightToggle" inherits="GameMenuButtonTemplate" text="Hilight">
         <Size><AbsDimension x="65" y="25"/></Size>
         <Anchors>
-        <Anchor point="TOPRIGHT" relativeTo="TInv_Button_MoveLockToggle" relativePoint="TOPLEFT">
+        <Anchor point="TOPLEFT" relativeTo="TInv_Button_MoveLockToggle" relativePoint="TOPRIGHT">
             <Offset>
-              <AbsDimension x="-4" y="0"/>
+              <AbsDimension x="4" y="0"/>
             </Offset>
           </Anchor>
         </Anchors>
@@ -396,9 +396,9 @@
       <Button name="TInv_Button_ChangeEditMode" inherits="GameMenuButtonTemplate" text="Edit">
         <Size><AbsDimension x="50" y="25"/></Size>
         <Anchors>
-          <Anchor point="TOPRIGHT" relativeTo="TInv_Button_HighlightToggle" relativePoint="TOPLEFT">
+          <Anchor point="TOPLEFT" relativeTo="TInv_Button_HighlightToggle" relativePoint="TOPRIGHT">
             <Offset>
-              <AbsDimension x="-2" y="0"/>
+              <AbsDimension x="2" y="0"/>
             </Offset>
           </Anchor>
         </Anchors>
@@ -420,9 +420,9 @@
       <Button name="TInv_Button_ShowBank" inherits="GameMenuButtonTemplate" text="Show Bank">
         <Size><AbsDimension x="95" y="25"/></Size>
         <Anchors>
-          <Anchor point="TOPRIGHT" relativeTo="TInv_Button_ChangeEditMode" relativePoint="TOPLEFT">
+          <Anchor point="TOPLEFT" relativeTo="TInv_Button_ChangeEditMode" relativePoint="TOPRIGHT">
             <Offset>
-              <AbsDimension x="-2" y="0"/>
+              <AbsDimension x="2" y="0"/>
             </Offset>
           </Anchor>
         </Anchors>
@@ -443,9 +443,9 @@
       <Button name="TInv_Button_Reload" inherits="GameMenuButtonTemplate" text="Re-sort">
         <Size><AbsDimension x="65" y="25"/></Size>
         <Anchors>
-          <Anchor point="TOPRIGHT" relativeTo="TInv_Button_ShowBank" relativePoint="TOPLEFT">
+          <Anchor point="TOPLEFT" relativeTo="TInv_Button_ShowBank" relativePoint="TOPRIGHT">
             <Offset>
-              <AbsDimension x="-4" y="0"/>
+              <AbsDimension x="4" y="0"/>
             </Offset>
           </Anchor>
         </Anchors>
@@ -465,9 +465,9 @@
 
       <Frame name="TInv_UserDropdown" inherits="TBag_UserDropdownTemplate">
         <Anchors>
-          <Anchor point="TOPRIGHT" relativeTo="TInvFrame" relativePoint="TOPRIGHT">
+          <Anchor point="TOPLEFT" relativeTo="TInvFrame" relativePoint="TOPLEFT">
             <Offset>
-              <AbsDimension x="14" y="27"/>
+              <AbsDimension x="-14" y="27"/>
             </Offset>
           </Anchor>
         </Anchors>
@@ -480,9 +480,9 @@
 
     <EditBox name="TInv_SearchBox" inherits="TBag_SearchBoxTemplate">
         <Anchors>
-          <Anchor point="RIGHT" relativeTo="TInv_UserDropdown" relativePoint="LEFT">
+          <Anchor point="LEFT" relativeTo="TInv_UserDropdown" relativePoint="RIGHT">
             <Offset>
-              <AbsDimension x="10" y="0"/>
+              <AbsDimension x="5" y="0"/>
             </Offset>
           </Anchor>
         </Anchors>
