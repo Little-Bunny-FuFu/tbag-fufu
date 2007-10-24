@@ -337,7 +337,7 @@ function TBnk_OnEvent(event)
       -- Only process for events that are related to the bank.
       if (arg1 and TBag_Member(TBnk_Bags, arg1)) then
         -- Stack the bags if we are in a state to
-        if (CursorHasItem() == nil and CursorHasMoney() == nil and CursorHasSpell() == nil and TBag_IsStacking() == nil) then
+        if (CursorHasItem() == nil and CursorHasMoney() == nil and CursorHasSpell() == nil and TBag_IsStacking(TBAG_STACK_BNK) == nil) then
           -- Stack the bags if configured to
           if (TBnkCfg["stack_auto"] == 1) then
             if (TBNK_PLAYERID == TBAG_PLAYERID) then
@@ -1592,7 +1592,7 @@ function TBnk_UpdateWindow(resort_req)
   -- Consume a message for bag stacking
   if (TBnkCfg["stack_once"] == 1) then
     if (TBNK_PLAYERID == TBAG_PLAYERID) then
-      TBag_Stack(TBnkItm[TBNK_PLAYERID], stackarr, emptyspec, specitems);
+      TBag_Stack(TBAG_STACK_BNK,TBnkItm[TBNK_PLAYERID], stackarr, emptyspec, specitems);
     end
   end
   TBnkCfg["stack_once"] = 0;

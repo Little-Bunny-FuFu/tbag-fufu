@@ -1,3 +1,8 @@
+* 2007-10-23-Shefki
+  - Fixed: Moving items to and from the bank would cause stacking not to
+    occur on the receiving side.  Both sides will properly stack now.
+    Thanks to Desa for reporting and helping me debug this problem.
+
 * 2007-10-22-Shefki
   NOTE: THIS IS A MAJOR UPDATE.  YOU MUST DELETE THE TBag FOLDER IN YOUR 
   ADDONS FOLDER AND REPLACE IT WITH A NEW ONE.  SOME FILES HAVE BEEN

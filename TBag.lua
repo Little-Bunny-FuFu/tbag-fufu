@@ -72,6 +72,8 @@ TBAG_V_NEWMINUS  = "newM";
 TBAG_FORCED_SHOW = {}
 
 TBAG_NEW_STACK = 1;
+TBAG_STACK_BNK = 1;
+TBAG_STACK_INV = 2;
 
 -- Local graphics settings
 local TBAG_PAD_BOTTOM_EDIT = 30;
@@ -2950,14 +2952,17 @@ end
 -- Stacking
 -----------------------------------------------------------------------
 
-local TBAG_ISSTACKING = nil;
+local TBAG_ISSTACKING = {
+  [TBAG_STACK_BNK] = nil,
+  [TBAG_STACK_INV] = nil,
+};
 
-function TBag_IsStacking()
-  return TBAG_ISSTACKING;
+function TBag_IsStacking(where)
+  return TBAG_ISSTACKING[where];
 end
 
 -- sa = stackarr, shortened to make the code manageable
-function TBag_Stack(itmcache, sa, emptyspec, specitems)
+function TBag_Stack(where, itmcache, sa, emptyspec, specitems)
   local hasstacked;
   
   if TBAG_NEW_STACK == 0 then
@@ -2965,7 +2970,7 @@ function TBag_Stack(itmcache, sa, emptyspec, specitems)
       local sn = table.getn(sa);
       TBag_PrintDEBUG("Stacking!  Array size = "..sn);
     
-      TBAG_ISSTACKING = 1;
+      TBAG_ISSTACKING[where] = 1;
     
       -- For every need, try to find a count that matches it
       for k_c = 1, sn do
@@ -3028,10 +3033,10 @@ function TBag_Stack(itmcache, sa, emptyspec, specitems)
       end
     end
     end
-    TBAG_ISSTACKING = nil;
+    TBAG_ISSTACKING[where] = nil;
   else 
     -- BEGIN NEW STACK ALGORITHM. /cheer
-    TBAG_ISSTACKING = 1;
+    TBAG_ISSTACKING[where] = 1;
     -- Iterate the list of items that can be stacked
     for itemid,itms in pairs(sa) do
       -- Sort the list of slots with the item in it by how
@@ -3045,7 +3050,7 @@ function TBag_Stack(itmcache, sa, emptyspec, specitems)
             return a[TBAG_I_COUNT] > b[TBAG_I_COUNT];
 	  end
 	end);
-      
+       
       -- We start filling the largest stacks and pulling
       -- from the smallest stacks
       local dest = 1;
@@ -3253,7 +3258,8 @@ function TBag__ItemMover__main(instructions)
       end
     else
       -- Done stacking
-      TBAG_ISSTACKING = nil;
+      TBAG_ISSTACKING[TBAG_STACK_BNK] = nil;
+      TBAG_ISSTACKING[TBAG_STACK_INV] = nil;
     end
     instructions = coroutine.yield(instructions);
   end

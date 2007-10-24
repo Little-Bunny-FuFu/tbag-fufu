@@ -293,7 +293,7 @@ function TInv_OnEvent(event)
       -- Only process events related to the inventory window
       if (arg1 and TBag_Member(TInv_Bags, arg1)) then
         -- Stack the bags if we are in a state to
-        if (CursorHasItem() == nil and CursorHasMoney() == nil and CursorHasSpell() == nil and TBag_IsStacking() == nil) then
+        if (CursorHasItem() == nil and CursorHasMoney() == nil and CursorHasSpell() == nil and TBag_IsStacking(TBAG_STACK_INV) == nil) then
           -- Stack the bags if configured to
           if (TInvCfg["stack_auto"] == 1) then
             if (TINV_PLAYERID == TBAG_PLAYERID) then
@@ -1593,7 +1593,7 @@ function TInv_UpdateWindow(resort_req)
   -- Consume a message for bag stacking
   if (TInvCfg["stack_once"] == 1) then
     if (TINV_PLAYERID == TBAG_PLAYERID) then
-      TBag_Stack(TInvItm[TINV_PLAYERID], stackarr, emptyspec, specitems);
+      TBag_Stack(TBAG_STACK_INV, TInvItm[TINV_PLAYERID], stackarr, emptyspec, specitems);
     end
   end
   TInvCfg["stack_once"] = nil;
