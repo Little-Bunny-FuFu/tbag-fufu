@@ -33,26 +33,19 @@
         this:RegisterEvent("MODIFIER_STATE_CHANGED");
         this:RegisterForClicks("LeftButtonUp", "RightButtonUp");	   
         BankFrameItemButton_OnLoad();
+	this.UpdateTooltip = TBnk_ItemButton_OnEnter;
       </OnLoad>
       <OnEnter>
-        TBnk_ItemButton_OnEnter();
+        TBnk_ItemButton_OnEnter(self);
       </OnEnter>
       <OnLeave>
         TBnk_ItemButton_OnLeave();
       </OnLeave>
-      <OnUpdate>
-        TBnk_OnUpdate(arg1);
-      </OnUpdate>
       <PostClick>
         if ( IsModifierKeyDown() ) then
-	  TBag_ItemButton_OnModifiedClick(arg1);
+	  TInvHooks_ContainerFrameItemButton_OnModifiedClick(arg1);
 	end
       </PostClick>
-      <OnEvent>
-        if (GameTooltip:IsOwned(this)) then
-	  TBnk_ItemButton_OnEnter();
-	end
-      </OnEvent>
     </Scripts>
   </Button>
 
@@ -83,25 +76,16 @@
       </Layer>
     </Layers>
     <Scripts>
+      <OnLoad>
+        ContainerFrameItemButton_OnLoad();
+	this.UpdateTooltip = TBnk_ItemButton_OnEnter;
+      </OnLoad>
       <OnEnter>
-        TBnk_ItemButton_OnEnter();
+        TBnk_ItemButton_OnEnter(self);
       </OnEnter>
       <OnLeave>
         TBnk_ItemButton_OnLeave();
       </OnLeave>
-      <OnUpdate>
-        TBnk_OnUpdate(arg1);
-      </OnUpdate>
-      <PostClick>
-        if ( IsModifierKeyDown() ) then
-	  TBag_ItemButton_OnModifiedClick(arg1);
-	end
-      </PostClick>
-      <OnEvent>
-        if (GameTooltip:IsOwned(this)) then
-	  TBnk_ItemButton_OnEnter();
-	end
-      </OnEvent>
     </Scripts>
   </Button>
 
@@ -154,42 +138,37 @@
         end
       </OnHide>
       <OnEnter>
-        TBnk_SlotTargetButton_OnEnter();
+        TBnk_SlotTargetButton_OnEnter(self);
       </OnEnter>
       <OnLeave>
         TBnk_SlotTargetButton_OnLeave();
       </OnLeave>
-      <OnUpdate>
-        TBnk_SlotTargetButton_OnUpdate(arg1);
-      </OnUpdate>
     </Scripts>
   </Button>
 
-  <CheckButton name="TBnk_BankBagTemplate" inherits="BankItemButtonTemplate" virtual="true">
+  <CheckButton name="TBnk_BankBagTemplate" inherits="BankItemButtonGenericTemplate" virtual="true">
     <Size><AbsDimension x="40" y="40"/></Size>
 		<Scripts>
 			<OnLoad>
 				BankFrameBagButton_OnLoad();
+				this.UpdateTooltip = TBnk_BankBagButton_OnEnter;
 			</OnLoad>
 			<OnClick>
-				if ( IsShiftKeyDown() ) then
-					BankFrameItemButtonBag_OnShiftClick();
+				if ( IsModifiedClick("PICKUPACTION") ) then
+					BankFrameItemButtonBag_Pickup();
 				else
 					BankFrameItemButtonBag_OnClick(arg1);
 				end
 			</OnClick>
 	        <OnDragStart>
-	            BankFrameItemButtonBag_OnShiftClick();
+	            BankFrameItemButtonBag_Pickup();
 	        </OnDragStart>
 	        <OnReceiveDrag>
 	            BankFrameItemButtonBag_OnClick();
 	        </OnReceiveDrag>
       <OnEnter>
-        TBnk_BankBagButton_OnEnter();
+        TBnk_BankBagButton_OnEnter(self);
       </OnEnter>
-      <OnUpdate>
-        TBnk_BankBagButton_OnUpdate(arg1);
-      </OnUpdate>
 		</Scripts>
 		<Frames>
 			<Frame name="$parentHighlightFrame" setAllPoints="true">
@@ -589,9 +568,9 @@
                 </Layers>
         <Scripts>
           <OnEnter>
-            GameTooltip:SetOwner(this, "ANCHOR_LEFT");
+            GameTooltip:SetOwner(self, "ANCHOR_LEFT");
             GameTooltip:ClearLines();
-            GameTooltip:AddLine(this.tooltip);
+            GameTooltip:AddLine(self.tooltip);
             GameTooltip:Show();
           </OnEnter>
           <OnLeave>

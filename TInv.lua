@@ -335,8 +335,8 @@ function TInv_SetBarFromClass(itm)
   return itm[TBAG_I_BAR];
 end
 
-function TInv_ItemButton_OnEnter()
-  local itm = TBag_GetItmFromFrame(TBAG_BUTTONS, this:GetName());
+function TInv_ItemButton_OnEnter(self)
+  local itm = TBag_GetItmFromFrame(TBAG_BUTTONS, self:GetName());
   local hasCooldown, repairCost;
   local bar;
   if (itm ~= nil) then
@@ -351,7 +351,7 @@ function TInv_ItemButton_OnEnter()
 
   if ( not itm[TBAG_I_ITEMLINK]) then
     if ( TInv_edit_mode == 1 ) then
-      GameTooltip:SetOwner(this, "ANCHOR_LEFT");
+      GameTooltip:SetOwner(self, "ANCHOR_LEFT");
       GameTooltip:ClearLines();
       GameTooltip:AddLine("Empty Slot", 1,1,1 );
 
@@ -379,9 +379,9 @@ function TInv_ItemButton_OnEnter()
 
   -- Tool Tip Anchor: Anchor Right if the frame is on the left side of the screen else Anchor Left.
   if (TInvCfg["frameLEFT"] < GetScreenWidth()/2) then
-    GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+    GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
   else
-    GameTooltip:SetOwner(this, "ANCHOR_LEFT");
+    GameTooltip:SetOwner(self, "ANCHOR_LEFT");
   end
 
   hasCooldown, repairCost = TBag_SetInventoryItem(GameTooltip, TINV_PLAYERID, 
@@ -389,9 +389,9 @@ function TInv_ItemButton_OnEnter()
 
   --[[
   if ( hasCooldown ) then
-    this.updateTooltip = 1;
+    self.updateTooltip = 1;
   else
-    this.updateTooltip = nil;
+    self.updateTooltip = nil;
   end
   --]]
 
@@ -402,13 +402,13 @@ function TInv_ItemButton_OnEnter()
   elseif ( MerchantFrame:IsVisible() ) then
     ShowContainerSellCursor(itm[TBAG_I_BAG], itm[TBAG_I_SLOT]);
 --    TBag_RegisterCurrentTooltipSellValue(GameTooltip, itm[TBAG_I_BAG], itm[TBAG_I_SLOT], itm);
-  elseif ( this.readable or (IsControlKeyDown() and this.hasItem) ) then
+  elseif ( self.readable or (IsModifiedClick("DRESSUP") and self.hasItem) ) then
     ShowInspectCursor();
   else
     ResetCursor();
   end
 
-  if ( IsShiftKeyDown() ) then
+  if ( IsModifiedClick("COMPAREITEMS") ) then
     GameTooltip_ShowCompareItem();
   end
 
@@ -438,25 +438,6 @@ function TInv_ItemButton_OnEnter()
   if ( TInv_edit_mode == 1 ) then
     -- redraw the window to show the hllighting of entire class items
     TInv_UpdateWindow();
-  end
-end
-
-function TInv_ItemButton_OnUpdate(elapsed)
-  --[[
-  if ( not this.updateTooltip ) then
-    return;
-  end
-
-  this.updateTooltip = this.updateTooltip - elapsed;
-  if ( this.updateTooltip > 0 ) then
-    return;
-  end
-  --]]
-
-  if ( GameTooltip:IsOwned(this) ) then
-    TInv_ItemButton_OnEnter();
-  else
-    this.updateTooltip = nil;
   end
 end
 
@@ -651,15 +632,15 @@ function TInv_SlotTargetButton_OnClick(button, ignoreShift)
   end
 end
 
-function TInv_SlotTargetButton_OnEnter()
+function TInv_SlotTargetButton_OnEnter(self)
   local bar, tmp, key, value;
 
   if (TInv_edit_mode == 1) then
-    for tmp in string.gmatch(this:GetName(), "TInvFrame_SlotTarget_(%d+)") do
+    for tmp in string.gmatch(self:GetName(), "TInvFrame_SlotTarget_(%d+)") do
       bar = tonumber(tmp);
     end
 
-    GameTooltip:SetOwner(this, "ANCHOR_LEFT");
+    GameTooltip:SetOwner(self, "ANCHOR_LEFT");
     GameTooltip:ClearLines();
 
     if (TInv_edit_selected ~= "") then
@@ -682,7 +663,7 @@ function TInv_SlotTargetButton_OnEnter()
     GameTooltip:Show();
     return;
   end
-  if ( GameTooltip:IsOwned(this) ) then
+  if ( GameTooltip:IsOwned(self) ) then
     GameTooltip:Hide();
     ResetCursor();
   end
@@ -696,30 +677,11 @@ function TInv_SlotTargetButton_OnLeave()
   end
 end
 
-function TInv_SlotTargetButton_OnUpdate(elapsed)
-  --[[
-  if ( not this.updateTooltip ) then
-    return;
-  end
-
-  this.updateTooltip = this.updateTooltip - elapsed;
-  if ( this.updateTooltip > 0 ) then
-    return;
-  end
-  --]]
-
-  if ( GameTooltip:IsOwned(this) ) then
-    TInv_SlotTargetButton_OnEnter();
-  else
-    this.updateTooltip = nil;
-  end
-end
-
-function TInv_BagSlotButton_OnEnter()
-  local bag = this:GetID() - 19;
+function TInv_BagSlotButton_OnEnter(self)
+  local bag = self:GetID() - 19;
   local itemlink = TBag_GetPlayerBagCfg(TINV_PLAYERID, bag, TBAG_I_ITEMLINK);
 
-  GameTooltip:SetOwner(this, "ANCHOR_LEFT");
+  GameTooltip:SetOwner(self, "ANCHOR_LEFT");
   GameTooltip:ClearLines();
 
   if (itemlink and itemlink ~= "") then
@@ -729,14 +691,6 @@ function TInv_BagSlotButton_OnEnter()
   end
   
   GameTooltip:Show();
-end
-
-function TInv_BagSlotButton_OnUpdate(elapsed)
-  if ( GameTooltip:IsOwned(this) ) then
-    TInv_BagSlotButton_OnEnter();
-  else
-    this.updateTooltip = nil;
-  end
 end
 
 function TInv_RightClick_DeleteItemOverride()

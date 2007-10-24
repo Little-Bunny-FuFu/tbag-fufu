@@ -9,8 +9,9 @@ TInvHooks_funcs = {
   "ToggleBag",
   "ContainerFrame_OnShow", 
   "ContainerFrame_OnHide",
+  "ContainerFrameItemButton_OnModifiedClick",
   "BagSlotButton_OnClick",
-  "BagSlotButton_OnShiftClick",
+  "BagSlotButton_OnModifiedClick",
   "BagSlotButton_OnDrag",
   "BackpackButton_OnClick"
 };
@@ -141,7 +142,7 @@ function TInvHooks_OpenAllBags()
   end
 
   -- Open the faux bank as well
-  if (TBnkFrame:IsVisible()) then
+  if (TBnkFrame:IsVisible() and TBNK_ATBANK==1) then
     for _, bag in ipairs(TBnk_Bags) do 
       OpenBag(bag);
     end
@@ -216,7 +217,7 @@ end
 
 function TInvHooks_BagSlotButton_OnClick()
   TBag_PrintDEBUG("event: BagSlotButton_OnClick()");
-  if (TInvCfg["show_blizzard_frames"] == 0) then
+  if (TInvCfg["show_blizzard_frames"] == 0 or TINV_PLAYERID ~= TBAG_PLAYERID) then
     local id = this:GetID();
     local hadItem = PutItemInBag(id);
     if (not hadItem) then
@@ -237,8 +238,8 @@ function TInvHooks_BagSlotButton_OnClick()
   end
 end
 
-function TInvHooks_BagSlotButton_OnShiftClick()
-  if (TInvCfg["show_blizzard_frames"] == 1) then
+function TInvHooks_BagSlotButton_OnModifiedClick()
+  if (TInvCfg["show_blizzard_frames"] == 1 and TBAG_PLAYERID == TINV_PLAYERID) then
       if (TInvFrame:IsVisible()) then
         OpenAllBags();
       else
@@ -272,7 +273,7 @@ end
 
 function TInvHooks_BackpackButton_OnClick()
   TBag_PrintDEBUG("event: BackpackButton_OnClick()");
-  if (TInvCfg["show_blizzard_frames"] == 0) then
+  if (TInvCfg["show_blizzard_frames"] == 0 or TINV_PLAYERID ~= TBAG_PLAYERID) then
     if (not PutItemInBackpack()) then
       TBag_UpdateButtonHighlights();
     end
@@ -280,7 +281,7 @@ function TInvHooks_BackpackButton_OnClick()
       TInv_Toggle();
       MainMenuBarBackpackButton:SetChecked(0);
     end
-  elseif (IsShiftKeyDown()) then
+  elseif (IsModifiedClick("OPENALLBAGS")) then
     OpenAllBags();
   else
     TInvHooks_savedfuncs["BackpackButton_OnClick"]();
@@ -291,8 +292,8 @@ end
 function TInvHooks_ContainerFrame_OnHide()
   TBag_PrintDEBUG("event: ContainerFrame_OnHide()");
   TInvHooks_savedfuncs["ContainerFrame_OnHide"]();
-  TInv_UpdateWindow(TBAG_REQ_MUST);
-
+--  TInv_UpdateWindow(TBAG_REQ_MUST);
+ 
   TBag_GetBagFrame(this:GetID()):SetChecked(0);
   TBag_UpdateButtonHighlights();
 end
@@ -333,3 +334,119 @@ function TInvHooks_ToggleDropDownMenu(level, value, dropDownFrame, anchorName, x
     frame:SetPoint("TOPLEFT", "UIParent", "BOTTOMLEFT", adjustX, adjustY);
   end
 end
+
+function TInvHooks_ContainerFrameItemButton_OnModifiedClick(button)
+  local itm = TBag_GetItmFromFrame(TBAG_BUTTONS, this:GetName());
+  local alt_pickup = TBagCfg["Inv"]["alt_pickup"];
+  local alt_panel = TBagCfg["Inv"]["alt_panel"];
+  if (alt_pickup == 0) then alt_pickup = nil; end
+  if (alt_panel == 0) then alt_panel = nil; end
+  local call_blizzard = true;
+
+  TBag_PrintDEBUG("event: ItemButton_OnModifiedClick this="..this:GetName());
+
+  -- Make sure we are one of our buttons
+  if (itm) then
+    if (TBag_Member(TInv_Bags,itm[TBAG_I_BAG]) and TBAG_PLAYERID == TINV_PLAYERID) then
+      TBag_PrintDEBUG("ItemButton_OnModifiedClick live bag");
+      if ( IsAltKeyDown() ) then    -- Manage Alt+Click Auto Trade/Auction
+        TBag_PrintDEBUG("ItemButton_OnModifiedClick alt key");
+        if (TradeFrame) and (TradeFrame:IsShown()) then
+          local tradeslot = TradeFrame_GetAvailableSlot();
+          if (tradeslot) and (alt_pickup) then
+            PickupContainerItem(itm[TBAG_I_BAG], itm[TBAG_I_SLOT]);
+            ClickTradeButton(tradeslot);
+            if (CursorHasItem()) then
+              PickupContainerItem(itm[TBAG_I_BAG], itm[TBAG_I_SLOT]);
+            end
+            call_blizzard = false;
+          end
+        elseif (AuctionFrame) and ( AuctionFrame:IsShown() ) then
+          -- Check if we have auctioneer 
+          if (AuctionFramePost) and (AuctionFramePost:IsVisible() ) then
+            if (alt_pickup) then
+              PickupContainerItem(itm[TBAG_I_BAG], itm[TBAG_I_SLOT]);
+              AuctionFramePost_AuctionItem_OnClick(AuctionFramePostAuctionItem);
+              call_blizzard = false;
+            end
+          else
+            if (alt_panel) then
+              AuctionFrameTab_OnClick(3);
+            end
+            if (PanelTemplates_GetSelectedTab(AuctionFrame) == 3)
+              and (alt_pickup) then
+              PickupContainerItem(itm[TBAG_I_BAG], itm[TBAG_I_SLOT]);
+              ClickAuctionSellItemButton();
+              call_blizzard = false;
+            end
+          end
+          if (CursorHasItem()) and (alt_pickup) then
+            PickupContainerItem(itm[TBAG_I_BAG], itm[TBAG_I_SLOT]);
+            call_blizzard = false;
+          end
+        elseif (MailFrame) and ( MailFrame:IsShown() ) then
+          TBag_PrintDEBUG("ItemButton_OnModifiedClick mailframe");
+          -- If we have no CT_MailMod, always send it to the SendMail frame
+          if (CT_MailFrame) then
+            -- Otherwise, check to see if we have mail already
+            if (SendMailFrame:IsVisible()) then
+              local itemName = GetSendMailItem();
+              if (itemName) then
+  -- Disable this until we can figure out how to do it slickly
+--                MailFrameTab_OnClick(3);
+--                CT_MailButton_OnClick(CT_MailButton2);
+--                MailFrameTab_OnClick(2);
+--                SendMailPackageButton_OnClick();
+--                MailFrameTab_OnClick(3);
+--                CT_MailButton_OnClick(CT_MailButton1);
+--                CT_Mail_UpdateItemButtons();
+              end
+            elseif (not CT_MailFrame:IsVisible()) then
+              TBag_PrintDEBUG("ItemButton_OnModifiedClick CT_MailFrame:IsVisible yes");
+              if (alt_panel) then
+                MailFrameTab_OnClick(2);
+              end
+              if (PanelTemplates_GetSelectedTab(MailFrame) == 2)
+                and (alt_pickup) then
+                PickupContainerItem(itm[TBAG_I_BAG], itm[TBAG_I_SLOT]);
+                ClickSendMailItemButton();
+                call_blizzard = false;
+              end
+            end
+          else
+            if (alt_panel) then
+              MailFrameTab_OnClick(2);
+            end
+            if (PanelTemplates_GetSelectedTab(MailFrame) == 2)
+              and (alt_pickup) then
+              PickupContainerItem(itm[TBAG_I_BAG], itm[TBAG_I_SLOT]);
+              ClickSendMailItemButton();
+              call_blizzard = false;
+            end
+          end
+        end
+      end
+    elseif (TBNK_ATBANK == 0 or TBAG_PLAYERID ~= TINV_PLAYERID) then
+      if (itm[TBAG_I_ITEMLINK] ~= nil) then
+        if (IsModifiedClick("CHATLINK")) then
+          ChatEdit_InsertLink(TBag_MakeHyperlink(itm[TBAG_I_ITEMLINK]))
+          call_blizzard =false;
+        elseif (IsModifiedClick("DRESSUP")) then
+          DressUpItemLink(TBag_MakeHyperlink(itm[TBAG_I_ITEMLINK]))
+          call_blizzard = false;
+	elseif (IsModifiedClick("SPLITSTACK")) then
+	  call_blizzard = false;
+        end
+      end
+    elseif (TBNK_ATBANK == 1 and itm[TBAG_I_BAG] == -1) then
+      TBag_PrintDEBUG('ItemButton_OnModifiedClick At bank click on bank bag');
+      BankFrameItemButtonGeneric_OnModifiedClick(button);
+      call_blizzard = false;
+    end
+  end
+
+  if (call_blizzard) then
+    TInvHooks_savedfuncs["ContainerFrameItemButton_OnModifiedClick"](button);
+  end
+end
+

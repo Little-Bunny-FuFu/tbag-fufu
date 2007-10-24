@@ -351,8 +351,8 @@ function TBnk_OnMouseDown(button, frame)
 end
 
 
-function TBnk_ItemButton_OnEnter()
-  local itm = TBag_GetItmFromFrame(TBAG_BUTTONS, this:GetName());
+function TBnk_ItemButton_OnEnter(self)
+  local itm = TBag_GetItmFromFrame(TBAG_BUTTONS, self:GetName());
   local bar;
   if (itm ~= nil) then
     bar = itm[TBAG_I_BAR];
@@ -363,7 +363,7 @@ function TBnk_ItemButton_OnEnter()
 
   if ( not itm[TBAG_I_ITEMLINK]) then
     if ( TBnk_edit_mode == 1 ) then
-      GameTooltip:SetOwner(this, "ANCHOR_LEFT");
+      GameTooltip:SetOwner(self, "ANCHOR_LEFT");
       GameTooltip:ClearLines();
       GameTooltip:AddLine("Empty Slot", 1,1,1 );
 
@@ -382,9 +382,9 @@ function TBnk_ItemButton_OnEnter()
 
   -- Tool Tip Anchor: Anchor Right if the frame is on the left side of the screen else Anchor Left.
   if (TBnkCfg["frameLEFT"] < GetScreenWidth()/2) then
-    GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+    GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
   else
-    GameTooltip:SetOwner(this, "ANCHOR_LEFT");
+    GameTooltip:SetOwner(self, "ANCHOR_LEFT");
   end
 
   hasCooldown, repairCost = TBag_SetInventoryItem(GameTooltip, TBNK_PLAYERID, 
@@ -397,11 +397,11 @@ function TBnk_ItemButton_OnEnter()
   elseif ( MerchantFrame:IsVisible() ) then
     ShowContainerSellCursor(itm[TBAG_I_BAG], itm[TBAG_I_SLOT]);
 --    TBag_RegisterCurrentTooltipSellValue(GameTooltip, itm[TBAG_I_BAG], itm[TBAG_I_SLOT], itm);
-  elseif ( this.readable ) then
+  elseif ( self.readable ) then
     ShowInspectCursor();
   end
 
-  if ( IsShiftKeyDown() ) then
+  if ( IsModifiedClick("COMPAREITEMS") ) then
     TBag_PrintDEBUG('ShowCompareItem Called');
     GameTooltip_ShowCompareItem();
   end
@@ -416,23 +416,6 @@ function TBnk_ItemButton_OnEnter()
   if ( TBnk_edit_mode == 1 ) then
     -- redraw the window to show the hllighting of entire class items
     TBnk_UpdateWindow();
-  end
-end
-
-function TBnk_OnUpdate(elapsed)
-  if ( not this.updateTooltip ) then
-    return;
-  end
-
-  this.updateTooltip = this.updateTooltip - elapsed;
-  if ( this.updateTooltip > 0 ) then
-    return;
-  end
-
-  if ( GameTooltip:IsOwned(this) ) then
-    TBnk_ItemButton_OnEnter();
-  else
-    this.updateTooltip = nil;
   end
 end
 
@@ -511,7 +494,7 @@ function TBnk_ItemButton_OnClick(button, ignoreShift)
           -- Don't sell the item if the buyback tab is selected
           return;
         end
-        if ( MerchantFrame:IsShown() and IsShiftKeyDown() ) then
+        if ( MerchantFrame:IsShown() and IsModifiedClick("SPLITSTACK") ) then
           this.SplitStack = function(button, split)
             SplitContainerItem(itm[TBAG_I_BAG], itm[TBAG_I_SLOT], split);
             MerchantItemButton_OnClick("LeftButton");
@@ -536,7 +519,7 @@ function TBnkFrameBagBank_OnClick()
 
   if ( not hadItem ) then
     if (TBnkCfg["show_blizzard_frames"] == 0) then
-      if (not IsShiftKeyDown()) then
+      if (not IsModifiedClick("OPENALLBAGS")) then
         TBag_UpdateButtonHighlights();
       else
         this:SetChecked(0);
@@ -547,7 +530,7 @@ function TBnkFrameBagBank_OnClick()
         ToggleBag(-1);
         PlaySound("BAGMENUBUTTONPRESS");
       else 
-        if (not IsShiftKeyDown()) then
+        if (not IsModifiedClick("OPENALLBAGS")) then
           TBag_UpdateButtonHighlights();
         else
           this:SetChecked(0);
@@ -681,15 +664,15 @@ function TBnk_SlotTargetButton_OnClick(button, ignoreShift)
   end
 end
 
-function TBnk_SlotTargetButton_OnEnter()
+function TBnk_SlotTargetButton_OnEnter(self)
   local bar, tmp, key, value;
 
   if (TBnk_edit_mode == 1) then
-    for tmp in string.gmatch(this:GetName(), "TBnkFrame_SlotTarget_(%d+)") do
+    for tmp in string.gmatch(self:GetName(), "TBnkFrame_SlotTarget_(%d+)") do
       bar = tonumber(tmp);
     end
 
-    GameTooltip:SetOwner(this, "ANCHOR_LEFT");
+    GameTooltip:SetOwner(self, "ANCHOR_LEFT");
     GameTooltip:ClearLines();
 
     if (TBnk_edit_selected ~= "") then
@@ -713,7 +696,7 @@ function TBnk_SlotTargetButton_OnEnter()
     return;
   end
 
-  if ( GameTooltip:IsOwned(this) ) then
+  if ( GameTooltip:IsOwned(self) ) then
     GameTooltip:Hide();
     ResetCursor();
   end
@@ -727,28 +710,11 @@ function TBnk_SlotTargetButton_OnLeave()
   end
 end
 
-function TBnk_SlotTargetButton_OnUpdate(elapsed)
-  if ( not this.updateTooltip ) then
-    return;
-  end
-
-  this.updateTooltip = this.updateTooltip - elapsed;
-  if ( this.updateTooltip > 0 ) then
-    return;
-  end
-
-  if ( GameTooltip:IsOwned(this) ) then
-    TBnk_SlotTargetButton_OnEnter();
-  else
-    this.updateTooltip = nil;
-  end
-end
-
-function TBnk_BankBagButton_OnEnter()
-  local bag = this:GetID();
+function TBnk_BankBagButton_OnEnter(self)
+  local bag = self:GetID();
   local itemlink = TBag_GetPlayerBagCfg(TBNK_PLAYERID, bag, TBAG_I_ITEMLINK);
 
-  GameTooltip:SetOwner(this, "ANCHOR_LEFT");
+  GameTooltip:SetOwner(self, "ANCHOR_LEFT");
   GameTooltip:ClearLines();
 
   if (itemlink and itemlink ~= "") then
@@ -757,23 +723,15 @@ function TBnk_BankBagButton_OnEnter()
     local numSlots, _ = TBag_GetNumBankSlots(TBNK_PLAYERID);
 
     if (bag <= numSlots + 4) then
-      SetItemButtonTextureVertexColor(this, 1.0,1.0,1.0, 1.0);
+      SetItemButtonTextureVertexColor(self, 1.0,1.0,1.0, 1.0);
       GameTooltip:AddLine(BANK_BAG, 1, 1, 1);
     else
-      SetItemButtonTextureVertexColor(this, 1.0,0.1,0.1, 1.0);
+      SetItemButtonTextureVertexColor(self, 1.0,0.1,0.1, 1.0);
       GameTooltip:AddLine(BANK_BAG_PURCHASE);
     end
   end
   
   GameTooltip:Show();
-end
-
-function TBnk_BankBagButton_OnUpdate(elapsed)
-  if ( GameTooltip:IsOwned(this) ) then
-    TBnk_BankBagButton_OnEnter();
-  else
-    this.updateTooltip = nil;
-  end
 end
 
 function TBnk_RightClick_DeleteItemOverride()

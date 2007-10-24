@@ -1,3 +1,21 @@
+* 2007-09-25-Shefki
+  - Bump interface version to match 2.2.0.
+  - Changes required to make tooltips function properly with 2.2.0.
+  - Fixes to the bank due to changes in the Blizzard bank implementation.
+  - Do not open the bank bag frames when not actually at the bank on 
+    OpenAllBags().
+  - Try to avoid sound lag issues from multiple blizzard bag frames 
+    opening.  Caused by an apparent bug in the 2.2.0 sound system,
+    which I've reported, but at least try to avoid excercising the bug. 
+  - Upped max bag size to 40 slots since there are now 36 slot bags 
+    on the PTR (at least for premades).
+  - Fixed: When show blizzard bag frames was enabled and you were viewing
+    another characters inventory clicking on a bag button would open the
+    bag even though it was the current characters bag not the character
+    you were viewing.
+  - Rework processing of clicks due to the new modifier key system in
+    2.2.0.
+ 
 * 2007-06-26-Shefki
   - Fixed: When the bag or bank is closed in edit mode and then
     reopened the edit mode button text would be out of sync and

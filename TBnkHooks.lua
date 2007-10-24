@@ -1,6 +1,6 @@
 TBnkHooks_funcs = {
   "BankFrameItemButtonBag_OnClick",
-  "BankFrameItemButtonBag_OnShiftClick",
+  "BankFrameItemButtonBag_Pickup",
   "CloseAllWindows"
 };
 
@@ -128,10 +128,10 @@ function TBnkHooks_BankFrameItemButtonBag_OnClick(arg1)
   TBag_UpdateButtonHighlights();
 end
 
-function TBnkHooks_BankFrameItemButtonBag_OnShiftClick(arg1)
+function TBnkHooks_BankFrameItemButtonBag_Pickup(arg1)
   this:SetChecked(0);
   if (TBNK_ATBANK == 1) then
-    TBnkHooks_savedfuncs["BankFrameItemButtonBag_OnShiftClick"](arg1);
+    TBnkHooks_savedfuncs["BankFrameItemButtonBag_Pickup"](arg1);
   end
 end
 

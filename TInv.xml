@@ -29,25 +29,16 @@
       </Layer>
     </Layers>
     <Scripts>
+      <OnLoad>
+        ContainerFrameItemButton_OnLoad();
+        this.UpdateTooltip = TInv_ItemButton_OnEnter;
+      </OnLoad>
       <OnEnter>
-        TInv_ItemButton_OnEnter();
+        TInv_ItemButton_OnEnter(self);
       </OnEnter>
       <OnLeave>
         TInv_ItemButton_OnLeave();
       </OnLeave>
-      <OnUpdate>
-        TInv_ItemButton_OnUpdate(arg1);
-      </OnUpdate>
-      <PostClick>
-        if ( IsModifierKeyDown() ) then
-          TBag_ItemButton_OnModifiedClick(arg1);
-        end
-      </PostClick>
-      <OnEvent>
-        if (GameTooltip:IsOwned(this) ) then
-	  TInv_ItemButton_OnEnter();
-	end
-      </OnEvent>
     </Scripts>
   </Button>
 
@@ -99,14 +90,11 @@
         end
       </OnHide>
       <OnEnter>
-        TInv_SlotTargetButton_OnEnter();
+        TInv_SlotTargetButton_OnEnter(self);
       </OnEnter>
       <OnLeave>
         TInv_SlotTargetButton_OnLeave();
       </OnLeave>
-      <OnUpdate>
-        TInv_SlotTargetButton_OnUpdate(arg1);
-      </OnUpdate>
     </Scripts>
   </Button>
 
@@ -131,12 +119,15 @@
       </Frame>
     </Frames>
     <Scripts>
+      <OnLoad>
+        PaperDollItemSlotButton_OnLoad();
+        this:RegisterEvent("BAG_UPDATE");
+        this.isBag = 1;	
+        this.UpdateTooltip = TInv_BagSlotButton_OnEnter;
+      </OnLoad>
       <OnEnter>
-        TInv_BagSlotButton_OnEnter();
+        TInv_BagSlotButton_OnEnter(self);
       </OnEnter>
-      <OnUpdate>
-        TInv_BagSlotButton_OnUpdate(arg1);
-      </OnUpdate>
     </Scripts>
   </CheckButton>
 
