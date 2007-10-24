@@ -38,6 +38,16 @@
       <OnUpdate>
         TInv_ItemButton_OnUpdate(arg1);
       </OnUpdate>
+      <PostClick>
+        if ( IsModifierKeyDown() ) then
+          TBag_ItemButton_OnModifiedClick(arg1);
+        end
+      </PostClick>
+      <OnEvent>
+        if (GameTooltip:IsOwned(this) ) then
+	  TInv_ItemButton_OnEnter();
+	end
+      </OnEvent>
     </Scripts>
   </Button>
 

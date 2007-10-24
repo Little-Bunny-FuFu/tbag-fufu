@@ -1,5 +1,6 @@
 TBnkHooks_funcs = {
   "BankFrameItemButtonBag_OnClick",
+  "BankFrameItemButtonBag_OnShiftClick",
   "BankFrameItemButtonBag_OnDrag",
   "CloseAllWindows"
 };
@@ -89,6 +90,12 @@ function TBnk_Close()
   CloseBag(9);
   CloseBag(10);
 
+  -- Unhighlight any bags that are still highlighted.
+  for _, bag in ipairs(TBnk_Bags) do
+    TBag_GetBagFrame(bag):SetChecked(0);
+  end
+  TBag_UpdateButtonHighlights();
+
   -- Always reset to the global player for event processing
   TBnk_SetPlayer(TBAG_PLAYERID);
 end
@@ -104,8 +111,22 @@ end
 
 function TBnkHooks_BankFrameItemButtonBag_OnClick(arg1)
   TBag_PrintDEBUG("event: BankFrameItemButtonBag_OnClick()");
-  TBnkHooks_savedfuncs["BankFrameItemButtonBag_OnClick"](arg1);
-  TBnk_UpdateWindow(TBAG_REQ_MUST);
+  if (TBnkCfg["show_blizzard_frames"] == 0) then
+    local inventoryID = this:GetInventorySlot();
+    local id = this:GetID();
+    local hadItem = PutItemInBag(inventoryID);
+    if (not hadItem) then
+      TBag_UpdateButtonHighlights();
+    end
+  else
+    TBnkHooks_savedfuncs["BankFrameItemButtonBag_OnClick"](arg1);
+    TBnk_UpdateWindow(TBAG_REQ_MUST);
+  end
+end
+
+function TBnkHooks_BankFrameItemButtonBag_OnShiftClick(arg1)
+  this:SetChecked(0);
+  TBnkHooks_savedfuncs["BankFrameItemButtonBag_OnShiftClick"](arg1);
 end
 
 function TBnkHooks_BankFrameItemButtonBag_OnDrag()

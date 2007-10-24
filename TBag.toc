@@ -1,7 +1,7 @@
-## Interface: 20005
-## Title: TBag |cffcc33cc[Talos]|r
+## Interface: 20100 
+## Title: TBag
 ## Notes: The last bag addon you'll ever need.  Autosorting, viewable anywhere, easy to use yet amazingly configurable
-## Author: Talos
+## Author: Talos, Modified by Shefki
 ## RequiredDeps: 
 ## OptionalDeps: ItemSync, LootLink, Auctioneer, EquipCompare
 ## SavedVariables: TBagCfg, TBagInfo, TBnkItm, TInvItm, TContItm, TBodyItm, TMailItm, TItmNameIDMap

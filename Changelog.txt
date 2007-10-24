@@ -1,0 +1,26 @@
+* 2007-06-09-Shefki
+  - Fix crash from items with cooldowns in some bank slots.
+  - Offline (not at bank) viewing now properly displays items with
+    random enchants.
+  - Search results of items that have random enchants now show the
+    full name and the proper link.
+  - Icon for the built in bank slots is no longer a candy sack but
+    a more appropriate footlocker like icon.
+  - Added an option to disable showing the blizzard bag frames when
+    clicking on bag icons.  (Defaults to not showing them).
+  - Added support for linking items in chat and using the dressing
+    room for offline (not at bank or inventory of other characters).
+    Normal shift click and ctrl click behavior to access this
+    functionality is available.
+  - Added support for Item Comparisons added with WoW 2.1.  Holding
+    down shift while hovering over an item will show you what you
+    have equiped in the same slots as that item.  Works for
+    the bank (offline or online) and bags (current character or not).
+    Note: Some items this will not work with.  This is a Blizzard bug,
+    if it is not properly set to Class: Armor the comparison tooltips
+    will not display.
+  - Removed unused files: TBody.xml, TBody.lua, and Save.txt.
+  - Added Readme.txt and Changelog.txt.
+  - Updated TOC file.  Interface is now set to the current release
+    interface.  Removed the ugly color Talos from the Title.  
+    Added my name to the author line.

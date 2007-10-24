@@ -10,7 +10,9 @@ TInvHooks_funcs = {
   "ContainerFrame_OnShow", 
   "ContainerFrame_OnHide",
   "BagSlotButton_OnClick",
-  "BagSlotButton_OnDrag"
+  "BagSlotButton_OnShiftClick",
+  "BagSlotButton_OnDrag",
+  "BackpackButton_OnClick"
 };
 
 TInvHooks_savedfuncs = {};
@@ -94,6 +96,13 @@ function TInv_Close()
     CloseBag(3);
     CloseBag(4);
   end
+
+  -- Unhighlight any bags that are still highlighted.
+  for _, bag in ipairs(TInv_Bags) do
+    TBag_GetBagFrame(bag):SetChecked(0);
+  end
+  TBag_UpdateButtonHighlights();
+  
   -- Always reset to the global player for event processing
   TInv_SetPlayer(TBAG_PLAYERID);
   TINV_ALLOWOPENBACKPACK = 0;
@@ -136,13 +145,13 @@ function TInvHooks_OpenBag(bag)
   TBag_PrintDEBUG("event: OpenBag("..bag..")");
   TInvHooks_savedfuncs["OpenBag"](bag);
 
-  -- Update the texture to the candy sack
+  -- Update the texture to the box for the bank bag 
   if (bag == -1) then
     local contid = IsBagOpen(-1);
     if (contid) then
   	  getglobal("ContainerFrame"..contid.."PortraitButton"):SetID(-1);
  	  getglobal("ContainerFrame"..contid.."Name"):SetText("Your Bank");
-	  SetPortraitToTexture("ContainerFrame"..contid.."Portrait", "Interface\\Icons\\INV_ValentinesCandySack");
+	  SetPortraitToTexture("ContainerFrame"..contid.."Portrait", "Interface\\Icons\\INV_Box_03");
     end
   end
 end
@@ -156,13 +165,13 @@ function TInvHooks_ToggleBag(bag)
   TBag_PrintDEBUG("event: ToggleBag("..bag..")");
   TInvHooks_savedfuncs["ToggleBag"](bag);
 
-  -- Update the texture to the candy sack
+  -- Update the texture to the box for the bank bag 
   if (bag == -1) then
     local contid = IsBagOpen(-1);
     if (contid) then
   	  getglobal("ContainerFrame"..contid.."PortraitButton"):SetID(-1);
  	  getglobal("ContainerFrame"..contid.."Name"):SetText("Your Bank");
-	  SetPortraitToTexture("ContainerFrame"..contid.."Portrait", "Interface\\Icons\\INV_ValentinesCandySack");
+	  SetPortraitToTexture("ContainerFrame"..contid.."Portrait", "Interface\\Icons\\INV_Box_03");
     end
   end
 end
@@ -189,17 +198,42 @@ end
 
 function TInvHooks_ToggleBackpack()
   TBag_PrintDEBUG("event: ToggleBackpack()");
-  if (TInvFrame:IsVisible()) then
+  if (TInvFrame:IsVisible() and TInvCfg["show_blizzard_frames"] == 1) then
     TInvHooks_savedfuncs["ToggleBackpack"]();
   else
     TInv_Toggle();
+    MainMenuBarBackpackButton:SetChecked(0);
   end
 end
 
 function TInvHooks_BagSlotButton_OnClick()
   TBag_PrintDEBUG("event: BagSlotButton_OnClick()");
-  TInvHooks_savedfuncs["BagSlotButton_OnClick"]();
-  TInv_UpdateWindow(TBAG_REQ_MUST);
+  if (TInvCfg["show_blizzard_frames"] == 0) then
+    local id = this:GetID();
+    local hadItem = PutItemInBag(id);
+    if (not hadItem) then
+      TBag_UpdateButtonHighlights();
+    end
+    if (this:GetParent() ~= TInvFrame) then
+      TInv_Toggle();
+      this:SetChecked(0);
+    end
+  else
+    TInvHooks_savedfuncs["BagSlotButton_OnClick"]();
+    TInv_UpdateWindow(TBAG_REQ_MUST);
+  end
+end
+
+function TInvHooks_BagSlotButton_OnShiftClick()
+  if (TInvCfg["show_blizzard_frames"] == 1) then
+      for _, bag in ipairs(TInv_Bags) do
+	if (bag ~= KEYRING_CONTAINER) then
+          OpenBag(bag);
+	end
+      end
+  else
+    this:SetChecked(0);
+  end
 end
 
 function TInvHooks_BagSlotButton_OnDrag()
@@ -215,6 +249,18 @@ function TInvHooks_ContainerFrame_OnShow()
 
   TBag_GetBagFrame(this:GetID()):SetChecked(1);
   TBag_UpdateButtonHighlights();
+end
+
+function TInvHooks_BackpackButton_OnClick()
+  TBag_PrintDEBUG("event: BackpackButton_OnClick()");
+  if (TInvCfg["show_blizzard_frames"] == 0) then
+    if (not PutItemInBackpack()) then
+      TBag_UpdateButtonHighlights();
+    end
+  else
+    TInvHooks_savedfuncs["BackpackButton_OnClick"]();
+    TInv_UpdateWindow(TBAG_REQ_MUST);
+  end
 end
 
 function TInvHooks_ContainerFrame_OnHide()

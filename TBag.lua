@@ -1709,10 +1709,10 @@ function TBag_GetItemID(link)
   local a,b,c,d;
 
   if ( (link ~= nil) and (type(link) == "string") ) then
-    _, _, a,b,c,d = string.find(link, "item:(%d+):(%d+):(%d+):(%d+)");
+    _, _, a,b,c,d,e,f,g,h = string.find(link, "item:(%d+):(%d+):(%d+):(%d+):(%d+):(%d+):(%-?%d+):(%-?%d+)");
     if (a) then
       itemid = a;
-      itemlink = "item:"..a..":"..b..":"..c..":"..d
+      itemlink = "item:"..a..":"..b..":"..c..":"..d..":"..e..":"..f..":"..g..":"..h
     end
   end
 
@@ -1805,7 +1805,7 @@ function TBag_GatherSearchResults(srch, itmcache, place)
           if (itm[TBAG_I_ITEMID]) and (itm[TBAG_I_NAME]) then
             -- Do case insensitive searches
             if (string.find(string.lower(itm[TBAG_I_NAME]), srch)) then
-              TBag_AddSearchResult(itm[TBAG_I_ITEMID], playername, place, itm[TBAG_I_COUNT]);
+              TBag_AddSearchResult(itm[TBAG_I_ITEMLINK], playername, place, itm[TBAG_I_COUNT]);
             end
           end
         end
@@ -1824,9 +1824,9 @@ function TBag_JustifyStr(str, width, color)
   return result..color..str.."|r";
 end
 
-function TBag_DisplaySearchResult(aResult, itemid)
+function TBag_DisplaySearchResult(aResult, itemlink)
   local chatframe = DEFAULT_CHAT_FRAME;
-  local hyperlink = TBag_MakeHyperlink("item:"..itemid..":0:0:0");
+  local hyperlink = TBag_MakeHyperlink(itemlink);
   local total = 0;
   local lines = 0;
 
@@ -1878,11 +1878,11 @@ function TBag_DoSearch(srch)
     end
 
     -- Display all the search results
-    for itemid, aResult in pairs(TBag_SrchResults) do
+    for itemlink, aResult in pairs(TBag_SrchResults) do
       if (not found) then
         DEFAULT_CHAT_FRAME:AddMessage(TBAG_SCP.."Search results for '"..srch.."':", 1, 1, 1);
       end
-      TBag_DisplaySearchResult(aResult, itemid);
+      TBag_DisplaySearchResult(aResult, itemlink);
       found = 1;
     end
 
@@ -2224,6 +2224,7 @@ function TBag_InitDefVals(cfg, bagarr, row1offset, reset)
   TBag_SetDef(cfg, "show_bag_icons", 0, reset, TBag_NumFunc, 0, 1);
   TBag_SetDef(cfg, "spotlight_open", 1, reset, TBag_NumFunc, 0, 1);
   TBag_SetDef(cfg, "spotlight_hover", 1, reset, TBag_NumFunc, 0, 1);
+  TBag_SetDef(cfg, "show_blizzard_frames", 0, reset, TBag_NumFunc, 0, 1);
 
   TBag_SetDef(cfg, "stack_auto", 1, reset, TBag_NumFunc, 0, 1);
   TBag_SetDef(cfg, "stack_resort", 1, reset, TBag_NumFunc, 0, 1);
@@ -2487,7 +2488,8 @@ function TBag_GetBagType(playerid, bag)
   -- get the live info if we are the current player, and at the bank
   if (playerid == TBAG_PLAYERID) then
     if (((TBNK_ATBANK == 1) or TBag_Member(TInv_Bags, bag)) and bag > 0) then
-      local _, _, id = strfind(GetInventoryItemLink("player", ContainerIDToInventoryID(bag)) or "", "item:(%d+)");
+      local _, _, itemlink = strfind(GetInventoryItemLink("player", ContainerIDToInventoryID(bag)) or "", "^|%x+|H(.+)|h%[.+%]");
+      local id, itemlink = TBag_GetItemID(itemlink);
       if (id) then 
 	    local name, itemType, subType = TBag_GetItemInfo(id);
         if (itemType == "Quiver") then 
@@ -2499,7 +2501,7 @@ function TBag_GetBagType(playerid, bag)
             type = "PROF";
           end
         end
-        TBag_SetPlayerBagCfg(playerid, bag, TBAG_I_ITEMLINK, "item:"..id..":0:0:0");
+        TBag_SetPlayerBagCfg(playerid, bag, TBAG_I_ITEMLINK, itemlink);
         TBag_SetPlayerBagCfg(playerid, bag, TBAG_I_ITEMID, id);
         TBag_SetPlayerBagCfg(playerid, bag, TBAG_I_NAME, name);
         TBag_SetPlayerBagCfg(playerid, bag, TBAG_I_COUNT, 1);
@@ -2535,7 +2537,7 @@ function TBag_GetBagTexture(playerid, bag)
   if (bag == 0) then
     texture = "Interface\\Buttons\\Button-Backpack-Up";
   elseif (bag == -1) then
-    texture = "Interface\\Icons\\INV_ValentinesCandySack";
+    texture = "Interface\\Icons\\INV_Box_03";
   elseif (bag == KEYRING_CONTAINER) then
     texture = "Interface\\ContainerFrame\\KeyRing-Bag-Icon";
   else
@@ -3051,7 +3053,7 @@ function TBag_UpdateButtonHighlights()
       texture:SetVertexColor(r[bag], g[bag], b[bag], a[bag]);
       local cfg = TBag_GetCfgFromBag(bag);
 
-      if (isopen[bag]) and (cfg) 
+      if (TBag_GetBagFrame(bag):GetChecked() == 1 or isopen[bag]) and (cfg) 
         and (cfg["spotlight_open"] == 1) 
         and (cfg["show_Bag"..bag] == 1) then
         texture:Show();
@@ -4140,56 +4142,79 @@ function TBag_ItemButton_OnModifiedClick(button)
   local alt_panel = TBagCfg["Inv"]["alt_panel"];
   if (alt_pickup == 0) then alt_pickup = nil; end
   if (alt_panel == 0) then alt_panel = nil; end
+  local call_blizzard = true;
 
+  TBag_PrintDEBUG("event: ItemButton_OnModifiedClick this="..this:GetName());
+  
   -- Make sure we are one of our buttons
   if (itm) then
-    if ( IsAltKeyDown() ) then    -- Manage Alt+Click Auto Trade/Auction
-      if (TradeFrame) and (TradeFrame:IsShown()) then
-        local tradeslot = TradeFrame_GetAvailableSlot();
-        if (tradeslot) and (alt_pickup) then
-          PickupContainerItem(itm[TBAG_I_BAG], itm[TBAG_I_SLOT]);
-          ClickTradeButton(tradeslot);
-          if (CursorHasItem()) then
+    if (TBag_Member(TInv_Bags,itm[TBAG_I_BAG]) and TBAG_PLAYERID == TINV_PLAYERID) then
+      TBag_PrintDEBUG("ItemButton_OnModifiedClick live bag");
+      if ( IsAltKeyDown() ) then    -- Manage Alt+Click Auto Trade/Auction
+        TBag_PrintDEBUG("ItemButton_OnModifiedClick alt key");
+        if (TradeFrame) and (TradeFrame:IsShown()) then
+          local tradeslot = TradeFrame_GetAvailableSlot();
+          if (tradeslot) and (alt_pickup) then
             PickupContainerItem(itm[TBAG_I_BAG], itm[TBAG_I_SLOT]);
-          end
-        end
-      elseif (AuctionFrame) and ( AuctionFrame:IsShown() ) then
-        -- Check if we have auctioneer 
-        if (AuctionFramePost) and (AuctionFramePost:IsVisible() ) then
-          if (alt_pickup) then
-            PickupContainerItem(itm[TBAG_I_BAG], itm[TBAG_I_SLOT]);
-            AuctionFramePost_AuctionItem_OnClick(AuctionFramePostAuctionItem);
-          end
-        else
-          if (alt_panel) then
-            AuctionFrameTab_OnClick(3);
-          end
-          if (PanelTemplates_GetSelectedTab(AuctionFrame) == 3) 
-            and (alt_pickup) then
-            PickupContainerItem(itm[TBAG_I_BAG], itm[TBAG_I_SLOT]);
-            ClickAuctionSellItemButton();
-          end
-        end
-        if (CursorHasItem()) and (alt_pickup) then
-          PickupContainerItem(itm[TBAG_I_BAG], itm[TBAG_I_SLOT]);
-        end
-      elseif (MailFrame) and ( MailFrame:IsShown() ) then
-        -- If we have no CT_MailMod, always send it to the SendMail frame
-        if (CT_MailFrame) then
-          -- Otherwise, check to see if we have mail already
-          if (SendMailFrame:IsVisible()) then
-            local itemName = GetSendMailItem();
-            if (itemName) then
--- Disable this until we can figure out how to do it slickly
---              MailFrameTab_OnClick(3);
---              CT_MailButton_OnClick(CT_MailButton2);
---              MailFrameTab_OnClick(2);
---              SendMailPackageButton_OnClick();
---              MailFrameTab_OnClick(3);
---              CT_MailButton_OnClick(CT_MailButton1);
---              CT_Mail_UpdateItemButtons();
+            ClickTradeButton(tradeslot);
+            if (CursorHasItem()) then
+              PickupContainerItem(itm[TBAG_I_BAG], itm[TBAG_I_SLOT]);
             end
-          elseif (not CT_MailFrame:IsVisible()) then
+	    call_blizzard = false;
+          end
+        elseif (AuctionFrame) and ( AuctionFrame:IsShown() ) then
+          -- Check if we have auctioneer 
+          if (AuctionFramePost) and (AuctionFramePost:IsVisible() ) then
+            if (alt_pickup) then
+              PickupContainerItem(itm[TBAG_I_BAG], itm[TBAG_I_SLOT]);
+              AuctionFramePost_AuctionItem_OnClick(AuctionFramePostAuctionItem);
+	      call_blizzard = false;
+            end
+          else
+            if (alt_panel) then
+              AuctionFrameTab_OnClick(3);
+            end
+            if (PanelTemplates_GetSelectedTab(AuctionFrame) == 3) 
+              and (alt_pickup) then
+              PickupContainerItem(itm[TBAG_I_BAG], itm[TBAG_I_SLOT]);
+              ClickAuctionSellItemButton();
+	      call_blizzard = false;
+            end
+          end
+          if (CursorHasItem()) and (alt_pickup) then
+            PickupContainerItem(itm[TBAG_I_BAG], itm[TBAG_I_SLOT]);
+	    call_blizzard = false;
+          end
+        elseif (MailFrame) and ( MailFrame:IsShown() ) then
+          TBag_PrintDEBUG("ItemButton_OnModifiedClick mailframe");
+          -- If we have no CT_MailMod, always send it to the SendMail frame
+          if (CT_MailFrame) then
+            -- Otherwise, check to see if we have mail already
+            if (SendMailFrame:IsVisible()) then
+              local itemName = GetSendMailItem();
+              if (itemName) then
+  -- Disable this until we can figure out how to do it slickly
+--                MailFrameTab_OnClick(3);
+--                CT_MailButton_OnClick(CT_MailButton2);
+--                MailFrameTab_OnClick(2);
+--                SendMailPackageButton_OnClick();
+--                MailFrameTab_OnClick(3);
+--                CT_MailButton_OnClick(CT_MailButton1);
+--                CT_Mail_UpdateItemButtons();
+              end
+            elseif (not CT_MailFrame:IsVisible()) then
+	      TBag_PrintDEBUG("ItemButton_OnModifiedClick CT_MailFrame:IsVisible yes");
+              if (alt_panel) then
+                MailFrameTab_OnClick(2);
+              end
+              if (PanelTemplates_GetSelectedTab(MailFrame) == 2) 
+                and (alt_pickup) then
+                PickupContainerItem(itm[TBAG_I_BAG], itm[TBAG_I_SLOT]);
+                ClickSendMailItemButton();
+		call_blizzard = false;
+              end
+            end
+          else
             if (alt_panel) then
               MailFrameTab_OnClick(2);
             end
@@ -4197,23 +4222,29 @@ function TBag_ItemButton_OnModifiedClick(button)
               and (alt_pickup) then
               PickupContainerItem(itm[TBAG_I_BAG], itm[TBAG_I_SLOT]);
               ClickSendMailItemButton();
+	      call_blizzard = false;
             end
-          end
-        else
-          if (alt_panel) then
-            MailFrameTab_OnClick(2);
-          end
-          if (PanelTemplates_GetSelectedTab(MailFrame) == 2) 
-            and (alt_pickup) then
-            PickupContainerItem(itm[TBAG_I_BAG], itm[TBAG_I_SLOT]);
-            ClickSendMailItemButton();
           end
         end
       end
+    elseif (TBNK_ATBANK == 0 or TBAG_PLAYERID ~= TINV_PLAYERID) then
+      if (button == "LeftButton") then
+	if (IsShiftKeyDown()) then
+          ChatEdit_InsertLink(TBag_MakeHyperlink(itm[TBAG_I_ITEMLINK]))
+  	  call_blizzard =false;
+	elseif (IsControlKeyDown()) then
+	  DressUpItemLink(TBag_MakeHyperlink(itm[TBAG_I_ITEMLINK]))
+	  call_blizzard = false;
+	end
+      end
+    elseif (TBNK_ATBANK == 1 and itm[TBAG_I_BAG] == -1) then
+      TBag_PrintDEBUG('ItemButton_OnModifiedClick At bank click on bank bag');
+      BankFrameItemButtonGeneric_OnModifiedClick(button);
+      call_blizzard = false;
     end
   end
+
+  if (call_blizzard) then
+    ContainerFrameItemButton_OnModifiedClick(button);
+  end
 end
-
-hooksecurefunc('ContainerFrameItemButton_OnModifiedClick', 
-  TBag_ItemButton_OnModifiedClick)
-

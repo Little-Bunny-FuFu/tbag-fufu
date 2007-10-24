@@ -401,6 +401,11 @@ function TBnk_ItemButton_OnEnter()
     ShowInspectCursor();
   end
 
+  if ( IsShiftKeyDown() ) then
+    TBag_PrintDEBUG('ShowCompareItem Called');
+    GameTooltip_ShowCompareItem();
+  end
+  
   -- Then do a highlight to show the bag
   if (itm[TBAG_I_BAG] ~= KEYRING_CONTAINER) and (TBnkCfg["spotlight_hover"] == 1) then
     local r, g, b, a = TBag_GetColor(TBnkCfg, "bag_"..itm[TBAG_I_BAG]);
@@ -529,10 +534,16 @@ function TBnkFrameBagBank_OnClick()
 --  local hadItem = PutItemInBag(BankButtonIDToInvSlotID(slot));
   local hadItem;
 
-  -- Only open at the bank
-  if ( not hadItem ) and (TBNK_ATBANK == 1) then
-    ToggleBag(-1);
-    PlaySound("BAGMENUBUTTONPRESS");
+  if ( not hadItem ) then
+    if (TBnkCfg["show_blizzard_frames"] == 0) then
+      TBag_UpdateButtonHighlights();
+    else
+      -- Only open at the bank
+      if (TBNK_ATBANK == 1) then
+        ToggleBag(-1);
+        PlaySound("BAGMENUBUTTONPRESS");
+      end
+    end
   end
 end
 

@@ -29,6 +29,9 @@
       </Layer>
     </Layers>
     <Scripts>
+      <OnLoad>
+	this:RegisterEvent("MODIFIER_STATE_CHANGED");
+      </OnLoad>
       <OnEnter>
         TBnk_ItemButton_OnEnter();
       </OnEnter>
@@ -38,6 +41,16 @@
       <OnUpdate>
         TBnk_OnUpdate(arg1);
       </OnUpdate>
+      <PostClick>
+        if ( IsModifierKeyDown() ) then
+	  TBag_ItemButton_OnModifiedClick(arg1);
+	end
+      </PostClick>
+      <OnEvent>
+        if (GameTooltip:IsOwned(this)) then
+	  TBnk_ItemButton_OnEnter();
+	end
+      </OnEvent>
     </Scripts>
   </Button>
 
@@ -53,7 +66,7 @@
       </Anchor>
     </Anchors>
     <Frames>
-      <Model name="$parent_Cooldown" inherits="CooldownFrameTemplate"/>
+      <Cooldown name="$parent_Cooldown" inherits="CooldownFrameTemplate"/>
       <Frame name="$parentHighlightFrame" setAllPoints="true">
         <Layers>
           <Layer>
@@ -77,6 +90,16 @@
       <OnUpdate>
         TBnk_OnUpdate(arg1);
       </OnUpdate>
+      <PostClick>
+        if ( IsModifierKeyDown() ) then
+	  TBag_ItemButton_OnModifiedClick(arg1);
+	end
+      </PostClick>
+      <OnEvent>
+        if (GameTooltip:IsOwned(this)) then
+	  TBnk_ItemButton_OnEnter();
+	end
+      </OnEvent>
     </Scripts>
   </Button>
 
@@ -552,7 +575,7 @@
      </Frames>
                 <Layers>
                     <Layer>
-                      <Texture name="$parent_bkgr" file="Interface\Icons\INV_ValentinesCandySack" hidden="false">
+                      <Texture name="$parent_bkgr" file="Interface\Icons\INV_Box_03" hidden="false">
                         <Anchor point="CENTER" relativeTo="$parent" relativePoint="CENTER">
               <Offset>
                 <AbsDimension x="0" y="0"/>

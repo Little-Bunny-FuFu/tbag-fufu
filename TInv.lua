@@ -391,6 +391,10 @@ function TInv_ItemButton_OnEnter()
     ResetCursor();
   end
 
+  if ( IsShiftKeyDown() ) then
+    GameTooltip_ShowCompareItem();
+  end
+
   if ( TInv_edit_mode == 1 ) then
     -- move by class
     if (itm[TBAG_I_CAT] ~= nil) then
