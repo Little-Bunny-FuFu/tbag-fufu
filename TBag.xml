@@ -1,0 +1,103 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"   xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
+  <Script file="TBag.lua"/>
+  <Script file="TBagCmd.lua"/>
+  <Script file="TBagHook.lua"/>
+  <Script file="TBagOpt.lua"/>
+  <Script file="TBagTooltip.lua"/>
+  <Script file="TBagTrade.lua"/>
+
+  <GameTooltip name="TBag_tt" frameStrata="TOOLTIP" visible="false" hidden="true" parent="UIParent" inherits="GameTooltipTemplate">
+    <Scripts>
+      <OnLoad>
+        this:SetOwner(UIParent, "ANCHOR_NONE");
+      </OnLoad>
+    </Scripts>
+  </GameTooltip>
+
+  <FontString name="TBag_BigFont"  font="Interface\AddOns\TBag\DAB_CooldownFont.ttf" virtual="true" justifyH="CENTER">
+    <Shadow>
+      <Offset>
+        <AbsDimension x="1" y="-1"/>
+      </Offset>
+      <Color r="0" g="0" b="0"/>
+    </Shadow>
+    <FontHeight>
+      <AbsValue val="16"/>
+    </FontHeight>
+    <Color r="1" g="0" b="0.25"/>
+  </FontString>
+
+  <Texture name="TBag_ButtonBkgrTemplate" alphaMode="ADD" file="Interface\AddOns\TBag\skin\ButtonBkgr" setAllPoints="true" virtual="true">
+    <Size>
+      <AbsDimension x="64" y="64"/>
+    </Size>
+  </Texture>  
+
+  <Frame name="TBagainerFrameTemplate" frameStrata="MEDIUM" enableMouse="true" virtual="true">
+    <Size>
+      <AbsDimension x="40" y="40"/>
+    </Size>
+  </Frame>
+
+  <Frame name="TBag_BarFrameTemplate" toplevel="false" frameStrata="MEDIUM" movable="false" enableMouse="false" hidden="true" virtual="true"> 
+    <Size><AbsDimension x="200" y="46"/></Size>
+    <Anchors>
+      <Anchor point="BOTTOMRIGHT">
+        <Offset>
+          <AbsDimension x="0" y="0"/>
+        </Offset>
+      </Anchor>
+    </Anchors>
+
+    <Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+      <EdgeSize>
+        <AbsValue val="4"/>
+      </EdgeSize>
+      <TileSize>
+        <AbsValue val="4"/>
+      </TileSize>
+      <BackgroundInsets>
+        <AbsInset left="2" right="2" top="2" bottom="2"/>
+      </BackgroundInsets>
+    </Backdrop>
+  </Frame>
+
+  <Frame name="TBag_UserDropdownTemplate" inherits="UIDropDownMenuTemplate" enableMouse="true" virtual="true">
+  <Layers>
+    <Layer level="BACKGROUND">
+      <FontString name="$parentLabel" inherits="GameFontNormalSmall" text=" ">
+        <Anchors>
+          <Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT">
+            <Offset>
+              <AbsDimension x="-70" y="-20"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+      </FontString>
+    </Layer>
+  </Layers>
+  <Scripts>
+    <OnEnter>
+      GameTooltip:SetOwner(this, "ANCHOR_TOPRIGHT");
+      GameTooltip:SetText(this.tooltip, nil, nil, nil, nil, 1);
+    </OnEnter>
+    <OnLeave>
+      GameTooltip:Hide();
+      ResetCursor();
+    </OnLeave>
+  </Scripts>
+  </Frame>
+
+  <EditBox name="TBag_SearchBoxTemplate" inherits="InputBoxTemplate" hidden="false" virtual="true" autoFocus="false">
+    <Size><AbsDimension x="140" y="30"/></Size>
+    <Scripts>
+      <OnTabPressed>
+        this:ClearFocus();
+      </OnTabPressed>
+      <OnEnterPressed>
+        TBag_DoSearch(this:GetText());
+        this:ClearFocus();
+      </OnEnterPressed>
+    </Scripts>
+  </EditBox>
+</Ui>

@@ -1,0 +1,8 @@
+<Bindings>
+  <Binding name="TINV_TOGGLE" header="TBag">
+    TInv_Toggle();
+  </Binding>
+  <Binding name="TBNK_TOGGLE" header="TBag">
+    TBnk_Toggle();
+  </Binding>
+</Bindings>

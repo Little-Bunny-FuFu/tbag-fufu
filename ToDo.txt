@@ -1,0 +1,87 @@
+/*=======================================================================+
+ | ESSENTIALS
+ +=======================================================================*/
+
+Fix Seventh Bank Bag bug
+
+Sorting!
+  Add a persistent per character / per bar sort flag
+    Make the new mechanism trigger the per bar sort flag
+    Make re-sort trigger all per bar flags
+    Only sort bars that have the sort flag raised
+
+Memory Usage
+  Change new flag to single character
+  Change all id's to numbers from strings
+  Create ItemSync style itemname array
+    Load time function change if ItemSync exists
+    Load time function change if CT_Mod exists
+  Create String lookup table for types, subtypes, and categories
+  Change indices on bags to numbers
+    Make sure to prefix mail and body slot info
+  Fix timestamps / rarity on empty slots
+  Do we need bag type per slot?
+  Make Item Link extract 8 numbers, and shorten and expand from :0  
+    Get rid of item: prefix?
+  
+
+Test key ring
+  This Item Begins a Quest not working
+
+Stacking Problems
+  Occasionally stuck in cursor.  Why?  Auctioneer testing
+  Can we get it to always prefer existing stacks for placement?
+
+UPGRADE:
+  Change Hooks to new code call?  How to override bag?
+
+Create Body Viewer
+  Expand to link all stats
+Create Mail Viewer
+
+Do collectibles from all raid instances
+   Molten Core, etc.
+
+Add to mail stack when things are sent to one of your own toons
+
+Rip out lootlink dependencies, add in recipebook
+  Heck, root out all the addon dependencies, since they are all messed up
+
+Put searches into own chat window (like fishing buddy) and click on and off
+
+/*-----------------------------------------------------------------------+
+ | FOO FOO
+ +-----------------------------------------------------------------------*/
+
+Make portraits update for diff players?
+
+Sleek mode without bags or buttons etc.
+
+Need to close and disable clicking bags on alternate views, maybe highlight
+
+Allow drag and drop onto bank icon, also do highlighting 
+
+Get locked appearance to work properly with CT_MailMod
+
+Get graphics to work... maybe cache window height?
+
+/*-----------------------------------------------------------------------+
+ | SAVE INFO
+ +-----------------------------------------------------------------------*/
+
+BankFrameBag1-6
+BankFrameItem1-24
+
+KeyRingButton
+
+ContainerFrame1Item1-#
+Hmmm... they auto allocate
+1-5 = Bags
+6-11 = BankBags
+
+AuctionsItemButton
+AuctionFramePostAuctionItem on 
+AuctionFramePost
+AuctionFrameAuctions
+
+
