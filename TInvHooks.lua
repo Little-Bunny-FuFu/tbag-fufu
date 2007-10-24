@@ -101,6 +101,7 @@ function TInv_Close()
   for _, bag in ipairs(TInv_Bags) do
     TBag_GetBagFrame(bag):SetChecked(0);
   end
+  MainMenuBarBackpackButton:SetChecked(0);
   TBag_UpdateButtonHighlights();
   
   -- Always reset to the global player for event processing
@@ -119,18 +120,24 @@ end
 function TInvHooks_CloseAllWindows()
   TBag_PrintDEBUG("event: CloseAllWindows()");
 
-  local itemsVisible = TInvHooks_savedfuncs["CloseAllWindows"]();
   local engVisible = TInvFrame:IsVisible();
-  
   if (engVisible) then
     TInv_Close();
   end
+ 
+  local itemsVisible = TInvHooks_savedfuncs["CloseAllWindows"]();
+  
   return (itemsVisible or engVisible);
 end
 
 function TInvHooks_OpenAllBags()
   TBag_PrintDEBUG("event: OpenAllBags()");
-  TInvHooks_savedfuncs["OpenAllBags"]();
+
+  if (TInvFrame:IsVisible() and TInvCfg["show_blizzard_frames"] == 1) then
+    TInvHooks_savedfuncs["OpenAllBags"]();
+  else
+    TInv_Toggle();
+  end
 
   -- Open the faux bank as well
   if (TBnkFrame:IsVisible()) then
@@ -219,20 +226,31 @@ function TInvHooks_BagSlotButton_OnClick()
       this:SetChecked(0);
     end
   else
-    TInvHooks_savedfuncs["BagSlotButton_OnClick"]();
-    TInv_UpdateWindow(TBAG_REQ_MUST);
+    if (TInvFrame:IsVisible()) then
+      TInvHooks_savedfuncs["BagSlotButton_OnClick"]();
+      TInv_UpdateWindow(TBAG_REQ_MUST);
+    else 
+      TInv_Toggle();
+      this:SetChecked(0);
+    end
   end
 end
 
 function TInvHooks_BagSlotButton_OnShiftClick()
   if (TInvCfg["show_blizzard_frames"] == 1) then
-      for _, bag in ipairs(TInv_Bags) do
-	if (bag ~= KEYRING_CONTAINER) then
-          OpenBag(bag);
-	end
+      if (TInvFrame:IsVisible()) then
+        OpenAllBags();
+      else
+        TInv_Toggle();
+	this:SetChecked(0);
       end
   else
-    this:SetChecked(0);
+    if (this:GetParent() ~= TInvFrame) then
+      TInv_Toggle();
+      this:SetChecked(0);
+    else
+      TBag_UpdateButtonHighlights();
+    end
   end
 end
 
@@ -257,6 +275,12 @@ function TInvHooks_BackpackButton_OnClick()
     if (not PutItemInBackpack()) then
       TBag_UpdateButtonHighlights();
     end
+    if (this:GetParent() ~= TInvFrame) then
+      TInv_Toggle();
+      MainMenuBarBackpackButton:SetChecked(0);
+    end
+  elseif (IsShiftKeyDown()) then
+    OpenAllBags();
   else
     TInvHooks_savedfuncs["BackpackButton_OnClick"]();
     TInv_UpdateWindow(TBAG_REQ_MUST);

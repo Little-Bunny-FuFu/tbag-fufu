@@ -32,6 +32,7 @@
       <OnLoad>
         this:RegisterEvent("MODIFIER_STATE_CHANGED");
         this:RegisterForClicks("LeftButtonUp", "RightButtonUp");	   
+        BankFrameItemButton_OnLoad();
       </OnLoad>
       <OnEnter>
         TBnk_ItemButton_OnEnter();
@@ -143,8 +144,9 @@
         TBnk_SlotTargetButton_OnClick("LeftButton", 1);
       </OnReceiveDrag>
       <OnLoad>
-            this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+        this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
         this:RegisterForDrag("LeftButton");
+        ContainerFrameItemButton_OnLoad();	
       </OnLoad>
       <OnHide>
         if ( this.hasStackSplit and (this.hasStackSplit == 1) ) then

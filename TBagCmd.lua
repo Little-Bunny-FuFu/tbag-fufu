@@ -11,9 +11,9 @@ function TBnk_cmd(msg)
   cmd = string.lower(cmd);
 
   if (cmd == "hide") then
-    TBnk_frame:Hide();
+    TBnk_Close();
   elseif (cmd == "show") then
-    TBnk_frame:Show();
+    TBnk_Open();
   elseif (cmd == "update") then
     TBnk_UpdateWindow(TBAG_REQ_MUST);
   elseif (cmd == "debug") then
@@ -43,9 +43,9 @@ function TInv_cmd(msg)
   cmd = string.lower(cmd);
 
   if (cmd == "hide") then
-    TInv_frame:Hide();
+    TInv_Close();
   elseif (cmd == "show") then
-    TInv_frame:Show();
+    TInv_Open();
   elseif (cmd == "update") then
     TInv_UpdateWindow(TBAG_REQ_MUST);
   elseif (cmd == "debug") then

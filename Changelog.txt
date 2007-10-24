@@ -1,3 +1,22 @@
+* 2007-06-19-Shefki
+  - Fixed: Ability to split stacks in bank.
+  - Fixed: Backpack button not opening inventory window.
+  - Fixed: Bag spotlights weren't clearing when closing inventory
+    window in some cases.
+  - Fixed: Other mods using OpenAllBags() were causing the blizzard
+    frames to open.  BulkMail2 was an example of such an addon.
+  - Fixed: When the Keyring is set to show in the inventory window,
+    clicking on the keys allows you to properly interact with them.
+    Previously, you'd pickup inventory items rather than keys or
+    nothing would happen.
+  - Fixed: /tinv show, /tinv hide, /tbnk show, /tbnk hide were not
+    working.  Fixed them.
+  - /tbag is now an alias for /tinv.
+  - Shift clicking on bag/backpack/bankbag buttons now produces a
+    consistent result.  In particular shift clicking on the backpack
+    button will no longer close the inventory window.
+  - Removed the Talos from the header on the keybindings.
+
 * 2007-06-10-Shefki
   - Right clicking on an item in a built in bank slot wasn't moving
     the item to the bag.  Somehow the frame wasn't inheriting 

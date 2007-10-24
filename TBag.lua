@@ -1,4 +1,4 @@
-BINDING_HEADER_TBag = "TBag by Talos";
+BINDING_HEADER_TBag = "TBag";
 
 -----------------------------------------------------------------------
 -- General Constants
@@ -1425,6 +1425,10 @@ function TBag_Init()
     TMailItm[TBAG_PLAYERID][TBAG_D_BAG] = {};
   end
 
+  -- Force the KEYRING_CONTAINER frame's id to -2.  Can't set frames to
+  -- negative values from XML. :(
+  getglobal(TBag_GetDummyBagFrameName(KEYRING_CONTAINER)):SetID(-2);
+  
   -- Initialize any player related info
   local group;
   group = TBagInfo[TBAG_PLAYERID][TBAG_G_BASIC];

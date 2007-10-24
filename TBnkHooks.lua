@@ -1,7 +1,6 @@
 TBnkHooks_funcs = {
   "BankFrameItemButtonBag_OnClick",
   "BankFrameItemButtonBag_OnShiftClick",
-  "BankFrameItemButtonBag_OnDrag",
   "CloseAllWindows"
 };
 
@@ -111,28 +110,28 @@ end
 
 function TBnkHooks_BankFrameItemButtonBag_OnClick(arg1)
   TBag_PrintDEBUG("event: BankFrameItemButtonBag_OnClick()");
-  if (TBnkCfg["show_blizzard_frames"] == 0) then
-    local inventoryID = this:GetInventorySlot();
-    local id = this:GetID();
-    local hadItem = PutItemInBag(inventoryID);
-    if (not hadItem) then
-      TBag_UpdateButtonHighlights();
+  local inventoryID = this:GetInventorySlot();
+  local id = this:GetID();
+  local hadItem = PutItemInBag(inventoryID);
+  if (TBnkCfg["show_blizzard_frames"] == 1) then
+    if (not hadItem and TBNK_ATBANK == 1) then
+      -- open bag
+      ToggleBag(id);
+      PlaySound("BAGMENUBUTTONPRESS");
     end
-  else
-    TBnkHooks_savedfuncs["BankFrameItemButtonBag_OnClick"](arg1);
-    TBnk_UpdateWindow(TBAG_REQ_MUST);
   end
+  if (hadItem) then
+    this:SetChecked(0);
+  end
+  TBnk_UpdateWindow(TBAG_REQ_MUST);
+  TBag_UpdateButtonHighlights();
 end
 
 function TBnkHooks_BankFrameItemButtonBag_OnShiftClick(arg1)
   this:SetChecked(0);
-  TBnkHooks_savedfuncs["BankFrameItemButtonBag_OnShiftClick"](arg1);
-end
-
-function TBnkHooks_BankFrameItemButtonBag_OnDrag()
-  TBag_PrintDEBUG("event: BankFrameItemButtonBag_OnDrag()");
-  TBnkHooks_savedfuncs["BankFrameItemButtonBag_OnDrag"]();
-  TBnk_UpdateWindow(TBAG_REQ_MUST);
+  if (TBNK_ATBANK == 1) then
+    TBnkHooks_savedfuncs["BankFrameItemButtonBag_OnShiftClick"](arg1);
+  end
 end
 
 function TBnkHooks_CloseAllWindows()

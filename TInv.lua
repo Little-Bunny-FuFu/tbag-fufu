@@ -149,6 +149,7 @@ function TInv_init(reset)
   -- register slash command
   SlashCmdList["TINV"] = TInv_cmd;
   SLASH_TINV1 = "/tinv";
+  SLASH_TINV2 = "/tbag";
 
   -- load default values
   TInv_InitDefVals(reset);
@@ -446,7 +447,7 @@ end
 function TInv_ItemButton_OnLeave()
   local itm = TBag_GetItmFromFrame(TBAG_BUTTONS, this:GetName());
 
-  TBag_PrintDEBUG("TInv_ItemButton_OnLeave() this="..this:GetName() );
+  TBag_PrintDEBUG("TInv_ItemButton_OnLeave() this="..this:GetName().." id="..this:GetID().." parent"..this:GetParent():GetName().." id="..this:GetParent():GetID() );
 
   if (TInv_edit_selected == "") then
     TInv_edit_hilight = "";

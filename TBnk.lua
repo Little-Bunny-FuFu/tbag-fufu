@@ -536,12 +536,22 @@ function TBnkFrameBagBank_OnClick()
 
   if ( not hadItem ) then
     if (TBnkCfg["show_blizzard_frames"] == 0) then
-      TBag_UpdateButtonHighlights();
+      if (not IsShiftKeyDown()) then
+        TBag_UpdateButtonHighlights();
+      else
+        this:SetChecked(0);
+      end
     else
       -- Only open at the bank
       if (TBNK_ATBANK == 1) then
         ToggleBag(-1);
         PlaySound("BAGMENUBUTTONPRESS");
+      else 
+        if (not IsShiftKeyDown()) then
+          TBag_UpdateButtonHighlights();
+        else
+          this:SetChecked(0);
+        end
       end
     end
   end

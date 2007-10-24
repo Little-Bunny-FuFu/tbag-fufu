@@ -334,7 +334,6 @@
         </Anchors>
         <Scripts>
           <OnClick>
-            TInvFrame:Hide();
             CloseBackpack();
           </OnClick>
         </Scripts>
@@ -608,11 +607,7 @@
             TInvMenuBarBackpackButtonIconTexture:SetTexture("Interface\\Buttons\\Button-Backpack-Up");
           </OnLoad>
           <OnClick>
-            if ( IsShiftKeyDown() ) then
-              OpenAllBags();
-            else
-              BackpackButton_OnClick();
-            end
+            BackpackButton_OnClick();
           </OnClick>
           <OnReceiveDrag>
             BackpackButton_OnClick();

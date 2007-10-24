@@ -37,35 +37,40 @@ textbox just to the left of the name dropdown.
 
 Todo/Known Issues
 
-* Shift Clicking on the backpack closes tbag and opens the blizzard frames for the
-individual bags other than the backpack, regardless of the show blizzard frames
-setting.  Unfortunately, there's no easy fix due to the way Blizzard is handling
-that shift click.  I'll look for a better fix in the future.
-
-* Keychain - You can set it to include the keychain slots in the tbag interface...
-However, they are generally very buggy, picking up a key ends up picking up another
-inventory item.  Shouldn't be too hard to fix...
+* Show Blizzard Frames.  This setting right now is only working for bags.
+  Needs to be implemented for the keychain.  Also it should be smart and realize
+  that bags/keychain etc that you have chosen to hide from the tbag interface
+  should open using the blizzard frames.  
 
 * Searching.  Text results alone suck.  Should be able to use the highlighting 
-like we have for new items for searches.  
+  like we have for new items for searches.  
 
 * Missing items from the default groups.  With TBC many new items have been added.
-In some cases they are improperly labeled and need some manual intervention to
-sort properly.  Updating the list of item numbers that need special casing needs
-to be done or find a library that does this for us.  PeriodicTable may be an 
-option, but I'm not sure it'll be a complete solution.  In the interim people
-who run into such issues should post item numbers and categories of such items
-to one of the forums for addons (curse, wowinterface).
+  In some cases they are improperly labeled and need some manual intervention to
+  sort properly.  Updating the list of item numbers that need special casing needs
+  to be done or find a library that does this for us.  PeriodicTable may be an 
+  option, but I'm not sure it'll be a complete solution.  In the interim people
+  who run into such issues should post item numbers and categories of such items
+  to one of the forums for addons (curse, wowinterface).
 
 * Easier way to recatagorize single items.  Having to add a pattern to put
   a single item in a different category is annoying.  Bring back the behavior
   EngBags had of allowing you to assign items to a category via right click.
 
+* TBag's auto restack feature will restack all bags whenever there is an update.
+  This is slow.  Try to optomize this to avoid UI lagginess.  Since the
+  BAG_UPDATE event tells us what bag was updated we may be able to speed things
+  up by only looking for items that need restacking in that bag. 
+
 * Messy/dead code.  The addon is filled with messy and dead code.  It needs a good
-clean out and review of essentially every single line.  There is a lot of code
-duplication that is unnecessary.  While this is something I might like to do, it
-is *NOT* a priority.  My major priorities are fixing annoying bugs and tweaking
-features to be more useful.  
+  clean out and review of essentially every single line.  There is a lot of code
+  duplication that is unnecessary.  While this is something I might like to do, it
+  is *NOT* a priority.  My major priorities are fixing annoying bugs and tweaking
+  features to be more useful.  
+
+* Shift Clicking on the backpack has a small cosmetic issue.  The button highlights
+  and can cause the highlight to be out of sync.  This is related to how Blizzard
+  is handling shift clicks on the backpack.  No workaround available at this time.
 
 Contacting Me
 
