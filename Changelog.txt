@@ -10,6 +10,8 @@
     data but once all characters have been logged into this issue
     will no longer occur.  Additionally, this allows all bags to show
     in search results even if they are hidden.
+  - Fixed: Unhiding the Player dropdown box would cause it to be out of
+    sync with the actual status of the window.
 
 * 2007-10-22-Shefki
   NOTE: THIS IS A MAJOR UPDATE.  YOU MUST DELETE THE TBag FOLDER IN YOUR 

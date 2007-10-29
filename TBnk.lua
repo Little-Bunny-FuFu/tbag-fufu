@@ -1693,7 +1693,7 @@ end
 
 function TBnk_UserDropdown_OnLoad()
   UIDropDownMenu_Initialize(this, TBnk_UserDropdown_Initialize);
-  UIDropDownMenu_SetSelectedValue(this, TBAG_PLAYERID);
+  UIDropDownMenu_SetSelectedValue(this, TBNK_PLAYERID);
   TBnk_UserDropdown.tooltip = "You are viewing this player's bank.";
   UIDropDownMenu_SetWidth(TBAG_USERDD_WIDTH, TBnk_UserDropdown);
 --  OptionsFrame_EnableDropDown(TBnk_UserDropdown);

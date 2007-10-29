@@ -1686,7 +1686,7 @@ end
 
 function TInv_UserDropdown_OnLoad()
   UIDropDownMenu_Initialize(this, TInv_UserDropdown_Initialize);
-  UIDropDownMenu_SetSelectedValue(this, TBAG_PLAYERID);
+  UIDropDownMenu_SetSelectedValue(this, TINV_PLAYERID);
   TInv_UserDropdown.tooltip = "You are viewing this player's inventory.";
   UIDropDownMenu_SetWidth(TBAG_USERDD_WIDTH, this);
 --  OptionsFrame_EnableDropDown(this);
