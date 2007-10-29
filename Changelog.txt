@@ -1,7 +1,15 @@
-* 2007-10-23-Shefki
+* 2007-10-28beta-Shefki
   - Fixed: Moving items to and from the bank would cause stacking not to
     occur on the receiving side.  Both sides will properly stack now.
     Thanks to Desa for reporting and helping me debug this problem.
+  - Fixed: TBag was not caching bags that were set not to be shown.  If
+    you later turned that bag on and then viewed another character that
+    you hadn't logged onto with that bag turned on, it would show
+    the items for the last character viewed for those slots and not
+    position them properly.  Item caches can still be missing some
+    data but once all characters have been logged into this issue
+    will no longer occur.  Additionally, this allows all bags to show
+    in search results even if they are hidden.
 
 * 2007-10-22-Shefki
   NOTE: THIS IS A MAJOR UPDATE.  YOU MUST DELETE THE TBag FOLDER IN YOUR 

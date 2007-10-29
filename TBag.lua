@@ -2233,7 +2233,7 @@ function TBag_UpdateItmCache(cfg, playerid, itmcache, bagarr, atbank)
   end
 
   for index, bag in ipairs(bagarr) do
-    if (cfg["show_Bag"..bag] == 1) then
+--    if (cfg["show_Bag"..bag] == 1) then
       if (itmcache[bag] == nil) then
         itmcache[bag] = {};
       end
@@ -2296,7 +2296,7 @@ function TBag_UpdateItmCache(cfg, playerid, itmcache, bagarr, atbank)
           -- Put on the stack array if we need more to stack
 	  stackarr = TBag_InsertStackArr(stackarr,itm);
 
-          if (itm[TBAG_I_BAR] == nil) then
+          if (itm[TBAG_I_BAR] == nil and cfg["show_Bag"..bag] == 1) then
             resort_mandatory = 1;
           end
 
@@ -2309,7 +2309,9 @@ function TBag_UpdateItmCache(cfg, playerid, itmcache, bagarr, atbank)
              ) then
             -- the item changed
             if (itm[TBAG_I_TIMESTAMP] ~= nil) then
-              resort_suggested = 1;
+              if (cfg["show_Bag"..bag] == 1) then
+                resort_suggested = 1;
+	      end
               itm[TBAG_I_TIMESTAMP] = time();
               itm[TBAG_I_NEWSTR] = TBAG_V_NEWON;
 	      TBAG_FORCED_SHOW[TBag_BagSlotToString(itm[TBAG_I_BAG],itm[TBAG_I_SLOT])] = 1
@@ -2344,7 +2346,7 @@ function TBag_UpdateItmCache(cfg, playerid, itmcache, bagarr, atbank)
         end
         itmcache[bag] = {};
       end
-    end
+--    end
   end
 
   if (resort_mandatory == 1) then
