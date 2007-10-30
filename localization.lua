@@ -1,4 +1,4 @@
-TBAG_VERSION = "20071030-r25-Shefki";
+TBAG_VERSION = "20071030-r27-Shefki";
 TBAG_S_RARITY  = "R_";  -- Do not touch this  ;-)
 
 TBag_DefaultItemOverrides = {
