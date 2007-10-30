@@ -1,4 +1,4 @@
-* 20071030-r27-Shefki
+* 20071030-r32-Shefki
   - Fixed: Moving items to and from the bank would cause stacking not to
     occur on the receiving side.  Both sides will properly stack now.
     Thanks to Desa for reporting and helping me debug this problem.
@@ -12,6 +12,7 @@
     in search results even if they are hidden.
   - Fixed: Unhiding the Player dropdown box would cause it to be out of
     sync with the actual status of the window.
+  - Standardize version numbers and start including svn rev number.
 
 * 2007-10-22-Shefki
   NOTE: THIS IS A MAJOR UPDATE.  YOU MUST DELETE THE TBag FOLDER IN YOUR 
