@@ -255,15 +255,6 @@ end
 -- UTILITY Funcs
 -----------------------------------------------------------------------
 
-function TBag_GetVersion()
-  local rev = '$Rev$'
-  local date = '$Date$'
-  local short_date = string.gsub(string.sub(date, string.find(date, '$Date: %d+-%d+-%d ')),'-','');
-  local version = short_date..'-r'..string.sub(rev, string.find(rev, '$Rev: %d+ %$'))..
-    '-Shefki';
-  return version;
-end
-
 function TBag_PrintDEBUG(msg,r,g,b,frame,id,unknown4th)
   if ((TBag_DEBUGMESSAGES) == 1 or (TINV_DEBUGMESSAGES == 1)) then
     TBag_Print(msg,r,g,b,frame,id,unknown4th)

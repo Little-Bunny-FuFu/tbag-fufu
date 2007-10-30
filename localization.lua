@@ -1,5 +1,13 @@
-TBAG_VERSION = "20071030-r27-Shefki";
+-- $Id$
+
 TBAG_S_RARITY  = "R_";  -- Do not touch this  ;-)
+
+local rev = '$Rev$'
+local date = '$Date$'
+local dev = '-Alpha';
+local short_date = string.gsub(string.sub(date, string.find(date, '%d+-%d+-%d+')),'-','');
+TBAG_VERSION = short_date..'-r'..string.sub(rev, string.find(rev, '%d+'))..dev..
+    '-Shefki';
 
 TBag_DefaultItemOverrides = {
 };
