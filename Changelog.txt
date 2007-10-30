@@ -1,4 +1,4 @@
-* 2007103026-Shefki
+* 20071030-r27-Shefki
   - Fixed: Moving items to and from the bank would cause stacking not to
     occur on the receiving side.  Both sides will properly stack now.
     Thanks to Desa for reporting and helping me debug this problem.
