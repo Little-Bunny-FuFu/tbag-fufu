@@ -1,3 +1,5 @@
+-- $ Id $
+
 TBAG_S_TRADES = "trades";
 TBAG_S_SECOND = "second";
 TBAG_S_SKILLS = "skills";

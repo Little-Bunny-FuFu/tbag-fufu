@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# $ Id $
+
 version=`grep -E '^TBAG_VERSION = ' localization.lua | cut -d '"' -f 2`
 year=`echo ${version} | cut -d '-' -f 1`
 month=`echo $version | cut -d '-' -f 2`

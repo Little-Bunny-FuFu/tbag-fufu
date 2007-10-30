@@ -1,3 +1,5 @@
+-- $ Id $
+
 local TBnk_CfgOpt = {};
 
 TBnk_Options_UPDATE_HAPPENING = 0;

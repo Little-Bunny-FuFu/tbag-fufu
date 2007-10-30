@@ -1,5 +1,7 @@
 #!/usr/bin/perl
 
+# $ Id $
+
 #######################################################################
 ### scrape-wowhead.perl                                             ###
 ### Fetches data from wowhead to build default categories for TBag. ###
