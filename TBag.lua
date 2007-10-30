@@ -1,4 +1,4 @@
--- $ Id $
+-- $Id $
 
 BINDING_HEADER_TBag = "TBag";
 

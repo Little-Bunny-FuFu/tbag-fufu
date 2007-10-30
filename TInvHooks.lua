@@ -1,4 +1,4 @@
--- $ Id $
+-- $Id $
 TInvHooks_funcs = {
   "CloseAllWindows",
   "OpenBackpack",

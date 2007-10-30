@@ -1,4 +1,4 @@
-<!-- $ Id $ -->
+<!-- $Id $ -->
 <Bindings>
   <Binding name="TINV_TOGGLE" header="TBag">
     TInv_Toggle();

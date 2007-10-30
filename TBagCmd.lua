@@ -1,4 +1,4 @@
--- $ Id $
+-- $Id $
 function TBag_ShowHelp(arr)
   for _, line in ipairs(arr) do
     TBag_Print(line);
