@@ -1,4 +1,4 @@
--- $Id $ 
+-- $Id$ 
 
 BINDING_NAME_TBNK_TOGGLE = "Toggle Bank Window";
 

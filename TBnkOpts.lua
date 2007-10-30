@@ -1,4 +1,4 @@
--- $Id $
+-- $Id$
 
 local TBnk_CfgOpt = {};
 

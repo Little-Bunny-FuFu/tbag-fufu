@@ -1,4 +1,4 @@
--- $Id $
+-- $Id$
 local TInv_CfgOpt = {};
 
 TINVOPT_UPDATE_HAPPENING = 0;

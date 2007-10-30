@@ -1,4 +1,4 @@
--- $Id $
+-- $Id$
 TBnkHooks_funcs = {
   "BankFrameItemButtonBag_OnClick",
   "BankFrameItemButtonBag_Pickup",

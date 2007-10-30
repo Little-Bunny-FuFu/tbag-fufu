@@ -1,4 +1,4 @@
--- $Id $
+-- $Id$
 
 TBAG_NUMCOL_MIN = 8;
 TBAG_NUMCOL_MAX = 20;

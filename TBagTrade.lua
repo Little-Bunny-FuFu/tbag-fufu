@@ -1,4 +1,4 @@
--- $Id $
+-- $Id$
 
 TBAG_S_TRADES = "trades";
 TBAG_S_SECOND = "second";

@@ -1,4 +1,4 @@
--- $Id $
+-- $Id$
 BINDING_NAME_TINV_TOGGLE = "Toggle Inventory Window";
 
 -- Constants
