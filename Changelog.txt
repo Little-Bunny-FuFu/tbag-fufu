@@ -1,3 +1,6 @@
+* 20071030-r35-Shefki
+  - Remove extra dev files from zip file included on accident.
+
 * 20071030-r32-Shefki
   - Fixed: Moving items to and from the bank would cause stacking not to
     occur on the receiving side.  Both sides will properly stack now.
