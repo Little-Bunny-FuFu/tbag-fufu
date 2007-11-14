@@ -914,11 +914,13 @@ function TBag_SetDefLayout(cfg, bagarr, row1offset, reset)
   TBag_SetCatBar(cfg, "IN_GEM_BAG", 16, reset);
   TBag_SetCatBar(cfg, "IN_HERB_BAG", 16, reset);
   TBag_SetCatBar(cfg, "IN_MINE_BAG", 16, reset);
+  TBag_SetCatBar(cfg, "IN_LTHR_BAG", 16, reset);
   TBag_SetCatBar(cfg, "EMPTY_ENCH_SLOTS", 16, reset);
   TBag_SetCatBar(cfg, "EMPTY_ENG_SLOTS", 16, reset);
   TBag_SetCatBar(cfg, "EMPTY_GEM_SLOTS", 16, reset);
   TBag_SetCatBar(cfg, "EMPTY_HERB_SLOTS", 16, reset);
   TBag_SetCatBar(cfg, "EMPTY_MINE_SLOTS", 16, reset);
+  TBag_SetCatBar(cfg, "EMPTY_LTHR_SLOTS", 16, reset);
 
   TBag_SetCatBar(cfg, "CLOTH", 15, reset);
   TBag_SetCatBar(cfg, "FIRST_AID", 15, reset);
@@ -1405,6 +1407,8 @@ function TBag_GetBagType(playerid, bag)
 	    type = "MINE";
 	  elseif (subType == "Enchanting Bag") then
             type = "ENCH";
+	  elseif (subType == "Leatherworking Bag") then
+            type = "LTHR";
           end
         end
         TBag_SetPlayerBagCfg(playerid, bag, TBAG_I_ITEMLINK, itemlink);

@@ -1,10 +1,20 @@
+* 20071113-r38-Shefki
+  - Update toc for 2.3.0
+  - Add support for leatherworking bags to the compression algorithm.
+  - Update item info for 2.3.0, there may be some errors in the 
+    list of items that can go in what container because of a change in
+    the formatting the game uses for that information.
+  - Update default sorts for the removal of the "Reagent" item type.
+    You'll need to do /tinv resetsorts and /tbnk resetsorts to get
+    the new sorts.
+
 * 20071030-r37-Shefki
   - Remove extra dev files from zip file included on accident.
 
 * 20071030-r32-Shefki
   - Fixed: Moving items to and from the bank would cause stacking not to
     occur on the receiving side.  Both sides will properly stack now.
-    Thanks to Desa for reporting and helping me debug this problem.
+    Thanks to Dessa for reporting and helping me debug this problem.
   - Fixed: TBag was not caching bags that were set not to be shown.  If
     you later turned that bag on and then viewed another character that
     you hadn't logged onto with that bag turned on, it would show

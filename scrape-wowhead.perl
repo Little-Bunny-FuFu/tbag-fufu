@@ -24,7 +24,7 @@ use WWW::Mechanize;
 my $wowhead_url = 'http://www.wowhead.com/';
 my $item_tag = '?item=';
 my $trade_filter = '?items&filter=cr=86;crv=0;crs=';
-my $poison_filter = '?items=15.-5&filter=cl=4';
+my $poison_filter = '?items=0.-3&filter=cl=4';
 
 # bagtype names as the key with an item id to one of these types of 
 # bags.
@@ -35,6 +35,7 @@ my %bag_types = (
 	'ENCH' => '21858',
 	'GEM'  => '24270',
 	'MINE' => '29540',
+	'LTHR' => '34490',
 	'QUIV' => '18714',
 	'AMMO' => '19320'
 );

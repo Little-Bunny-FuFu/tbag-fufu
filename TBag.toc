@@ -1,4 +1,4 @@
-## Interface: 20200 
+## Interface: 20300 
 ## Title: TBag
 ## Notes: The last bag addon you'll ever need.  Autosorting, viewable anywhere, easy to use yet amazingly configurable
 ## Author: Talos, Modified by Shefki

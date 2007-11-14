@@ -274,43 +274,45 @@ TBag_DefaultSearchList = {
   { "KEY_QUEST", "", " Key", "Key", "" },
 
 -- Reagents
-  { "CLASS_REAGENT", "", "Light Feather", "Miscellaneous", "" },
+  { "CLASS_REAGENT", "", "Light Feather", "", "" },
 
-  { "WARLOCK_REAGENT", "", "Infernal Stone", "Reagent", "" },
-  { "WARLOCK_REAGENT", "", "Demonic Figurine", "Reagent", "" },
+  { "WARLOCK_REAGENT", "", "Infernal Stone", "Gem", "" },
+  { "WARLOCK_REAGENT", "", "Demonic Figurine", "Gem", "" },
 
   { "ROGUE_REAGENT", "", "Blinding Powder", "", "" },
   { "ROGUE_REAGENT", "", "Flash Powder", "", "" },
 
-  { "DRUID_REAGENT", "", " Seed", "Reagent", "" },
-  { "DRUID_REAGENT", "", "Wild ", "Reagent", "" },
-  { "MAGE_REAGENT", "", "Arcane Powder", "Reagent", "" },
-  { "MAGE_REAGENT", "", "Rune of ", "Reagent", "" },
-  { "PALADIN_REAGENT", "", "Symbol of", "Reagent", "" },
-  { "PRIEST_REAGENT", "", " Candle", "Reagent", "" },
-  { "SHAMAN_REAGENT", "", "Ankh", "Reagent", "" },
+  { "DRUID_REAGENT", "", " Seed", "Gem", "" },
+  { "DRUID_REAGENT", "", "Flintweed Seed", "Miscellaneous", "" },
+  { "DRUID_REAGENT", "", "Wild ", "Gem", "" },
+  { "DRUID_REAGENT", "", "Wild Quillvine", "Miscellaneous", "" },
+  { "MAGE_REAGENT", "", "Arcane Powder", "Gem", "" },
+  { "MAGE_REAGENT", "", "Rune of ", "Gem", "" },
+  { "PALADIN_REAGENT", "", "Symbol of", "Miscellaneous", "" },
+  { "PRIEST_REAGENT", "", " Candle", "Gem", "" },
+  { "SHAMAN_REAGENT", "", "Ankh", "Gem", "" },
   { "SHAMAN_REAGENT", "", "Fish Oil", "", "" },
   { "SHAMAN_REAGENT", "", "Shiny Fish Scales", "", "" },
 
   { "ROGUE_TOOL", "", "Thieves' Tools", "", "" },
-  { "SHAMAN_TOOL", "", " Totem", "Reagent", "" },
-  { "SOULSHARD", "", "Soul Shard", "Reagent", "" },
+  { "SHAMAN_TOOL", "", " Totem", "Gem", "" },
+  { "SOULSHARD", "", "Soul Shard", "Gem", "" },
 
   { "DUMMY", "", "Target Dummy", "Trade Goods", "" },
 
 -- Reagents that aren't really specific to a trade
 -- but are used by a variety so special case them.
-  { "REAGENT", "", "Elemental %a+", "Reagent", ""},
-  { "REAGENT", "", "Essence of %a+", "Reagent", ""},
-  { "REAGENT", "", "Globe of Water", "Reagent", ""},
-  { "REAGENT", "", "Breath of Wind", "Reagent", ""},
-  { "REAGENT", "", "Heart of Fire", "Reagent", ""},
-  { "REAGENT", "", "Core of Earth", "Reagent", ""},
-  { "REAGENT", "", "Mote of %a+", "Reagent", ""},
-  { "REAGENT", "", "Primal %a+", "Reagent", ""},
+  { "REAGENT", "", "Elemental %a+", "Gem", ""},
+  { "REAGENT", "", "Essence of %a+", "Gem", ""},
+  { "REAGENT", "", "Globe of Water", "Gem", ""},
+  { "REAGENT", "", "Breath of Wind", "Gem", ""},
+  { "REAGENT", "", "Heart of Fire", "Gem", ""},
+  { "REAGENT", "", "Core of Earth", "Gem", ""},
+  { "REAGENT", "", "Mote of %a+", "Trade Goods", ""},
+  { "REAGENT", "", "Primal %a+", "Trade Goods", ""},
   { "REAGENT", "", "Void Crystal", "Trade Goods", ""},
-  { "REAGENT", "", "Nether Vortex", "Reagent", ""},
-  { "REAGENT", "", "Heart of Darkness", "Reagent", ""},
+  { "REAGENT", "", "Nether Vortex", "Trade Goods", ""},
+  { "REAGENT", "", "Heart of Darkness", "Trade Goods", ""},
 
 -- Trades (fishing done above before equipment)
   { "ALCHEMY", "", " Vial", "Trade Goods", "" },
