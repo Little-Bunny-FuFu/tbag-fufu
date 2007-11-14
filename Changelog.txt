@@ -1,4 +1,4 @@
-* 20071113-r38-Shefki
+* 20071113-r40-Shefki
   - Update toc for 2.3.0
   - Add support for leatherworking bags to the compression algorithm.
   - Update item info for 2.3.0, there may be some errors in the 
