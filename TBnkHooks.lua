@@ -1,8 +1,7 @@
 -- $Id$
 TBnkHooks_funcs = {
   "BankFrameItemButtonBag_OnClick",
-  "BankFrameItemButtonBag_Pickup",
-  "CloseAllWindows"
+  "BankFrameItemButtonBag_Pickup"
 };
 
 TBnkHooks_savedfuncs = {};
@@ -142,15 +141,11 @@ end
 function TBnkHooks_CloseAllWindows()
   TBag_PrintDEBUG("event: CloseAllWindows()");
 
-  local itemsVisible = TBnkHooks_savedfuncs["CloseAllWindows"]();
-  local engVisible = TBnkFrame:IsVisible();
-
-  if (engVisible) then
+  if (TBnkFrame:IsVisible()) then
     TBnk_Close();
   end
-
-  return (itemsVisible or engVisible);
 end
+hooksecurefunc('CloseAllWindows', TBnkHooks_CloseAllWindows);
 
 function TBnkHooks_ToggleDropDownMenu(level, value, dropDownFrame, anchorName, xOffset, yOffset)
   TBag_PrintDEBUG("event: ToggleDropDownMenu()");

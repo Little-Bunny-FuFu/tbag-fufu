@@ -1,6 +1,5 @@
 -- $Id$
 TInvHooks_funcs = {
-  "CloseAllWindows",
   "OpenBackpack",
   "CloseBackpack",
   "ToggleBackpack",
@@ -124,15 +123,11 @@ end
 function TInvHooks_CloseAllWindows()
   TBag_PrintDEBUG("event: CloseAllWindows()");
 
-  local engVisible = TInvFrame:IsVisible();
-  if (engVisible) then
+  if (TInvFrame:IsVisible()) then
     TInv_Close();
   end
- 
-  local itemsVisible = TInvHooks_savedfuncs["CloseAllWindows"]();
-  
-  return (itemsVisible or engVisible);
 end
+hooksecurefunc('CloseAllWindows', TInvHooks_CloseAllWindows);
 
 function TInvHooks_OpenAllBags()
   TBag_PrintDEBUG("event: OpenAllBags()");
