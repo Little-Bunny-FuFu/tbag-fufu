@@ -1,3 +1,9 @@
+* 20071120-r??-Shefki
+  - Fix a taint bug that happened when you died.
+  - Fix sort of class reagents and darkmoon faire cards.  Hopefully,
+    this is all correct now for 2.3.0.  Requies another /tinv resetsorts
+    and /tbnk resetsorts
+
 * 20071113-r40-Shefki
   - Update toc for 2.3.0
   - Add support for leatherworking bags to the compression algorithm.
