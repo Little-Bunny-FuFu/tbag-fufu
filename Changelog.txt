@@ -1,4 +1,4 @@
-* 20071120-r??-Shefki
+* 20071128-r45-Shefki
   - Fix a taint bug that happened when you died.
   - Fix sort of class reagents and darkmoon faire cards.  Hopefully,
     this is all correct now for 2.3.0.  Requies another /tinv resetsorts
