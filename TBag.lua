@@ -493,7 +493,7 @@ function TBag_GetItemInfo(itemid)
 end
 
 function TBag_GetItemTexture(itemid)
-  local _, _, _, _, _, _, _, _, _, invTexture = GetItemInfo(itemid);
+  local invTexture = GetItemIcon(itemid);
   return invTexture;
 end
 
