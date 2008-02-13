@@ -1,7 +1,8 @@
 -- $Id$
 TBnkHooks_funcs = {
   "BankFrameItemButtonBag_OnClick",
-  "BankFrameItemButtonBag_Pickup"
+  "BankFrameItemButtonBag_Pickup",
+  "BankFrameItemButtonGeneric_OnModifiedClick"
 };
 
 TBnkHooks_savedfuncs = {};
@@ -136,6 +137,10 @@ function TBnkHooks_BankFrameItemButtonBag_Pickup(arg1)
   if (TBNK_ATBANK == 1) then
     TBnkHooks_savedfuncs["BankFrameItemButtonBag_Pickup"](arg1);
   end
+end
+
+function TBnkHooks_BankFrameItemButtonGeneric_OnModifiedClick(arg1)
+  TInvHooks_ContainerFrameItemButton_OnModifiedClick(arg1);  
 end
 
 function TBnkHooks_CloseAllWindows()
