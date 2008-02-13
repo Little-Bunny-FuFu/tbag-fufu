@@ -548,7 +548,6 @@ function TInvHooks_ContainerFrameItemButton_OnModifiedClick(button)
       end
     elseif (TBNK_ATBANK == 1 and itm[TBAG_I_BAG] == -1) then
       TBag_PrintDEBUG('ItemButton_OnModifiedClick At bank click on bank bag');
-      BankFrameItemButtonGeneric_OnModifiedClick(button);
       call_blizzard = false;
     end
   end
