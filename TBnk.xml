@@ -212,7 +212,7 @@
         <Anchors>
           <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOM">
             <Offset>
-              <AbsDimension x="76" y="7"/>
+              <AbsDimension x="76" y="-22"/>
             </Offset>
           </Anchor>
         </Anchors>
@@ -239,7 +239,7 @@
         <Anchors>
           <Anchor point="BOTTOMLEFT" relativePoint="BOTTOM">
             <Offset>
-              <AbsDimension x="80" y="7"/>
+              <AbsDimension x="80" y="-22"/>
             </Offset>
           </Anchor>
         </Anchors>

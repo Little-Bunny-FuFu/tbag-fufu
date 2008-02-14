@@ -160,7 +160,7 @@
         <Anchors>
           <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOM">
             <Offset>
-              <AbsDimension x="38" y="7"/>
+              <AbsDimension x="38" y="-22"/>
             </Offset>
           </Anchor>
         </Anchors>
@@ -189,7 +189,7 @@
         <Anchors>
           <Anchor point="BOTTOMLEFT" relativePoint="BOTTOM">
             <Offset>
-              <AbsDimension x="42" y="7"/>
+              <AbsDimension x="42" y="-22"/>
             </Offset>
           </Anchor>
         </Anchors>
