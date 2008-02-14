@@ -1600,14 +1600,8 @@ function TBag_GetCooldownString(cooldownInfo)
 end
 
 
-function TBag_MakeHyperlink(itemlink)
-  local name, _, quality = GetItemInfo(itemlink);
-  local QL_Colors = { "ff9d9d9d", "ffffffff", "ff1eff00", "ff0070dd", "ffa335ee", "ffff8000", "ffffcc9d"};
-
-  if (name) and (itemlink) and (quality) then
-    quality = tonumber(quality);
-    return "|c"..QL_Colors[quality+1].."|H"..itemlink.."|h["..name.."]|h|r";
-  end
+function TBag_MakeHyperlink(itemstring)
+  local _, itemlink, _ = GetItemInfo(itemstring);
   return itemlink;
 end
 
