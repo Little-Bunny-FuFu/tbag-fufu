@@ -566,21 +566,24 @@ function TBag_PlacePrep(place)
   end
 end
 
-function TBag_AddSearchResult(itemid, playername, place, count)
-  TBag_PrintDEBUG("TBag_AddSearchResult "..count.." "..itemid
+function TBag_AddSearchResult(itemstring, playername, place, count)
+  -- Strip the unique id
+  itemstring = string.gsub(itemstring, "(item:%d+:%d+:%d+:%d+:%d+:%d+:%-?%d+):%-?%d+","%1:0",1);
+
+  TBag_PrintDEBUG("TBag_AddSearchResult "..count.." "..itemstring
     ..TBag_PlacePrep(place)..playername.."'s "..place);
 
   -- First see if this result has been added before
-  if (TBag_SrchResults[itemid] == nil) then
-    TBag_SrchResults[itemid] = {};
+  if (TBag_SrchResults[itemstring] == nil) then
+    TBag_SrchResults[itemstring] = {};
   end
-  if (TBag_SrchResults[itemid][playername] == nil) then
-    TBag_SrchResults[itemid][playername] = {};
+  if (TBag_SrchResults[itemstring][playername] == nil) then
+    TBag_SrchResults[itemstring][playername] = {};
   end
-  if (TBag_SrchResults[itemid][playername][place] == nil) then
-    TBag_SrchResults[itemid][playername][place] = count;
+  if (TBag_SrchResults[itemstring][playername][place] == nil) then
+    TBag_SrchResults[itemstring][playername][place] = count;
   else
-    TBag_SrchResults[itemid][playername][place] = TBag_SrchResults[itemid][playername][place] + count;
+    TBag_SrchResults[itemstring][playername][place] = TBag_SrchResults[itemstring][playername][place] + count;
   end
 end
 
