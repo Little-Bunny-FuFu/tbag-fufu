@@ -12,7 +12,6 @@ TBAG_REALM = GetRealmName();
 
 -- Main mapping array
 TBAG_BUTTONS = {};
-TBAG_BAGSIZE_MAX = 40;
 
 -- GFX settings
 TBAG_BAR_MAX = 32;
@@ -435,7 +434,7 @@ function TBag_CreateDummyBag(bag, template)
   if (dbag) then
     local buttonname;
 
-    for slot = 1, TBAG_BAGSIZE_MAX do
+    for slot = 1, MAX_CONTAINER_ITEMS do
       buttonname = TBag_GetBagItemButtonName(bag, slot);
       if not (getglobal(buttonname)) then
         CreateFrame("Button", buttonname, dbag, template);

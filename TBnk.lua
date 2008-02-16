@@ -1633,7 +1633,7 @@ function TBnk_UpdateWindow(resort_req)
         TBag_GetBagItemButtonName(bag, slot),
         TBnk_edit_mode, TBnk_edit_hilight, TBnk_hilight_new)
     end
-    for slot = size+1, TBAG_BAGSIZE_MAX do
+    for slot = size+1, MAX_CONTAINER_ITEMS do
       getglobal(TBag_GetBagItemButtonName(bag, slot)):Hide();
     end
   end
