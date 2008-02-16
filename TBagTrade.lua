@@ -228,7 +228,7 @@ function TBag_MakeTradeCreationKeyword(itm, trade, cat, docreated)
   TBag_PrintDEBUG("TBag_MakeTradeKeyword done");
 end
 
-function TBag_MakeTradeReagentKeywords(itm, trade1, trade)
+function TBag_MakeTradeReagentKeywords(itm, trade1, trade2)
   if (itm ~= nil and itm[TBAG_I_ITEMID] ~= nil) then
     for reagent,_ in pairs(TBagCfg[TBAG_S_REAGENT]) do
       if (reagent == itm[TBAG_I_ITEMID]) then
@@ -303,5 +303,5 @@ function TBag_MakeAllTradeKeywords(itm, docreated, trade1, trade2)
       TBag_MakeTradeCreationKeyword(itm, TBag_Loc(trade), TBag_Cat(trade), docreated);
     end
   end
-  TBag_MakeTradeReagentKeywords(itm, trade1, trade);
+  TBag_MakeTradeReagentKeywords(itm, trade1, trade2);
 end
