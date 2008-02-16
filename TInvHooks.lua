@@ -152,10 +152,10 @@ function TInvHooks_OpenBag(bag)
   TInvHooks_savedfuncs["OpenBag"](bag);
 
   -- Update the texture to the box for the bank bag 
-  if (bag == -1) then
-    local contid = IsBagOpen(-1);
+  if (bag == BANK_CONTAINER) then
+    local contid = IsBagOpen(BANK_CONTAINER);
     if (contid) then
-  	  getglobal("ContainerFrame"..contid.."PortraitButton"):SetID(-1);
+  	  getglobal("ContainerFrame"..contid.."PortraitButton"):SetID(BANK_CONTAINER);
  	  getglobal("ContainerFrame"..contid.."Name"):SetText("Your Bank");
 	  SetPortraitToTexture("ContainerFrame"..contid.."Portrait", "Interface\\Icons\\INV_Box_03");
     end
@@ -172,10 +172,10 @@ function TInvHooks_ToggleBag(bag)
   TInvHooks_savedfuncs["ToggleBag"](bag);
 
   -- Update the texture to the box for the bank bag 
-  if (bag == -1) then
-    local contid = IsBagOpen(-1);
+  if (bag == BANK_CONTAINER) then
+    local contid = IsBagOpen(BANK_CONTAINER);
     if (contid) then
-  	  getglobal("ContainerFrame"..contid.."PortraitButton"):SetID(-1);
+  	  getglobal("ContainerFrame"..contid.."PortraitButton"):SetID(BANK_CONTAINER);
  	  getglobal("ContainerFrame"..contid.."Name"):SetText("Your Bank");
 	  SetPortraitToTexture("ContainerFrame"..contid.."Portrait", "Interface\\Icons\\INV_Box_03");
     end
@@ -546,7 +546,7 @@ function TInvHooks_ContainerFrameItemButton_OnModifiedClick(button)
 	  call_blizzard = false;
         end
       end
-    elseif (TBNK_ATBANK == 1 and itm[TBAG_I_BAG] == -1) then
+    elseif (TBNK_ATBANK == 1 and itm[TBAG_I_BAG] == BANK_CONTAINER) then
       TBag_PrintDEBUG('ItemButton_OnModifiedClick At bank click on bank bag');
       TBnkHooks_savedfuncs["BankFrameItemButtonGeneric_OnModifiedClick"](arg1);
       call_blizzard = false;

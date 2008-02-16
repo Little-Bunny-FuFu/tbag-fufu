@@ -144,7 +144,7 @@ function TBnk_init(reset)
 
   -- Make all the frames
   for _, bag in ipairs(TBnk_Bags) do
-    if (bag == -1) then
+    if (bag == BANK_CONTAINER) then
       TBag_CreateDummyBag(bag, "TBnk_BankItemButtonTemplate");
     else
       TBag_CreateDummyBag(bag, "TBnk_ItemButtonTemplate");
@@ -258,11 +258,11 @@ end
 
 function TBnk_UpdateBagGfx()
   local i;
+  local bag = BANK_CONTAINER;
   local numSlots, _ = TBag_GetNumBankSlots(TBNK_PLAYERID);
-  local free, size = TBag_UpdateSlots(TBNK_PLAYERID, "TBnkNum", -1, TBnkCfg["show_bag_sizes"]);
+  local free, size = TBag_UpdateSlots(TBNK_PLAYERID, "TBnkNum", bag, TBnkCfg["show_bag_sizes"]);
   local totalfree = free;
   local totalsize = size;
-  local bag = -1;
 
   TBag_UpdateBagColors(bag);
   TBag_SetPlayerBagCfg(TBNK_PLAYERID, bag, TBAG_I_ITEMLINK, nil);
@@ -573,14 +573,16 @@ function TBnkFrameBagBank_OnClick()
 
   -- Only open at the bank
   if ( not hadItem and TBNK_ATBANK == 1) then
-    if (TBnkCfg["show_blizzard_frames"] == 1 or TBnkCfg["show_Bag-1"] == 0) then
+    if (TBnkCfg["show_blizzard_frames"] == 1 or
+	TBnkCfg["show_Bag"..BANK_CONTAINER] == 0) then
       if (not IsModifiedClick("OPENALLBAGS")) then
-        ToggleBag(-1);
+        ToggleBag(BANK_CONTAINER);
         PlaySound("BAGMENUBUTTONPRESS");
        end
     end
   end
-  if (IsModifiedClick("OPENALLBAGS") or (TBNK_ATBANK == 0 and TBnkCfg["show_Bag-1"] == 0)) then
+  if (IsModifiedClick("OPENALLBAGS") or
+      (TBNK_ATBANK == 0 and TBnkCfg["show_Bag"..BANK_CONTAINER] == 0)) then
     this:SetChecked(0);
   end
   TBag_UpdateButtonHighlights();

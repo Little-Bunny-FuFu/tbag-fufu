@@ -117,10 +117,10 @@ TBAG_S_CLASS     = "class";
 -- Main Bag and Item arrays
 -----------------------------------------------------------------------
 
-local TBAG_BAGMIN = -2;
+local TBAG_BAGMIN = KEYRING_CONTAINER;
 local TBAG_BAGMAX = 11;
-TInv_Bags = { 0, 4, 3, 2, 1, KEYRING_CONTAINER };
-TBnk_Bags = { -1, 5, 6, 7, 8, 9, 10, 11 };
+TInv_Bags = { BACKPACK_CONTAINER, 4, 3, 2, 1, KEYRING_CONTAINER };
+TBnk_Bags = { BANK_CONTAINER, 5, 6, 7, 8, 9, 10, 11 };
 TBody_Slots = {
   ["HeadSlot"] = 1,
   ["NeckSlot"] = 2,
@@ -219,9 +219,9 @@ function TBag_Init()
     TMailItm[TBAG_PLAYERID] = {};
   end
 
-  -- Force the KEYRING_CONTAINER frame's id to -2.  Can't set frames to
-  -- negative values from XML. :(
-  getglobal(TBag_GetDummyBagFrameName(KEYRING_CONTAINER)):SetID(-2);
+  -- Force the KEYRING_CONTAINER frame's id to the proper value.
+  -- Can't set frames to negative values from XML. :(
+  getglobal(TBag_GetDummyBagFrameName(KEYRING_CONTAINER)):SetID(KEYRING_CONTAINER);
   
   -- Initialize any player related info
   local group;
@@ -1342,9 +1342,9 @@ end
 -- Used for options strings
 function TBag_GetBagDispName(bag)
   if ( bag < TBAG_BAGMIN ) or ( bag > TBAG_BAGMAX ) then return ""; end
-  if (bag == -2) then return "Keyring"; end
-  if (bag == -1) then return "Bank"; end
-  if (bag == 0) then return "Backpack"; end
+  if (bag == KEYRING_CONTAINER) then return "Keyring"; end
+  if (bag == BANK_CONTAINER) then return "Bank"; end
+  if (bag == BACKPACK_CONTAINER) then return "Backpack"; end
   if (bag == 1) then return "Fourth Bag"; end
   if (bag == 2) then return "Third Bag"; end
   if (bag == 3) then return "Second Bag"; end
@@ -1361,9 +1361,9 @@ end
 -- Used for EMPTY_X_SLOTS
 function TBag_GetBagPosName(bag)
   if ( bag < TBAG_BAGMIN ) or ( bag > TBAG_BAGMAX ) then return ""; end
-  if (bag == -2) then return "KEYRING"; end
-  if (bag == -1) then return "BANK"; end
-  if (bag == 0) then return "BACKPACK"; end
+  if (bag == KEYRING_CONTAINER) then return "KEYRING"; end
+  if (bag == BANK_CONTAINER) then return "BANK"; end
+  if (bag == BACKPACK_CONTAINER) then return "BACKPACK"; end
   if (bag == 1) then return "BAG1"; end
   if (bag == 2) then return "BAG2"; end
   if (bag == 3) then return "BAG3"; end
@@ -1386,7 +1386,7 @@ function TBag_GetBagType(playerid, bag)
 
   -- get the live info if we are the current player, and at the bank
   if (playerid == TBAG_PLAYERID) then
-    if (((TBNK_ATBANK == 1) or TBag_Member(TInv_Bags, bag)) and bag > 0) then
+    if (((TBNK_ATBANK == 1) or TBag_Member(TInv_Bags, bag)) and bag > BACKPACK_CONTAINER) then
       local _, _, itemlink = strfind(GetInventoryItemLink("player", ContainerIDToInventoryID(bag)) or "", "^|%x+|H(.+)|h%[.+%]");
       local id, itemlink = TBag_GetItemID(itemlink);
       if (id) then 
@@ -1447,9 +1447,9 @@ function TBag_GetBagTexture(playerid, bag)
 
 
   -- Special bag textures are always fixed
-  if (bag == 0) then
+  if (bag == BACKPACK_CONTAINER) then
     texture = "Interface\\Buttons\\Button-Backpack-Up";
-  elseif (bag == -1) then
+  elseif (bag == BANK_CONTAINER) then
     texture = "Interface\\Icons\\INV_Box_03";
   elseif (bag == KEYRING_CONTAINER) then
     texture = "Interface\\ContainerFrame\\KeyRing-Bag-Icon";
@@ -1468,9 +1468,9 @@ end
 function TBag_GetBagFrameName(bag)
   if (bag == KEYRING_CONTAINER) then
     return "TInvingButton";
-  elseif (bag == -1) then
+  elseif (bag == BANK_CONTAINER) then
     return "TBnkFrameBagBank";
-  elseif (bag == 0) then
+  elseif (bag == BACKPACK_CONTAINER) then
     return "TInvMenuBarBackpackButton";
   elseif TBag_Member(TInv_Bags, bag) then
     return "TInvacterBag"..(bag-1).."Slot";
@@ -1484,9 +1484,9 @@ end
 function TBag_GetDummyBagFrameName(bag)
   if (bag == KEYRING_CONTAINER) then
     return "TInvainerFrame13";
-  elseif (bag == 0) then
+  elseif (bag == BACKPACK_CONTAINER) then
     return "TInvainerFrame12";
-  elseif (bag == -1) then
+  elseif (bag == BANK_CONTAINER) then
     return "TBnkFrame";
   elseif TBag_Member(TInv_Bags, bag) then
     return "TInvainerFrame"..(bag);
@@ -1504,9 +1504,9 @@ end
 function TBag_GetBagIdxName(bag)
   if (bag == KEYRING_CONTAINER) then
     return "KeyRing";
-  elseif (bag == -1) then
+  elseif (bag == BANK_CONTAINER) then
     return "Bank";
-  elseif (bag == 0) then
+  elseif (bag == BACKPACK_CONTAINER) then
     return tostring(bag);
   elseif TBag_Member(TInv_Bags, bag) then
     return tostring(bag);
@@ -1518,7 +1518,7 @@ end
 function TBag_GetBagNumName(bag)
   if TBag_Member(TBnk_Bags, bag) then
     return "TBnkNum"..TBag_GetBagIdxName(bag);
-  elseif (bag == 0) then
+  elseif (bag == BACKPACK_CONTAINER) then
     return "TInvNum"..TBag_GetBagIdxName(bag);
   elseif TBag_Member(TInv_Bags, bag) then
     return "TInvNum"..TBag_GetBagIdxName(bag);
@@ -1755,7 +1755,7 @@ end
 function TBag_UpdateSlots(playerid, name, bag, showsize)
   local free, size = TBag_GetSlotInfo(playerid, bag);
   -- TBag_Print(playerid..", b="..bag..", "..free.."/"..size..", AT="..TBNK_ATBANK);
-  if (bag == -1) then bag = "Bank"; end
+  if (bag == BANK_CONTAINER) then bag = "Bank"; end
   if (bag == KEYRING_CONTAINER) then bag = "KeyRing"; end
 
   TBag_SetFreeStr(getglobal(name..bag.."Text"), free, size, showsize);
@@ -2021,9 +2021,9 @@ function TBag_GetInvSlotID(bag, slot)
   local id;
   if (bag == KEYRING_CONTAINER) then
     id = KeyRingButtonIDToInvSlotID(slot);
-  elseif (bag == -1) then
+  elseif (bag == BANK_CONTAINER) then
     id = BankButtonIDToInvSlotID(slot);
-  elseif (bag >= 0) and (bag <= TBAG_BAGMAX) then
+  elseif (bag >= BACKPACK_CONTAINER) and (bag <= TBAG_BAGMAX) then
     id = 100*bag + slot;  -- ???
   end
 
@@ -2038,7 +2038,7 @@ function TBag_SetInventoryItem(tt, playerid, itemlink, bag, slot)
   if (playerid == TBAG_PLAYERID) then
     -- Inventory and being at the bank is always safe
     if (TBag_Member(TInv_Bags, bag) or TBNK_ATBANK == 1) then
-      if (bag == KEYRING_CONTAINER) or (bag == -1) then
+      if (bag == KEYRING_CONTAINER) or (bag == BANK_CONTAINER) then
         hasCooldown, repairCost = tt:SetInventoryItem("player", TBag_GetInvSlotID(bag, slot));
       else
         hasCooldown, repairCost = tt:SetBagItem(bag, slot);
