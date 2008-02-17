@@ -1311,7 +1311,7 @@ function TBag_PositionFrame(frameName, childAttachPoint, parentFrameName, parent
     frame:SetHeight(height);
     frame:Show();
   else
-    message("Attempt to find frame '"..frameName.."' failed.");
+    TBag_PrintDEBUG("Attempt to find frame '"..frameName.."' failed.");
   end
 end
 

@@ -601,7 +601,7 @@ function TBnk_RightClick_PickupItem()
   if ( (bag ~= nil) and (slot ~= nil) ) then
     PickupContainerItem(bag, slot);
   else
-  message("Error, value not found.");
+  TBag_PrintDEBUG("Error, value not found.");
   end
 end
 
