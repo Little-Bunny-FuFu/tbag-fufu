@@ -535,13 +535,13 @@ function TBag_CleanConfig()
 end
 
 function TBag_BagSlotToString(bag,slot)
-  return bag.."."..slot;
+  return bag..":"..slot;
 end
 
 function TBag_StringToBagSlot(string)
   local bag,slot;
 
-  bag,slot = TBag_SplitStr(string,'.');
+  bag,slot = TBag_SplitStr(string,':');
   return tonumber(bag),tonumber(slot);
 end
 
