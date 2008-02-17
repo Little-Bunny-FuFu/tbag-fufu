@@ -1620,28 +1620,14 @@ end
 function TBag_SetRarityColor(rarity, name)
   local bkgr = getglobal(name.."_bkgr");
   local normal = getglobal(name.."NormalTexture");
+  if (rarity) then
+    local r, g, b = GetItemQualityColor(rarity);
 
-  if (rarity == nil) then
+    bkgr:SetVertexColor(r, g, b, 1);
+    normal:SetVertexColor(r, g, b, 0.5);
+  else
     bkgr:SetVertexColor(0.05,0.05,0.05,1);
     normal:SetVertexColor(0.05,0.05,0.05, 0.5);
-  elseif (rarity == 0) then     -- gray item
-    bkgr:SetVertexColor(0.1,0.1,0.1,1);
-    normal:SetVertexColor(0.1,0.1,0.1,0.75);
-  elseif (rarity == 1) then     -- white item
-    bkgr:SetVertexColor(0.25,0.25,0.25,1);
-    normal:SetVertexColor(0.25,0.25,0.25, 0.5);
-  elseif (rarity == 2) then     -- green item
-    bkgr:SetVertexColor(0,.8,0.2,1);
-    normal:SetVertexColor(0,.8,0.2, 0.5);
-  elseif (rarity == 3) then     -- blue item
-    bkgr:SetVertexColor(0.25,0.15,1,1);
-    normal:SetVertexColor(0.25,0.15,1, 0.5);
-  elseif (rarity == 4) then     -- purple item
-    bkgr:SetVertexColor(1,.2,1,1);
-    normal:SetVertexColor(1,.2,1, 0.5);
-  else    -- ?!
-    bkgr:SetVertexColor(0,0,0,1);
-    normal:SetVertexColor(0,0,0, 0.5);
   end
 end
 
