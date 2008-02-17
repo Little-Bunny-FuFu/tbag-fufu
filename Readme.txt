@@ -56,9 +56,8 @@ Todo/Known Issues
   is *NOT* a priority.  My major priorities are fixing annoying bugs and tweaking
   features to be more useful.  
 
-* Localization cleanup.  Review of the code looking for places where it needs localized.
-  Turn localization.lua into just localization data.  There's some constants in there
-  that have nothing to do with localization.  Once this is done look for translators.
+* Localization.  Localization cleanup is complete, just need translators.  If
+  you're interested in translating contact me on Curse. 
 
 Contacting Me
 
