@@ -1,5 +1,13 @@
 -- $Id$
 
+local rev = '$Rev$'
+local date = '$Date$'
+local dev = '-Alpha';
+local short_date = string.gsub(string.sub(date, string.find(date, '%d+-%d+-%d+')),'-','');
+TBAG_VERSION = short_date..'-r'..string.sub(rev, string.find(rev, '%d+'))..dev..
+    '-Shefki';
+    
+
 BINDING_HEADER_TBag = "TBag";
 
 -----------------------------------------------------------------------
@@ -111,6 +119,8 @@ TBAG_S_EQUIPPED  = "equip";
 TBAG_G_BASIC     = "basic";
 TBAG_S_CLASS     = "class";
 
+-- Localization Support
+local L = TBAG_LOCALE;
 
 -----------------------------------------------------------------------
 -- Main Bag and Item arrays
@@ -240,11 +250,11 @@ function TBag_ChangeKeybind()
     local key1, key2 = GetBindingKey("TOGGLEBACKPACK");
     if (key1) then
       SetBinding(key1, "TINV_TOGGLE");
-      TBag_Print(TBAG_SCP.."Setting keybind to '"..key1.."'", 1, 1, 1);
+      TBag_Print(string.format(L['%sSetting keybind to %q'],TBAG_SCP,key1), 1, 1, 1);
       SaveBindings(GetCurrentBindingSet());
     elseif (key2) then
       SetBinding(key2, "TINV_TOGGLE");
-      TBag_Print(TBAG_SCP.."Setting keybind to '"..key2.."'", 1, 1, 1);
+      TBag_Print(string.format(L['%sSetting keybind to %q'],TBAG_SCP,key2), 1, 1, 1);
       SaveBindings(GetCurrentBindingSet());
     end
   end
@@ -555,13 +565,13 @@ local SC_PLAYER = "|cff11ccee";
 local SC_TOTAL  = "|cffeeff11";
 local SC_WHITE  = "|cffffffff";
 
-function TBag_PlacePrep(place)
+function TBag_PlacePrep(playername,place)
   if (place == "body") then
-    return " on ";
+    return string.format(" on %s's %s",playername,place);
   elseif (place == "container") then
-    return " as ";
+    return string.format(" as %s's %s",playername,place);
   else
-    return " in ";
+    return string.format(" in %s's %s",playername,place); 
   end
 end
 
@@ -570,7 +580,7 @@ function TBag_AddSearchResult(itemstring, playername, place, count)
   itemstring = string.gsub(itemstring, "(item:%d+:%d+:%d+:%d+:%d+:%d+:%-?%d+):%-?%d+","%1:0",1);
 
   TBag_PrintDEBUG("TBag_AddSearchResult "..count.." "..itemstring
-    ..TBag_PlacePrep(place)..playername.."'s "..place);
+    ..TBag_PlacePrep(playername,place));
 
   -- First see if this result has been added before
   if (TBag_SrchResults[itemstring] == nil) then
@@ -639,16 +649,16 @@ function TBag_DisplaySearchResult(aResult, itemlink)
 
   -- Write out a short summary total if we have multiple lines
   if (lines > 1) then
-    chatframe:AddMessage(TBag_JustifyStr(total, 3, SC_TOTAL).." "..hyperlink.." found:", .7, .7, .7);
+    chatframe:AddMessage(TBag_JustifyStr(total, 3, SC_TOTAL).." "..hyperlink..L[" found:"], .7, .7, .7);
   end
 
   -- Then write out a line for each of the place results
   for playername, places in pairs(aResult) do
     for place, count in pairs(places) do
       if (lines == 1) then
-        chatframe:AddMessage(TBag_JustifyStr(count, 3, SC_TOTAL).." "..hyperlink..TBag_PlacePrep(place)..SC_PLAYER..playername.."|r's "..place, .7, .7, .7);
+        chatframe:AddMessage(TBag_JustifyStr(count, 3, SC_TOTAL).." "..hyperlink..TBag_PlacePrep(SC_PLAYER..playername.."|r",place), .7, .7, .7);
       elseif (lines > 1) then
-        chatframe:AddMessage(TBag_JustifyStr(count, 6, SC_WHITE)..TBag_PlacePrep(place)..SC_PLAYER..playername.."|r's "..place, .7, .7, .7);
+        chatframe:AddMessage(TBag_JustifyStr(count, 6, SC_WHITE)..TBag_PlacePrep(SC_PLAYER..playername.."|r",place), .7, .7, .7);
       end
     end
   end
@@ -661,11 +671,11 @@ function TBag_DoSearch(srch)
     local found;
     
     -- Gather all the search info
-    TBag_GatherSearchResults(string.lower(srch), TInvItm, "bags");
-    TBag_GatherSearchResults(string.lower(srch), TBnkItm, "bank");
-    TBag_GatherSearchResults(string.lower(srch), TContItm, "container");
-    TBag_GatherSearchResults(string.lower(srch), TBodyItm, "body");
-    TBag_GatherSearchResults(string.lower(srch), TMailItm, "mail");
+    TBag_GatherSearchResults(string.lower(srch), TInvItm, L["bags"]);
+    TBag_GatherSearchResults(string.lower(srch), TBnkItm, L["bank"]);
+    TBag_GatherSearchResults(string.lower(srch), TContItm, L["container"]);
+    TBag_GatherSearchResults(string.lower(srch), TBodyItm, L["body"]);
+    TBag_GatherSearchResults(string.lower(srch), TMailItm, L["mail"]);
 
     -- Sort it alphabetically
     table.sort(TBag_SrchResults);
@@ -676,7 +686,7 @@ function TBag_DoSearch(srch)
     -- Display all the search results
     for itemlink, aResult in pairs(TBag_SrchResults) do
       if (not found) then
-        DEFAULT_CHAT_FRAME:AddMessage(TBAG_SCP.."Search results for '"..srch.."':", 1, 1, 1);
+        DEFAULT_CHAT_FRAME:AddMessage(TBAG_SCP..string.format(L["Search results for %q:"],srch), 1, 1, 1);
       end
       TBag_DisplaySearchResult(aResult, itemlink);
       found = 1;
@@ -684,7 +694,7 @@ function TBag_DoSearch(srch)
 
     -- If there's no results, say so
     if (not found) then
-      DEFAULT_CHAT_FRAME:AddMessage(TBAG_SCP..SC_NONE.."No results|r for '"..srch.."'");
+      DEFAULT_CHAT_FRAME:AddMessage(TBAG_SCP..SC_NONE..string.format(L["No results|r for %q"],srch));
     end
   end
 end
@@ -803,210 +813,210 @@ function TBag_SetDefLayout(cfg, bagarr, row1offset, reset)
   if (reset == 1) and (cfg) then cfg[TBAG_CAT_BAR] = {}; end
 
 -- Eighth default line (top) - Empty and Act Ons
-  TBag_SetCatBar(cfg, "EMPTY_AMMO_SLOTS", 32, reset);
-  TBag_SetCatBar(cfg, "EMPTY_QUIV_SLOTS", 32, reset);
-  TBag_SetCatBar(cfg, "IN_AMMO_BAG", 32, reset);
-  TBag_SetCatBar(cfg, "IN_QUIV_BAG", 32, reset);
-  TBag_SetCatBar(cfg, "EMPTY_SOUL_SLOTS", 32, reset);
-  TBag_SetCatBar(cfg, "IN_SOUL_BAG", 32, reset);
+  TBag_SetCatBar(cfg, string.format(L["EMPTY_%s_SLOTS"],L["AMMO"]), 32, reset);
+  TBag_SetCatBar(cfg, string.format(L["EMPTY_%s_SLOTS"],L["QUIV"]), 32, reset);
+  TBag_SetCatBar(cfg, string.format(L["IN_%s_BAG"],L["AMMO"]), 32, reset);
+  TBag_SetCatBar(cfg, string.format(L["IN_%s_BAG"],L["QUIV"]), 32, reset);
+  TBag_SetCatBar(cfg, string.format(L["EMPTY_%s_SLOTS"],L["SOUL"]), 32, reset);
+  TBag_SetCatBar(cfg, string.format(L["IN_%s_BAG"],L["SOUL"]), 32, reset);
   -- arrows and bullets that AREN'T in your shot bags
-  TBag_SetCatBar(cfg, "PROJECTILE", 32, reset);
+  TBag_SetCatBar(cfg, L["PROJECTILE"], 32, reset);
   -- soulshards that AREN'T in your soul bags
-  TBag_SetCatBar(cfg, "SOULSHARD", 32, reset);
+  TBag_SetCatBar(cfg, L["SOULSHARD"], 32, reset);
 
-  TBag_SetCatBar(cfg, "MISC", 31, reset);
-  TBag_SetCatBar(cfg, "UNKNOWN", 31, reset);
+  TBag_SetCatBar(cfg, L["MISC"], 31, reset);
+  TBag_SetCatBar(cfg, L["UNKNOWN"], 31, reset);
 
-  TBag_SetCatBar(cfg, "CONSUMABLE", 30, reset);
+  TBag_SetCatBar(cfg, L["CONSUMABLE"], 30, reset);
 
-  TBag_SetCatBar(cfg, "ACT_ON", 29, reset);
-  TBag_SetCatBar(cfg, "ACT_OPEN", 29, reset);
-  TBag_SetCatBar(cfg, "ACT_SELL", 29, reset);
-  TBag_SetCatBar(cfg, "BAG", 29, reset);
-  TBag_SetCatBar(cfg, "GRAY_ITEMS", 29, reset); 
+  TBag_SetCatBar(cfg, L["ACT_ON"], 29, reset);
+  TBag_SetCatBar(cfg, L["ACT_OPEN"], 29, reset);
+  TBag_SetCatBar(cfg, L["ACT_SELL"], 29, reset);
+  TBag_SetCatBar(cfg, L["BAG"], 29, reset);
+  TBag_SetCatBar(cfg, L["GRAY_ITEMS"], 29, reset); 
 
   local bag;
   for _, bag in ipairs(bagarr) do
-    TBag_SetCatBar(cfg, "EMPTY_"..TBag_GetBagPosName(bag).."_SLOTS", 29, reset); 
+    TBag_SetCatBar(cfg, string.format(L["EMPTY_%s_SLOTS"],TBag_GetBagPosName(bag)), 29, reset); 
   end
 
 -- Seventh default line - Quests and Factions
-  TBag_SetCatBar(cfg, "QUEST", 28, reset);
-  TBag_SetCatBar(cfg, "SOULBOUND_OTHER", 28, reset); 
+  TBag_SetCatBar(cfg, L["QUEST"], 28, reset);
+  TBag_SetCatBar(cfg, string.format(L["SOULBOUND_%s"],L["OTHER"]), 28, reset); 
 
-  TBag_SetCatBar(cfg, "THORIUM_BROTHER", 27, reset);
-  TBag_SetCatBar(cfg, "TIMBERMAW", 27, reset);
-  TBag_SetCatBar(cfg, "KEY_QUEST", 27, reset);
-  TBag_SetCatBar(cfg, "CENARION_EXPEDITION", 27, reset);
-  TBag_SetCatBar(cfg, "SPOREGGAR", 27, reset);
+  TBag_SetCatBar(cfg, L["THORIUM_BROTHER"], 27, reset);
+  TBag_SetCatBar(cfg, L["TIMBERMAW"], 27, reset);
+  TBag_SetCatBar(cfg, L["KEY_QUEST"], 27, reset);
+  TBag_SetCatBar(cfg, L["CENARION_EXPEDITION"], 27, reset);
+  TBag_SetCatBar(cfg, L["SPOREGGAR"], 27, reset);
 
-  TBag_SetCatBar(cfg, "IN_KEYRING_BAG", 26, reset);
-  TBag_SetCatBar(cfg, "EMPTY_KEYRING_SLOTS", 26, reset);
-  TBag_SetCatBar(cfg, "PVP", 26, reset);
+  TBag_SetCatBar(cfg, string.format(L["IN_%s_BAG"],L["KEYRING"]), 26, reset);
+  TBag_SetCatBar(cfg, string.format(L["EMPTY_%s_SLOTS"],L["KEYRING"]), 26, reset);
+  TBag_SetCatBar(cfg, L["PVP"], 26, reset);
 
-  TBag_SetCatBar(cfg, "ENCHANTS", 25, reset);
-  TBag_SetCatBar(cfg, "BOOK", 25, reset);
-  TBag_SetCatBar(cfg, "DESIGN", 25, reset);
-  TBag_SetCatBar(cfg, "FORMULA", 25, reset);
-  TBag_SetCatBar(cfg, "RECIPE", 25, reset);
-  TBag_SetCatBar(cfg, "PATTERN", 25, reset);
-  TBag_SetCatBar(cfg, "PLANS", 25, reset);
-  TBag_SetCatBar(cfg, "SCHEMATIC", 25, reset);
-  TBag_SetCatBar(cfg, "RECIPE_OTHER", 25, reset);
+  TBag_SetCatBar(cfg, L["ENCHANTS"], 25, reset);
+  TBag_SetCatBar(cfg, L["BOOK"], 25, reset);
+  TBag_SetCatBar(cfg, L["DESIGN"], 25, reset);
+  TBag_SetCatBar(cfg, L["FORMULA"], 25, reset);
+  TBag_SetCatBar(cfg, L["RECIPE"], 25, reset);
+  TBag_SetCatBar(cfg, L["PATTERN"], 25, reset);
+  TBag_SetCatBar(cfg, L["PLANS"], 25, reset);
+  TBag_SetCatBar(cfg, L["SCHEMATIC"], 25, reset);
+  TBag_SetCatBar(cfg, L["RECIPE_OTHER"], 25, reset);
 
 -- Sixth default line - Collectibles 
-  TBag_SetCatBar(cfg, "ARGENT_DAWN", 24, reset);
-  TBag_SetCatBar(cfg, "ALDOR", 24, reset);
-  TBag_SetCatBar(cfg, "SCRYER", 24, reset);
-  TBag_SetCatBar(cfg, "SHA'TAR", 24, reset);
-  TBag_SetCatBar(cfg, "LOWER_CITY", 24, reset);
+  TBag_SetCatBar(cfg, L["ARGENT_DAWN"], 24, reset);
+  TBag_SetCatBar(cfg, L["ALDOR"], 24, reset);
+  TBag_SetCatBar(cfg, L["SCRYER"], 24, reset);
+  TBag_SetCatBar(cfg, L["SHA'TAR"], 24, reset);
+  TBag_SetCatBar(cfg, L["LOWER_CITY"], 24, reset);
 
-  TBag_SetCatBar(cfg, "AHN_QIRAJ", 23, reset);
-  TBag_SetCatBar(cfg, "CENARION_CIRCLE", 23, reset);
-  TBag_SetCatBar(cfg, "NETHERWING", 23, reset);
+  TBag_SetCatBar(cfg, L["AHN_QIRAJ"], 23, reset);
+  TBag_SetCatBar(cfg, L["CENARION_CIRCLE"], 23, reset);
+  TBag_SetCatBar(cfg, L["NETHERWING"], 23, reset);
 
-  TBag_SetCatBar(cfg, "BLACKWING_LAIR", 22, reset);
-  TBag_SetCatBar(cfg, "DARKMOON_FAIRE", 22, reset);
-  TBag_SetCatBar(cfg, "OGRI'LA", 22, reset);
+  TBag_SetCatBar(cfg, L["BLACKWING_LAIR"], 22, reset);
+  TBag_SetCatBar(cfg, L["DARKMOON_FAIRE"], 22, reset);
+  TBag_SetCatBar(cfg, L["OGRI'LA"], 22, reset);
 
-  TBag_SetCatBar(cfg, "MOLTEN_CORE", 21, reset);
-  TBag_SetCatBar(cfg, "ZUL_GURUB", 21, reset);
-  TBag_SetCatBar(cfg, "CONSORTIUM", 21, reset);
-  TBag_SetCatBar(cfg, "HALAA", 21, reset);
+  TBag_SetCatBar(cfg, L["MOLTEN_CORE"], 21, reset);
+  TBag_SetCatBar(cfg, L["ZUL_GURUB"], 21, reset);
+  TBag_SetCatBar(cfg, L["CONSORTIUM"], 21, reset);
+  TBag_SetCatBar(cfg, L["HALAA"], 21, reset);
 
 -- Fifth default line - To Sell
-  TBag_SetCatBar(cfg, "REAGENT", 20, reset);
+  TBag_SetCatBar(cfg, L["REAGENT"], 20, reset);
 
-  TBag_SetCatBar(cfg, "TRADE_GOODS", 19, reset);
-  TBag_SetCatBar(cfg, "ALCHEMY", 19, reset);
-  TBag_SetCatBar(cfg, "BLACKSMITHING", 19, reset);
-  TBag_SetCatBar(cfg, "ENCHANTING", 19, reset);
-  TBag_SetCatBar(cfg, "ENGINEERING", 19, reset);
-  TBag_SetCatBar(cfg, "JEWELCRAFTING", 19, reset);
-  TBag_SetCatBar(cfg, "LEATHERWORKING", 19, reset);
-  TBag_SetCatBar(cfg, "MINING", 19, reset);
-  TBag_SetCatBar(cfg, "POISONS", 19, reset);
-  TBag_SetCatBar(cfg, "TAILORING", 19, reset);
+  TBag_SetCatBar(cfg, L["TRADE_GOODS"], 19, reset);
+  TBag_SetCatBar(cfg, L["ALCHEMY"], 19, reset);
+  TBag_SetCatBar(cfg, L["BLACKSMITHING"], 19, reset);
+  TBag_SetCatBar(cfg, L["ENCHANTING"], 19, reset);
+  TBag_SetCatBar(cfg, L["ENGINEERING"], 19, reset);
+  TBag_SetCatBar(cfg, L["JEWELCRAFTING"], 19, reset);
+  TBag_SetCatBar(cfg, L["LEATHERWORKING"], 19, reset);
+  TBag_SetCatBar(cfg, L["MINING"], 19, reset);
+  TBag_SetCatBar(cfg, L["POISONS"], 19, reset);
+  TBag_SetCatBar(cfg, L["TAILORING"], 19, reset);
 
-  TBag_SetCatBar(cfg, "RELIC", 18, reset);
-  TBag_SetCatBar(cfg, "RING", 18, reset);
-  TBag_SetCatBar(cfg, "TRINKET", 18, reset);
+  TBag_SetCatBar(cfg, L["RELIC"], 18, reset);
+  TBag_SetCatBar(cfg, L["RING"], 18, reset);
+  TBag_SetCatBar(cfg, L["TRINKET"], 18, reset);
 
-  TBag_SetCatBar(cfg, "01_HEAD", 17, reset);
-  TBag_SetCatBar(cfg, "02_NECK", 17, reset);
-  TBag_SetCatBar(cfg, "03_SHOULDER", 17, reset);
-  TBag_SetCatBar(cfg, "04_BACK", 17, reset);
-  TBag_SetCatBar(cfg, "05_CHEST", 17, reset);
-  TBag_SetCatBar(cfg, "06_SHIRT", 17, reset);
-  TBag_SetCatBar(cfg, "07_TABARD", 17, reset);
-  TBag_SetCatBar(cfg, "08_WRIST", 17, reset);
-  TBag_SetCatBar(cfg, "09_HANDS", 17, reset);
-  TBag_SetCatBar(cfg, "10_WAIST", 17, reset);
-  TBag_SetCatBar(cfg, "11_LEGS", 17, reset);
-  TBag_SetCatBar(cfg, "12_FEET", 17, reset);
-  TBag_SetCatBar(cfg, "13_OFFHAND", 17, reset);
-  TBag_SetCatBar(cfg, "ARMOR", 17, reset);
-  TBag_SetCatBar(cfg, "WEAPON", 17, reset);
+  TBag_SetCatBar(cfg, L["01_HEAD"], 17, reset);
+  TBag_SetCatBar(cfg, L["02_NECK"], 17, reset);
+  TBag_SetCatBar(cfg, L["03_SHOULDER"], 17, reset);
+  TBag_SetCatBar(cfg, L["04_BACK"], 17, reset);
+  TBag_SetCatBar(cfg, L["05_CHEST"], 17, reset);
+  TBag_SetCatBar(cfg, L["06_SHIRT"], 17, reset);
+  TBag_SetCatBar(cfg, L["07_TABARD"], 17, reset);
+  TBag_SetCatBar(cfg, L["08_WRIST"], 17, reset);
+  TBag_SetCatBar(cfg, L["09_HANDS"], 17, reset);
+  TBag_SetCatBar(cfg, L["10_WAIST"], 17, reset);
+  TBag_SetCatBar(cfg, L["11_LEGS"], 17, reset);
+  TBag_SetCatBar(cfg, L["12_FEET"], 17, reset);
+  TBag_SetCatBar(cfg, L["13_OFFHAND"], 17, reset);
+  TBag_SetCatBar(cfg, L["ARMOR"], 17, reset);
+  TBag_SetCatBar(cfg, L["WEAPON"], 17, reset);
 
 -- Fourth default line - To Use or Sell
-  TBag_SetCatBar(cfg, "TRADE1", 16, reset);
-  TBag_SetCatBar(cfg, "TRADE2", 16, reset);
-  TBag_SetCatBar(cfg, "IN_ENCH_BAG", 16, reset);
-  TBag_SetCatBar(cfg, "IN_ENG_BAG", 16, reset);
-  TBag_SetCatBar(cfg, "IN_GEM_BAG", 16, reset);
-  TBag_SetCatBar(cfg, "IN_HERB_BAG", 16, reset);
-  TBag_SetCatBar(cfg, "IN_MINE_BAG", 16, reset);
-  TBag_SetCatBar(cfg, "IN_LTHR_BAG", 16, reset);
-  TBag_SetCatBar(cfg, "EMPTY_ENCH_SLOTS", 16, reset);
-  TBag_SetCatBar(cfg, "EMPTY_ENG_SLOTS", 16, reset);
-  TBag_SetCatBar(cfg, "EMPTY_GEM_SLOTS", 16, reset);
-  TBag_SetCatBar(cfg, "EMPTY_HERB_SLOTS", 16, reset);
-  TBag_SetCatBar(cfg, "EMPTY_MINE_SLOTS", 16, reset);
-  TBag_SetCatBar(cfg, "EMPTY_LTHR_SLOTS", 16, reset);
+  TBag_SetCatBar(cfg, L["TRADE1"], 16, reset);
+  TBag_SetCatBar(cfg, L["TRADE2"], 16, reset);
+  TBag_SetCatBar(cfg, string.format(L["IN_%s_BAG"],L["ENCH"]), 16, reset);
+  TBag_SetCatBar(cfg, string.format(L["IN_%s_BAG"],L["ENG"]), 16, reset);
+  TBag_SetCatBar(cfg, string.format(L["IN_%s_BAG"],L["GEM"]), 16, reset);
+  TBag_SetCatBar(cfg, string.format(L["IN_%s_BAG"],L["HERB"]), 16, reset);
+  TBag_SetCatBar(cfg, string.format(L["IN_%s_BAG"],L["MINE"]), 16, reset);
+  TBag_SetCatBar(cfg, string.format(L["IN_%s_BAG"],L["LTHR"]), 16, reset);
+  TBag_SetCatBar(cfg, string.format(L["EMPTY_%s_SLOTS"],L["ENCH"]), 16, reset);
+  TBag_SetCatBar(cfg, string.format(L["EMPTY_%s_SLOTS"],L["ENG"]), 16, reset);
+  TBag_SetCatBar(cfg, string.format(L["EMPTY_%s_SLOTS"],L["GEM"]), 16, reset);
+  TBag_SetCatBar(cfg, string.format(L["EMPTY_%s_SLOTS"],L["HERB"]), 16, reset);
+  TBag_SetCatBar(cfg, string.format(L["EMPTY_%s_SLOTS"],L["MINE"]), 16, reset);
+  TBag_SetCatBar(cfg, string.format(L["EMPTY_%s_SLOTS"],L["LTHR"]), 16, reset);
 
-  TBag_SetCatBar(cfg, "CLOTH", 15, reset);
-  TBag_SetCatBar(cfg, "FIRST_AID", 15, reset);
+  TBag_SetCatBar(cfg, L["CLOTH"], 15, reset);
+  TBag_SetCatBar(cfg, L["FIRST_AID"], 15, reset);
 
-  TBag_SetCatBar(cfg, "COOKING", 14, reset);
-  TBag_SetCatBar(cfg, "SOULBOUND_RELIC", 14, reset);
-  TBag_SetCatBar(cfg, "SOULBOUND_RING", 14, reset);
-  TBag_SetCatBar(cfg, "SOULBOUND_TRINKET", 14, reset);
+  TBag_SetCatBar(cfg, L["COOKING"], 14, reset);
+  TBag_SetCatBar(cfg, string.format(L["SOULBOUND_%s"],L["RELIC"]), 14, reset);
+  TBag_SetCatBar(cfg, string.format(L["SOULBOUND_%s"],L["RING"]), 14, reset);
+  TBag_SetCatBar(cfg, string.format(L["SOULBOUND_%s"],L["TRINKET"]), 14, reset);
 
-  TBag_SetCatBar(cfg, "SOULBOUND_01_HEAD", 13, reset);
-  TBag_SetCatBar(cfg, "SOULBOUND_02_NECK", 13, reset);
-  TBag_SetCatBar(cfg, "SOULBOUND_03_SHOULDER", 13, reset);
-  TBag_SetCatBar(cfg, "SOULBOUND_04_BACK", 13, reset);
-  TBag_SetCatBar(cfg, "SOULBOUND_05_CHEST", 13, reset);
-  TBag_SetCatBar(cfg, "SOULBOUND_06_SHIRT", 13, reset);
-  TBag_SetCatBar(cfg, "SOULBOUND_07_TABARD", 13, reset);
-  TBag_SetCatBar(cfg, "SOULBOUND_08_WRIST", 13, reset);
-  TBag_SetCatBar(cfg, "SOULBOUND_09_HANDS", 13, reset);
-  TBag_SetCatBar(cfg, "SOULBOUND_10_WAIST", 13, reset);
-  TBag_SetCatBar(cfg, "SOULBOUND_11_LEGS", 13, reset);
-  TBag_SetCatBar(cfg, "SOULBOUND_12_FEET", 13, reset);
-  TBag_SetCatBar(cfg, "SOULBOUND_13_OFFHAND", 13, reset);
-  TBag_SetCatBar(cfg, "SOULBOUND_ARMOR", 13, reset);
-  TBag_SetCatBar(cfg, "SOULBOUND_WEAPON", 13, reset);
-  TBag_SetCatBar(cfg, "TRADE1_CREATED", 13, reset);
-  TBag_SetCatBar(cfg, "TRADE2_CREATED", 13, reset);
+  TBag_SetCatBar(cfg, string.format(L["SOULBOUND_%s"],L["01_HEAD"]), 13, reset);
+  TBag_SetCatBar(cfg, string.format(L["SOULBOUND_%s"],L["02_NECK"]), 13, reset);
+  TBag_SetCatBar(cfg, string.format(L["SOULBOUND_%s"],L["03_SHOULDER"]), 13, reset);
+  TBag_SetCatBar(cfg, string.format(L["SOULBOUND_%s"],L["04_BACK"]), 13, reset);
+  TBag_SetCatBar(cfg, string.format(L["SOULBOUND_%s"],L["05_CHEST"]), 13, reset);
+  TBag_SetCatBar(cfg, string.format(L["SOULBOUND_%s"],L["06_SHIRT"]), 13, reset);
+  TBag_SetCatBar(cfg, string.format(L["SOULBOUND_%s"],L["07_TABARD"]), 13, reset);
+  TBag_SetCatBar(cfg, string.format(L["SOULBOUND_%s"],L["08_WRIST"]), 13, reset);
+  TBag_SetCatBar(cfg, string.format(L["SOULBOUND_%s"],L["09_HANDS"]), 13, reset);
+  TBag_SetCatBar(cfg, string.format(L["SOULBOUND_%s"],L["10_WAIST"]), 13, reset);
+  TBag_SetCatBar(cfg, string.format(L["SOULBOUND_%s"],L["11_LEGS"]), 13, reset);
+  TBag_SetCatBar(cfg, string.format(L["SOULBOUND_%s"],L["12_FEET"]), 13, reset);
+  TBag_SetCatBar(cfg, string.format(L["SOULBOUND_%s"],L["13_OFFHAND"]), 13, reset);
+  TBag_SetCatBar(cfg, string.format(L["SOULBOUND_%s"],L["ARMOR"]), 13, reset);
+  TBag_SetCatBar(cfg, string.format(L["SOULBOUND_%s"],L["WEAPON"]), 13, reset);
+  TBag_SetCatBar(cfg, string.format(L["%s_CREATED"],L["TRADE1"]), 13, reset);
+  TBag_SetCatBar(cfg, string.format(L["%s_CREATED"],L["TRADE2"]), 13, reset);
 
 -- Third default line - Swappables
-  TBag_SetCatBar(cfg, "MINIPET", 12, reset);
-  TBag_SetCatBar(cfg, "MOUNT", 12, reset);
+  TBag_SetCatBar(cfg, L["MINIPET"], 12, reset);
+  TBag_SetCatBar(cfg, L["MOUNT"], 12, reset);
 
-  TBag_SetCatBar(cfg, "FISHING", 11, reset);
-  TBag_SetCatBar(cfg, "TRADE_TOOL", 11, reset);
-  TBag_SetCatBar(cfg, "CLASS_TOOL", 11, reset);
+  TBag_SetCatBar(cfg, L["FISHING"], 11, reset);
+  TBag_SetCatBar(cfg, L["TRADE_TOOL"], 11, reset);
+  TBag_SetCatBar(cfg, L["CLASS_TOOL"], 11, reset);
 
-  TBag_SetCatBar(cfg, "EQUIPPED_RELIC", 10, reset);
-  TBag_SetCatBar(cfg, "EQUIPPED_RING", 10, reset);
-  TBag_SetCatBar(cfg, "EQUIPPED_TRINKET", 10, reset);
-  TBag_SetCatBar(cfg, "EQUIPPED_OTHER", 10, reset);
+  TBag_SetCatBar(cfg, string.format(L["EQUIPPED_%s"],L["RELIC"]), 10, reset);
+  TBag_SetCatBar(cfg, string.format(L["EQUIPPED_%s"],L["RING"]), 10, reset);
+  TBag_SetCatBar(cfg, string.format(L["EQUIPPED_%s"],L["TRINKET"]), 10, reset);
+  TBag_SetCatBar(cfg, string.format(L["EQUIPPED_%s"],L["OTHER"]), 10, reset);
 
-  TBag_SetCatBar(cfg, "EQUIPPED_01_HEAD", 9, reset);
-  TBag_SetCatBar(cfg, "EQUIPPED_02_NECK", 9, reset);
-  TBag_SetCatBar(cfg, "EQUIPPED_03_SHOULDER", 9, reset);
-  TBag_SetCatBar(cfg, "EQUIPPED_04_BACK", 9, reset);
-  TBag_SetCatBar(cfg, "EQUIPPED_05_CHEST", 9, reset);
-  TBag_SetCatBar(cfg, "EQUIPPED_06_SHIRT", 9, reset);
-  TBag_SetCatBar(cfg, "EQUIPPED_07_TABARD", 9, reset);
-  TBag_SetCatBar(cfg, "EQUIPPED_08_WRIST", 9, reset);
-  TBag_SetCatBar(cfg, "EQUIPPED_09_HANDS", 9, reset);
-  TBag_SetCatBar(cfg, "EQUIPPED_10_WAIST", 9, reset);
-  TBag_SetCatBar(cfg, "EQUIPPED_11_LEGS", 9, reset);
-  TBag_SetCatBar(cfg, "EQUIPPED_12_FEET", 9, reset);
-  TBag_SetCatBar(cfg, "EQUIPPED_13_OFFHAND", 9, reset);
-  TBag_SetCatBar(cfg, "EQUIPPED_ARMOR", 9, reset);
-  TBag_SetCatBar(cfg, "EQUIPPED_WEAPON", 9, reset);
+  TBag_SetCatBar(cfg, string.format(L["EQUIPPED_%s"],L["01_HEAD"]), 9, reset);
+  TBag_SetCatBar(cfg, string.format(L["EQUIPPED_%s"],L["02_NECK"]), 9, reset);
+  TBag_SetCatBar(cfg, string.format(L["EQUIPPED_%s"],L["03_SHOULDER"]), 9, reset);
+  TBag_SetCatBar(cfg, string.format(L["EQUIPPED_%s"],L["04_BACK"]), 9, reset);
+  TBag_SetCatBar(cfg, string.format(L["EQUIPPED_%s"],L["05_CHEST"]), 9, reset);
+  TBag_SetCatBar(cfg, string.format(L["EQUIPPED_%s"],L["06_SHIRT"]), 9, reset);
+  TBag_SetCatBar(cfg, string.format(L["EQUIPPED_%s"],L["07_TABARD"]), 9, reset);
+  TBag_SetCatBar(cfg, string.format(L["EQUIPPED_%s"],L["08_WRIST"]), 9, reset);
+  TBag_SetCatBar(cfg, string.format(L["EQUIPPED_%s"],L["09_HANDS"]), 9, reset);
+  TBag_SetCatBar(cfg, string.format(L["EQUIPPED_%s"],L["10_WAIST"]), 9, reset);
+  TBag_SetCatBar(cfg, string.format(L["EQUIPPED_%s"],L["11_LEGS"]), 9, reset);
+  TBag_SetCatBar(cfg, string.format(L["EQUIPPED_%s"],L["12_FEET"]), 9, reset);
+  TBag_SetCatBar(cfg, string.format(L["EQUIPPED_%s"],L["13_OFFHAND"]), 9, reset);
+  TBag_SetCatBar(cfg, string.format(L["EQUIPPED_%s"],L["ARMOR"]), 9, reset);
+  TBag_SetCatBar(cfg, string.format(L["EQUIPPED_%s"],L["WEAPON"]), 9, reset);
 
 -- Second default line - Out of Combat Stocks
-  TBag_SetCatBar(cfg, "FOOD", 8, reset);
-  TBag_SetCatBar(cfg, "FOOD_BUFF", 8, reset);
+  TBag_SetCatBar(cfg, L["FOOD"], 8, reset);
+  TBag_SetCatBar(cfg, L["FOOD_BUFF"], 8, reset);
 
-  TBag_SetCatBar(cfg, "DRINK", 7, reset);
-  TBag_SetCatBar(cfg, "COMBO", 7, reset);
+  TBag_SetCatBar(cfg, L["DRINK"], 7, reset);
+  TBag_SetCatBar(cfg, L["COMBO"], 7, reset);
 
-  TBag_SetCatBar(cfg, "BUFF", 6, reset);
-  TBag_SetCatBar(cfg, "POISONS_CREATED", 6, reset);
+  TBag_SetCatBar(cfg, L["BUFF"], 6, reset);
+  TBag_SetCatBar(cfg, string.format(L["%s_CREATED"],L["POISONS"]), 6, reset);
 
-  TBag_SetCatBar(cfg, "CLASS_REAGENT", 5, reset);
-  TBag_SetCatBar(cfg, "DUMMY", 5, reset);
-  TBag_SetCatBar(cfg, "KEY_OPEN", 5, reset);
+  TBag_SetCatBar(cfg, L["CLASS_REAGENT"], 5, reset);
+  TBag_SetCatBar(cfg, L["DUMMY"], 5, reset);
+  TBag_SetCatBar(cfg, L["KEY_OPEN"], 5, reset);
 
 -- First default line - In Combat Stocks
-  TBag_SetCatBar(cfg, "BANDAGE", 4+row1offset, reset);
-  TBag_SetCatBar(cfg, "HEALTH_RESTORE", 4+row1offset, reset);
-  TBag_SetCatBar(cfg, "HEALTHSTONE", 4+row1offset, reset);
+  TBag_SetCatBar(cfg, L["BANDAGE"], 4+row1offset, reset);
+  TBag_SetCatBar(cfg, L["HEALTH_RESTORE"], 4+row1offset, reset);
+  TBag_SetCatBar(cfg, L["HEALTHSTONE"], 4+row1offset, reset);
 
-  TBag_SetCatBar(cfg, "MANA_RESTORE", 3+row1offset, reset);
-  TBag_SetCatBar(cfg, "COMBO_RESTORE", 3+row1offset, reset);
-  TBag_SetCatBar(cfg, "RAGE_RESTORE", 3+row1offset, reset);
-  TBag_SetCatBar(cfg, "ENERGY_RESTORE", 3+row1offset, reset);
+  TBag_SetCatBar(cfg, L["MANA_RESTORE"], 3+row1offset, reset);
+  TBag_SetCatBar(cfg, L["COMBO_RESTORE"], 3+row1offset, reset);
+  TBag_SetCatBar(cfg, L["RAGE_RESTORE"], 3+row1offset, reset);
+  TBag_SetCatBar(cfg, L["ENERGY_RESTORE"], 3+row1offset, reset);
 
-  TBag_SetCatBar(cfg, "CURE", 2+row1offset, reset);
-  TBag_SetCatBar(cfg, "EXPLOSIVES", 2+row1offset, reset);
+  TBag_SetCatBar(cfg, L["CURE"], 2+row1offset, reset);
+  TBag_SetCatBar(cfg, L["EXPLOSIVES"], 2+row1offset, reset);
 
-  TBag_SetCatBar(cfg, "HEARTH", 1+row1offset, reset);
+  TBag_SetCatBar(cfg, L["HEARTH"], 1+row1offset, reset);
 
   table.sort(TBag_GetCatBar(cfg));
 end
@@ -1077,15 +1087,6 @@ end
 function TBag_ResetSorts(cfg)
   cfg["item_overrides"] = {};
   cfg["item_search_list"] = TBag_DefaultSearchList;
-  
-  for key, value in ipairs(cfg["item_search_list"]) do
-    -- Localize all the string
-    cfg["item_search_list"][key][1] = TBag_Cat(value[1]);
-    cfg["item_search_list"][key][2] = TBag_Cat(value[2]);
-    cfg["item_search_list"][key][3] = TBag_Loc(value[3]);
-    cfg["item_search_list"][key][4] = TBag_Loc(value[4]);
-    cfg["item_search_list"][key][5] = TBag_Loc(value[5]);
-  end
 end
 
 -- set reset to 1 to restore all default values
@@ -1189,24 +1190,25 @@ function TBag_AssignCats(cfg, reset)
   -- find matching categories that are not assigned
   for _ ,value in ipairs(cfg["item_search_list"]) do
     if (TBag_GetCat(cfg, value[1]) == nil) then
-      message("TBag: Unassigned category "..value[1].." has been assigned to slot 1");
+      DEFAULT_CHAT_FRAME:AddMessage(TBAG_SCP..
+        string.format(L["Unassigned category %s has been assigned to slot 1"],value[1]));
       TBag_SetCatBar(cfg, value[1], 1, reset);
     end
   end
 end
 
 function TBag_SetCatForClass(c, cat)
-  c["WARLOCK"] = cat;
-  c["ROGUE"] = cat;
+  c[L["WARLOCK"]] = cat;
+  c[L["ROGUE"]] = cat;
 
-  c["DRUID"] = cat;
-  c["MAGE"] = cat;
-  c["PALADIN"] = cat;
-  c["PRIEST"] = cat;
-  c["SHAMAN"] = cat;
+  c[L["DRUID"]] = cat;
+  c[L["MAGE"]] = cat;
+  c[L["PALADIN"]] = cat;
+  c[L["PRIEST"]] = cat;
+  c[L["SHAMAN"]] = cat;
 
-  c["WARRIOR"] = cat;
-  c["HUNTER"] = cat;
+  c[L["WARRIOR"]] = cat;
+  c[L["HUNTER"]] = cat;
 end
 
 function TBag_SetClassCats(cfg, playerid, reset)
@@ -1215,31 +1217,31 @@ function TBag_SetClassCats(cfg, playerid, reset)
   local class;
 
   if (group) and (group[TBAG_S_CLASS]) then
-    class = string.upper(group[TBAG_S_CLASS]);
+    class = TBag_Cat(group[TBAG_S_CLASS]);
   else
     class = "";
   end
 
-  TBag_SetCatForClass(c, "REAGENT")
-  c[class] = "CLASS_REAGENT";
+  TBag_SetCatForClass(c, L["REAGENT"])
+  c[class] = L["CLASS_REAGENT"];
 
-  TBag_SetCatBar(cfg, "WARLOCK_REAGENT", c["WARLOCK"], reset);
-  TBag_SetCatBar(cfg, "ROGUE_REAGENT", c["ROGUE"], reset);
+  TBag_SetCatBar(cfg, string.format(L["%s_REAGENT"],L["WARLOCK"]), c["WARLOCK"], reset);
+  TBag_SetCatBar(cfg, string.format(L["%s_REAGENT"],L["ROGUE"]), c["ROGUE"], reset);
 
-  TBag_SetCatBar(cfg, "DRUID_REAGENT", c["DRUID"], reset);
-  TBag_SetCatBar(cfg, "MAGE_REAGENT", c["MAGE"], reset);
-  TBag_SetCatBar(cfg, "PALADIN_REAGENT", c["PALADIN"], reset);
-  TBag_SetCatBar(cfg, "PRIEST_REAGENT", c["PRIEST"], reset);
-  TBag_SetCatBar(cfg, "SHAMAN_REAGENT", c["SHAMAN"], reset);
+  TBag_SetCatBar(cfg, string.format(L["%s_REAGENT"],L["DRUID"]), c["DRUID"], reset);
+  TBag_SetCatBar(cfg, string.format(L["%s_REAGENT"],L["MAGE"]), c["MAGE"], reset);
+  TBag_SetCatBar(cfg, string.format(L["%s_REAGENT"],L["PALADIN"]), c["PALADIN"], reset);
+  TBag_SetCatBar(cfg, string.format(L["%s_REAGENT"],L["PRIEST"]), c["PRIEST"], reset);
+  TBag_SetCatBar(cfg, string.format(L["%s_REAGENT"],L["SHAMAN"]), c["SHAMAN"], reset);
 
-  c[class] = "CLASS_TOOL";
+  c[class] = L["CLASS_TOOL"];
 
-  TBag_SetCatBar(cfg, "ROGUE_TOOL", c["ROGUE"], reset);
-  TBag_SetCatBar(cfg, "SHAMAN_TOOL", c["SHAMAN"], reset);
+  TBag_SetCatBar(cfg, string.format(L["%s_TOOL"],L["ROGUE"]), c["ROGUE"], reset);
+  TBag_SetCatBar(cfg, string.format(L["%s_TOOL"],L["SHAMAN"]), c["SHAMAN"], reset);
 end
 
 function TBag_PrintCachedCharacters()
-  DEFAULT_CHAT_FRAME:AddMessage(TBAG_SCP.."Character data cached for:", 1, 1, 1);
+  DEFAULT_CHAT_FRAME:AddMessage(TBAG_SCP..L["Character data cached for:"], 1, 1, 1);
   for key, value in pairs(TInvItm) do 
     local player,realm = TBag_SplitStr(key,"|");
     DEFAULT_CHAT_FRAME:AddMessage(player.." "..realm);
@@ -1259,15 +1261,25 @@ function TBag_DeleteCachedCharacter(char,realm)
   TMailItm[playerid] = nil;
   TBagInfo[playerid] = nil;
   if (found == 1 and TInvItm[playerid] == nil) then
-    DEFAULT_CHAT_FRAME:AddMessage(TBAG_SCP.."Removed cache for '"..playerid.."'", 1, 1, 1);
+    DEFAULT_CHAT_FRAME:AddMessage(TBAG_SCP..
+       string.format(L["Removed cache for %q"],playerid),
+       1, 1, 1);
   else
-    DEFAULT_CHAT_FRAME:AddMessage(TBAG_SCP.."Couldn't find and remove cache for '"..playerid.."'", 1, 1, 1);
+    DEFAULT_CHAT_FRAME:AddMessage(TBAG_SCP..
+       string.format(L["Couldn't find and remove cache for %q"],playerid),
+       1, 1, 1);
   end
 end
 
 -----------------------------------------------------------------------
 -- Categories and Bars
 -----------------------------------------------------------------------
+
+function TBag_Cat(str)
+  -- Uppercase, and replace spaces
+  local cat = string.upper(str);
+  return string.gsub(cat, " ", "_");
+end
 
 function TBag_SetCatBar(cfg, cat, bar, reset)
   if ((cfg ~= nil) and (cat ~= nil)) then
@@ -1341,39 +1353,39 @@ end
 -- Used for options strings
 function TBag_GetBagDispName(bag)
   if ( bag < TBAG_BAGMIN ) or ( bag > TBAG_BAGMAX ) then return ""; end
-  if (bag == KEYRING_CONTAINER) then return "Keyring"; end
-  if (bag == BANK_CONTAINER) then return "Bank"; end
-  if (bag == BACKPACK_CONTAINER) then return "Backpack"; end
-  if (bag == 1) then return "Fourth Bag"; end
-  if (bag == 2) then return "Third Bag"; end
-  if (bag == 3) then return "Second Bag"; end
-  if (bag == 4) then return "First Bag"; end
-  if (bag == 5) then return "First Bank Bag"; end
-  if (bag == 6) then return "Second Bank Bag"; end
-  if (bag == 7) then return "Third Bank Bag"; end
-  if (bag == 8) then return "Fourth Bank Bag"; end
-  if (bag == 9) then return "Fifth Bank Bag"; end
-  if (bag == 10) then return "Sixth Bank Bag"; end
-  if (bag == 11) then return "Seventh Bank Bag"; end
+  if (bag == KEYRING_CONTAINER) then return KEYRING; end
+  if (bag == BANK_CONTAINER) then return L["Bank"]; end
+  if (bag == BACKPACK_CONTAINER) then return L["Backpack"]; end
+  if (bag == 1) then return L["Fourth Bag"]; end
+  if (bag == 2) then return L["Third Bag"]; end
+  if (bag == 3) then return L["Second Bag"]; end
+  if (bag == 4) then return L["First Bag"]; end
+  if (bag == 5) then return L["First Bank Bag"]; end
+  if (bag == 6) then return L["Second Bank Bag"]; end
+  if (bag == 7) then return L["Third Bank Bag"]; end
+  if (bag == 8) then return L["Fourth Bank Bag"]; end
+  if (bag == 9) then return L["Fifth Bank Bag"]; end
+  if (bag == 10) then return L["Sixth Bank Bag"]; end
+  if (bag == 11) then return L["Seventh Bank Bag"]; end
 end
 
 -- Used for EMPTY_X_SLOTS
 function TBag_GetBagPosName(bag)
   if ( bag < TBAG_BAGMIN ) or ( bag > TBAG_BAGMAX ) then return ""; end
-  if (bag == KEYRING_CONTAINER) then return "KEYRING"; end
-  if (bag == BANK_CONTAINER) then return "BANK"; end
-  if (bag == BACKPACK_CONTAINER) then return "BACKPACK"; end
-  if (bag == 1) then return "BAG1"; end
-  if (bag == 2) then return "BAG2"; end
-  if (bag == 3) then return "BAG3"; end
-  if (bag == 4) then return "BAG4"; end
-  if (bag == 5) then return "BBAG1"; end
-  if (bag == 6) then return "BBAG2"; end
-  if (bag == 7) then return "BBAG3"; end
-  if (bag == 8) then return "BBAG4"; end
-  if (bag == 9) then return "BBAG5"; end
-  if (bag == 10) then return "BBAG6"; end
-  if (bag == 11) then return "BBAG7"; end
+  if (bag == KEYRING_CONTAINER) then return L["KEYRING"]; end
+  if (bag == BANK_CONTAINER) then return L["BANK"]; end
+  if (bag == BACKPACK_CONTAINER) then return L["BACKPACK"]; end
+  if (bag == 1) then return L["BAG1"]; end
+  if (bag == 2) then return L["BAG2"]; end
+  if (bag == 3) then return L["BAG3"]; end
+  if (bag == 4) then return L["BAG4"]; end
+  if (bag == 5) then return L["BBAG1"]; end
+  if (bag == 6) then return L["BBAG2"]; end
+  if (bag == 7) then return L["BBAG3"]; end
+  if (bag == 8) then return L["BBAG4"]; end
+  if (bag == 9) then return L["BBAG5"]; end
+  if (bag == 10) then return L["BBAG6"]; end
+  if (bag == 11) then return L["BBAG7"]; end
 end
 
 -- Used for EMPTY_X_SLOTS and IN_X_BAG
@@ -1390,27 +1402,27 @@ function TBag_GetBagType(playerid, bag)
       local id, itemlink = TBag_GetItemID(itemlink);
       if (id) then 
 	    local name, itemType, subType = TBag_GetItemInfo(id);
-        if (itemType == "Quiver") then 
-	  if (subType == "Quiver") then
-	    type = "QUIV";
-	  elseif (subType == "Ammo Pouch") then
-            type = "AMMO";
+        if (itemType == L["Quiver"]) then 
+	  if (subType == L["Quiver"]) then
+	    type = L["QUIV"];
+	  elseif (subType == L["Ammo Pouch"]) then
+            type = L["AMMO"];
 	  end
-        elseif (itemType == "Container") then
-          if (subType == "Soul Bag") then 
-            type = "SOUL";
-	  elseif (subType == "Engineering Bag") then
-	    type = "ENG";
-	  elseif (subType == "Gem Bag") then
-	    type = "GEM";
-	  elseif (subType == "Herb Bag") then
-            type = "HERB";
-	  elseif (subType == "Mining Bag") then
-	    type = "MINE";
-	  elseif (subType == "Enchanting Bag") then
-            type = "ENCH";
-	  elseif (subType == "Leatherworking Bag") then
-            type = "LTHR";
+        elseif (itemType == L["Container"]) then
+          if (subType == L["Soul Bag"]) then 
+            type = L["SOUL"];
+	  elseif (subType == L["Engineering Bag"]) then
+	    type = L["ENG"];
+	  elseif (subType == L["Gem Bag"]) then
+	    type = L["GEM"];
+	  elseif (subType == L["Herb Bag"]) then
+            type = L["HERB"];
+	  elseif (subType == L["Mining Bag"]) then
+	    type = L["MINE"];
+	  elseif (subType == L["Enchanting Bag"]) then
+            type = L["ENCH"];
+	  elseif (subType == L["Leatherworking Bag"]) then
+            type = L["LTHR"];
           end
         end
         TBag_SetPlayerBagCfg(playerid, bag, TBAG_I_ITEMLINK, itemlink);
@@ -1431,7 +1443,7 @@ function TBag_GetBagType(playerid, bag)
 
   -- Special keyring setting
   if (bag == KEYRING_CONTAINER) then
-    TBag_SetPlayerBagCfg(playerid, bag, TBAG_I_BAGTYPE, "KEYRING");
+    TBag_SetPlayerBagCfg(playerid, bag, TBAG_I_BAGTYPE, L["KEYRING"]);
   end
 
   -- Get the type from the cache always
@@ -1974,18 +1986,18 @@ function TBag_MakeColorMenu(cfg, updatefunc, level, bagarr)
   local info, bag;
 
   info = TBag_MakeColorPickerInfo(cfg, "bkgr_", 
-    TBAG_MAIN_BAR, "Main Background Color", updatefunc);
+    TBAG_MAIN_BAR, L["Main Background Color"], updatefunc);
   UIDropDownMenu_AddButton(info, level);
 
   info = TBag_MakeColorPickerInfo(cfg, "brdr_", 
-    TBAG_MAIN_BAR, "Main Border Color", updatefunc);
+    TBAG_MAIN_BAR, L["Main Border Color"], updatefunc);
   UIDropDownMenu_AddButton(info, level);
 
   info = { ["disabled"] = 1 };
   UIDropDownMenu_AddButton(info, level);
 
   info = {
-    ["text"] = "Set Bar Colors to Main Colors",
+    ["text"] = L["Set Bar Colors to Main Colors"],
     ["value"] = {  },
     ["func"] = function()
       TBag_ResetBarColors(cfg);
@@ -1999,7 +2011,7 @@ function TBag_MakeColorMenu(cfg, updatefunc, level, bagarr)
 
   for _, bag in ipairs(bagarr) do
     info = TBag_MakeColorPickerInfo(cfg, "bag_", 
-      bag, "Spotlight for "..TBag_GetBagDispName(bag), updatefunc);
+      bag, string.format(L["Spotlight for %s"],TBag_GetBagDispName(bag)), updatefunc);
     UIDropDownMenu_AddButton(info, level);
   end
 end
@@ -2137,7 +2149,7 @@ end
 
 function TBag_MakeEmptySlot(itm)
   if (itm) then
-    itm[TBAG_I_NAME] = "Empty Slot";
+    itm[TBAG_I_NAME] = L["Empty Slot"];
     itm[TBAG_I_ITEMID] = nil;
     itm[TBAG_I_RARITY] = nil;
     itm[TBAG_I_TYPE] = "";
@@ -2319,7 +2331,7 @@ function TBag_UpdateItmCache(cfg, playerid, itmcache, bagarr, atbank)
 	      TBAG_FORCED_SHOW[TBag_BagSlotToString(itm[TBAG_I_BAG],itm[TBAG_I_SLOT])] = 1
             end
             local tooltip = TBag_MakeToolTipStr(playerid, itm[TBAG_I_ITEMLINK], bag, slot);
-            if (string.find(tooltip, "Soulbound")) then
+            if (string.find(tooltip, L["Soulbound"])) then
               itm[TBAG_I_SOULBOUND] = 1;
             end
           else
@@ -2447,9 +2459,10 @@ end
 function TBag_PickBar(cfg, playerid, itm, trade1, trade2)
   if (itm[TBAG_I_ITEMLINK] == nil) then
     if (itm[TBAG_I_BAGTYPE]) and (itm[TBAG_I_BAGTYPE] ~= "") then
-      itm[TBAG_I_CAT] = "EMPTY_"..itm[TBAG_I_BAGTYPE].."_SLOTS";
+      itm[TBAG_I_CAT] = string.format(L["EMPTY_%s_SLOTS"],itm[TBAG_I_BAGTYPE]);
     else
-      itm[TBAG_I_CAT] = "EMPTY_"..TBag_GetBagPosName(itm[TBAG_I_BAG]).."_SLOTS";
+      itm[TBAG_I_CAT] = string.format(L["EMPTY_%s_SLOTS"],
+                                      TBag_GetBagPosName(itm[TBAG_I_BAG]));
     end
     TBag_SetBarFromClass(cfg, itm);
     return itm;
@@ -2463,7 +2476,7 @@ function TBag_PickBar(cfg, playerid, itm, trade1, trade2)
   -- reset item keywords
   if (itm[TBAG_I_BAGTYPE]) and (itm[TBAG_I_BAGTYPE] ~= "") then
     if (cfg["special_bag_sort"] == 1) then
-      itm[TBAG_I_CAT] = "IN_"..itm[TBAG_I_BAGTYPE].."_BAG";
+      itm[TBAG_I_CAT] = string.format(L["IN_%s_BAG"],itm[TBAG_I_BAGTYPE]);
       itm[TBAG_I_KEYWORD] = {
         [itm[TBAG_I_CAT]] = 1,  -- this indicates that the special bag isn't empty
       };
@@ -2481,29 +2494,31 @@ function TBag_PickBar(cfg, playerid, itm, trade1, trade2)
   TBag_MakeAllTradeKeywords(itm, cfg["trade_created_sort"], trade1, trade2);
 
   if (trade1 ~= "") then
-    TBag_SetCatBar(cfg, TBag_Cat(trade1), TBag_Cat("TRADE1"), 1);
+    TBag_SetCatBar(cfg, TBag_Cat(trade1), L["TRADE1"], 1);
     if (cfg["trade_created_sort"] == 1) then
-      TBag_SetCatBar(cfg, TBag_Cat(trade1).."_CREATED", TBag_Cat("TRADE1").."_CREATED", 1);
+      TBag_SetCatBar(cfg, string.format(L["%s_CREATED"],TBag_Cat(trade1)),
+                     string.format(L["%s_CREATED"],L["TRADE1"]), 1); 
     else
-      TBag_SetCatBar(cfg, TBag_Cat(trade1).."_CREATED", nil, 1);
+      TBag_SetCatBar(cfg, string.format(L["%s_CREATED"],TBag_Cat(trade1)), nil, 1);
     end
   end
   if (trade2 ~= "") then
-    TBag_SetCatBar(cfg, TBag_Cat(trade2), TBag_Cat("TRADE2"), 1);
+    TBag_SetCatBar(cfg, TBag_Cat(trade2), L["TRADE2"], 1);
     if (cfg["trade_created_sort"] == 1) then
-      TBag_SetCatBar(cfg, TBag_Cat(trade2).."_CREATED", TBag_Cat("TRADE2").."_CREATED", 1);
+      TBag_SetCatBar(cfg, string.format(L["%s_CREATED"],TBag_Cat(trade2)),
+                     string.format(L["%s_CREATED"],L["TRADE2"]), 1);
     else
-      TBag_SetCatBar(cfg, TBag_Cat(trade2).."_CREATED", nil, 1);
+      TBag_SetCatBar(cfg, string.format(L["%s_CREATED"],TBag_Cat(trade2)), nil, 1);
     end
   end
 
   if (itm[TBAG_I_SOULBOUND] == 1) then
-    itm[TBAG_I_KEYWORD]["SOULBOUND"] = 1;
+    itm[TBAG_I_KEYWORD][L["SOULBOUND"]] = 1;
 
     -- Only treat soulbound equipment as equipped
     if ( TBag_GetPlayerInfo(playerid, TBAG_S_EQUIPPED) ~= nil ) then
       if (TBag_GetPlayerInfo(playerid, TBAG_S_EQUIPPED)[ itm[TBAG_I_ITEMID] ] ~= nil) then
-      itm[TBAG_I_KEYWORD]["EQUIPPED"] = 1;
+      itm[TBAG_I_KEYWORD][L["EQUIPPED"]] = 1;
       end
     end
   end
@@ -2569,14 +2584,14 @@ function TBag_PickBar(cfg, playerid, itm, trade1, trade2)
   end
 
   if (itm[TBAG_I_CAT] == nil) then
-    itm[TBAG_I_CAT] = "UNKNOWN";
+    itm[TBAG_I_CAT] = L["UNKNOWN"];
 
     itm[TBAG_I_BAR] = TBag_GetCat(cfg, itm[TBAG_I_CAT]);
     while ( (itm[TBAG_I_BAR] ~= nil) and (type(itm[TBAG_I_BAR]) ~= "number") ) do
     itm[TBAG_I_BAR] = TBag_GetCat(cfg, itm[TBAG_I_BAR]);
     end
     if (type(itm[TBAG_I_BAR]) ~= "number") then
-    itm[TBAG_I_CAT] = "UNKNOWN";
+    itm[TBAG_I_CAT] = L["UNKNOWN"];
     itm[TBAG_I_BAR] = 1;
     end
   end

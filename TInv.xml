@@ -173,9 +173,9 @@
 
           <OnEnter>
             GameTooltip_AddNewbieTip(
-              TBag_Loc("TBag_ColumnsAdd_tooltip_title"),
+	      TBAG_LOCALE["Window Size"],
               1.0, 1.0, 1.0,
-              TBag_Loc("TBag_ColumnsAdd_tooltip") );
+	      TBAG_LOCALE["Increase the number of columns displayed"] );
           </OnEnter>
           <OnLeave>
             GameTooltip:Hide();
@@ -202,9 +202,9 @@
 
           <OnEnter>
             GameTooltip_AddNewbieTip(
-              TBag_Loc("TBag_ColumnsDel_tooltip_title"),
+	      TBAG_LOCALE["Window Size"],
               1.0, 1.0, 1.0,
-              TBag_Loc("TBag_ColumnsDel_tooltip") );
+	      TBAG_LOCALE["Decrease the number of columns displayed"] );
           </OnEnter>
           <OnLeave>
             GameTooltip:Hide();
@@ -272,9 +272,9 @@
           </OnClick>
           <OnEnter>
             if (TInv_hilight_new == 0) then
-              GameTooltip_AddNewbieTip(TBag_Loc("TBag_HighlightToggle_off"), 1.0, 1.0, 1.0, TBag_Loc("TBag_HighlightToggle_off_tooltip"));
+	    GameTooltip_AddNewbieTip(TBAG_LOCALE["Hilight"], 1.0, 1.0, 1.0, TBAG_LOCALE["Highlight of new items is OFF."]);
             else
-              GameTooltip_AddNewbieTip(TBag_Loc("TBag_HighlightToggle_on"), 1.0, 1.0, 1.0, TBag_Loc("TBag_HighlightToggle_on_tooltip"));
+	    GameTooltip_AddNewbieTip(TBAG_LOCALE["Normal"], 1.0, 1.0, 1.0, TBAG_LOCALE["Highlight of new items is ON."]);
             end
           </OnEnter>
           <OnLeave>
@@ -298,7 +298,7 @@
             TInv_Button_ChangeEditMode_OnClick();
           </OnClick>
           <OnEnter>
-            GameTooltip_AddNewbieTip(TBag_Loc("TBag_ChangeEditMode_tooltip_title"), 1.0, 1.0, 1.0, TBag_Loc("TBag_ChangeEditMode_tooltip"));
+		  GameTooltip_AddNewbieTip(TBAG_LOCALE["Edit Mode"], 1.0, 1.0, 1.0, TBAG_LOCALE["Select this option to move classes of items into different 'bars' (the red numbers)."]);
           </OnEnter>
           <OnLeave>
             GameTooltip:Hide();
@@ -322,7 +322,7 @@
             TInv_Button_ShowBank_OnClick();
           </OnClick>
           <OnEnter>
-            GameTooltip_AddNewbieTip(TBag_Loc("TBag_ShowBank_tooltip_title"), 1.0, 1.0, 1.0, TBag_Loc("TBag_ShowBank_tooltip"));
+		  GameTooltip_AddNewbieTip(TBAG_LOCALE["View Bank"], 1.0, 1.0, 1.0, TBAG_LOCALE["Displays bank contents in a view-only mode.  You may select another player's bank to view from the dropdown."]);
           </OnEnter>
           <OnLeave>
             GameTooltip:Hide();
@@ -345,7 +345,7 @@
             TInv_Button_Reload_OnClick();
           </OnClick>
           <OnEnter>
-            GameTooltip_AddNewbieTip(TBag_Loc("TBag_Reload_tooltip_title"), 1.0, 1.0, 1.0, TBag_Loc("TBag_Reload_tooltip"));
+		  GameTooltip_AddNewbieTip(TBAG_LOCALE["Re-sort View"], 1.0, 1.0, 1.0, TBAG_LOCALE["Reloads your items and re-sorts their view."]);
           </OnEnter>
           <OnLeave>
             GameTooltip:Hide();
@@ -568,7 +568,7 @@
       </OnReceiveDrag>
       <OnEnter>
         GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
-        GameTooltip:SetText(KEYRING, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+	GameTooltip:SetText(TBAG_LOCALE["Keyring"], HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
         GameTooltip:AddLine();
       </OnEnter>
       <OnLeave>
@@ -723,7 +723,8 @@
     <Scripts>
       <OnLoad>
         this:RegisterEvent("VARIABLES_LOADED");
-        tinsert(UISpecialFrames,this:GetName());
+	tinsert(UISpecialFrames,this:GetName());
+	TInv_Button_Reload:SetText(TBAG_LOCALE["Re-sort"]);
       </OnLoad> 
       <OnEvent>
         if (event == "VARIABLES_LOADED") then 

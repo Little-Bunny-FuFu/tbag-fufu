@@ -1,5 +1,8 @@
 -- $Id$
 
+-- Localization Support
+local L = TBAG_LOCALE;
+
 TBAG_NUMCOL_MIN = 8;
 TBAG_NUMCOL_MAX = 20;
 
@@ -190,94 +193,93 @@ function TBagOpt_MakeItemSearch(cfgopt, cfg, swapfunc)
 end
 
 function TBagOpt_CreateCfgOpt(cfgopt, cfg, bagarr, updatefunc, resizefunc, forcefunc)
-
-  TBagOpt_MakeHeader(cfgopt, "Main Sizing Preferences");
-  TBagOpt_MakeSlider(cfgopt, "Number of Item Columns:",
+  TBagOpt_MakeHeader(cfgopt, L["Main Sizing Preferences"]);
+  TBagOpt_MakeSlider(cfgopt, L["Number of Item Columns:"],
     cfg, "maxColumns", TBAG_NUMCOL_MIN, TBAG_NUMCOL_MAX, 1, 
     forcefunc);
-  TBagOpt_MakeSlider(cfgopt, "Number of Horizontal Bars:",
+  TBagOpt_MakeSlider(cfgopt, L["Number of Horizontal Bars:"],
     cfg, "bar_x", 1, cfg["maxColumns"], 1, 
     forcefunc);
-  TBagOpt_MakeSlider(cfgopt, "Window Scale:",
+  TBagOpt_MakeSlider(cfgopt, L["Window Scale:"],
     cfg, "scale", 0.1, 1.0, 0.05, 
     forcefunc);
-  TBagOpt_MakeSlider(cfgopt, "Item Button Size:",
+  TBagOpt_MakeSlider(cfgopt, L["Item Button Size:"],
     cfg, "frameButtonSize", TBAG_N_BUTTON_MIN, TBAG_N_BUTTON_MAX, 1, 
     resizefunc);
-  TBagOpt_MakeSlider(cfgopt, "Item Button Padding:",
+  TBagOpt_MakeSlider(cfgopt, L["Item Button Padding:"],
     cfg, "framePad", 0, TBAG_N_SPACE_MAX, 1, 
     resizefunc);
-  TBagOpt_MakeSlider(cfgopt, "Spacing - X Button:",
+  TBagOpt_MakeSlider(cfgopt, L["Spacing - X Button:"],
     cfg, "frameXSpace", 0, TBAG_N_SPACE_MAX, 1, 
     resizefunc);
-  TBagOpt_MakeSlider(cfgopt, "Spacing - Y Button:",
+  TBagOpt_MakeSlider(cfgopt, L["Spacing - Y Button:"],
     cfg, "frameYSpace", 0, TBAG_N_SPACE_MAX, 1, 
     resizefunc);
-  TBagOpt_MakeSlider(cfgopt, "Spacing - X Pool:",
+  TBagOpt_MakeSlider(cfgopt, L["Spacing - X Pool:"],
     cfg, "frameXPool", 0, TBAG_N_SPACE_MAX, 1, 
     resizefunc);
-  TBagOpt_MakeSlider(cfgopt, "Spacing - Y Pool:",
+  TBagOpt_MakeSlider(cfgopt, L["Spacing - Y Pool:"],
     cfg, "frameYPool", 0, TBAG_N_SPACE_MAX, 1, 
     resizefunc);
-  TBagOpt_MakeSlider(cfgopt, "Count Font Size:",
+  TBagOpt_MakeSlider(cfgopt, L["Count Font Size:"],
     cfg, "count_font", TBAG_N_FONT_MIN, TBAG_N_FONT_MAX, 1, 
     resizefunc);
-  TBagOpt_MakeSlider(cfgopt, "Count Placement - X:",
+  TBagOpt_MakeSlider(cfgopt, L["Count Placement - X:"],
     cfg, "count_font_x", 0, TBAG_N_BUTTON_MAX, 1, 
     resizefunc);
-  TBagOpt_MakeSlider(cfgopt, "Count Placement - Y:",
+  TBagOpt_MakeSlider(cfgopt, L["Count Placement - Y:"],
     cfg, "count_font_y", 0, TBAG_N_BUTTON_MAX, 1, 
     resizefunc);
-  TBagOpt_MakeSlider(cfgopt, "New Tag Font Size:",
+  TBagOpt_MakeSlider(cfgopt, L["New Tag Font Size:"],
     cfg, "new_font", TBAG_N_FONT_MIN, TBAG_N_FONT_MAX, 1, 
     resizefunc);
 
   local bag;
 
-  TBagOpt_MakeHeader(cfgopt, "Bag Contents Show");
+  TBagOpt_MakeHeader(cfgopt, L["Bag Contents Show"]);
   for _, bag in ipairs(bagarr) do
-    TBagOpt_MakeCheck(cfgopt, "Show "..TBag_GetBagDispName(bag)..":",
+    TBagOpt_MakeCheck(cfgopt, string.format(L["Show %s:"],TBag_GetBagDispName(bag)),
       cfg, "show_Bag"..bag, forcefunc);
   end
 
-  TBagOpt_MakeHeader(cfgopt, "General Display Preferences");
-  TBagOpt_MakeCheck(cfgopt, "Show Size on Bag Count:",
+  TBagOpt_MakeHeader(cfgopt, L["General Display Preferences"]);
+  TBagOpt_MakeCheck(cfgopt, L["Show Size on Bag Count:"],
     cfg, "show_bag_sizes", updatefunc);
-  TBagOpt_MakeCheck(cfgopt, "Show Bag Icons on Empty Slots:",
+  TBagOpt_MakeCheck(cfgopt, L["Show Bag Icons on Empty Slots:"],
     cfg, "show_bag_icons", forcefunc);
-  TBagOpt_MakeCheck(cfgopt, "Show Blizzard Bag Frames:",
+  TBagOpt_MakeCheck(cfgopt, L["Show Blizzard Bag Frames:"],
     cfg, "show_blizzard_frames", updatefunc);
-  TBagOpt_MakeCheck(cfgopt, "Spotlight Open or Selected Bags:",
+  TBagOpt_MakeCheck(cfgopt, L["Spotlight Open or Selected Bags:"],
     cfg, "spotlight_open", updatefunc);
-  TBagOpt_MakeCheck(cfgopt, "Spotlight Mouseover:",
+  TBagOpt_MakeCheck(cfgopt, L["Spotlight Mouseover:"],
     cfg, "spotlight_hover", updatefunc);
-  TBagOpt_MakeCheck(cfgopt, "Show Item Rarity Color:",
+  TBagOpt_MakeCheck(cfgopt, L["Show Item Rarity Color:"],
     cfg, "show_rarity_color", updatefunc);
 
-  TBagOpt_MakeCheck(cfgopt, "Auto Stack:",
+  TBagOpt_MakeCheck(cfgopt, L["Auto Stack:"],
     cfg, "stack_auto", updatefunc);
-  TBagOpt_MakeCheck(cfgopt, "Stack on Re-sort:",
+  TBagOpt_MakeCheck(cfgopt, L["Stack on Re-sort:"],
     cfg, "stack_resort", updatefunc);
 
-  TBagOpt_MakeCheck(cfgopt, "Profession Bags precede Sorting:",
+  TBagOpt_MakeCheck(cfgopt, L["Profession Bags precede Sorting:"],
     cfg, "special_bag_sort", updatefunc);
-  TBagOpt_MakeCheck(cfgopt, "Trade Creation precedes Sorting (Reopen Window):",
+  TBagOpt_MakeCheck(cfgopt, L["Trade Creation precedes Sorting (Reopen Window):"],
     cfg, "trade_created_sort", forcefunc);
 end
 
 
 function TBagOpt_CreateNewOpt(cfgopt, cfg, updatefunc)
-  TBagOpt_MakeHeader(cfgopt, "New Tag Options");
-  TBagOpt_MakeEdit(cfgopt, "New Tag Text:",
+  TBagOpt_MakeHeader(cfgopt, L["New Tag Options"]);
+  TBagOpt_MakeEdit(cfgopt, L["New Tag Text:"],
     cfg, TBAG_V_NEWON, TBAG_TAG_MAX, updatefunc);
-  TBagOpt_MakeEdit(cfgopt, "Increased Tag Text:",
+  TBagOpt_MakeEdit(cfgopt, L["Increased Tag Text:"],
     cfg, TBAG_V_NEWPLUS, TBAG_TAG_MAX, updatefunc);
-  TBagOpt_MakeEdit(cfgopt, "Decreased Tag Text:",
+  TBagOpt_MakeEdit(cfgopt, L["Decreased Tag Text:"],
     cfg, TBAG_V_NEWMINUS, TBAG_TAG_MAX, updatefunc);
 
-  TBagOpt_MakeSlider(cfgopt, "New Tag Timeout (minutes):",
+  TBagOpt_MakeSlider(cfgopt, L["New Tag Timeout (minutes):"],
     cfg, "newItemTimeout", 0, 24*60, 15, updatefunc);
-  TBagOpt_MakeSlider(cfgopt, "Recent Tag Timeout (minutes):",
+  TBagOpt_MakeSlider(cfgopt, L["Recent Tag Timeout (minutes):"],
     cfg, "recentTimeout", 0, 60, 5, updatefunc);
 end
 

@@ -6,7 +6,8 @@
 ## OptionalDeps: Auctioneer
 ## SavedVariables: TBagCfg, TBagInfo, TBnkItm, TInvItm, TContItm, TBodyItm, TMailItm
 ## Dependencies: 
-localization.xml
+localization.enUS.lua
+defaults.lua
 TBag.xml
 TInv.xml
 TInvOpts.xml

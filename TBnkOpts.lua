@@ -1,5 +1,8 @@
 -- $Id$
 
+-- Localization Support
+local L = TBAG_LOCALE;
+
 local TBnk_CfgOpt = {};
 
 TBnk_Options_UPDATE_HAPPENING = 0;
@@ -154,7 +157,7 @@ end
 
 function TBnkOpts_AddCat()
   -- Add a blank entry
-  table.insert(TBnkCfg["item_search_list"], {"UNKNOWN", "", "", "", ""});
+  table.insert(TBnkCfg["item_search_list"], {L["UNKNOWN"], "", "", "", ""});
 
   -- Refresh the window, scrolling down to last entry
   TBnkOpt_CreateCfgOpt();

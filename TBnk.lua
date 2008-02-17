@@ -1,6 +1,9 @@
 -- $Id$ 
 
-BINDING_NAME_TBNK_TOGGLE = "Toggle Bank Window";
+-- Localization Support
+local L = TBAG_LOCALE;
+
+BINDING_NAME_TBNK_TOGGLE = L["Toggle Bank Window"];
 
 -- Constants
 TBnk_DEBUGMESSAGES = 0;         -- 0 = off, 1 = on
@@ -179,13 +182,13 @@ function TBnk_init(reset)
   TBnkHooks_Register(TBAG_HOOK_UNREGISTER);
   TBnkHooks_Register(TBAG_HOOK_REGISTER);
 
-  TBnk_Button_HighlightToggle:SetText(TBag_Loc("TBag_HighlightToggle_off"));
-  TBnk_Button_ChangeEditMode:SetText(TBag_Loc("TBag_ChangeEditMode_off"));
+  TBnk_Button_HighlightToggle:SetText(L["Hilight"]);
+  TBnk_Button_ChangeEditMode:SetText(L["Edit"]);
 
   if (TBnkCfg["moveLock"] == 0) then
-    TBnk_Button_MoveLockToggle:SetText(TBag_Loc("TBag_MoveLock_locked"));
+    TBnk_Button_MoveLockToggle:SetText(L["L"]);
   else
-    TBnk_Button_MoveLockToggle:SetText(TBag_Loc("TBag_MoveLock_unlocked"));
+    TBnk_Button_MoveLockToggle:SetText(L["U"]);
   end
 
   if (TBnkCfg["show_bagbuttons"] == 0) then
@@ -302,7 +305,7 @@ function TBnk_InitBagGfx()
   -- Spoof the bank
   local button = getglobal("TBnkFrameBagBank");
   SetItemButtonTextureVertexColor(button, 1.0,1.0,1.0, 1.0);
-  button.tooltipText = "The Bank";
+  button.tooltipText = L["The Bank"];
 
   for i=1, NUM_BANKBAGSLOTS do
     button = getglobal("TBnkFrameBag"..i);
@@ -419,7 +422,7 @@ function TBnk_ItemButton_OnEnter(self)
     if ( TBnk_edit_mode == 1 ) then
       GameTooltip:SetOwner(self, "ANCHOR_LEFT");
       GameTooltip:ClearLines();
-      GameTooltip:AddLine("Empty Slot", 1,1,1 );
+      GameTooltip:AddLine(L["Empty Slot"], 1,1,1 );
 
       GameTooltip:Show();
     else
@@ -609,10 +612,10 @@ function TBnk_Button_HighlightToggle_OnClick()
   PlaySound("igMainMenuOptionCheckBoxOn");
   if (TBnk_hilight_new == 0) then
   TBnk_hilight_new = 1;
-  TBnk_Button_HighlightToggle:SetText(TBag_Loc("TBag_HighlightToggle_on"));
+  TBnk_Button_HighlightToggle:SetText(L["Normal"]);
   else
   TBnk_hilight_new = 0;
-  TBnk_Button_HighlightToggle:SetText(TBag_Loc("TBag_HighlightToggle_off"));
+  TBnk_Button_HighlightToggle:SetText(L["Hilight"]);
   end
   TBnk_UpdateWindow();
 end
@@ -621,12 +624,12 @@ function TBnk_Button_ChangeEditMode_OnClick()
   PlaySound("igMainMenuOptionCheckBoxOn");
   if (TBnk_edit_mode == 0) then
     TBnk_edit_mode = 1;
-    TBnk_Button_ChangeEditMode:SetText(TBag_Loc("TBag_ChangeEditMode_on"));
+    TBnk_Button_ChangeEditMode:SetText(L["View"]);
     -- Always hide the purchase info on edit
     TBnk_UpdatePurchaseGfx();
   else
     TBnk_edit_mode = 0;
-    TBnk_Button_ChangeEditMode:SetText(TBag_Loc("TBag_ChangeEditMode_off"));
+    TBnk_Button_ChangeEditMode:SetText(L["Edit"]);
   end
 
   -- resort will force a window redraw
@@ -655,10 +658,10 @@ end
 function TBnk_Button_ShowPurchase_OnClick()
  if (TBnkCfg["show_purchase_button"] == 0) then
    TBnkCfg["show_purchase_button"] = 1;
-   TBnk_Button_ShowPurchase:SetText(TBag_Loc("TBag_ShowPurchase_off"));
+   TBnk_Button_ShowPurchase:SetText(L["Hide Purchase"]);
  else
    TBnkCfg["show_purchase_button"] = 0;
-   TBnk_Button_ShowPurchase:SetText(TBag_Loc("TBag_ShowPurchase_on"));
+   TBnk_Button_ShowPurchase:SetText(L["Show Purchase"]);
  end
  TBnk_UpdatePurchaseGfx();
 end
@@ -667,10 +670,10 @@ function TBnk_Button_MoveLockToggle_OnClick()
   PlaySound("igMainMenuOptionCheckBoxOn");
   if (TBnkCfg["moveLock"] == 0) then
   TBnkCfg["moveLock"] = 1;
-  TBnk_Button_MoveLockToggle:SetText(TBag_Loc("TBag_MoveLock_unlocked"));
+  TBnk_Button_MoveLockToggle:SetText(L["U"]);
   else
   TBnkCfg["moveLock"] = 0;
-  TBnk_Button_MoveLockToggle:SetText(TBag_Loc("TBag_MoveLock_locked"));
+  TBnk_Button_MoveLockToggle:SetText(L["L"]);
   end
 end
 
@@ -724,20 +727,17 @@ function TBnk_SlotTargetButton_OnEnter(self)
     GameTooltip:ClearLines();
 
     if (TBnk_edit_selected ~= "") then
-      GameTooltip:AddLine("|c"..TBAG_C_INST.."Left click to move category |r|c"
-        ..TBAG_C_CAT..TBnk_edit_selected.."|r|c"..TBAG_C_INST.." to bar |r|c"
-        ..TBAG_C_BAR..bar.."|r");
+      GameTooltip:AddLine(string.format(L["|c%sLeft click to move category |r|c%s%s|r|c%s to bar |r|c%s%s|r"],TBAG_C_INST,TBAG_C_CAT,TBnk_edit_selected,TBAG_C_INST,TBAG_C_BAR,bar));
     else
-      GameTooltip:AddLine("|c"..TBAG_C_INST.."Bar |r|c"
-        ..TBAG_C_BAR..bar.."|r");
+      GameTooltip:AddLine(string.format(L["|c%sBar |r|c%s%s|r"],TBAG_C_INST, TBAG_C_BAR, bar));
 
       GameTooltip:AddLine(" ");
       for key, value in pairs(TBNK_BC_LIST[bar]) do
-        GameTooltip:AddLine("|c"..TBAG_C_CAT..value.."|r");
+        GameTooltip:AddLine(string.format(L["|c%s%s|r"],TBAG_C_CAT,value));
       end
       GameTooltip:AddLine(" ", 1,0,0 );
 
-      GameTooltip:AddLine("Right click for options", 0.8,0.8,0.8 );
+      GameTooltip:AddLine(L["Right click for options"], 0.8,0.8,0.8 );
     end
 
     GameTooltip:Show();
@@ -993,20 +993,20 @@ function TBnkFrame_RightClickMenu_populate(level)
     info = { ["disabled"] = 1 };
     UIDropDownMenu_AddButton(info, level);
 
-    info = { ["text"] = "Current Category: "..itm[TBAG_I_CAT], ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
+    info = { ["text"] = string.format(L["Current Category: %s"],itm[TBAG_I_CAT]), ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
     UIDropDownMenu_AddButton(info, level);
 
     info = { ["disabled"] = 1 };
     UIDropDownMenu_AddButton(info, level);
 
-    info = { ["text"] = "Assign item to category:", ["hasArrow"] = 1, ["value"] = "override_placement" };
+    info = { ["text"] = L["Assign item to category:"], ["hasArrow"] = 1, ["value"] = "override_placement" };
     if (TBnkCfg["item_overrides"][itm[TBAG_I_ITEMID]] ~= nil) then
   info["checked"] = 1;
     end
     UIDropDownMenu_AddButton(info, level);
 
     info = {
-  ["text"] = "Use default category assignment",
+  ["text"] = L["Use default category assignment"],
   ["value"] = { [TBAG_I_BAG]=bag, [TBAG_I_SLOT]=slot },
   ["func"] = TBnk_RightClick_DeleteItemOverride
   };
@@ -1019,14 +1019,14 @@ function TBnkFrame_RightClickMenu_populate(level)
   info = { ["disabled"] = 1 };
   UIDropDownMenu_AddButton(info, level);
 
-  info = { ["text"] = "Debug Info: ", ["hasArrow"] = 1, ["value"] = "show_debug" };
+  info = { ["text"] = L["Debug Info: "], ["hasArrow"] = 1, ["value"] = "show_debug" };
   UIDropDownMenu_AddButton(info, level);
     end
   elseif (level == 2) then
     if ( UIDROPDOWNMENU_MENU_VALUE == "override_placement" ) then
   for i = 1, TBAG_BAR_MAX do
   info = {
-    ["text"] = "Categories within bar "..i;
+    ["text"] = string.format(L["Categories within bar %d"],i);
     ["value"] = { ["opt"]="override_placement_select", [TBAG_I_BAG]=bag, [TBAG_I_SLOT]=slot, ["select_bar"]=i },
     ["hasArrow"] = 1
     };
@@ -1081,8 +1081,7 @@ function TBnkFrame_RightClickMenu_populate(level)
   -- right click on a slot
   bar = TBnk_RightClickMenu_opts[TBAG_I_BAR];
 
-  info = { ["text"] = "|c"..TBAG_C_INST.."Bar |r|c"
-      ..TBAG_C_BAR..bar.."|r", ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
+  info = { ["text"] = string.format(L["|c%sBar |r|c%s%s|r"],TBAG_C_INST,TBAG_C_BAR,bar), ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
   UIDropDownMenu_AddButton(info, level);
 
   info = { ["disabled"] = 1 };
@@ -1090,7 +1089,7 @@ function TBnkFrame_RightClickMenu_populate(level)
 
   for key, value in pairs(TBNK_BC_LIST[bar]) do
     info = {
-    ["text"] = "Move: |c"..TBAG_C_CAT..value.."|r";
+    ["text"] = string.format(L["Move: |c%s%s|r"],TBAG_C_CAT,value);
     ["value"] = value;
     ["func"] = function()
   TBnk_edit_selected = (this.value);
@@ -1104,13 +1103,13 @@ function TBnkFrame_RightClickMenu_populate(level)
   info = { ["disabled"] = 1 };
   UIDropDownMenu_AddButton(info, level);
 
-  info = { ["text"] = "Sort Mode:", ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
+  info = { ["text"] = L["Sort Mode:"], ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
   UIDropDownMenu_AddButton(info, level);
 
   for key, value in pairs({
-    [TBAG_SORTBY_NONE] = "No sort",
-    [TBAG_SORTBY_NORM] = "Sort by name",
-    [TBAG_SORTBY_REV] = "Sort last words first"
+    [TBAG_SORTBY_NONE] = L["No sort"],
+    [TBAG_SORTBY_NORM] = L["Sort by name"],
+    [TBAG_SORTBY_REV] = L["Sort last words first"]
     }) do
   
     if (TBag_GetGrp(TBnkCfg, TBAG_G_BAR_SORT, bar) == key) then
@@ -1133,12 +1132,12 @@ function TBnkFrame_RightClickMenu_populate(level)
   info = { ["disabled"] = 1 };
   UIDropDownMenu_AddButton(info, level);
 
-  info = { ["text"] = "Hilight new items:", ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
+  info = { ["text"] = L["Hilight new items:"], ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
   UIDropDownMenu_AddButton(info, level);
 
   for key,value in pairs({
-    [0] = "Don't tag new items",
-    [1] = "Tag new items"
+    [0] = L["Don't tag new items"],
+    [1] = L["Tag new items"]
     }) do
 
     if (TBag_GetGrp(TBnkCfg, TBAG_G_USE_NEW, bar) == key) then
@@ -1162,12 +1161,12 @@ function TBnkFrame_RightClickMenu_populate(level)
   info = { ["disabled"] = 1 };
   UIDropDownMenu_AddButton(info, level);
 
-  info = { ["text"] = "Hide Bar:", ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
+  info = { ["text"] = L["Hide Bar:"], ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
   UIDropDownMenu_AddButton(info, level);
 
   for key,value in pairs({
-    [0] = "Show items assigned to this bar",
-    [1] = "Hide items assigned to this bar"
+    [0] = L["Show items assigned to this bar"],
+    [1] = L["Hide items assigned to this bar"]
     }) do
 
     if (TBag_GetGrp(TBnkCfg, TBAG_G_BAR_HIDE, bar) == key) then
@@ -1191,15 +1190,15 @@ function TBnkFrame_RightClickMenu_populate(level)
   info = { ["disabled"] = 1 };
   UIDropDownMenu_AddButton(info, level);
 
-  info = { ["text"] = "Color:", ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
+  info = { ["text"] = L["Color:"], ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
   UIDropDownMenu_AddButton(info, level);
 
   info = TBag_MakeColorPickerInfo(TBnkCfg, "bkgr_", bar,
-    "Background Color for Bar "..bar, TBnk_UpdateWindow);
+    string.format(L["Background Color for Bar %d"],bar), TBnk_UpdateWindow);
   UIDropDownMenu_AddButton(info, level);
 
   info = TBag_MakeColorPickerInfo(TBnkCfg, "brdr_", bar,
-    "Border Color for Bar "..bar, TBnk_UpdateWindow);
+    string.format(L["Border Color for Bar %d"],bar), TBnk_UpdateWindow);
   UIDropDownMenu_AddButton(info, level);
 
   -------------------------------------------------------------------------------------------------
@@ -1208,7 +1207,7 @@ function TBnkFrame_RightClickMenu_populate(level)
   elseif (TBnk_RightClickMenu_mode == "mainwindow") then
   if (level == 1) then
 
-    info = { ["text"] = TBag_Loc("TBag_MenuTitle"), ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
+    info = { ["text"] = string.format(L["TBag v%s"],TBAG_VERSION), ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
     UIDropDownMenu_AddButton(info, level);
 
     if (TBNK_ATBANK == 0) then
@@ -1216,7 +1215,7 @@ function TBnkFrame_RightClickMenu_populate(level)
       UIDropDownMenu_AddButton(info, level);
 
       info = {
-        ["text"] = "Select Character";
+        ["text"] = L["Select Character"];
         ["value"] = { ["opt"]="select_character" },
         ["hasArrow"] = 1
         };
@@ -1227,7 +1226,7 @@ function TBnkFrame_RightClickMenu_populate(level)
     UIDropDownMenu_AddButton(info, level);
 
     info = {
-  ["text"] = "Edit Mode",
+  ["text"] = L["Edit Mode"],
   ["value"] = nil,
   ["func"] = TBnk_Button_ChangeEditMode_OnClick
   };
@@ -1237,7 +1236,7 @@ function TBnkFrame_RightClickMenu_populate(level)
     UIDropDownMenu_AddButton(info, level);
 
     info = {
-  ["text"] = "Lock window",
+  ["text"] = L["Lock window"],
   ["value"] = nil,
   ["func"] = TBnk_Button_MoveLockToggle_OnClick
   };
@@ -1247,14 +1246,14 @@ function TBnkFrame_RightClickMenu_populate(level)
     UIDropDownMenu_AddButton(info, level);
 
   info = {
-  ["text"] = "Reload bags",
+  ["text"] = L["Reload bags"],
   ["value"] = nil,
   ["func"] = TBnk_Button_Reload_OnClick
   };
   UIDropDownMenu_AddButton(info, level);
 
     info = {
-  ["text"] = "Show Purchase Info",
+  ["text"] = L["Show Purchase Info"],
   ["value"] = nil,
   ["func"] = TBnk_Button_ShowPurchase_OnClick
   };
@@ -1267,7 +1266,7 @@ function TBnkFrame_RightClickMenu_populate(level)
     UIDropDownMenu_AddButton(info, level);
 
     info = {
-  ["text"] = "Hilight New Items",
+  ["text"] = L["Hilight New Items"],
   ["value"] = nil,
   ["func"] = TBnk_Button_HighlightToggle_OnClick
   };
@@ -1277,7 +1276,7 @@ function TBnkFrame_RightClickMenu_populate(level)
     UIDropDownMenu_AddButton(info, level);
 
     info = {
-  ["text"] = "Reset NEW tag",
+  ["text"] = L["Reset NEW tag"],
   ["value"] = nil,
   ["func"] = function()
     local bag, slot, index;
@@ -1301,7 +1300,7 @@ function TBnkFrame_RightClickMenu_populate(level)
   UIDropDownMenu_AddButton(info, level);
 
     info = {
-  ["text"] = "Advanced Configuration",
+  ["text"] = L["Advanced Configuration"],
   ["value"] = nil,
   ["func"] = function()
     TBnk_OptsFrame:Show();
@@ -1314,7 +1313,7 @@ function TBnkFrame_RightClickMenu_populate(level)
 
     
     info = {
-      ["text"] = "Set Size";
+      ["text"] = L["Set Size"];
       ["value"] = { ["opt"]="set_scale" },
       ["hasArrow"] = 1
     };
@@ -1324,7 +1323,7 @@ function TBnkFrame_RightClickMenu_populate(level)
       UIDropDownMenu_AddButton(info, level);
 
       info = {
-        ["text"] = "Set Colors";
+        ["text"] = L["Set Colors"];
         ["value"] = { ["opt"]="set_colors" },
         ["hasArrow"] = 1
         };
@@ -1335,7 +1334,7 @@ function TBnkFrame_RightClickMenu_populate(level)
       UIDropDownMenu_AddButton(info, level);
       
       info = {
-        ["text"] = "Hide";
+        ["text"] = L["Hide"];
         ["value"] = { ["opt"]="hide_frames" },
         ["hasArrow"] = 1
         };
@@ -1373,7 +1372,7 @@ function TBnkFrame_RightClickMenu_populate(level)
           TBag_MakeColorMenu(TBnkCfg, TBnk_UpdateWindow, level, TBnk_Bags);
         elseif (UIDROPDOWNMENU_MENU_VALUE["opt"] == "hide_frames") then
           info = {
-            ["text"] = "Hide Player Dropdown";
+            ["text"] = L["Hide Player Dropdown"];
             ["func"] = TBnk_Toggle_UserDropdown;
             };
           if (TBnkCfg["show_userdropdown"] == 0) then
@@ -1381,7 +1380,7 @@ function TBnkFrame_RightClickMenu_populate(level)
           end
           UIDropDownMenu_AddButton(info, level);
           info = {
-            ["text"] = "Hide Re-sort Button";
+            ["text"] = L["Hide Re-sort Button"];
             ["func"] = TBnk_Toggle_ReloadButton;
             };
           if (TBnkCfg["show_reloadbutton"] == 0) then
@@ -1389,7 +1388,7 @@ function TBnkFrame_RightClickMenu_populate(level)
           end
           UIDropDownMenu_AddButton(info, level);
           info = {
-            ["text"] = "Hide Show Purchase Button";
+            ["text"] = L["Hide Show Purchase Button"];
             ["func"] = TBnk_Toggle_Purchase;
             };
           if (TBnkCfg["show_purchasetoggle"] == 0) then
@@ -1397,7 +1396,7 @@ function TBnkFrame_RightClickMenu_populate(level)
           end
           UIDropDownMenu_AddButton(info, level);
            info = {
-            ["text"] = "Hide Edit Button";
+            ["text"] = L["Hide Edit Button"];
             ["func"] = TBnk_Toggle_EditButton;
             };
           if (TBnkCfg["show_editbutton"] == 0) then
@@ -1405,7 +1404,7 @@ function TBnkFrame_RightClickMenu_populate(level)
           end
           UIDropDownMenu_AddButton(info, level);
           info = {
-            ["text"] = "Hide Hilight Button";
+            ["text"] = L["Hide Hilight Button"];
             ["func"] = TBnk_Toggle_HighlightButton;
             };
           if (TBnkCfg["show_hilightbutton"] == 0) then
@@ -1413,7 +1412,7 @@ function TBnkFrame_RightClickMenu_populate(level)
           end
           UIDropDownMenu_AddButton(info, level);
           info = {
-            ["text"] = "Hide Lock Button";
+            ["text"] = L["Hide Lock Button"];
             ["func"] = TBnk_Toggle_LockButton;
             };
           if (TBnkCfg["show_lockbutton"] == 0) then
@@ -1421,7 +1420,7 @@ function TBnkFrame_RightClickMenu_populate(level)
           end
           UIDropDownMenu_AddButton(info, level);
           info = {
-            ["text"] = "Hide Close Button";
+            ["text"] = L["Hide Close Button"];
             ["func"] = TBnk_Toggle_CloseButton;
             };
           if (TBnkCfg["show_closebutton"] == 0) then
@@ -1429,7 +1428,7 @@ function TBnkFrame_RightClickMenu_populate(level)
           end
           UIDropDownMenu_AddButton(info, level);
           info = {
-            ["text"] = "Hide Total";
+            ["text"] = L["Hide Total"];
             ["func"] = TBnk_Toggle_Total;
             };
           if (TBnkCfg["show_total"] == 0) then
@@ -1437,7 +1436,7 @@ function TBnkFrame_RightClickMenu_populate(level)
           end
           UIDropDownMenu_AddButton(info, level);
           info = {
-            ["text"] = "Hide Bag Buttons";
+            ["text"] = L["Hide Bag Buttons"];
             ["func"] = TBnk_Toggle_BagSlotButtons;
             };
           if (TBnkCfg["show_bagbuttons"] == 0) then
@@ -1445,7 +1444,7 @@ function TBnkFrame_RightClickMenu_populate(level)
           end
           UIDropDownMenu_AddButton(info, level);
           info = {
-            ["text"] = "Hide Money";
+            ["text"] = L["Hide Money"];
             ["func"] = TBnk_Toggle_Money;
             };
           if (TBnkCfg["show_money"] == 0) then
@@ -1660,9 +1659,9 @@ function TBnk_UpdateWindow(resort_req)
   TBag_ColorFrame(TBnkCfg, frame, TBAG_MAIN_BAR);
 
   if (TBnk_edit_mode == 1) then
-    TBnk_Button_ColumnsAdd:SetText(TBag_Loc("TBag_ColumnsAdd_buttontitle"));
+    TBnk_Button_ColumnsAdd:SetText(L["<++>"]);
     TBnk_Button_ColumnsAdd:Show();
-    TBnk_Button_ColumnsDel:SetText(TBag_Loc("TBag_ColumnsDel_buttontitle"));
+    TBnk_Button_ColumnsDel:SetText(L[">--<"]);
     TBnk_Button_ColumnsDel:Show();
   else
     TBnk_Button_ColumnsAdd:Hide();
@@ -1698,7 +1697,7 @@ end
 function TBnk_UserDropdown_OnLoad()
   UIDropDownMenu_Initialize(this, TBnk_UserDropdown_Initialize);
   UIDropDownMenu_SetSelectedValue(this, TBNK_PLAYERID);
-  TBnk_UserDropdown.tooltip = "You are viewing this player's bank.";
+  TBnk_UserDropdown.tooltip = L["You are viewing this player's bank."];
   UIDropDownMenu_SetWidth(TBAG_USERDD_WIDTH, TBnk_UserDropdown);
 --  OptionsFrame_EnableDropDown(TBnk_UserDropdown);
 end

@@ -1,5 +1,8 @@
 -- $Id$
 
+-- Localization support
+local L = TBAG_LOCALE;
+
 TBAG_S_TRADES = "trades";
 TBAG_S_SECOND = "second";
 TBAG_S_SKILLS = "skills";
@@ -58,13 +61,13 @@ function TBag_GetTradeType(trade)
   else
 --    TBag_PrintDEBUG("TBag_GetTradeType: "..trade);
 
-    if ((trade == TBag_Loc("Cooking")) or (trade == TBag_Loc("First Aid")) 
-      or (trade == TBag_Loc("Fishing"))) then
+    if ((trade == L["Cooking"]) or (trade == L["First Aid"]) 
+      or (trade == L["Fishing"])) then
       return TBAG_S_SECOND;
-    elseif ((trade == TBag_Loc("Alchemy")) or (trade == TBag_Loc("Blacksmithing")) 
-      or (trade == TBag_Loc("Enchanting")) or (trade == TBag_Loc("Engineering")) 
-      or (trade == TBag_Loc("Leatherworking")) or (trade == TBag_Loc("Tailoring"))
-      or (trade == TBag_Loc("Jewelcrafting"))) then
+    elseif ((trade == L["Alchemy"]) or (trade == L["Blacksmithing"]) 
+      or (trade == L["Enchanting"]) or (trade == L["Engineering"]) 
+      or (trade == L["Leatherworking"]) or (trade == L["Tailoring"])
+      or (trade == L["Jewelcrafting"])) then
       return TBAG_S_TRADES;
     else
       return TBAG_S_SKILLS;
@@ -217,9 +220,9 @@ function TBag_MakeTradeCreationKeyword(itm, trade, cat, docreated)
       for itemid, _ in pairs(aTrade) do
         if (itm[TBAG_I_ITEMID] == itemid) then
           if (docreated == 1) then
-            itm[TBAG_I_KEYWORD][cat.."_CREATED"] = 1;
+            itm[TBAG_I_KEYWORD][string.format(L["%s_CREATED"],cat)] = 1;
           else
-            itm[TBAG_I_KEYWORD][cat.."_CREATED"] = nil;
+            itm[TBAG_I_KEYWORD][string.format(L["%s_CREATED"],cat)] = nil;
           end
         end
       end
@@ -250,10 +253,10 @@ function TBag_MakeTradeReagentKeywords(itm, trade1, trade2)
 	for trade,_ in pairs (counts[max_count]) do
 	    itm[TBAG_I_KEYWORD][TBag_Cat(trade)] = 1;
 	    if (trade == trade1) then
-	      itm[TBAG_I_KEYWORD]["TRADE1"] = 1;
+	      itm[TBAG_I_KEYWORD][L["TRADE1"]] = 1;
 	    end
 	    if (trade == trade2) then
-	     itm[TBAG_I_KEYWORD]["TRADE2"] = 1;
+	     itm[TBAG_I_KEYWORD][L["TRADE2"]] = 1;
 	    end
 	end
       end
@@ -288,19 +291,19 @@ function TBag_MakeAllTradeKeywords(itm, docreated, trade1, trade2)
   for trade, _ in pairs(TBag_GetAllProfessions()) do
     if (trade ~= 'version' and trade ~= TBAG_S_UPDATE) then
 --    TBag_PrintDEBUG("profession ="..trade );
-      TBag_MakeTradeCreationKeyword(itm, TBag_Loc(trade), TBag_Cat(trade), docreated);
+      TBag_MakeTradeCreationKeyword(itm, trade, TBag_Cat(trade), docreated);
     end
   end
   for trade, _ in pairs(TBag_GetAllSeconds()) do
     if (trade ~= 'version' and trade ~= TBAG_S_UPDATE) then
 --    TBag_PrintDEBUG("second ="..trade );
-      TBag_MakeTradeCreationKeyword(itm, TBag_Loc(trade), TBag_Cat(trade), docreated);
+      TBag_MakeTradeCreationKeyword(itm, trade, TBag_Cat(trade), docreated);
     end
   end
   for trade, _ in pairs(TBag_GetAllSkills()) do
     if (trade ~= 'version' and trade ~= TBAG_S_UPDATE) then
 --    TBag_PrintDEBUG("skill ="..trade );
-      TBag_MakeTradeCreationKeyword(itm, TBag_Loc(trade), TBag_Cat(trade), docreated);
+      TBag_MakeTradeCreationKeyword(itm, trade, TBag_Cat(trade), docreated);
     end
   end
   TBag_MakeTradeReagentKeywords(itm, trade1, trade2);

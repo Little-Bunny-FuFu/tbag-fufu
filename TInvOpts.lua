@@ -1,4 +1,8 @@
 -- $Id$
+
+-- Localization Support
+local L = TBAG_LOCALE;
+
 local TInv_CfgOpt = {};
 
 TINVOPT_UPDATE_HAPPENING = 0;
@@ -69,12 +73,12 @@ function TInvOpt_CreateCfgOpt()
   TBagOpt_CreateCfgOpt(TInv_CfgOpt, TInvCfg, TInv_Bags, TInv_UpdateWindow, 
     TInvOpt_ResizeUpdate, TInvOpt_ForceUpdate);
 
-  TBagOpt_MakeCheck(TInv_CfgOpt, "Alt Key Auto-Pickup:",
+  TBagOpt_MakeCheck(TInv_CfgOpt, L["Alt Key Auto-Pickup:"],
     TInvCfg, "alt_pickup", TInvOpt_ResizeUpdate);
-  TBagOpt_MakeCheck(TInv_CfgOpt, "Alt Key Auto-Panel:",
+  TBagOpt_MakeCheck(TInv_CfgOpt, L["Alt Key Auto-Panel:"],
     TInvCfg, "alt_panel", TInvOpt_ResizeUpdate);
 
-  TBagOpt_MakeCheck(TInv_CfgOpt, "Show Keyring Empty Slots (Enable Show above):",
+  TBagOpt_MakeCheck(TInv_CfgOpt, L["Show Keyring Empty Slots (Enable Show above):"],
     TInvCfg, "show_keyring_empty_slots", TInvOpt_ResizeUpdate);
 
   TBagOpt_CreateNewOpt(TInv_CfgOpt, TInvCfg, TInv_UpdateWindow);
@@ -155,7 +159,7 @@ end
 
 function TInvOpts_AddCat()
   -- Add a blank entry
-  table.insert(TInvCfg["item_search_list"], {"UNKNOWN", "", "", "", ""});
+  table.insert(TInvCfg["item_search_list"], {L["UNKNOWN"], "", "", "", ""});
 
   -- Refresh the window, scrolling down to last entry
   TInvOpt_CreateCfgOpt();

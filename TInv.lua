@@ -1,5 +1,9 @@
 -- $Id$
-BINDING_NAME_TINV_TOGGLE = "Toggle Inventory Window";
+
+-- Localization Support
+local L = TBAG_LOCALE;
+
+BINDING_NAME_TINV_TOGGLE = L["Toggle Inventory Window"];
 
 -- Constants
 TINV_DEBUGMESSAGES = 0;   -- 0 = off, 1 = on
@@ -195,13 +199,13 @@ function TInv_init(reset)
   TInvHooks_Register(TBAG_HOOK_UNREGISTER);
   TInvHooks_Register(TBAG_HOOK_REGISTER);
 
-  TInv_Button_HighlightToggle:SetText(TBag_Loc("TBag_HighlightToggle_off"));
-  TInv_Button_ChangeEditMode:SetText(TBag_Loc("TBag_ChangeEditMode_off"));
+  TInv_Button_HighlightToggle:SetText(L["Hilight"]);
+  TInv_Button_ChangeEditMode:SetText(L["Edit"]);
 
   if (TInvCfg["moveLock"] == 0) then
-    TInv_Button_MoveLockToggle:SetText(TBag_Loc("TBag_MoveLock_locked"));
+    TInv_Button_MoveLockToggle:SetText(L["L"]);
   else
-    TInv_Button_MoveLockToggle:SetText(TBag_Loc("TBag_MoveLock_unlocked"));
+    TInv_Button_MoveLockToggle:SetText(L["U"]);
   end
 
   
@@ -270,7 +274,7 @@ function TInv_UpdateBagGfx()
   for _, bag in ipairs(TInv_Bags) do
     local free, size = TBag_UpdateSlots(TINV_PLAYERID, "TInvNum", bag, TInvCfg["show_bag_sizes"]);
     local type = TBag_GetBagType(TINV_PLAYERID, bag);
-    if (type ~= "AMMO") and (type ~= "SOUL") and (type ~= "KEYRING") then
+    if (type ~= L["AMMO"]) and (type ~= L["SOUL"]) and (type ~= L["KEYRING"]) then
       totalfree = totalfree + free;
       totalsize = totalsize + size;
     end
@@ -419,7 +423,7 @@ function TInv_ItemButton_OnEnter(self)
     if ( TInv_edit_mode == 1 ) then
       GameTooltip:SetOwner(self, "ANCHOR_LEFT");
       GameTooltip:ClearLines();
-      GameTooltip:AddLine("Empty Slot", 1,1,1 );
+      GameTooltip:AddLine(L["Empty Slot"], 1,1,1 );
 
       -- move by class
       if (itm[TBAG_I_CAT] ~= nil) then
@@ -429,7 +433,7 @@ function TInv_ItemButton_OnEnter(self)
 --          GameTooltip:AddLine("|cFF00FF7FLeft click to select category to move:|r "..itm[TBAG_I_CAT], 1,0.25,0.5 );
         end
       else
-        GameTooltip:AddLine("error: Item has no category", 1,0,0 );
+        GameTooltip:AddLine(L["Item has no category"], 1,0,0 );
       end
 
       GameTooltip:Show();
@@ -490,7 +494,7 @@ function TInv_ItemButton_OnEnter(self)
 --        GameTooltip:AddLine(" ", 0,0,0);
       end
     else
-      GameTooltip:AddLine("Item has no category", 1,0,0 );
+      GameTooltip:AddLine(L["Item has no category"], 1,0,0 );
     end
   end
 
@@ -593,10 +597,10 @@ function TInv_Button_HighlightToggle_OnClick()
   PlaySound("igMainMenuOptionCheckBoxOn");
   if (TInv_hilight_new == 0) then
     TInv_hilight_new = 1;
-    TInv_Button_HighlightToggle:SetText(TBag_Loc("TBag_HighlightToggle_on"));
+    TInv_Button_HighlightToggle:SetText(L["Normal"]);
   else
     TInv_hilight_new = 0;
-    TInv_Button_HighlightToggle:SetText(TBag_Loc("TBag_HighlightToggle_off"));
+    TInv_Button_HighlightToggle:SetText(L["Hilight"]);
   end
   TInv_UpdateWindow();
 end
@@ -605,10 +609,10 @@ function TInv_Button_ChangeEditMode_OnClick()
   PlaySound("igMainMenuOptionCheckBoxOn");
   if (TInv_edit_mode == 0) then
     TInv_edit_mode = 1;
-    TInv_Button_ChangeEditMode:SetText(TBag_Loc("TBag_ChangeEditMode_on"));
+    TInv_Button_ChangeEditMode:SetText(L["View"]);
   else
     TInv_edit_mode = 0;
-    TInv_Button_ChangeEditMode:SetText(TBag_Loc("TBag_ChangeEditMode_off"));
+    TInv_Button_ChangeEditMode:SetText(L["Edit"]);
   end
   -- resort will force a window redraw
   TInv_UpdateWindow(TBAG_REQ_MUST);
@@ -633,9 +637,9 @@ end
 
 function TInv_SynchShowBank()
   if (TBnkFrame:IsVisible()) then
-    TInv_Button_ShowBank:SetText(TBag_Loc("TBag_ShowBank_off"));
+    TInv_Button_ShowBank:SetText(L["Hide Bank"]);
   else
-    TInv_Button_ShowBank:SetText(TBag_Loc("TBag_ShowBank_on"));
+    TInv_Button_ShowBank:SetText(L["Show Bank"]);
   end
 end
 
@@ -658,10 +662,10 @@ function TInv_Button_MoveLockToggle_OnClick()
   PlaySound("igMainMenuOptionCheckBoxOn");
   if (TInvCfg["moveLock"] == 0) then
     TInvCfg["moveLock"] = 1;
-    TInv_Button_MoveLockToggle:SetText(TBag_Loc("TBag_MoveLock_unlocked"));
+    TInv_Button_MoveLockToggle:SetText(L["U"]);
   else
     TInvCfg["moveLock"] = 0;
-    TInv_Button_MoveLockToggle:SetText(TBag_Loc("TBag_MoveLock_locked"));
+    TInv_Button_MoveLockToggle:SetText(L["L"]);
   end
 end
 
@@ -712,20 +716,17 @@ function TInv_SlotTargetButton_OnEnter(self)
     GameTooltip:ClearLines();
 
     if (TInv_edit_selected ~= "") then
-      GameTooltip:AddLine("|c"..TBAG_C_INST.."Left click to move category |r|c"
-        ..TBAG_C_CAT..TInv_edit_selected.."|r|c"..TBAG_C_INST.." to bar |r|c"
-        ..TBAG_C_BAR..bar.."|r");
+      GameTooltip:AddLine(string.format("|c%sLeft click to move category |r|c%s%s|r|c%s to bar |r|c%s%s|r",TBAG_C_INST,TBAG_C_CAT,TInv_edit_selected,TBAG_C_INST,TBAG_C_BAR,bar));
     else
-      GameTooltip:AddLine("|c"..TBAG_C_INST.."Bar |r|c"
-        ..TBAG_C_BAR..bar.."|r");
+      GameTooltip:AddLine(string.format("|c%sBar |r|c%s%s|r",TBAG_C_INST,TBAG_C_BAR,bar));
 
       GameTooltip:AddLine(" ");
       for key, value in pairs(TINV_BC_LIST[bar]) do
-        GameTooltip:AddLine("|c"..TBAG_C_CAT..value.."|r");
+        GameTooltip:AddLine(string.format("|c%s%s|r",TBAG_C_CAT,value));
       end
       GameTooltip:AddLine(" ");
 
-      GameTooltip:AddLine("Right click for options", 0.85,0.85,0.85, 1.0);
+      GameTooltip:AddLine(L["Right click for options"], 0.85,0.85,0.85, 1.0);
     end
 
     GameTooltip:Show();
@@ -755,7 +756,7 @@ function TInv_BagSlotButton_OnEnter(self)
   if (itemlink and itemlink ~= "") then
     GameTooltip:SetHyperlink(itemlink);
   else
-    GameTooltip:AddLine("Equip Container", 1,1,1);
+    GameTooltip:AddLine(L["Equip Container"], 1,1,1);
   end
   
   GameTooltip:Show();
@@ -981,20 +982,20 @@ function TInvFrame_RightClickMenu_populate(level)
       info = { ["disabled"] = 1 };
       UIDropDownMenu_AddButton(info, level);
 
-      info = { ["text"] = "Current Category: "..itm[TBAG_I_CAT], ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
+      info = { ["text"] = string.format(L["Current Category: %s"],itm[TBAG_I_CAT]), ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
       UIDropDownMenu_AddButton(info, level);
 
       info = { ["disabled"] = 1 };
       UIDropDownMenu_AddButton(info, level);
 
-      info = { ["text"] = "Assign item to category:", ["hasArrow"] = 1, ["value"] = "override_placement" };
+      info = { ["text"] = L["Assign item to category:"], ["hasArrow"] = 1, ["value"] = "override_placement" };
       if (TInvCfg["item_overrides"][itm[TBAG_I_ITEMID]] ~= nil) then
         info["checked"] = 1;
       end
       UIDropDownMenu_AddButton(info, level);
 
       info = {
-        ["text"] = "Use default category assignment",
+        ["text"] = L["Use default category assignment"],
         ["value"] = { [TBAG_I_BAG]=bag, [TBAG_I_SLOT]=slot },
         ["func"] = TInv_RightClick_DeleteItemOverride
         };
@@ -1007,14 +1008,14 @@ function TInvFrame_RightClickMenu_populate(level)
         info = { ["disabled"] = 1 };
         UIDropDownMenu_AddButton(info, level);
 
-        info = { ["text"] = "Debug Info: ", ["hasArrow"] = 1, ["value"] = "show_debug" };
+        info = { ["text"] = L["Debug Info: "], ["hasArrow"] = 1, ["value"] = "show_debug" };
         UIDropDownMenu_AddButton(info, level);
       end
     elseif (level == 2) then
       if ( UIDROPDOWNMENU_MENU_VALUE == "override_placement" ) then
         for i = 1, TBAG_BAR_MAX do
           info = {
-            ["text"] = "Categories within bar "..i;
+            ["text"] = string.format(L["Categories within bar %d"],i);
             ["value"] = { ["opt"]="override_placement_select", [TBAG_I_BAG]=bag, [TBAG_I_SLOT]=slot, ["select_bar"]=i },
             ["hasArrow"] = 1
             };
@@ -1070,8 +1071,8 @@ function TInvFrame_RightClickMenu_populate(level)
     -- right click on a slot
     bar = TInv_RightClickMenu_opts[TBAG_I_BAR];
 
-    info = { ["text"] = "|c"..TBAG_C_INST.."Bar |r|c"
-      ..TBAG_C_BAR..bar.."|r", ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
+    info = { ["text"] = string.format(L["|c%sBar |r|c%s%s|r"],TBAG_C_INST, TBAG_C_BAR, bar),
+      ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
     UIDropDownMenu_AddButton(info, level);
 
     info = { ["disabled"] = 1 };
@@ -1079,7 +1080,7 @@ function TInvFrame_RightClickMenu_populate(level)
 
     for key, value in pairs(TINV_BC_LIST[bar]) do
       info = {
-        ["text"] = "Move: |c"..TBAG_C_CAT..value.."|r";
+        ["text"] = string.format(L["Move: |c%s%s|r"],TBAG_C_CAT,value);
         ["value"] = value;
         ["func"] = function()
           TInv_edit_selected = (this.value);
@@ -1093,13 +1094,13 @@ function TInvFrame_RightClickMenu_populate(level)
     info = { ["disabled"] = 1 };
     UIDropDownMenu_AddButton(info, level);
 
-    info = { ["text"] = "Sort Mode:", ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
+    info = { ["text"] = L["Sort Mode:"], ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
     UIDropDownMenu_AddButton(info, level);
 
     for key, value in pairs({
-      [TBAG_SORTBY_NONE] = "No sort",
-      [TBAG_SORTBY_NORM] = "Sort by name",
-      [TBAG_SORTBY_REV] = "Sort last words first"
+      [TBAG_SORTBY_NONE] = L["No sort"],
+      [TBAG_SORTBY_NORM] = L["Sort by name"],
+      [TBAG_SORTBY_REV] = L["Sort last words first"]
       }) do
 
       if (TBag_GetGrp(TInvCfg, TBAG_G_BAR_SORT, bar) == key) then
@@ -1123,12 +1124,12 @@ function TInvFrame_RightClickMenu_populate(level)
     info = { ["disabled"] = 1 };
     UIDropDownMenu_AddButton(info, level);
     
-    info = { ["text"] = "Hide Bar:", ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };  
+    info = { ["text"] = L["Hide Bar:"], ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
     UIDropDownMenu_AddButton(info, level);
   
     for key,value in pairs({
-      [0] = "Show items assigned to this bar",
-      [1] = "Hide items assigned to this bar"
+      [0] = L["Show items assigned to this bar"],
+      [1] = L["Hide items assigned to this bar"]
       }) do
     
       if (TBag_GetGrp(TInvCfg, TBAG_G_BAR_HIDE, bar) == key) then
@@ -1153,12 +1154,12 @@ function TInvFrame_RightClickMenu_populate(level)
     info = { ["disabled"] = 1 };
     UIDropDownMenu_AddButton(info, level);
 
-    info = { ["text"] = "Hilight new items:", ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
+    info = { ["text"] = L["Hilight new items:"], ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
     UIDropDownMenu_AddButton(info, level);
 
     for key,value in pairs({
-      [0] = "Don't tag new items",
-      [1] = "Tag new items"
+      [0] = L["Don't tag new items"],
+      [1] = L["Tag new items"]
       }) do
 
       if (TBag_GetGrp(TInvCfg, TBAG_G_USE_NEW, bar) == key) then
@@ -1186,11 +1187,11 @@ function TInvFrame_RightClickMenu_populate(level)
     UIDropDownMenu_AddButton(info, level);
 
     info = TBag_MakeColorPickerInfo(TInvCfg, "bkgr_", bar,
-        "Background Color for Bar "..bar, TInv_UpdateWindow);
+        string.format(L["Background Color for Bar %d"],bar), TInv_UpdateWindow);
     UIDropDownMenu_AddButton(info, level);
 
     info = TBag_MakeColorPickerInfo(TInvCfg, "brdr_", bar,
-        "Border Color for Bar "..bar, TInv_UpdateWindow);
+        string.format(L["Border Color for Bar %d"],bar), TInv_UpdateWindow);
     UIDropDownMenu_AddButton(info, level);
 
   -------------------------------------------------------------------------------------------------
@@ -1199,14 +1200,14 @@ function TInvFrame_RightClickMenu_populate(level)
   elseif (TInv_RightClickMenu_mode == "mainwindow") then
     if (level == 1) then
 
-      info = { ["text"] = TBag_Loc("TBag_MenuTitle"), ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
+      info = { ["text"] = string.format(L["TBag v%s"],TBAG_VERSION), ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
       UIDropDownMenu_AddButton(info, level);
 
       info = { ["disabled"] = 1 };
       UIDropDownMenu_AddButton(info, level);
 
       info = {
-        ["text"] = "Select Character";
+        ["text"] = L["Select Character"];
         ["value"] = { ["opt"]="select_character" },
         ["hasArrow"] = 1
         };
@@ -1216,7 +1217,7 @@ function TInvFrame_RightClickMenu_populate(level)
       UIDropDownMenu_AddButton(info, level);
 
       info = {
-        ["text"] = "Edit Mode",
+        ["text"] = L["Edit Mode"],
         ["value"] = nil,
         ["func"] = TInv_Button_ChangeEditMode_OnClick
         };
@@ -1226,7 +1227,7 @@ function TInvFrame_RightClickMenu_populate(level)
       UIDropDownMenu_AddButton(info, level);
 
       info = {
-        ["text"] = "Lock window",
+        ["text"] = L["Lock window"],
         ["value"] = nil,
         ["func"] = TInv_Button_MoveLockToggle_OnClick
         };
@@ -1236,21 +1237,21 @@ function TInvFrame_RightClickMenu_populate(level)
       UIDropDownMenu_AddButton(info, level);
 
       info = {
-        ["text"] = "Reload bags",
+        ["text"] = L["Reload bags"],
         ["value"] = nil,
         ["func"] = TInv_Button_Reload_OnClick
         };
       UIDropDownMenu_AddButton(info, level);
 
       info = {
-        ["text"] = "Show Bank",
+        ["text"] = L["Show Bank"],
         ["value"] = nil,
         ["func"] = TInv_Button_ShowBank_OnClick
         };
       UIDropDownMenu_AddButton(info, level);
 
       info = {
-        ["text"] = "Close Inventory",
+        ["text"] = L["Close Inventory"],
         ["value"] = nil,
         ["func"] = TInv_Close
         };
@@ -1261,7 +1262,7 @@ function TInvFrame_RightClickMenu_populate(level)
       UIDropDownMenu_AddButton(info, level);
 
       info = {
-        ["text"] = "Hilight New Items",
+        ["text"] = L["Hilight New Items"],
         ["value"] = nil,
         ["func"] = TInv_Button_HighlightToggle_OnClick
         };
@@ -1271,7 +1272,7 @@ function TInvFrame_RightClickMenu_populate(level)
       UIDropDownMenu_AddButton(info, level);
 
       info = {
-        ["text"] = "Reset NEW tag",
+        ["text"] = L["Reset NEW tag"],
         ["value"] = nil,
         ["func"] = function()
             local bag, slot;
@@ -1296,7 +1297,7 @@ function TInvFrame_RightClickMenu_populate(level)
       UIDropDownMenu_AddButton(info, level);
 
       info = {
-        ["text"] = "Advanced Configuration",
+        ["text"] = L["Advanced Configuration"],
         ["value"] = nil,
         ["func"] = function()
             TInv_OptsFrame:Show();
@@ -1309,7 +1310,7 @@ function TInvFrame_RightClickMenu_populate(level)
 
       
       info = {
-        ["text"] = "Set Size";
+        ["text"] = L["Set Size"];
         ["value"] = { ["opt"]="set_scale" },
         ["hasArrow"] = 1
         };
@@ -1319,7 +1320,7 @@ function TInvFrame_RightClickMenu_populate(level)
       UIDropDownMenu_AddButton(info, level);
 
       info = {
-        ["text"] = "Set Colors";
+        ["text"] = L["Set Colors"];
         ["value"] = { ["opt"]="set_colors" },
         ["hasArrow"] = 1
         };
@@ -1329,7 +1330,7 @@ function TInvFrame_RightClickMenu_populate(level)
       UIDropDownMenu_AddButton(info, level);
 
       info = {
-        ["text"] = "Hide";
+        ["text"] = L["Hide"];
         ["value"] = { ["opt"]="hide_frames" },
         ["hasArrow"] = 1
         };
@@ -1366,7 +1367,7 @@ function TInvFrame_RightClickMenu_populate(level)
           TBag_MakeColorMenu(TInvCfg, TInv_UpdateWindow, level, TInv_Bags);
 	elseif (UIDROPDOWNMENU_MENU_VALUE["opt"] == "hide_frames") then
 	  info = {
-            ["text"] = "Hide Player Dropdown";
+            ["text"] = L["Hide Player Dropdown"];
 	    ["func"] = TInv_Toggle_UserDropdown;
 	    };
           if (TInvCfg["show_userdropdown"] == 0) then
@@ -1374,7 +1375,7 @@ function TInvFrame_RightClickMenu_populate(level)
           end
 	  UIDropDownMenu_AddButton(info, level);
 	  info = {
-            ["text"] = "Hide Search Box";
+            ["text"] = L["Hide Search Box"];
 	    ["func"] = TInv_Toggle_SearchBox;
 	    };
           if (TInvCfg["show_searchbox"] == 0) then
@@ -1382,7 +1383,7 @@ function TInvFrame_RightClickMenu_populate(level)
           end
 	  UIDropDownMenu_AddButton(info, level);
 	  info = {
-            ["text"] = "Hide Re-sort Button";
+            ["text"] = L["Hide Re-sort Button"];
 	    ["func"] = TInv_Toggle_ReloadButton;
 	    };
           if (TInvCfg["show_reloadbutton"] == 0) then
@@ -1390,7 +1391,7 @@ function TInvFrame_RightClickMenu_populate(level)
           end
 	  UIDropDownMenu_AddButton(info, level);
 	  info = {
-            ["text"] = "Hide Bank Button";
+            ["text"] = L["Hide Bank Button"];
 	    ["func"] = TInv_Toggle_BankButton;
 	    };
           if (TInvCfg["show_bankbutton"] == 0) then
@@ -1398,7 +1399,7 @@ function TInvFrame_RightClickMenu_populate(level)
           end
 	  UIDropDownMenu_AddButton(info, level);
 	  info = {
-            ["text"] = "Hide Edit Button";
+            ["text"] = L["Hide Edit Button"];
 	    ["func"] = TInv_Toggle_EditButton;
 	    };
           if (TInvCfg["show_editbutton"] == 0) then
@@ -1406,7 +1407,7 @@ function TInvFrame_RightClickMenu_populate(level)
           end
 	  UIDropDownMenu_AddButton(info, level);
 	  info = {
-            ["text"] = "Hide Hilight Button";
+            ["text"] = L["Hide Hilight Button"];
 	    ["func"] = TInv_Toggle_HighlightButton;
 	    };
           if (TInvCfg["show_hilightbutton"] == 0) then
@@ -1414,7 +1415,7 @@ function TInvFrame_RightClickMenu_populate(level)
           end
 	  UIDropDownMenu_AddButton(info, level);
 	  info = {
-            ["text"] = "Hide Lock Button";
+            ["text"] = L["Hide Lock Button"];
 	    ["func"] = TInv_Toggle_LockButton;
 	    };
           if (TInvCfg["show_lockbutton"] == 0) then
@@ -1422,7 +1423,7 @@ function TInvFrame_RightClickMenu_populate(level)
           end
 	  UIDropDownMenu_AddButton(info, level);
 	  info = {
-            ["text"] = "Hide Close Button";
+            ["text"] = L["Hide Close Button"];
 	    ["func"] = TInv_Toggle_CloseButton;
 	    };
           if (TInvCfg["show_closebutton"] == 0) then
@@ -1430,7 +1431,7 @@ function TInvFrame_RightClickMenu_populate(level)
           end
 	  UIDropDownMenu_AddButton(info, level);
 	  info = {
-            ["text"] = "Hide Total";
+            ["text"] = L["Hide Total"];
 	    ["func"] = TInv_Toggle_Total;
 	    };
           if (TInvCfg["show_total"] == 0) then
@@ -1438,7 +1439,7 @@ function TInvFrame_RightClickMenu_populate(level)
           end
 	  UIDropDownMenu_AddButton(info, level);
 	  info = {
-            ["text"] = "Hide Bag Buttons";
+            ["text"] = L["Hide Bag Buttons"];
 	    ["func"] = TInv_Toggle_BagSlotButtons;
 	    };
           if (TInvCfg["show_bagbuttons"] == 0) then
@@ -1446,7 +1447,7 @@ function TInvFrame_RightClickMenu_populate(level)
           end
 	  UIDropDownMenu_AddButton(info, level);
 	  info = {
-            ["text"] = "Hide Money";
+            ["text"] = L["Hide Money"];
 	    ["func"] = TInv_Toggle_Money;
 	    };
           if (TInvCfg["show_money"] == 0) then
@@ -1662,9 +1663,9 @@ function TInv_UpdateWindow(resort_req)
     TBag_ColorFrame(TInvCfg, frame, TBAG_MAIN_BAR);
 
     if (TInv_edit_mode == 1) then
-      TInv_Button_ColumnsAdd:SetText(TBag_Loc("TBag_ColumnsAdd_buttontitle"));
+      TInv_Button_ColumnsAdd:SetText(L["<++>"]);
       TInv_Button_ColumnsAdd:Show();
-      TInv_Button_ColumnsDel:SetText(TBag_Loc("TBag_ColumnsDel_buttontitle"));
+      TInv_Button_ColumnsDel:SetText(L[">--<"]);
       TInv_Button_ColumnsDel:Show();
     else
       TInv_Button_ColumnsAdd:Hide();
@@ -1688,7 +1689,7 @@ end
 function TInv_UserDropdown_OnLoad()
   UIDropDownMenu_Initialize(this, TInv_UserDropdown_Initialize);
   UIDropDownMenu_SetSelectedValue(this, TINV_PLAYERID);
-  TInv_UserDropdown.tooltip = "You are viewing this player's inventory.";
+  TInv_UserDropdown.tooltip = L["You are viewing this player's inventory."];
   UIDropDownMenu_SetWidth(TBAG_USERDD_WIDTH, this);
 --  OptionsFrame_EnableDropDown(this);
 end

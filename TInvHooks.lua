@@ -1,4 +1,8 @@
 -- $Id$
+
+-- Localization support
+local L = TBAG_LOCALE;
+
 TInvHooks_funcs = {
   "OpenBackpack",
   "CloseBackpack",
@@ -76,7 +80,7 @@ function TInv_Open()
       TINV_CACHE_REQ = TBAG_REQ_MUST
     end
     TInv_edit_mode = 0;
-    TInv_Button_ChangeEditMode:SetText(TBag_Loc("TBag_ChangeEditMode_off"));
+    TInv_Button_ChangeEditMode:SetText(L["Edit"]);
 
     -- Check the keybinding
     if (TINV_KEYBINDCHECK) then
