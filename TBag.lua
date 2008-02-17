@@ -1517,10 +1517,6 @@ function TBag_GetBagIdxName(bag)
     return "KeyRing";
   elseif (bag == BANK_CONTAINER) then
     return "Bank";
-  elseif (bag == BACKPACK_CONTAINER) then
-    return tostring(bag);
-  elseif TBag_Member(TInv_Bags, bag) then
-    return tostring(bag);
   else
     return tostring(bag);
   end
@@ -1529,8 +1525,6 @@ end
 function TBag_GetBagNumName(bag)
   if TBag_Member(TBnk_Bags, bag) then
     return "TBnkNum"..TBag_GetBagIdxName(bag);
-  elseif (bag == BACKPACK_CONTAINER) then
-    return "TInvNum"..TBag_GetBagIdxName(bag);
   elseif TBag_Member(TInv_Bags, bag) then
     return "TInvNum"..TBag_GetBagIdxName(bag);
   else
@@ -1715,13 +1709,16 @@ function TBag_GetNumBankSlots(playerid)
 end
 
 function TBag_GetMoney(playerid)
-  local money = GetMoney();
+  local money;
   if (playerid == TBAG_PLAYERID) then
+    money = GetMoney();
+    -- Update the cache.
     TBag_SetPlayerInfo(playerid, TBAG_S_MONEY, money);
+  else
+    -- Not the current player so fetch from the cache.
+    money = TBag_GetPlayerInfo(playerid, TBAG_S_MONEY);
   end
 
-  -- Always fetch from the cache
-  money = TBag_GetPlayerInfo(playerid, TBAG_S_MONEY);
   if (money == nil) then money = 0; end
   return money;
 end
