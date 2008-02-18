@@ -47,9 +47,6 @@ Todo/Known Issues
 * UI design review.  Improve the look and the usablity of the addon.  Especially
   the configuration.
 
-* Option to put windows back in default positions in case they get positioned
-  off screen.
-
 * Messy/dead code.  The addon is filled with messy and dead code.  It needs a good
   clean out and review of essentially every single line.  There is a lot of code
   duplication that is unnecessary.  While this is something I might like to do, it
