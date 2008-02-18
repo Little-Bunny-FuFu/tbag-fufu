@@ -12,6 +12,7 @@ local TBNK_HELP = {
     L[" /tbnk config  -- configuration options"],
     L[" /tbnk debug  -- turn debug info on/off"],
     L[" /tbnk reset  -- sets everything back to default values"],
+    L[" /tbnk resetpos -- put the bank back to its default position"],
     L[" /tbnk resetsorts -- clears the item search list"],
     L[" /tbnk printchars -- prints a list of all the chars with cached info"],
     L[" /tbnk deletechar CHAR SERVER -- clears all cached info for character "]
@@ -25,6 +26,7 @@ local TINV_HELP = {
     L[" /tinv config  -- configuration options"],
     L[" /tinv debug  -- turn debug info on/off"],
     L[" /tinv reset  -- sets everything back to default values"],
+    L[" /tinv resetpos -- put the inventory window back to its default position"],
     L[" /tinv resetsorts -- clears the item search list"],
     L[" /tinv printchars -- prints a list of all the chars with cached info"],
     L[" /tinv deletechar CHAR SERVER -- clears all cached info for character "]
@@ -62,6 +64,9 @@ function TBnk_cmd(msg)
     TBnkOpt_ResizeUpdate();
   elseif (cmd == L["resetsorts"]) then
     TBag_ResetSorts(TBnkCfg);
+    TBnk_UpdateWindow(TBAG_REQ_MUST);
+  elseif (cmd == L["resetpos"]) then
+    TBnk_SetDefPos(TBnkCfg,1);
     TBnk_UpdateWindow(TBAG_REQ_MUST);
   elseif (cmd == L["printchars"]) then
     TBag_PrintCachedCharacters();
@@ -101,6 +106,9 @@ function TInv_cmd(msg)
     TInvOpt_ResizeUpdate();
   elseif (cmd == L["resetsorts"]) then
     TBag_ResetSorts(TInvCfg);
+    TInv_UpdateWindow(TBAG_REQ_MUST);
+  elseif (cmd == L["resetpos"]) then
+    TInv_SetDefPos(TInvCfg,1);
     TInv_UpdateWindow(TBAG_REQ_MUST);
   elseif (cmd == L["printchars"]) then
     TBag_PrintCachedCharacters();

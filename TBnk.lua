@@ -100,6 +100,15 @@ function TBnk_CalcButtonSize(newsize, pad)
   TBNK_BGF_HEIGHT = TBag_MakeEven(TBNK_BGF_HEIGHT, TBNK_BF_HEIGHT);
 end
 
+function TBnk_SetDefPos(cfg, reset)
+  TBag_SetDef(cfg, "frameLEFT", UIParent:GetRight() * UIParent:GetScale() * 0.294, reset, TBag_NumFunc);
+  TBag_SetDef(cfg, "frameRIGHT", UIParent:GetRight() * UIParent:GetScale() * 0.684, reset, TBag_NumFunc);
+  TBag_SetDef(cfg, "frameTOP", UIParent:GetTop() * UIParent:GetScale() * 0.83, reset, TBag_NumFunc);
+  TBag_SetDef(cfg, "frameBOTTOM", UIParent:GetTop() * UIParent:GetScale() * 0.232, reset, TBag_NumFunc);
+  TBag_SetDef(cfg, "frameXRelativeTo", "LEFT", reset, TBag_StrFunc, {"RIGHT","LEFT"} );
+  TBag_SetDef(cfg, "frameYRelativeTo", "BOTTOM", reset, TBag_StrFunc, {"TOP","BOTTOM"} );
+end
+
 function TBnk_InitDefVals(reset)
   local i, key, value;
   local cfg = TBnkCfg;
@@ -120,12 +129,7 @@ function TBnk_InitDefVals(reset)
   end
   TBag_SetDefColors(cfg, reset);
 
-  TBag_SetDef(cfg, "frameLEFT", UIParent:GetRight() * UIParent:GetScale() * 0.294, reset, TBag_NumFunc);
-  TBag_SetDef(cfg, "frameRIGHT", UIParent:GetRight() * UIParent:GetScale() * 0.684, reset, TBag_NumFunc);
-  TBag_SetDef(cfg, "frameTOP", UIParent:GetTop() * UIParent:GetScale() * 0.83, reset, TBag_NumFunc);
-  TBag_SetDef(cfg, "frameBOTTOM", UIParent:GetTop() * UIParent:GetScale() * 0.232, reset, TBag_NumFunc);
-  TBag_SetDef(cfg, "frameXRelativeTo", "LEFT", reset, TBag_StrFunc, {"RIGHT","LEFT"} );
-  TBag_SetDef(cfg, "frameYRelativeTo", "BOTTOM", reset, TBag_StrFunc, {"TOP","BOTTOM"} );
+  TBnk_SetDefPos(cfg, reset);
 
   TBnk_CalcButtonSize(TBnkCfg["frameButtonSize"], TBnkCfg["framePad"]);
 end

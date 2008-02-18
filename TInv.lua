@@ -98,6 +98,15 @@ function TInv_CalcButtonSize(newsize, pad)
   TINV_BGF_HEIGHT = TBag_MakeEven(TINV_BGF_HEIGHT, TINV_BF_HEIGHT);
 end
 
+function TInv_SetDefPos(cfg, reset)
+  TBag_SetDef(cfg, "frameLEFT", UIParent:GetRight() * UIParent:GetScale() * 0.73, reset, TBag_NumFunc);
+  TBag_SetDef(cfg, "frameRIGHT", UIParent:GetRight() * UIParent:GetScale() * 0.92, reset, TBag_NumFunc);
+  TBag_SetDef(cfg, "frameTOP", UIParent:GetTop() * UIParent:GetScale() * 0.83, reset, TBag_NumFunc);
+  TBag_SetDef(cfg, "frameBOTTOM", UIParent:GetTop() * UIParent:GetScale() * 0.232, reset, TBag_NumFunc);
+  TBag_SetDef(cfg, "frameXRelativeTo", "LEFT", reset, TBag_StrFunc, {"RIGHT","LEFT"} );
+  TBag_SetDef(cfg, "frameYRelativeTo", "BOTTOM", reset, TBag_StrFunc, {"TOP","BOTTOM"} );
+end
+  
 -- set reset to 1 to restore all default values
 function TInv_InitDefVals(reset)
   local i, key, value;
@@ -121,13 +130,8 @@ function TInv_InitDefVals(reset)
   end
   TBag_SetDefColors(cfg, reset);
 
-  TBag_SetDef(cfg, "frameLEFT", UIParent:GetRight() * UIParent:GetScale() * 0.73, reset, TBag_NumFunc);
-  TBag_SetDef(cfg, "frameRIGHT", UIParent:GetRight() * UIParent:GetScale() * 0.92, reset, TBag_NumFunc);
-  TBag_SetDef(cfg, "frameTOP", UIParent:GetTop() * UIParent:GetScale() * 0.83, reset, TBag_NumFunc);
-  TBag_SetDef(cfg, "frameBOTTOM", UIParent:GetTop() * UIParent:GetScale() * 0.232, reset, TBag_NumFunc);
-  TBag_SetDef(cfg, "frameXRelativeTo", "LEFT", reset, TBag_StrFunc, {"RIGHT","LEFT"} );
-  TBag_SetDef(cfg, "frameYRelativeTo", "BOTTOM", reset, TBag_StrFunc, {"TOP","BOTTOM"} );
-
+  TInv_SetDefPos(cfg, reset);
+  
   TBag_SetDef(cfg, "show_searchbox", 1, reset, TBag_NumFunc, 0, 1);
   TBag_SetDef(cfg, "show_bankbutton", 1, reset, TBag_NumFunc, 0, 1);
   
