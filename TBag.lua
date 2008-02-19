@@ -502,7 +502,13 @@ function TBag_GetItemInfo(itemid)
 end
 
 function TBag_GetItemTexture(itemid)
-  local invTexture = GetItemIcon(itemid);
+  local invTexture;
+  if (GetItemIcon and type(GetItemIcon) == "function") then
+    invTexture = GetItemIcon(itemid);
+  else 
+    -- 2.3 backward compatability	  
+    _, _, _, _, _, _, _, _, _, invTexture = GetItemInfo(itemid); 
+  end
   return invTexture;
 end
 
