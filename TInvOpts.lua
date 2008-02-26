@@ -81,6 +81,9 @@ function TInvOpt_CreateCfgOpt()
   TBagOpt_MakeCheck(TInv_CfgOpt, L["Show Keyring Empty Slots (Enable Show above):"],
     TInvCfg, "show_keyring_empty_slots", TInvOpt_ResizeUpdate);
 
+  TBagOpt_MakeCheck(TInv_CfgOpt, L["Show Soul Shard Count On Soul Bags:"],
+    TInvCfg, "show_soulshard_count", TInvOpt_ResizeUpdate);
+    
   TBagOpt_CreateNewOpt(TInv_CfgOpt, TInvCfg, TInv_UpdateWindow);
 
   TBagOpt_MakeItemSearchHeader(TInv_CfgOpt);

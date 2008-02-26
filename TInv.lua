@@ -120,6 +120,7 @@ function TInv_InitDefVals(reset)
   TBag_SetDef(cfg, "alt_panel", 1, reset, TBag_NumFunc, 0, 1);
 
   TBag_SetDef(cfg, "show_keyring_empty_slots", 0, reset, TBag_NumFunc, 0, 1);
+  TBag_SetDef(cfg, "show_soulshard_count", 1, reset, TBag_NumFunc, 0, 1);
 
   -- Colors
   TBag_SetColor(cfg, "bkgr_"..TBAG_MAIN_BAR, 0.0, 0.2, 0.4, 0.4, reset);
@@ -283,10 +284,17 @@ function TInv_UpdateBagGfx()
       totalsize = totalsize + size;
     end
       
-    -- Update the textures as well
     if (bag > 0) then
+      -- Update the textures as well
       TBag_GetBagFrameTexture(bag):SetTexture(
         TBag_GetBagTexture(TINV_PLAYERID, bag));
+
+      -- Deal with the count of soulshards in a soulbag.
+      if (type == L["SOUL"] and TInvCfg["show_soulshard_count"] == 1) then
+        SetItemButtonCount(TBag_GetBagFrame(bag), size - free);
+      else
+        SetItemButtonCount(TBag_GetBagFrame(bag), 0);
+      end
     end
 
     TBag_UpdateBagColors(bag);

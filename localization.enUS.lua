@@ -506,6 +506,7 @@ TBAG_LOCALE = setmetatable({
   ["Alt Key Auto-Pickup:"] = "Alt Key Auto-Pickup:",
   ["Alt Key Auto-Panel:"] = "Alt Key Auto-Panel:",
   ["Show Keyring Empty Slots (Enable Show above):"] = "Show Keyring Empty Slots (Enable Show above):",
+  ["Show Soul Shard Count On Soul Bags:"] = "Show Soul Shard Count On Soul Bags:",
 
 
 -----------------------------------------------------------------------
