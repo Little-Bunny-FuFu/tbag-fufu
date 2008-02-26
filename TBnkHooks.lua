@@ -133,8 +133,10 @@ function TBnkHooks_BankFrameItemButtonBag_Pickup(arg1)
   this:SetChecked(0);
   local id = this:GetID();
   if (IsModifiedClick("CHATLINK")) then
-    local bag_itemlink = TBag_GetPlayerBag(TBNK_PLAYERID,id)[TBAG_I_ITEMLINK];
-    if (bag_itemlink and ChatEdit_InsertLink(TBag_MakeHyperlink(bag_itemlink))) then
+    local itm = TBag_GetPlayerBag(TBNK_PLAYERID,id);
+    local hyperlink = TBag_MakeHyperlink(itm[TBAG_I_ITEMLINK],
+                                         itm[TBAG_I_NAME],itm[TBAG_I_RARITY]);
+    if (hyperlink and ChatEdit_InsertLink(hyperlink)) then
       return true;
     end
   end

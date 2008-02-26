@@ -288,8 +288,10 @@ end
 function TInvHooks_BagSlotButton_OnModifiedClick()
   local bag = this:GetID() - CharacterBag0Slot:GetID() + 1;
   if (IsModifiedClick("CHATLINK")) then
-    local bag_itemlink = TBag_GetPlayerBag(TINV_PLAYERID,bag)[TBAG_I_ITEMLINK];
-    if (bag_itemlink and ChatEdit_InsertLink(TBag_MakeHyperlink(bag_itemlink))) then
+    local itm = TBag_GetPlayerBag(TINV_PLAYERID,bag);
+    local hyperlink = TBag_MakeHyperlink(itm[TBAG_I_ITEMLINK],
+                                         itm[TBAG_I_NAME],itm[TBAG_I_RARITY]);
+    if (hyperlink and ChatEdit_InsertLink(hyperlink)) then
       this:SetChecked(0);
       return true;
     end
@@ -541,10 +543,11 @@ function TInvHooks_ContainerFrameItemButton_OnModifiedClick(button)
     elseif (TBNK_ATBANK == 0 or TBAG_PLAYERID ~= TINV_PLAYERID) then
       if (itm[TBAG_I_ITEMLINK] ~= nil) then
         if (IsModifiedClick("CHATLINK")) then
-          ChatEdit_InsertLink(TBag_MakeHyperlink(itm[TBAG_I_ITEMLINK]))
+          ChatEdit_InsertLink(TBag_MakeHyperlink(itm[TBAG_I_ITEMLINK],
+	                                         itm[TBAG_I_NAME],itm[TBAG_I_RARITY]))
           call_blizzard =false;
         elseif (IsModifiedClick("DRESSUP")) then
-          DressUpItemLink(TBag_MakeHyperlink(itm[TBAG_I_ITEMLINK]))
+          DressUpItemLink(itm[TBAG_I_ITEMLINK])
           call_blizzard = false;
 	elseif (IsModifiedClick("SPLITSTACK")) then
 	  call_blizzard = false;

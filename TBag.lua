@@ -64,7 +64,7 @@ TBAG_I_NAME      = "in";
 TBAG_I_TYPE      = "it";
 TBAG_I_SUBTYPE   = "is";
 
-local TBAG_I_RARITY    = "ir";
+TBAG_I_RARITY    = "ir";
 local TBAG_I_COUNT     = "ic";
 local TBAG_I_NEED      = "sn";
 local TBAG_I_SOULBOUND = "sb";
@@ -1409,7 +1409,7 @@ function TBag_GetBagType(playerid, bag)
       local _, _, itemlink = strfind(GetInventoryItemLink("player", ContainerIDToInventoryID(bag)) or "", "^|%x+|H(.+)|h%[.+%]");
       local id, itemlink = TBag_GetItemID(itemlink);
       if (id) then 
-	    local name, itemType, subType = TBag_GetItemInfo(id);
+	    local name, itemType, subType, quality = TBag_GetItemInfo(id);
         if (itemType == L["Quiver"]) then 
 	  if (subType == L["Quiver"]) then
 	    type = L["QUIV"];
@@ -1437,11 +1437,13 @@ function TBag_GetBagType(playerid, bag)
         TBag_SetPlayerBagCfg(playerid, bag, TBAG_I_ITEMID, id);
         TBag_SetPlayerBagCfg(playerid, bag, TBAG_I_NAME, name);
         TBag_SetPlayerBagCfg(playerid, bag, TBAG_I_COUNT, 1);
+        TBag_SetPlayerBagCfg(playerid, bag, TBAG_I_RARITY, quality);
       else
         TBag_SetPlayerBagCfg(playerid, bag, TBAG_I_ITEMLINK, nil);
         TBag_SetPlayerBagCfg(playerid, bag, TBAG_I_ITEMID, nil);
         TBag_SetPlayerBagCfg(playerid, bag, TBAG_I_NAME, nil);
         TBag_SetPlayerBagCfg(playerid, bag, TBAG_I_COUNT, nil);
+        TBag_SetPlayerBagCfg(playerid, bag, TBAG_I_RARITY, nil);
       end
 
       -- Save the type to cache
