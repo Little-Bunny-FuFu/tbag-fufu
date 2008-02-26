@@ -581,24 +581,27 @@ function TBag_PlacePrep(playername,place)
   end
 end
 
-function TBag_AddSearchResult(itemstring, playername, place, count)
+function TBag_AddSearchResult(itm, playername, place)
   -- Strip the unique id
-  itemstring = string.gsub(itemstring, "(item:%d+:%d+:%d+:%d+:%d+:%d+:%-?%d+):%-?%d+","%1:0",1);
+  local itemstring = string.gsub(itm[TBAG_I_ITEMLINK],
+    "(item:%d+:%d+:%d+:%d+:%d+:%d+:%-?%d+):%-?%d+","%1:0",1);
+  local count = itm[TBAG_I_COUNT];
+  local itemlink = TBag_MakeHyperlink(itemstring,itm[TBAG_I_NAME],itm[TBAG_I_RARITY]);
 
-  TBag_PrintDEBUG("TBag_AddSearchResult "..count.." "..itemstring
+  TBag_PrintDEBUG("TBag_AddSearchResult "..count.." "..itemlink
     ..TBag_PlacePrep(playername,place));
 
   -- First see if this result has been added before
-  if (TBag_SrchResults[itemstring] == nil) then
-    TBag_SrchResults[itemstring] = {};
+  if (TBag_SrchResults[itemlink] == nil) then
+    TBag_SrchResults[itemlink] = {};
   end
-  if (TBag_SrchResults[itemstring][playername] == nil) then
-    TBag_SrchResults[itemstring][playername] = {};
+  if (TBag_SrchResults[itemlink][playername] == nil) then
+    TBag_SrchResults[itemlink][playername] = {};
   end
-  if (TBag_SrchResults[itemstring][playername][place] == nil) then
-    TBag_SrchResults[itemstring][playername][place] = count;
+  if (TBag_SrchResults[itemlink][playername][place] == nil) then
+    TBag_SrchResults[itemlink][playername][place] = count;
   else
-    TBag_SrchResults[itemstring][playername][place] = TBag_SrchResults[itemstring][playername][place] + count;
+    TBag_SrchResults[itemlink][playername][place] = TBag_SrchResults[itemlink][playername][place] + count;
   end
 end
 
@@ -617,7 +620,7 @@ function TBag_GatherSearchResults(srch, itmcache, place)
           if (itm[TBAG_I_ITEMID]) and (itm[TBAG_I_NAME]) then
             -- Do case insensitive searches
             if (string.find(string.lower(itm[TBAG_I_NAME]), srch)) then
-              TBag_AddSearchResult(itm[TBAG_I_ITEMLINK], playername, place, itm[TBAG_I_COUNT]);
+              TBag_AddSearchResult(itm, playername, place);
             end
           end
         end
@@ -638,7 +641,6 @@ end
 
 function TBag_DisplaySearchResult(aResult, itemlink)
   local chatframe = DEFAULT_CHAT_FRAME;
-  local hyperlink = TBag_MakeHyperlink(itemlink);
   local total = 0;
   local lines = 0;
 
@@ -655,14 +657,14 @@ function TBag_DisplaySearchResult(aResult, itemlink)
 
   -- Write out a short summary total if we have multiple lines
   if (lines > 1) then
-    chatframe:AddMessage(TBag_JustifyStr(total, 3, SC_TOTAL).." "..hyperlink..L[" found:"], .7, .7, .7);
+    chatframe:AddMessage(TBag_JustifyStr(total, 3, SC_TOTAL).." "..itemlink..L[" found:"], .7, .7, .7);
   end
 
   -- Then write out a line for each of the place results
   for playername, places in pairs(aResult) do
     for place, count in pairs(places) do
       if (lines == 1) then
-        chatframe:AddMessage(TBag_JustifyStr(count, 3, SC_TOTAL).." "..hyperlink..TBag_PlacePrep(SC_PLAYER..playername.."|r",place), .7, .7, .7);
+        chatframe:AddMessage(TBag_JustifyStr(count, 3, SC_TOTAL).." "..itemlink..TBag_PlacePrep(SC_PLAYER..playername.."|r",place), .7, .7, .7);
       elseif (lines > 1) then
         chatframe:AddMessage(TBag_JustifyStr(count, 6, SC_WHITE)..TBag_PlacePrep(SC_PLAYER..playername.."|r",place), .7, .7, .7);
       end
@@ -1611,9 +1613,14 @@ function TBag_GetCooldownString(cooldownInfo)
 end
 
 
-function TBag_MakeHyperlink(itemstring)
-  local _, itemlink, _ = GetItemInfo(itemstring);
-  return itemlink;
+function TBag_MakeHyperlink(itemstring,name,quality)
+  -- Have to manually make the link becuase GetItemInfo() won't give us one
+  -- if the data isn't cached which may happen when doing searches.
+  if (name) and (itemstring) and (quality) then
+    quality = tonumber(quality);
+    local _,_,_,color = GetItemQualityColor(quality);
+    return color.."|H"..itemstring.."|h["..name.."]|h|r";
+  end
 end
 
 
