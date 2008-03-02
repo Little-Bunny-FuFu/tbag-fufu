@@ -81,7 +81,7 @@ end
 function TBagOpt_MakeCheck(cfgopt, text, cfg, name, updatefunc)
   table.insert(cfgopt,  {
     { ["type"] = "Text", ["ID"] = 1, ["width"] = TBAG_OPT_WIDTH, ["color"] = TBAG_OPT_COLOR, ["text"] = text },
-    { ["type"] = "Text", ["ID"] = 2, ["width"] = TBAG_MINMAX_WIDTH, ["color"] = TBAG_MINMAX_COLOR, ["align"] = "right", ["text"] = "No" },
+    { ["type"] = "Text", ["ID"] = 2, ["width"] = TBAG_MINMAX_WIDTH, ["color"] = TBAG_MINMAX_COLOR, ["align"] = "right", ["text"] = L["No"] },
     { ["type"] = "Text", ["ID"] = 3, ["width"] = TBAG_SPACER_WIDTH, ["color"] = TBAG_MINMAX_COLOR, ["align"] = "right", [""] = "" },
     { ["type"] = "Slider", ["ID"] = 1, ["width"] = 0.125, ["minValue"] = 0, ["maxValue"] = 1, ["valueStep"] = 1,
       ["defaultValue"] = function()
@@ -91,7 +91,7 @@ function TBagOpt_MakeCheck(cfgopt, text, cfg, name, updatefunc)
         TBag_SetCfgUpdate(cfg, name, v, tonumber, updatefunc);
       end
     },
-    { ["type"] = "Text", ["ID"] = 3, ["width"] = TBAG_MINMAX_WIDTH, ["color"] = TBAG_MINMAX_COLOR, ["align"] = "left", ["text"] = "Yes" }
+    { ["type"] = "Text", ["ID"] = 3, ["width"] = TBAG_MINMAX_WIDTH, ["color"] = TBAG_MINMAX_COLOR, ["align"] = "left", ["text"] = L["Yes"] }
   });
 end
 
@@ -152,11 +152,11 @@ function TBagOpt_MakeItemSearchHeader(cfgopt)
   table.insert(cfgopt,  {});
   table.insert(cfgopt,  {
     { ["type"] = "Text", ["ID"] = 1, ["width"] = 0.035+0.025+0.025+0.005, ["color"] = TBAG_HEADER_COLOR, ["text"] = "" },
-    { ["type"] = "Text", ["ID"] = 2, ["width"] = 0.20, ["color"] = TBAG_HEADER_COLOR, ["text"] = "Category" },
-    { ["type"] = "Text", ["ID"] = 3, ["width"] = 0.18, ["color"] = TBAG_HEADER_COLOR, ["text"] = "Keywords" },
-    { ["type"] = "Text", ["ID"] = 4, ["width"] = 0.32, ["color"] = TBAG_HEADER_COLOR, ["text"] = "Tooltip Search" },
-    { ["type"] = "Text", ["ID"] = 5, ["width"] = 0.12, ["color"] = TBAG_HEADER_COLOR, ["text"] = "Type" },
-    { ["type"] = "Text", ["ID"] = 6, ["width"] = 0.08, ["color"] = TBAG_HEADER_COLOR, ["text"] = "SubType" }
+    { ["type"] = "Text", ["ID"] = 2, ["width"] = 0.20, ["color"] = TBAG_HEADER_COLOR, ["text"] = L["Category"] },
+    { ["type"] = "Text", ["ID"] = 3, ["width"] = 0.18, ["color"] = TBAG_HEADER_COLOR, ["text"] = L["Keywords"] },
+    { ["type"] = "Text", ["ID"] = 4, ["width"] = 0.32, ["color"] = TBAG_HEADER_COLOR, ["text"] = L["Tooltip Search"] },
+    { ["type"] = "Text", ["ID"] = 5, ["width"] = 0.12, ["color"] = TBAG_HEADER_COLOR, ["text"] = L["Type"] },
+    { ["type"] = "Text", ["ID"] = 6, ["width"] = 0.08, ["color"] = TBAG_HEADER_COLOR, ["text"] = L["SubType"] }
   });
 end
 

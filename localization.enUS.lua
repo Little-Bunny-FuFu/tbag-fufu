@@ -410,6 +410,18 @@ TBAG_LOCALE = setmetatable({
   ["Decrease the number of columns displayed"] = "Decrease the number of columns displayed",
 
   ["Re-sort"] = "Re-sort",
+ 
+  ["Reset"] = "Reset",
+  ["Close"] = "Close",
+  ["Add New Cat"] = "Add New Cat",
+  ["Assign Cats"] = "Assign Cats",
+  ["No"] = "No",
+  ["Yes"] = "Yes",
+  ["Category"] = "Category",
+  ["Keywords"] = "Keywords",
+  ["Tooltip Search"] = "Tooltip Searach",
+  ["Type"] = "Type",
+  ["SubType"] = "SubType",
   
   -- Menus and Tooltips
   ["Main Background Color"] = "Main Background Color",

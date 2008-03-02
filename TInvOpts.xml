@@ -180,6 +180,9 @@
           </Anchor>
         </Anchors>
         <Scripts>
+          <OnLoad>
+            this:SetText(TBAG_LOCALE["Reset"]);
+	  </OnLoad>
           <OnClick>
             TBagCfg["Inv"] = {};
             TInv_init(1);
@@ -198,6 +201,9 @@
           </Anchor>
         </Anchors>
         <Scripts>
+          <OnLoad>
+            this:SetText(TBAG_LOCALE["Close"]);
+	  </OnLoad>
           <OnClick>
             TInv_OptsFrame:Hide();
           </OnClick>
@@ -213,6 +219,9 @@
           </Anchor>
         </Anchors>
         <Scripts>
+          <OnLoad>
+            this:SetText(TBAG_LOCALE["Add New Cat"]);
+	  </OnLoad>
           <OnClick>
             TInvOpts_AddCat();
           </OnClick>
@@ -228,6 +237,9 @@
           </Anchor>
         </Anchors>
         <Scripts>
+          <OnLoad>
+            this:SetText(TBAG_LOCALE["Assign Cats"]);
+	  </OnLoad>
           <OnClick>
             TBag_AssignCats(TInvCfg, 1);
             TBag_BuildBarClassList(TINV_BC_LIST, TInvCfg); 
