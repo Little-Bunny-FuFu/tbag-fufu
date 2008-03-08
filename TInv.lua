@@ -328,7 +328,7 @@ function TInv_OnEvent(event)
       end
     elseif ( event == "ITEM_LOCK_CHANGED" ) then
       -- arg1 = bag, arg2 = slot
-      if (arg1 and arg2 and TBag_Member(TInv_Bags, arg1)) then
+      if (arg1 and arg2 and type(arg2) == "number" and TBag_Member(TInv_Bags, arg1)) then
         TBag_UpdateLockedItem(TINV_PLAYERID,getglobal(TBag_GetBagItemButtonName(arg1,arg2)));
       end
 --    elseif ( event == "AUCTION_HOUSE_CLOSED" ) then
