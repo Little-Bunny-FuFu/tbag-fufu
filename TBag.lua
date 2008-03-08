@@ -588,20 +588,22 @@ function TBag_AddSearchResult(itm, playername, place)
   local count = itm[TBAG_I_COUNT];
   local itemlink = TBag_MakeHyperlink(itemstring,itm[TBAG_I_NAME],itm[TBAG_I_RARITY]);
 
-  TBag_PrintDEBUG("TBag_AddSearchResult "..count.." "..itemlink
-    ..TBag_PlacePrep(playername,place));
+  if (itemlink) then
+    TBag_PrintDEBUG("TBag_AddSearchResult "..count.." "..itemlink
+      ..TBag_PlacePrep(playername,place));
 
-  -- First see if this result has been added before
-  if (TBag_SrchResults[itemlink] == nil) then
-    TBag_SrchResults[itemlink] = {};
-  end
-  if (TBag_SrchResults[itemlink][playername] == nil) then
-    TBag_SrchResults[itemlink][playername] = {};
-  end
-  if (TBag_SrchResults[itemlink][playername][place] == nil) then
-    TBag_SrchResults[itemlink][playername][place] = count;
-  else
-    TBag_SrchResults[itemlink][playername][place] = TBag_SrchResults[itemlink][playername][place] + count;
+    -- First see if this result has been added before
+    if (TBag_SrchResults[itemlink] == nil) then
+      TBag_SrchResults[itemlink] = {};
+    end
+    if (TBag_SrchResults[itemlink][playername] == nil) then
+      TBag_SrchResults[itemlink][playername] = {};
+    end
+    if (TBag_SrchResults[itemlink][playername][place] == nil) then
+      TBag_SrchResults[itemlink][playername][place] = count;
+    else
+      TBag_SrchResults[itemlink][playername][place] = TBag_SrchResults[itemlink][playername][place] + count;
+    end
   end
 end
 
@@ -1616,13 +1618,18 @@ end
 
 
 function TBag_MakeHyperlink(itemstring,name,quality)
-  -- Have to manually make the link becuase GetItemInfo() won't give us one
-  -- if the data isn't cached which may happen when doing searches.
+  local itemlink;
+  -- First try to generate the itemlink off TBag's cached data.
+  -- If we don't have the info to do it then fall back on GetItemInfo().
+  -- GetItemInfo() can still fail but it's better than nothing.
   if (name) and (itemstring) and (quality) then
     quality = tonumber(quality);
     local _,_,_,color = GetItemQualityColor(quality);
-    return color.."|H"..itemstring.."|h["..name.."]|h|r";
+    itemlink = color.."|H"..itemstring.."|h["..name.."]|h|r";
+  elseif (itemstring) then
+    _,itemlink = GetItemInfo(itemstring);
   end
+  return itemlink;
 end
 
 
@@ -2621,7 +2628,7 @@ function TBag_ScanEquipped()
       dbag[TBAG_I_ITEMID], dbag[TBAG_I_ITEMLINK] = 
         TBag_GetItemID(itemLink);
 
-      dbag[TBAG_I_NAME] = GetItemInfo(dbag[TBAG_I_ITEMLINK]);
+      dbag[TBAG_I_NAME],_,dbag[TBAG_I_RARITY] = GetItemInfo(dbag[TBAG_I_ITEMLINK]);
       dbag[TBAG_I_COUNT] = 1;
     end
   end
@@ -2656,6 +2663,7 @@ function TBag_ScanMail()
         itm[TBAG_I_COUNT] = count;
         itm[TBAG_I_ITEMID] = itemid;
         itm[TBAG_I_ITEMLINK] = itemlink; 
+	itm[TBAG_I_RARITY] = quality;
       end
     end
   end
