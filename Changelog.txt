@@ -1,3 +1,49 @@
+* 20080317-r78-Shefki
+  - When running on WoW 2.4.0 or newer, always show icons for items
+    even if they are not in the item cache.  This is thanks to a new
+    functionality of the game.  Will prevent the situation with
+    slots showing no icon after a major update until a few viewings
+    or actually logging into all characters.  Change is backwards
+    comptable, this version will still work with 2.3.x
+  - When shift clicking to insert a link of an item in the built in
+    bank slots don't include the link twice.
+  - Search results will be consolidated again.  Apparently when I fixed
+    a problem with the links on items that had enchants or gems in them
+    I broke the consolidation and didn't notice it.
+  - When in edit mode the column add and delete buttons will now be 
+    slightly outside the normal window (like the Search box) so that they
+    will never overlap with the bag icons or money display.
+  - Various small code cleanups to remove unnecessary or duplicate code.
+    Also use Blizzard constants for more things.  E.G.  Rather than 
+    hardcoding the max bag size we use MAX_CONTAINER_ITEMS, if Blizzard
+    introduces a larger bag they'll update it and TBag will work without
+    requiring an update.
+  - The TRADE2 keyword was not always being properly set due to a typo.
+  - Stop using message(), some poorly coded addons break this and it will
+    not display if the global Display Lua Errors option is unchecked.
+    Addon feedback will always go to the default chat frame now.
+  - Implement proper support for localization of the addon.  There
+    are still no other translations besides enUS but anyone that's interested
+    can easily do so now.  Anyone who is interested should contact me.
+  - Use in game APIs for getting item quality colors rather than hard coding
+    them.  When Item Rarity Color is turned on Common (White) items will now
+    have White borders.
+  - Implement /tinv resetpos and /tbnk resetpos to allow users to put windows
+    back to their default positions so they don't have to reset all settings
+    to get them back.
+  - Searching should never result in a broken link or an error now.  However,
+    until you log into all characters some search results may be missing due
+    to insufficient data in the cache to produce links for some items.  Simply
+    logging into all characters, looking at their bags, bank and mailbox will
+    remedy this situation.
+  - Fix a small cosmetic issue with Soul Bags.  The game puts the count of
+    Soul Shards on the icon for Soul Bags.  This count didn't show if you 
+    were on a non-warlock and looked at a warlocks inventory and would
+    continue to show on a bag slot if logged into a warlock and logged at
+    a non-warlock character.  In both cases the count shows where it should
+    and doesn't where it shouldn't now.
+  - Closing the Item Socketing window will no longer cause an error in TBag.
+
 * 20071128-r45-Shefki
   - Fix a taint bug that happened when you died.
   - Fix sort of class reagents and darkmoon faire cards.  Hopefully,
