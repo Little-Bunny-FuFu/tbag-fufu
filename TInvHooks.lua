@@ -476,17 +476,13 @@ function TInvHooks_ContainerFrameItemButton_OnModifiedClick(button)
             call_blizzard = false;
           end
         elseif (AuctionFrame) and ( AuctionFrame:IsShown() ) then
-          -- Check if we have auctioneer 
-          if (AuctionFramePost) and (AuctionFramePost:IsVisible() ) then
-            if (alt_pickup) then
-              PickupContainerItem(itm[TBAG_I_BAG], itm[TBAG_I_SLOT]);
-              AuctionFramePost_AuctionItem_OnClick(AuctionFramePostAuctionItem);
-              call_blizzard = false;
-            end
-          else
-            if (alt_panel) then
-              AuctionFrameTab_OnClick(3);
-            end
+	  -- Always auto panel, but allow it to pass through unless
+	  -- there's a reason not to.
+          if (alt_panel) then
+            AuctionFrameTab_OnClick(3);
+          end
+          -- If we don't have auctioneer do not auto pickup let auctioneer do it.
+          if (not AuctionFramePost) then
             if (PanelTemplates_GetSelectedTab(AuctionFrame) == 3)
               and (alt_pickup) then
               PickupContainerItem(itm[TBAG_I_BAG], itm[TBAG_I_SLOT]);
