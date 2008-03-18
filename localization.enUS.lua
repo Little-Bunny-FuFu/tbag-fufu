@@ -684,6 +684,7 @@ TBAG_LOCALE = setmetatable({
   ["[Rr]estores %d+ to %d+ mana"] = "[Rr]estores %d+ to %d+ mana",
   ["Healing Potion"] = "Healing Potion",
   ["[Rr]estores %d+ to %d+ health"] = "[Rr]estores %d+ to %d+ health",
+  ["Place a %a+ stone statue"] = "Place a %a+ stone statue",
   [" [Cc]ure.* poison"] = " [Cc]ure.* poison",
   [" [Cc]ure.* disease"] = " [Cc]ure.* disease",
   [" [Cc]ure.* curse"] = " [Cc]ure.* curse",
