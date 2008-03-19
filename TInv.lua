@@ -409,14 +409,6 @@ function TInv_OnMouseDown(button, frame)
 end
 
 
-function TInv_SetBarFromClass(itm)
-  itm[TBAG_I_BAR] = TBag_GetCat(TInvCfg, itm[TBAG_I_CAT]);
-  while (type(itm[TBAG_I_BAR]) ~= "number") do
-    itm[TBAG_I_BAR] = TBag_GetCat(TInvCfg, itm[TBAG_I_BAR]);
-  end
-  return itm[TBAG_I_BAR];
-end
-
 function TInv_ItemButton_OnEnter(self)
   local itm = TBag_GetItmFromFrame(TBAG_BUTTONS, self:GetName());
   local hasCooldown, repairCost;
