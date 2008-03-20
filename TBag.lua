@@ -501,7 +501,6 @@ function TBag_GetItemID(link)
 end
 
 function TBag_CleanConfig()
-  -- Unused fields we can wipe
   TBagCfg["Body"] = nil;
   TBagCfg["TInv_RegisterHooks"] = nil;
   TBagCfg["Inv"]["show_top_gfx"] = nil;
@@ -518,23 +517,6 @@ function TBag_CleanConfig()
     TBagInfo[player]["stat"] = nil;
     TBagInfo[player]["pvp"] = nil;
   end
-  
-  -- Force any categories that were aliased to TRADE1 or TRADE2 back to 
-  -- their defaults.  Aliasing bars based on the trade skills of the character
-  -- was a horrible idea because it's a pain when dealing with multiple
-  -- characters.  It's not necessary since the rules can handle it anyway.
-  -- So we're undoing this and the code to do it has been removed.
-  for cat,bar in pairs(TBagCfg["Inv"][TBAG_CAT_BAR]) do
-    if (type(bar) == "string" and (bar == "TRADE1" or bar == "TRADE2")) then
-      TBag_SetCatBar(TBagCfg["Inv"],cat,19,1);
-    end
-  end
-  for cat,bar in pairs(TBagCfg["Bnk"][TBAG_CAT_BAR]) do
-    if (type(bar) == "string" and (bar == "TRADE1" or bar == "TRADE2")) then
-      TBag_SetCatBar(TBagCfg["Bnk"],cat,19,1);
-    end
-  end
-
 end
 
 function TBag_BagSlotToString(bag,slot)
@@ -2408,6 +2390,25 @@ function TBag_PickBar(cfg, playerid, itm, trade1, trade2)
   end
 
   TBag_MakeAllTradeKeywords(itm, cfg["trade_created_sort"], trade1, trade2);
+
+  if (trade1 ~= "") then
+    TBag_SetCatBar(cfg, TBag_Cat(trade1), L["TRADE1"], 1);
+    if (cfg["trade_created_sort"] == 1) then
+      TBag_SetCatBar(cfg, string.format(L["%s_CREATED"],TBag_Cat(trade1)),
+                     string.format(L["%s_CREATED"],L["TRADE1"]), 1); 
+    else
+      TBag_SetCatBar(cfg, string.format(L["%s_CREATED"],TBag_Cat(trade1)), nil, 1);
+    end
+  end
+  if (trade2 ~= "") then
+    TBag_SetCatBar(cfg, TBag_Cat(trade2), L["TRADE2"], 1);
+    if (cfg["trade_created_sort"] == 1) then
+      TBag_SetCatBar(cfg, string.format(L["%s_CREATED"],TBag_Cat(trade2)),
+                     string.format(L["%s_CREATED"],L["TRADE2"]), 1);
+    else
+      TBag_SetCatBar(cfg, string.format(L["%s_CREATED"],TBag_Cat(trade2)), nil, 1);
+    end
+  end
 
   if (itm[TBAG_I_SOULBOUND] == 1) then
     itm[TBAG_I_KEYWORD][L["SOULBOUND"]] = 1;
