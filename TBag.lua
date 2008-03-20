@@ -3201,26 +3201,6 @@ end
 -- Inits and Events
 -----------------------------------------------------------------------
 
-function TBag_RealmDropdown_Init(onclickfunc, TItm)
-  local info;
-  local realms = {};
-  
-  -- Grab all realms
-  for key, value in pairs(TItm) do
-    local realm = TBag_Split(key, "|")[2];
-    realms[realm] = 1;
-  end
-
-  -- Add all the realms
-  for key, value in pairs(realms) do
-    info = {};
-    info.text = key;
-    info.value = key;
-    info.func = onclickfunc;
-    UIDropDownMenu_AddButton(info);
-  end
-end
-
 function TBag_UserDropdown_Init(onclickfunc, TItm, curplayer, selRealm,level)
   local info;
   local users = {};
