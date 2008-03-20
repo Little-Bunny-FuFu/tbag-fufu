@@ -2057,47 +2057,6 @@ function TBag_MakeToolTipStr(playerid, itemlink, bag, slot)
   return tooltip, hasCooldown, repairCost;
 end
 
-function TBag_ExtractTooltip(tooltipframe)
-  local txt_left, txt_right, frame_left, frame_right, idx, out, tt_hack;
-
-  tt_hack = getglobal(tooltipframe);
-  tt_hack:SetOwner(UIParent, "ANCHOR_NONE");  -- this makes sure that tooltip.valid = true
-
-  out = {};
-
-  for idx = 1, getglobal(tooltipframe):NumLines() do
-    frame_left = getglobal(tooltipframe.."TextLeft"..idx);
-    frame_right = getglobal(tooltipframe.."TextRight"..idx);
-
-    out[idx] = {
-      ["l"] = frame_left:GetText(),
-      ["r"] = frame_right:GetText()
-      };
-
-    if ( not frame_left:IsVisible() ) then
-      out[idx]["l"] = "";
-    end
-    if ( not frame_right:IsVisible() ) then
-      out[idx]["r"] = "";
-    end
-
-    if (TBag_ENABLE_GETTEXTCOLOR) then
-      if (out[idx]["l"] ~= nil) then
-        out[idx]["lr"],
-        out[idx]["lg"],
-        out[idx]["lb"] = frame_left:GetTextColor();
-      end
-      if (out[idx]["r"] ~= nil) then
-        out[idx]["rr"],
-        out[idx]["rg"],
-        out[idx]["rb"] = frame_right:GetTextColor();
-      end
-    end
-  end
-
-  return out;
-end
-
 
 
 -----------------------------------------------------------------------
