@@ -934,7 +934,7 @@ function TInv_RightClick_DeleteItemOverride()
     itm = TInvItm[TINV_PLAYERID][bag][slot];
 
     if ( (itm[TBAG_I_ITEMID] ~= nil) and (TInvCfg["item_overrides"][itm[TBAG_I_ITEMID]] ~= nil) ) then
-      TInvCfg["item_overrides"] = TBag_Table_RemoveKey(TInvCfg["item_overrides"], itm[TBAG_I_ITEMID] );
+      TInvCfg["item_overrides"][itm[TBAG_I_ITEMID]] = nil;
       HideDropDownMenu(1);
 
       -- resort will force a window redraw as well

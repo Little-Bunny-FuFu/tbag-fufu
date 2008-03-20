@@ -403,18 +403,6 @@ function TBag_SplitStr(strtosplit,splitchar)
   end
 end
 
-function TBag_Table_RemoveKey(tab, key)
-  local temptab = {};
-
-  for k,v in pairs(tab) do
-    if (k ~= key) then
-      temptab[k] = v;
-    end
-  end
-
-  return temptab;
-end
-
 function TBag_Split(toCut, separator)
   local splitted = {};
   local i = 0;
