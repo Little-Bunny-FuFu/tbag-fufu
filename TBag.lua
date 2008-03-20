@@ -1568,18 +1568,6 @@ function TBag_GetBagNumFrame(bag)
   return getglobal(TBag_GetBagNumName(bag));
 end
 
-function TBag_SetGfx(frame, scale, parentname)
-  if (frame) then
-    if (parent) then
-      frame:SetParent(getglobal(parentname));
-    end
-    if (scale) then
-      frame:SetScale(scale);
-    end
-  end
-end
-
-
 function TBag_GetCooldownString(cooldownInfo)
   local CoolDownRemaining = cooldownInfo["duration"] - (GetTime() - cooldownInfo["start"]);
   -- 60 secs in a min
