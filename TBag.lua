@@ -454,21 +454,6 @@ function TBag_CreateFrame(type, name, parent, template, num, append)
   end
 end
 
-function TBag_CreateLayer(type, name, parent, template, num, append)
-  local idx;
-  if (num) then
-    for idx = 1, num do
-      if not (getglobal(name..idx..append)) then
---        CreateLayer(type, name..idx..append, parent, template);
-      end
-    end
-  else
-    if not (getglobal(name)) then
---      CreateLayer(type, name, parent, template);
-    end
-  end
-end
-
 function TBag_ResetNew(itm)
   if (itm) then
     itm[TBAG_I_TIMESTAMP] = 1;
