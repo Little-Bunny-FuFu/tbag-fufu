@@ -293,10 +293,6 @@ function TBag_Print(msg,r,g,b,frame,id,unknown4th)
   end
 end
 
-function TBag_Trim(s)
-  return string.trim(s);
-end
-
 function TBag_ReverseString(strtorev,toggle)
   local out = "", s1, s2;
 
@@ -410,7 +406,7 @@ function TBag_Split(toCut, separator)
 
   for item in string.gmatch(toCut .. separator, regEx) do
     i = i + 1;
-    splitted[i] = TBag_Trim(item) or '';
+    splitted[i] = string.trim(item) or '';
   end
   splitted[i] = nil;
   return splitted;
