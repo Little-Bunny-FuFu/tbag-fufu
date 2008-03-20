@@ -1568,29 +1568,6 @@ function TBag_GetBagNumFrame(bag)
   return getglobal(TBag_GetBagNumName(bag));
 end
 
-function TBag_GetCooldownString(cooldownInfo)
-  local CoolDownRemaining = cooldownInfo["duration"] - (GetTime() - cooldownInfo["start"]);
-  -- 60 secs in a min
-  -- 3600 secs in an hour
-  -- 86400 secs in a day
-  local days, hours, minutes, seconds;
-  days = math.floor(CoolDownRemaining / 86400);
-  CoolDownRemaining = CoolDownRemaining - 86400 * days;
-  hours = math.floor(CoolDownRemaining / 3600);
-  CoolDownRemaining = CoolDownRemaining - 3600 * hours;
-  minutes = math.floor(CoolDownRemaining / 60);
-  seconds = math.floor(CoolDownRemaining - 60 * minutes);
-  if days > 0 then
-    return format(ITEM_COOLDOWN_TIME_DAYS_P1, days+1);
-  elseif hours > 0 then
-    return format(ITEM_COOLDOWN_TIME_HOURS_P1, hours+1);
-  elseif minutes > 0 then
-    return format(ITEM_COOLDOWN_TIME_MIN, minutes+1);
-  else
-    return format(ITEM_COOLDOWN_TIME_SEC, seconds);
-  end
-end
-
 
 function TBag_MakeHyperlink(itemstring,name,quality)
   local itemlink;
