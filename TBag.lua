@@ -415,7 +415,19 @@ function TBag_ClearItmCache(itmcache, bagarr)
   local bag;
 
   for _, bag in pairs(bagarr) do
-    itmcache[bag] = {};
+    itmcache[bag] = itmcache[bag] or {};
+    local bagtab = itmcache[bag];
+    for slot,slottab in pairs(itmcache[bag]) do
+      if type(slottab) == "table" then
+        for k,_ in pairs(slottab) do
+          slottab[k] = nil;
+        end
+      else
+	-- Isn't a table so just nil it.  Some of the itmcache's
+	-- just store a single value for a slot.
+        bagtab[slot] = nil;
+      end
+    end
   end
 
   return itmcache;
@@ -1312,7 +1324,10 @@ function TBag_BuildBarClassList(bclist, cfg)
 
   -- First wipe the old bar class lists
   for bar = 1, TBAG_BAR_MAX do
-    bclist[bar] = {};
+    bclist[bar] = bclist[bar] or {};
+    for k,_ in pairs(bclist[bar]) do
+      bclist[bar][k] = nil;
+    end
   end
 
   -- Build up the list
@@ -2112,7 +2127,21 @@ function TBag_InsertStackArr(stackarr,itm)
   return stackarr;
 end
 
+local TBag_Itm = {};
+
+function TBag_CreateItm()
+  local itm = TBag_Itm;
+
+  for k,_ in pairs(itm) do
+    itm[k] = nil;
+  end
+
+  return TBag_Itm;
+end
+
 function TBag_UpdateItmCache(cfg, playerid, itmcache, bagarr, atbank)
+--  UpdateAddOnMemoryUsage();
+--  TBag_PrintDEBUG('UpdateItmCache Start Memory = '..tostring(GetAddOnMemoryUsage("TBag")));
   local bag, slot;  -- used as "for loop" counters
   local itm;    -- entry that will be written to the cache
   local update_suggested = 0;
@@ -2155,19 +2184,19 @@ function TBag_UpdateItmCache(cfg, playerid, itmcache, bagarr, atbank)
             itmcache[bag][slot] = { [TBAG_I_KEYWORD] = {} };
           end
 
-          itm = {
-            [TBAG_I_ITEMLINK] = GetContainerItemLink(bag, slot);
-            [TBAG_I_BAG] = bag,
-            [TBAG_I_SLOT] = slot,
-            [TBAG_I_BAGTYPE] = bagtype,
-            -- take items from old position
-            [TBAG_I_BAR] = itmcache[bag][slot][TBAG_I_BAR],
-            [TBAG_I_TIMESTAMP] = itmcache[bag][slot][TBAG_I_TIMESTAMP],
-            [TBAG_I_NEWSTR] = itmcache[bag][slot][TBAG_I_NEWSTR],
-            [TBAG_I_CAT] = itmcache[bag][slot][TBAG_I_CAT],
-            [TBAG_I_KEYWORD] = itmcache[bag][slot][TBAG_I_KEYWORD],
-	    [TBAG_I_SOULBOUND] = itmcache[bag][slot][TBAG_I_SOULBOUND],
-            };
+	  itm = TBag_CreateItm();
+	  
+          itm[TBAG_I_ITEMLINK] = GetContainerItemLink(bag, slot);
+          itm[TBAG_I_BAG] = bag;
+          itm[TBAG_I_SLOT] = slot;
+          itm[TBAG_I_BAGTYPE] = bagtype;
+          -- take items from old position
+          itm[TBAG_I_BAR] = itmcache[bag][slot][TBAG_I_BAR];
+          itm[TBAG_I_TIMESTAMP] = itmcache[bag][slot][TBAG_I_TIMESTAMP];
+          itm[TBAG_I_NEWSTR] = itmcache[bag][slot][TBAG_I_NEWSTR];
+          itm[TBAG_I_CAT] = itmcache[bag][slot][TBAG_I_CAT];
+          itm[TBAG_I_KEYWORD] = itmcache[bag][slot][TBAG_I_KEYWORD];
+	  itm[TBAG_I_SOULBOUND] = itmcache[bag][slot][TBAG_I_SOULBOUND];
 
           if (itm[TBAG_I_ITEMLINK] ~= nil) then
             -- there's an item in the bag, let's find out more about it
@@ -2184,9 +2213,6 @@ function TBag_UpdateItmCache(cfg, playerid, itmcache, bagarr, atbank)
               itm[TBAG_I_NEED] = 0;
             end
 
-	    -- Items not in a special bag but that can go into one need to be
-	    -- added to the specitems table.
-	    specitems = TBag_InsertSpecItem(specitems,itm);
           else
             -- no item in bag, set it as empty
             TBag_MakeEmptySlot(itm);
@@ -2195,13 +2221,8 @@ function TBag_UpdateItmCache(cfg, playerid, itmcache, bagarr, atbank)
             TBag_SetStackSkip(itm[TBAG_I_BAG], itm[TBAG_I_SLOT], nil);
             TBag_SetCompSkip(itm[TBAG_I_BAG], itm[TBAG_I_SLOT], nil);
 
-	    -- Empty slots in special bags need to be added to the 
-	    -- compress arg.
-	    emptyspec = TBag_InsertEmptySpec(emptyspec,itm);
           end
 
-          -- Put on the stack array if we need more to stack
-	  stackarr = TBag_InsertStackArr(stackarr,itm);
 
           if (itm[TBAG_I_BAR] == nil and cfg["show_Bag"..bag] == 1) then
             resort_mandatory = 1;
@@ -2243,19 +2264,43 @@ function TBag_UpdateItmCache(cfg, playerid, itmcache, bagarr, atbank)
           if (itm[TBAG_I_TIMESTAMP] == nil) then
             TBag_ResetNew(itm);
           end
+          
+          -- wipe old keys first
+	  for k,_ in pairs(itmcache[bag][slot]) do
+	    itmcache[bag][slot][k] = nil;
+	  end
+	  -- copy the new data over
+	  for k,v in pairs(itm) do
+            itmcache[bag][slot][k] = v;
+	  end
 
-           itmcache[bag][slot] = itm;  -- save updated information
+	  -- Put on the stack array if we need more to stack
+	  stackarr = TBag_InsertStackArr(stackarr,itmcache[bag][slot]);
+	 
+	  if (itm[TBAG_I_ITEMLINK] ~= nil) then
+	    -- Items not in a special bag but that can go into one need to be
+	    -- added to the specitems table.
+	    specitems = TBag_InsertSpecItem(specitems,itmcache[bag][slot]);
+	  else
+	    -- Empty slots in special bags need to be added to the 
+	    -- compress arg.
+	    emptyspec = TBag_InsertEmptySpec(emptyspec,itmcache[bag][slot]);
+	  end
         end
       else
         -- size = 0, make sure you wipe the cache entry
         if (table.getn(itmcache[bag]) ~= 0) then
           resort_mandatory = 1;
         end
-        itmcache[bag] = {};
+	for k,_ in pairs(itmcache[bag]) do
+          itmcache[bag][k] = nil;
+	end
       end
 --    end
   end
 
+--  UpdateAddOnMemoryUsage();
+--  TBag_PrintDEBUG('UpdateItmCache End Memory = '..tostring(GetAddOnMemoryUsage("TBag")));
   if (resort_mandatory == 1) then
     return TBAG_REQ_MUST, stackarr,emptyspec,specitems;
   elseif (resort_suggested == 1) then
@@ -2267,6 +2312,9 @@ end
 
 
 function TBag_SortItmCache(cfg, playerid, itmcache, baritm, bagarr)
+--  UpdateAddOnMemoryUsage();
+--  TBag_PrintDEBUG('SortItmCache Start Memory = '..tostring(GetAddOnMemoryUsage("TBag")));
+
   local i;
   local bag, slot;  -- variables used in outer loop
   local size;
@@ -2281,9 +2329,12 @@ function TBag_SortItmCache(cfg, playerid, itmcache, baritm, bagarr)
   end
   
   -- wipe the current bar positions table
-  baritm = {};
-  for i = 1, TBAG_BAR_MAX do
-    baritm[i] = {};
+  for bar = 1, TBAG_BAR_MAX do
+    baritm[bar] = baritm[bar] or {};
+    local bartab = baritm[bar];
+    for pos,_ in pairs(bartab) do
+      bartab[pos] = nil;
+    end 
   end
 
   for _, bag in ipairs(bagarr) do
@@ -2336,6 +2387,8 @@ function TBag_SortItmCache(cfg, playerid, itmcache, baritm, bagarr)
       );
     end
   end
+--  UpdateAddOnMemoryUsage();
+--  TBag_PrintDEBUG('SortItmCache End Memory = '..tostring(GetAddOnMemoryUsage("TBag")));
   return baritm;
 end
 
@@ -2378,7 +2431,10 @@ function TBag_PickBar(cfg, playerid, itm, trade1, trade2)
     end
   end
 
-  itm[TBAG_I_KEYWORD] = {};
+  itm[TBAG_I_KEYWORD] = itm[TBAG_I_KEYWORD] or {};
+  for k,_ in pairs(itm[TBAG_I_KEYWORD]) do
+    itm[TBAG_I_KEYWORD][k] = nil;
+  end
 
   if (itm[TBAG_I_RARITY] ~= nil) then
     itm[TBAG_I_KEYWORD][TBAG_S_RARITY..itm[TBAG_I_RARITY]] = 1;
@@ -2700,7 +2756,10 @@ function TBag_CalcBarLayout(calc_dat, baritm, barnum, numbars, colmax, edit_mode
   local iBar;
 
   -- First set the total bar sizes
-  calc_dat = {};
+  calc_dat = calc_dat or {};
+  for k,_ in pairs(calc_dat) do
+    calc_dat[k] = nil;
+  end
   for iBar = 0, numbars-1 do
     if (edit_mode == 1) then
       calc_dat[iBar] = table.getn(baritm[barnum+iBar]) + 1;
@@ -2876,6 +2935,8 @@ end
 
 -- sa = stackarr, shortened to make the code manageable
 function TBag_Stack(where, itmcache, sa, emptyspec, specitems)
+--  UpdateAddOnMemoryUsage();
+--  TBag_PrintDEBUG('Stack Start Memory = '..tostring(GetAddOnMemoryUsage("TBag")));
   local hasstacked;
   
   -- Set the mutex
@@ -2984,6 +3045,8 @@ function TBag_Stack(where, itmcache, sa, emptyspec, specitems)
     -- the stack and compress fighting each other.
   end
 
+--  UpdateAddOnMemoryUsage();
+--  TBag_PrintDEBUG('Stack End Memory = '..tostring(GetAddOnMemoryUsage("TBag")));
   return hasstacked;
 end
 

@@ -1573,6 +1573,10 @@ function TInv_UpdateWindow(resort_req)
     return;
   end
 
+--  UpdateAddOnMemoryUsage();
+--  TBag_PrintDEBUG('TInv_UpdateWindow Start Memory = '..tostring(GetAddOnMemoryUsage("TBag")));
+    
+  
   -- Set the overall scale
   TInvFrame:SetScale(TInvCfg["scale"]);
 
@@ -1679,6 +1683,8 @@ function TInv_UpdateWindow(resort_req)
   TInv_SetButton_Anchors();
   
   TInv_WindowIsUpdating = 0;
+--  UpdateAddOnMemoryUsage();
+--  TBag_PrintDEBUG('TInv_UpdateWindow End Memory = '..tostring(GetAddOnMemoryUsage("TBag")));
 
 end
 
