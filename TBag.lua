@@ -80,7 +80,6 @@ TBAG_V_NEWMINUS  = "newM";
 -- Used to track slots that can't be hidden until the next resort
 TBAG_FORCED_SHOW = {}
 
-TBAG_NEW_STACK = 1;
 TBAG_STACK_BNK = 1;
 TBAG_STACK_INV = 2;
 
@@ -2104,14 +2103,10 @@ function TBag_InsertStackArr(stackarr,itm)
     if (TBag_GetStackSkip(itm[TBAG_I_BAG], itm[TBAG_I_SLOT]) == nil) then
         TBag_PrintDEBUG("Stack inserting ("..itm[TBAG_I_BAG]..", "
         ..itm[TBAG_I_SLOT]..") with need="..itm[TBAG_I_NEED]);
-      if (TBAG_NEW_STACK == 0) then
-        table.insert(stackarr, itm);
-      else
-        if (stackarr[itm[TBAG_I_ITEMID]] == nil) then
-          stackarr[itm[TBAG_I_ITEMID]] = {};
-        end
-	table.insert(stackarr[itm[TBAG_I_ITEMID]],itm);
+      if (stackarr[itm[TBAG_I_ITEMID]] == nil) then
+        stackarr[itm[TBAG_I_ITEMID]] = {};
       end
+      table.insert(stackarr[itm[TBAG_I_ITEMID]],itm);
     end
   end
   return stackarr;
@@ -2883,138 +2878,68 @@ end
 function TBag_Stack(where, itmcache, sa, emptyspec, specitems)
   local hasstacked;
   
-  if TBAG_NEW_STACK == 0 then
-    if (sa) then
-      local sn = table.getn(sa);
-      TBag_PrintDEBUG("Stacking!  Array size = "..sn);
-    
-      TBAG_ISSTACKING[where] = 1;
-    
-      -- For every need, try to find a count that matches it
-      for k_c = 1, sn do
-        for k_n = 1, sn do
-          if (k_n ~= k_c) and (sa[k_c]) and (sa[k_n]) then
-            -- Find matching items
-            if (sa[k_c][TBAG_I_ITEMID]) and (sa[k_n][TBAG_I_ITEMID])
-              and (sa[k_n][TBAG_I_ITEMID] == sa[k_c][TBAG_I_ITEMID])
-              -- That aren't on the skip list
-              and (not TBag_GetStackSkip(sa[k_c][TBAG_I_BAG], sa[k_c][TBAG_I_SLOT]))
-              and (not TBag_GetStackSkip(sa[k_n][TBAG_I_BAG], sa[k_n][TBAG_I_SLOT])) then
-            
-            if (sa[k_n][TBAG_I_NEED] <= sa[k_c][TBAG_I_NEED])
-              and (sa[k_n][TBAG_I_NEED] > 0) then
-            
-              -- If one stack will fit on the other, drop it onto it
-              if (sa[k_n][TBAG_I_COUNT] <= sa[k_c][TBAG_I_NEED]) then
-                -- Drop one onto the other 
-                ClearCursor();
-                PickupContainerItem(sa[k_n][TBAG_I_BAG], sa[k_n][TBAG_I_SLOT]);
-                PickupContainerItem(sa[k_c][TBAG_I_BAG], sa[k_c][TBAG_I_SLOT]);
-                ClearCursor();
-              
-                -- Update the count totals
-                sa[k_c][TBAG_I_COUNT] = sa[k_c][TBAG_I_COUNT] + sa[k_n][TBAG_I_COUNT];
-                sa[k_c][TBAG_I_NEED] = sa[k_c][TBAG_I_NEED] - sa[k_n][TBAG_I_COUNT];
-              
-                -- And empty out the dropped slot
-                TBag_MakeEmptySlot(itmcache[sa[k_n][TBAG_I_BAG]][sa[k_n][TBAG_I_SLOT]]);
-                TBag_SetStackSkip(sa[k_n][TBAG_I_BAG], sa[k_n][TBAG_I_SLOT], nil);
-                sa[k_n] = nil;
-              
-              -- Otherwise, split the smaller stack to complete the larger
-              elseif (sa[k_n][TBAG_I_COUNT] > sa[k_c][TBAG_I_NEED]) then
-                -- Split one and drop onto the other
-                ClearCursor();
-                SplitContainerItem(sa[k_n][TBAG_I_BAG], sa[k_n][TBAG_I_SLOT], sa[k_c][TBAG_I_NEED]);
-                PickupContainerItem(sa[k_c][TBAG_I_BAG], sa[k_c][TBAG_I_SLOT]);
-                ClearCursor();
-              
-                -- Update the count totals
-                sa[k_n][TBAG_I_COUNT] = sa[k_n][TBAG_I_COUNT] - sa[k_c][TBAG_I_NEED];
-                sa[k_n][TBAG_I_NEED] = sa[k_n][TBAG_I_NEED] + sa[k_c][TBAG_I_NEED];
-                sa[k_c][TBAG_I_COUNT] = sa[k_c][TBAG_I_COUNT] + sa[k_c][TBAG_I_NEED];
-                sa[k_c][TBAG_I_NEED] = sa[k_c][TBAG_I_NEED] - sa[k_c][TBAG_I_NEED];
-              end
-            
-              -- Make sure to clear the skip list
-              TBag_SetStackSkip(sa[k_c][TBAG_I_BAG], sa[k_c][TBAG_I_SLOT], nil);
-            
-              -- If we've completed this stack, remove it from consideration
-              if (sa[k_c][TBAG_I_NEED] == 0) then
-                sa[k_c] = nil;
-              end
-            
-              hasstacked = 1;
-            end
-          end
-        end
+  -- Set the mutex
+  TBAG_ISSTACKING[where] = 1;
+  
+  -- Iterate the list of items that can be stacked
+  for itemid,itms in pairs(sa) do
+    -- Sort the list of slots with the item in it by how
+    -- big the stack is in descending order give
+    -- precedence to items in special bags.
+    table.sort(itms,
+    function(a,b)
+      if (a[TBAG_I_COUNT] == b[TBAG_I_COUNT]) then
+        return (a[TBAG_I_BAGTYPE] or "") > (b[TBAG_I_BAGTYPE] or "")
+      else
+        return a[TBAG_I_COUNT] > b[TBAG_I_COUNT];
       end
-    end
-    end
-    TBAG_ISSTACKING[where] = nil;
-  else 
-    -- BEGIN NEW STACK ALGORITHM. /cheer
-    TBAG_ISSTACKING[where] = 1;
-    -- Iterate the list of items that can be stacked
-    for itemid,itms in pairs(sa) do
-      -- Sort the list of slots with the item in it by how
-      -- big the stack is in descending order give
-      -- precedence to items in special bags.
-      table.sort(itms,
-        function(a,b)
-	  if (a[TBAG_I_COUNT] == b[TBAG_I_COUNT]) then
-	    return (a[TBAG_I_BAGTYPE] or "") > (b[TBAG_I_BAGTYPE] or "")
-	  else
-            return a[TBAG_I_COUNT] > b[TBAG_I_COUNT];
-	  end
-	end);
-       
-      -- We start filling the largest stacks and pulling
-      -- from the smallest stacks
-      local dest = 1;
-      local src = #itms;
-    
-      -- Unless there's more than one entry there's nothing to do.
-      if (src > 1) then
-	-- If the src and the dest are equal or have crossed each
-	-- other we're done.
-        while (src > dest) do
-          local srcitm = itms[src];
-          local destitm = itms[dest];
+    end);
 
-          if (destitm[TBAG_I_NEED] >= srcitm[TBAG_I_COUNT]) then
-            -- Source will be used up filling dest. 
-            TBag_ItemMover(srcitm[TBAG_I_BAG], srcitm[TBAG_I_SLOT],
-                           destitm[TBAG_I_BAG], destitm[TBAG_I_SLOT]);
-            
-            -- Update counts
-            destitm[TBAG_I_NEED] = destitm[TBAG_I_NEED] - srcitm[TBAG_I_COUNT];
-	    destitm[TBAG_I_COUNT] = destitm[TBAG_I_COUNT] + srcitm[TBAG_I_COUNT];
+    -- We start filling the largest stacks and pulling
+    -- from the smallest stacks
+    local dest = 1;
+    local src = #itms;
 
-	    -- source is now empty
-	    TBag_MakeEmptySlot(srcitm);
-            -- Push empty slots onto the empty list for possible compression 
-            emptyspec = TBag_InsertEmptySpec(emptyspec,srcitm);
-	    -- Move on to the next source stack
-	    src = src - 1;
-          else 
-	    -- Source is larger than the destination need
-	    TBag_ItemMover(srcitm[TBAG_I_BAG], srcitm[TBAG_I_SLOT],
-	                   destitm[TBAG_I_BAG], destitm[TBAG_I_SLOT],
-	  		   destitm[TBAG_I_NEED]);
+    -- Unless there's more than one entry there's nothing to do.
+    if (src > 1) then
+      -- If the src and the dest are equal or have crossed each
+      -- other we're done.
+      while (src > dest) do
+        local srcitm = itms[src];
+        local destitm = itms[dest];
 
-	    -- Update counts
-	    destitm[TBAG_I_NEED] = 0;
-	    destitm[TBAG_I_COUNT] = destitm[TBAG_I_COUNT] + destitm[TBAG_I_NEED];
-	    srcitm[TBAG_I_NEED] = srcitm[TBAG_I_NEED] + destitm[TBAG_I_NEED];
-	    srcitm[TBAG_I_NEED] = srcitm[TBAG_I_COUNT] - destitm[TBAG_I_NEED];
-          end
-	  -- Destination full move to the next one.
-	  if (destitm[TBAG_I_NEED] == 0) then
-	    dest = dest + 1;
-	  end
-	  hasstacked = 1;
+        if (destitm[TBAG_I_NEED] >= srcitm[TBAG_I_COUNT]) then
+          -- Source will be used up filling dest. 
+          TBag_ItemMover(srcitm[TBAG_I_BAG], srcitm[TBAG_I_SLOT],
+          destitm[TBAG_I_BAG], destitm[TBAG_I_SLOT]);
+
+          -- Update counts
+          destitm[TBAG_I_NEED] = destitm[TBAG_I_NEED] - srcitm[TBAG_I_COUNT];
+          destitm[TBAG_I_COUNT] = destitm[TBAG_I_COUNT] + srcitm[TBAG_I_COUNT];
+
+          -- source is now empty
+          TBag_MakeEmptySlot(srcitm);
+          -- Push empty slots onto the empty list for possible compression 
+          emptyspec = TBag_InsertEmptySpec(emptyspec,srcitm);
+          -- Move on to the next source stack
+          src = src - 1;
+        else 
+          -- Source is larger than the destination need
+          TBag_ItemMover(srcitm[TBAG_I_BAG], srcitm[TBAG_I_SLOT],
+          destitm[TBAG_I_BAG], destitm[TBAG_I_SLOT],
+          destitm[TBAG_I_NEED]);
+
+          -- Update counts
+          destitm[TBAG_I_NEED] = 0;
+          destitm[TBAG_I_COUNT] = destitm[TBAG_I_COUNT] + destitm[TBAG_I_NEED];
+          srcitm[TBAG_I_NEED] = srcitm[TBAG_I_NEED] + destitm[TBAG_I_NEED];
+          srcitm[TBAG_I_NEED] = srcitm[TBAG_I_COUNT] - destitm[TBAG_I_NEED];
         end
+        -- Destination full move to the next one.
+        if (destitm[TBAG_I_NEED] == 0) then
+          dest = dest + 1;
+        end
+        hasstacked = 1;
       end
     end
     if (emptyspec and type(emptyspec) == "table" and
