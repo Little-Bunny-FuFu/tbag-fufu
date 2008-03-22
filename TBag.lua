@@ -2602,6 +2602,12 @@ function TBag_ScanMail()
         local itm = TMailItm[TBAG_PLAYERID][idx][slot];
         local name, itemTexture, count, quality, canUse = GetInboxItem(idx,slot);
         local itemid,itemlink = TBag_GetItemID(GetInboxItemLink(idx,slot));
+
+        -- GetInboxItem is currently bugged and returns -1 for the quality
+        -- so try and get the correct quality from GetItemInfo
+        if (quality == -1) then
+          _,_,quality = GetItemInfo(itemlink);
+        end
          
         itm[TBAG_I_NAME] = name;
         itm[TBAG_I_COUNT] = count;
