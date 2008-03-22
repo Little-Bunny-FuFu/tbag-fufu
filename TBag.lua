@@ -599,7 +599,7 @@ function TBag_GatherSearchResults(srch, itmcache, place)
       for _, slotarr in pairs(bagarr) do
         for _, itm in pairs(slotarr) do
           -- Exclude empty slots
-          if (itm[TBAG_I_ITEMID]) and (itm[TBAG_I_NAME]) then
+          if (itm[TBAG_I_ITEMLINK]) and (itm[TBAG_I_NAME]) then
             -- Do case insensitive searches
             if (string.find(string.lower(itm[TBAG_I_NAME]), srch)) then
               TBag_AddSearchResult(itm, playername, place);
@@ -1419,10 +1419,12 @@ function TBag_GetBagType(playerid, bag)
           end
         end
         TBag_SetPlayerBagCfg(playerid, bag, TBAG_I_ITEMLINK, itemlink);
-        TBag_SetPlayerBagCfg(playerid, bag, TBAG_I_ITEMID, id);
         TBag_SetPlayerBagCfg(playerid, bag, TBAG_I_NAME, name);
         TBag_SetPlayerBagCfg(playerid, bag, TBAG_I_COUNT, 1);
         TBag_SetPlayerBagCfg(playerid, bag, TBAG_I_RARITY, quality);
+	-- ITEMID is obsolete since it's included in ITEMLINK
+	-- so always set it to nil.
+        TBag_SetPlayerBagCfg(playerid, bag, TBAG_I_ITEMID, nil);
       else
         TBag_SetPlayerBagCfg(playerid, bag, TBAG_I_ITEMLINK, nil);
         TBag_SetPlayerBagCfg(playerid, bag, TBAG_I_ITEMID, nil);
@@ -2084,7 +2086,7 @@ function TBag_InsertEmptySpec(emptyspec,itm)
   return emptyspec
 end
 
-function TBag_InsertSpecItem(specitems,itm)
+function TBag_InsertSpecItem(specitems,itm,id)
   if (itm == nil or type(itm) ~= "table") then
     return;
   end
@@ -2096,7 +2098,7 @@ function TBag_InsertSpecItem(specitems,itm)
     if (TBag_ContainerItems) then
       for _,items in pairs(TBag_ContainerItems) do
         if (type(items) == "table") then
-          if (items[itm[TBAG_I_ITEMID]] == 1) then
+          if (items[id] == 1) then
             table.insert(specitems, TBag_BagSlotToString(itm[TBAG_I_BAG],itm[TBAG_I_SLOT]));
           end
         end
@@ -2106,7 +2108,7 @@ function TBag_InsertSpecItem(specitems,itm)
   return specitems;
 end
 
-function TBag_InsertStackArr(stackarr,itm)
+function TBag_InsertStackArr(stackarr,itm,id)
   if (itm == nil or type(itm) ~= "table") then
     return;
   end
@@ -2118,10 +2120,8 @@ function TBag_InsertStackArr(stackarr,itm)
     if (TBag_GetStackSkip(itm[TBAG_I_BAG], itm[TBAG_I_SLOT]) == nil) then
         TBag_PrintDEBUG("Stack inserting ("..itm[TBAG_I_BAG]..", "
         ..itm[TBAG_I_SLOT]..") with need="..itm[TBAG_I_NEED]);
-      if (stackarr[itm[TBAG_I_ITEMID]] == nil) then
-        stackarr[itm[TBAG_I_ITEMID]] = {};
-      end
-      table.insert(stackarr[itm[TBAG_I_ITEMID]],itm);
+      stackarr[id] = stackarr[id] or {};
+      table.insert(stackarr[id],itm);
     end
   end
   return stackarr;
@@ -2144,6 +2144,7 @@ function TBag_UpdateItmCache(cfg, playerid, itmcache, bagarr, atbank)
 --  TBag_PrintDEBUG('UpdateItmCache Start Memory = '..tostring(GetAddOnMemoryUsage("TBag")));
   local bag, slot;  -- used as "for loop" counters
   local itm;    -- entry that will be written to the cache
+  local id;
   local update_suggested = 0;
   local resort_suggested = 0;
   local resort_mandatory = 0;
@@ -2186,6 +2187,8 @@ function TBag_UpdateItmCache(cfg, playerid, itmcache, bagarr, atbank)
 
 	  itm = TBag_CreateItm();
 	  
+	  id = nil; -- Clear our local id that we use to cache the id to avoid extra
+	            -- calls to TBag_GetItemID().
           itm[TBAG_I_ITEMLINK] = GetContainerItemLink(bag, slot);
           itm[TBAG_I_BAG] = bag;
           itm[TBAG_I_SLOT] = slot;
@@ -2200,8 +2203,7 @@ function TBag_UpdateItmCache(cfg, playerid, itmcache, bagarr, atbank)
 
           if (itm[TBAG_I_ITEMLINK] ~= nil) then
             -- there's an item in the bag, let's find out more about it
-            itm[TBAG_I_ITEMID], itm[TBAG_I_ITEMLINK] = 
-              TBag_GetItemID(itm[TBAG_I_ITEMLINK]);
+            id, itm[TBAG_I_ITEMLINK] = TBag_GetItemID(itm[TBAG_I_ITEMLINK]);
 
 
             local stacksize;
@@ -2275,12 +2277,12 @@ function TBag_UpdateItmCache(cfg, playerid, itmcache, bagarr, atbank)
 	  end
 
 	  -- Put on the stack array if we need more to stack
-	  stackarr = TBag_InsertStackArr(stackarr,itmcache[bag][slot]);
+	  stackarr = TBag_InsertStackArr(stackarr,itmcache[bag][slot],id);
 	 
 	  if (itm[TBAG_I_ITEMLINK] ~= nil) then
 	    -- Items not in a special bag but that can go into one need to be
 	    -- added to the specitems table.
-	    specitems = TBag_InsertSpecItem(specitems,itmcache[bag][slot]);
+	    specitems = TBag_InsertSpecItem(specitems,itmcache[bag][slot],id);
 	  else
 	    -- Empty slots in special bags need to be added to the 
 	    -- compress arg.
@@ -2419,6 +2421,9 @@ function TBag_PickBar(cfg, playerid, itm, trade1, trade2)
   local key, value;
   local found;
 
+  -- Fetch the items id
+  local itemid = TBag_GetItemID(itm[TBAG_I_ITEMLINK]);
+  
   -- reset item keywords
   if (itm[TBAG_I_BAGTYPE]) and (itm[TBAG_I_BAGTYPE] ~= "") then
     if (cfg["special_bag_sort"] == 1) then
@@ -2466,7 +2471,7 @@ function TBag_PickBar(cfg, playerid, itm, trade1, trade2)
 
     -- Only treat soulbound equipment as equipped
     if ( TBag_GetPlayerInfo(playerid, TBAG_S_EQUIPPED) ~= nil ) then
-      if (TBag_GetPlayerInfo(playerid, TBAG_S_EQUIPPED)[ itm[TBAG_I_ITEMID] ] ~= nil) then
+      if (TBag_GetPlayerInfo(playerid, TBAG_S_EQUIPPED)[ itemid ] ~= nil) then
       itm[TBAG_I_KEYWORD][L["EQUIPPED"]] = 1;
       end
     end
@@ -2480,7 +2485,7 @@ function TBag_PickBar(cfg, playerid, itm, trade1, trade2)
   itm[TBAG_I_CAT] = nil;
 
   -- step 1, check item overrides
-  itm[TBAG_I_CAT] = cfg["item_overrides"][itm[TBAG_I_ITEMID]];
+  itm[TBAG_I_CAT] = cfg["item_overrides"][itemid];
   if (itm[TBAG_I_CAT] ~= nil) then
     itm[TBAG_I_BAR] = TBag_GetCat(cfg, itm[TBAG_I_CAT]);
     while ( (itm[TBAG_I_BAR] ~= nil) and (type(itm[TBAG_I_BAR]) ~= "number") ) do
@@ -2569,8 +2574,7 @@ function TBag_ScanEquipped()
     if (itemLink) then
       TBag_SetItemLink(TBag_GetPlayerInfo(TBAG_PLAYERID, TBAG_S_EQUIPPED), itemLink);
 
-      dbag[TBAG_I_ITEMID], dbag[TBAG_I_ITEMLINK] = 
-        TBag_GetItemID(itemLink);
+      _, dbag[TBAG_I_ITEMLINK] = TBag_GetItemID(itemLink);
 
       dbag[TBAG_I_NAME],_,dbag[TBAG_I_RARITY] = GetItemInfo(dbag[TBAG_I_ITEMLINK]);
       dbag[TBAG_I_COUNT] = 1;
@@ -2601,7 +2605,7 @@ function TBag_ScanMail()
 	TMailItm[TBAG_PLAYERID][idx][slot] = {};
         local itm = TMailItm[TBAG_PLAYERID][idx][slot];
         local name, itemTexture, count, quality, canUse = GetInboxItem(idx,slot);
-        local itemid,itemlink = TBag_GetItemID(GetInboxItemLink(idx,slot));
+        local _,itemlink = TBag_GetItemID(GetInboxItemLink(idx,slot));
 
         -- GetInboxItem is currently bugged and returns -1 for the quality
         -- so try and get the correct quality from GetItemInfo
@@ -2611,7 +2615,6 @@ function TBag_ScanMail()
          
         itm[TBAG_I_NAME] = name;
         itm[TBAG_I_COUNT] = count;
-        itm[TBAG_I_ITEMID] = itemid;
         itm[TBAG_I_ITEMLINK] = itemlink; 
 	itm[TBAG_I_RARITY] = quality;
       end
@@ -3027,7 +3030,7 @@ function TBag_Stack(where, itmcache, sa, emptyspec, specitems)
 	        local bagtype = emptyitm[TBAG_I_BAGTYPE];
                 if (TBag_ContainerItems and TBag_ContainerItems[bagtype]) then
 	          -- Does the item go into this bag type?
-	          if (TBag_ContainerItems[bagtype][itemitm[TBAG_I_ITEMID]]) then
+	          if (TBag_ContainerItems[bagtype][TBag_GetItemID(itemitm[TBAG_I_ITEMLINK])]) then
                     -- Drop one onto the other
 		    TBag_ItemMover(itembag,itemslot,emptybag,emptyslot);
             

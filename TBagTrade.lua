@@ -207,18 +207,18 @@ function TBag_Trade()
 end
 
 
-function TBag_MakeTradeCreationKeyword(itm, trade, cat, docreated)
+function TBag_MakeTradeCreationKeyword(itm, id, trade, cat, docreated)
   if (trade ~= nil and type(trade) == "string"
     and cat ~= nil and type(cat) == "string" 
     and itm ~= nil) then
     TBag_PrintDEBUG("TBag_MakeTradeKeyword: "..trade..", "..cat);
-    if (itm[TBAG_I_ITEMID] ~= nil) then
+    if (itm[TBAG_I_ITEMLINK] ~= nil) then
       local itemid;
       local aTrade = TBag_GetTradeCreated(trade);
 
       -- disable depending on preferences
       for itemid, _ in pairs(aTrade) do
-        if (itm[TBAG_I_ITEMID] == itemid) then
+        if (id == itemid) then
           if (docreated == 1) then
             itm[TBAG_I_KEYWORD][string.format(L["%s_CREATED"],cat)] = 1;
           else
@@ -231,10 +231,10 @@ function TBag_MakeTradeCreationKeyword(itm, trade, cat, docreated)
   TBag_PrintDEBUG("TBag_MakeTradeKeyword done");
 end
 
-function TBag_MakeTradeReagentKeywords(itm, trade1, trade2)
-  if (itm ~= nil and itm[TBAG_I_ITEMID] ~= nil) then
+function TBag_MakeTradeReagentKeywords(itm, id, trade1, trade2)
+  if (itm ~= nil and itm[TBAG_I_ITEMLINK] ~= nil) then
     for reagent,_ in pairs(TBagCfg[TBAG_S_REAGENT]) do
-      if (reagent == itm[TBAG_I_ITEMID]) then
+      if (reagent == id) then
 	local max_count = 0;
 	local counts = {};
         for trade,ids in pairs (TBagCfg[TBAG_S_REAGENT][reagent]) do
@@ -286,25 +286,25 @@ function TBag_GetAllSkills()
 end
 
 function TBag_MakeAllTradeKeywords(itm, docreated, trade1, trade2)
-  local trade;
+  local id = TBag_GetItemID(itm[TBAG_I_ITEMLINK]);
   -- setup trade keywords
   for trade, _ in pairs(TBag_GetAllProfessions()) do
     if (trade ~= 'version' and trade ~= TBAG_S_UPDATE) then
 --    TBag_PrintDEBUG("profession ="..trade );
-      TBag_MakeTradeCreationKeyword(itm, trade, TBag_Cat(trade), docreated);
+      TBag_MakeTradeCreationKeyword(itm, id, trade, TBag_Cat(trade), docreated);
     end
   end
   for trade, _ in pairs(TBag_GetAllSeconds()) do
     if (trade ~= 'version' and trade ~= TBAG_S_UPDATE) then
 --    TBag_PrintDEBUG("second ="..trade );
-      TBag_MakeTradeCreationKeyword(itm, trade, TBag_Cat(trade), docreated);
+      TBag_MakeTradeCreationKeyword(itm, id, trade, TBag_Cat(trade), docreated);
     end
   end
   for trade, _ in pairs(TBag_GetAllSkills()) do
     if (trade ~= 'version' and trade ~= TBAG_S_UPDATE) then
 --    TBag_PrintDEBUG("skill ="..trade );
-      TBag_MakeTradeCreationKeyword(itm, trade, TBag_Cat(trade), docreated);
+      TBag_MakeTradeCreationKeyword(itm, id, trade, TBag_Cat(trade), docreated);
     end
   end
-  TBag_MakeTradeReagentKeywords(itm, trade1, trade2);
+  TBag_MakeTradeReagentKeywords(itm, id, trade1, trade2);
 end

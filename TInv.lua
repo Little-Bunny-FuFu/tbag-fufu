@@ -932,13 +932,16 @@ function TInv_RightClick_DeleteItemOverride()
 
   if ( (bag ~= nil) and (slot ~= nil) ) then
     itm = TInvItm[TINV_PLAYERID][bag][slot];
+    
+    if (itm[TBAG_I_ITEMLINK] ~= nil) then
+      local id = TBag_GetItemID(itm[TBAG_I_ITEMLINK]);
+      if TInvCfg["item_overrides"][id] ~= nil then
+        TInvCfg["item_overrides"][id] = nil;
+        HideDropDownMenu(1);
 
-    if ( (itm[TBAG_I_ITEMID] ~= nil) and (TInvCfg["item_overrides"][itm[TBAG_I_ITEMID]] ~= nil) ) then
-      TInvCfg["item_overrides"][itm[TBAG_I_ITEMID]] = nil;
-      HideDropDownMenu(1);
-
-      -- resort will force a window redraw as well
-      TInv_UpdateWindow(TBAG_REQ_MUST);
+        -- resort will force a window redraw as well
+        TInv_UpdateWindow(TBAG_REQ_MUST);
+      end
     end
   end
 end
@@ -953,7 +956,7 @@ function TInv_RightClick_SetItemOverride()
   if ( (bag ~= nil) and (slot ~= nil) and (new_barclass ~= nil) ) then
     itm = TInvItm[TINV_PLAYERID][bag][slot];
 
-    TInvCfg["item_overrides"][itm[TBAG_I_ITEMID]] = new_barclass;
+    TInvCfg["item_overrides"][TBag_GetItemID(itm[TBAG_I_ITEMLINK])] = new_barclass;
     HideDropDownMenu(2);
     HideDropDownMenu(1);
     TInv_UpdateWindow(TBAG_REQ_MUST);
@@ -962,7 +965,7 @@ end
 
 function TInvFrame_RightClickMenu_populate(level)
   local bar, bag, slot;
-  local info, itm, barclass, tmp, checked, i;
+  local info, itm, id, barclass, tmp, checked, i;
   local key, value, key2, value2;
 
 
@@ -976,6 +979,7 @@ function TInvFrame_RightClickMenu_populate(level)
     bag = TInv_RightClickMenu_opts[TBAG_I_BAG];
     slot = TInv_RightClickMenu_opts[TBAG_I_SLOT];
     itm = TInvItm[TINV_PLAYERID][bag][slot];
+    id = TBag_GetItemID(itm[TBAG_I_ITEMLINK]);
 
     if (level == 1) then
       -- top level of menu
@@ -993,7 +997,7 @@ function TInvFrame_RightClickMenu_populate(level)
       UIDropDownMenu_AddButton(info, level);
 
       info = { ["text"] = L["Assign item to category:"], ["hasArrow"] = 1, ["value"] = "override_placement" };
-      if (TInvCfg["item_overrides"][itm[TBAG_I_ITEMID]] ~= nil) then
+      if (TInvCfg["item_overrides"][id] ~= nil) then
         info["checked"] = 1;
       end
       UIDropDownMenu_AddButton(info, level);
@@ -1003,7 +1007,7 @@ function TInvFrame_RightClickMenu_populate(level)
         ["value"] = { [TBAG_I_BAG]=bag, [TBAG_I_SLOT]=slot },
         ["func"] = TInv_RightClick_DeleteItemOverride
         };
-      if (TInvCfg["item_overrides"][itm[TBAG_I_ITEMID]] == nil) then
+      if (TInvCfg["item_overrides"][id] == nil) then
         info["checked"] = 1;
       end
       UIDropDownMenu_AddButton(info, level);
@@ -1024,8 +1028,8 @@ function TInvFrame_RightClickMenu_populate(level)
             ["hasArrow"] = 1
             };
           if (
-        (TInvCfg["item_overrides"][itm[TBAG_I_ITEMID]]
-        ~= nil) and (TBag_GetCat(TInvCfg, TInvCfg["item_overrides"][itm[TBAG_I_ITEMID]]) == i) ) then
+        (TInvCfg["item_overrides"][id]
+        ~= nil) and (TBag_GetCat(TInvCfg, TInvCfg["item_overrides"][id]) == i) ) then
             info["checked"] = 1;
           end
           UIDropDownMenu_AddButton(info, level);
@@ -1059,7 +1063,7 @@ function TInvFrame_RightClickMenu_populate(level)
               ["value"] = { [TBAG_I_BAG]=bag, [TBAG_I_SLOT]=slot, ["barclass"]=barclass },
               ["func"] = TInv_RightClick_SetItemOverride
               };
-            if (TInvCfg["item_overrides"][itm[TBAG_I_ITEMID]] == barclass) then
+            if (TInvCfg["item_overrides"][id] == barclass) then
               info["checked"] = 1;
             end
             UIDropDownMenu_AddButton(info, level);
