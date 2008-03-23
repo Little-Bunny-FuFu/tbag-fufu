@@ -1596,9 +1596,13 @@ function TInv_UpdateWindow(resort_req)
   -- Always set the class cats for this player's class
   TBag_SetClassCats(TInvCfg, TINV_PLAYERID, 1);
 
+  -- Setup stackarr and comparr
+  local stackarr = TBag_CreateStackArr();
+  local comparr = TBag_CreateCompArr();
+  
   -- SORTING and ITEMCACHE
   if (resort_req == nil) then resort_req = TBAG_REQ_NONE; end
-  local cache_req, stackarr, emptyspec, specitems = TBag_UpdateItmCache(TInvCfg, TINV_PLAYERID, TInvItm[TINV_PLAYERID], TInv_Bags);
+  local cache_req = TBag_UpdateItmCache(TInvCfg, TINV_PLAYERID, TInvItm[TINV_PLAYERID], TInv_Bags,stackarr,comparr);
   if (resort_req == TBAG_REQ_PART) then
     resort_req = resort_req + TINV_CACHE_REQ;
   end
@@ -1607,7 +1611,7 @@ function TInv_UpdateWindow(resort_req)
   -- Consume a message for bag stacking
   if (TInvCfg["stack_once"] == 1) then
     if (TINV_PLAYERID == TBAG_PLAYERID) then
-      TBag_Stack(TBAG_STACK_INV, TInvItm[TINV_PLAYERID], stackarr, emptyspec, specitems);
+      TBag_Stack(TBAG_STACK_INV, TInvItm[TINV_PLAYERID], stackarr, comparr);
     end
   end
   TInvCfg["stack_once"] = nil;

@@ -69,6 +69,10 @@ local TBAG_I_COUNT     = "ic";
 local TBAG_I_NEED      = "sn";
 local TBAG_I_SOULBOUND = "sb";
 
+-- Used in the item compression routines
+TBAG_COMP_EMPTY = "e";
+TBAG_COMP_ITEM = "i";
+
 -- Used in the New mechanism
 local TBAG_I_TIMESTAMP = "ts";
 local TBAG_I_NEWSTR    = "nw";
@@ -164,6 +168,14 @@ local TBAG_D_BAG = 69;    -- A dummy bag number for search format
   bar_positions[ bar_number ][ position ] = { [TBAG_I_BAG]=bag, [TBAG_I_SLOT]=slot }
     - Contains the final locations in my window after sorting
   TBAG_BUTTONS[ frame_name ] = itmcache[bag][slot]
+
+  stackarr[itemid] = { table of itms ]
+    -- has the entry to the itemcach in an array for each itemid.
+    
+  comparr = { [TBAG_COMP_EMPTY] = { empties }, [TBAG_COMP_ITEM] = { items } }
+    -- Contains two arrays.  One containing all the itm entries for empty
+    -- slots in special bags and one contain all the itm entries for items
+    -- that can go into one of those slots.
 --]]
 
 function TBag_Init()
@@ -2073,25 +2085,18 @@ function TBag_MakeEmptySlot(itm)
   end
 end
 
-function TBag_InsertEmptySpec(emptyspec,itm)
-  if (itm == nil or type(itm) ~= "table") then
+function TBag_InsertEmptyInCompArr(ca,itm)
+  if (itm == nil or type(itm) ~= "table" or ca == nil) then
     return;
-  end
-  if (emptyspec == nil) then
-    emptyspec = {};
   end
   if (itm[TBAG_I_BAGTYPE] and itm[TBAG_I_BAGTYPE] ~= "") then
-    table.insert(emptyspec, TBag_BagSlotToString(itm[TBAG_I_BAG],itm[TBAG_I_SLOT]));
+    table.insert(ca[TBAG_COMP_EMPTY], itm);
   end
-  return emptyspec
 end
 
-function TBag_InsertSpecItem(specitems,itm,id)
-  if (itm == nil or type(itm) ~= "table") then
+function TBag_InsertItemInCompArr(ca,itm,id)
+  if (itm == nil or type(itm) ~= "table" or ca == nil) then
     return;
-  end
-  if (specitems == nil) then
-    specitems = {};
   end
   local bagtype = itm[TBAG_I_BAGTYPE];
   if (bagtype == nil or bagtype == "") then
@@ -2099,21 +2104,17 @@ function TBag_InsertSpecItem(specitems,itm,id)
       for _,items in pairs(TBag_ContainerItems) do
         if (type(items) == "table") then
           if (items[id] == 1) then
-            table.insert(specitems, TBag_BagSlotToString(itm[TBAG_I_BAG],itm[TBAG_I_SLOT]));
+            table.insert(ca[TBAG_COMP_ITEM], itm);
           end
         end
       end
     end
   end
-  return specitems;
 end
 
 function TBag_InsertStackArr(stackarr,itm,id)
-  if (itm == nil or type(itm) ~= "table") then
+  if (itm == nil or type(itm) ~= "table" or stackarr == nil) then
     return;
-  end
-  if (stackarr == nil) then
-    stackarr = {};
   end
   if (itm[TBAG_I_NEED] > 0) then
     -- Check that we aren't on the skip list
@@ -2124,7 +2125,6 @@ function TBag_InsertStackArr(stackarr,itm,id)
       table.insert(stackarr[id],itm);
     end
   end
-  return stackarr;
 end
 
 local TBag_Itm = {};
@@ -2139,7 +2139,7 @@ function TBag_CreateItm()
   return TBag_Itm;
 end
 
-function TBag_UpdateItmCache(cfg, playerid, itmcache, bagarr, atbank)
+function TBag_UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, comparr, atbank)
 --  UpdateAddOnMemoryUsage();
 --  TBag_PrintDEBUG('UpdateItmCache Start Memory = '..tostring(GetAddOnMemoryUsage("TBag")));
   local bag, slot;  -- used as "for loop" counters
@@ -2148,9 +2148,6 @@ function TBag_UpdateItmCache(cfg, playerid, itmcache, bagarr, atbank)
   local update_suggested = 0;
   local resort_suggested = 0;
   local resort_mandatory = 0;
-  local stackarr = {};
-  local emptyspec = {};
-  local specitems = {};
 
   -- variables used in outer loop, bag:
   local size;
@@ -2286,16 +2283,16 @@ function TBag_UpdateItmCache(cfg, playerid, itmcache, bagarr, atbank)
 	  end
 
 	  -- Put on the stack array if we need more to stack
-	  stackarr = TBag_InsertStackArr(stackarr,itmcache[bag][slot],id);
+	  TBag_InsertStackArr(stackarr,itmcache[bag][slot],id);
 	 
 	  if (itm[TBAG_I_ITEMLINK] ~= nil) then
 	    -- Items not in a special bag but that can go into one need to be
 	    -- added to the specitems table.
-	    specitems = TBag_InsertSpecItem(specitems,itmcache[bag][slot],id);
+	    TBag_InsertItemInCompArr(comparr,itmcache[bag][slot],id);
 	  else
 	    -- Empty slots in special bags need to be added to the 
 	    -- compress arg.
-	    emptyspec = TBag_InsertEmptySpec(emptyspec,itmcache[bag][slot]);
+	    TBag_InsertEmptyInCompArr(comparr,itmcache[bag][slot]);
 	  end
         end
       else
@@ -2313,11 +2310,11 @@ function TBag_UpdateItmCache(cfg, playerid, itmcache, bagarr, atbank)
 --  UpdateAddOnMemoryUsage();
 --  TBag_PrintDEBUG('UpdateItmCache End Memory = '..tostring(GetAddOnMemoryUsage("TBag")));
   if (resort_mandatory == 1) then
-    return TBAG_REQ_MUST, stackarr,emptyspec,specitems;
+    return TBAG_REQ_MUST;
   elseif (resort_suggested == 1) then
-    return TBAG_REQ_PART, stackarr,emptyspec,specitems;
+    return TBAG_REQ_PART;
   else
-    return TBAG_REQ_NONE, stackarr,emptyspec,specitems;
+    return TBAG_REQ_NONE;
   end
 end
 
@@ -2942,6 +2939,37 @@ end
 -- Stacking
 -----------------------------------------------------------------------
 
+local TBag_StackArr = {};
+  
+function TBag_CreateStackArr()
+  local sa = TBag_StackArr;
+
+  for k,_ in pairs(sa) do
+    sa[k] = nil;
+  end
+
+  return TBag_StackArr; 
+end
+  
+local TBag_CompArr = { [TBAG_COMP_EMPTY] = {}, [TBAG_COMP_ITEM] = {} };
+  
+function TBag_CreateCompArr()
+  local ca = TBag_CompArr;
+  
+  local epts = ca[TBAG_COMP_EMPTY];
+  local itms = ca[TBAG_COMP_ITEM];
+  
+  for k,_ in pairs(epts) do
+    epts[k] = nil;
+  end 
+    
+  for k,_ in pairs(itms) do
+    itms[k] = nil;
+  end
+
+  return TBag_CompArr;
+end
+
 local TBAG_ISSTACKING = {
   [TBAG_STACK_BNK] = nil,
   [TBAG_STACK_INV] = nil,
@@ -2952,7 +2980,8 @@ function TBag_IsStacking(where)
 end
 
 -- sa = stackarr, shortened to make the code manageable
-function TBag_Stack(where, itmcache, sa, emptyspec, specitems)
+-- ca = comparr
+function TBag_Stack(where, itmcache, sa, ca)
 --  UpdateAddOnMemoryUsage();
 --  TBag_PrintDEBUG('Stack Start Memory = '..tostring(GetAddOnMemoryUsage("TBag")));
   local hasstacked;
@@ -2999,7 +3028,7 @@ function TBag_Stack(where, itmcache, sa, emptyspec, specitems)
           -- source is now empty
           TBag_MakeEmptySlot(srcitm);
           -- Push empty slots onto the empty list for possible compression 
-          emptyspec = TBag_InsertEmptySpec(emptyspec,srcitm);
+          TBag_InsertEmptyInCompArr(ca,srcitm);
           -- Move on to the next source stack
           src = src - 1;
         else 
@@ -3022,19 +3051,22 @@ function TBag_Stack(where, itmcache, sa, emptyspec, specitems)
       end
     end
   end
-  if (emptyspec and type(emptyspec) == "table" and
-    specitems and type(specitems) == "table") then
-    local empty_size = table.getn(emptyspec);
-    local items_size = table.getn(specitems);
+  if (ca and type(ca) == "table") then
+    local epts = ca[TBAG_COMP_EMPTY];
+    local itms = ca[TBAG_COMP_ITEM];
+    local empty_size = table.getn(epts);
+    local items_size = table.getn(itms);
 
     for empty = 1, empty_size do
-      if (emptyspec[empty]) then
-        local emptybag,emptyslot = TBag_StringToBagSlot(emptyspec[empty]);
-        local emptyitm = itmcache[emptybag][emptyslot];
+      if (epts[empty]) then
+        local emptyitm = epts[empty] 
+        local emptybag = emptyitm[TBAG_I_BAG];
+	local emptyslot = emptyitm[TBAG_I_SLOT]
         for item = 1, items_size do
-          if (specitems[item]) then
-            local itembag,itemslot = TBag_StringToBagSlot(specitems[item]);
-            local itemitm = itmcache[itembag][itemslot]; 
+          if (itms[item]) then
+            local itemitm = itms[item];
+            local itembag = itemitm[TBAG_I_BAG];
+	    local itemslot = itemitm[TBAG_I_SLOT]; 
             if (not TBag_GetCompSkip(emptybag,emptyslot) and
               not TBag_GetCompSkip(itembag,itemslot)) then
               local bagtype = emptyitm[TBAG_I_BAGTYPE];
@@ -3048,7 +3080,7 @@ function TBag_Stack(where, itmcache, sa, emptyspec, specitems)
                   TBag_MakeEmptySlot(itmcache[itemitm[TBAG_I_BAG]][itemitm[TBAG_I_SLOT]]);
 
                   -- Remove the item from consideration
-                  specitems[item] = nil; 
+                  itms[item] = nil; 
                   break;
                 end
               end

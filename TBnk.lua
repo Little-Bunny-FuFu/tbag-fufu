@@ -1596,15 +1596,19 @@ function TBnk_UpdateWindow(resort_req)
   end
   TBagCfg["trades_changed"] = 0;
 
+  -- Setup stackarr and comparr
+  local stackarr = TBag_CreateStackArr();
+  local comparr = TBag_CreateCompArr();
+  
   -- Always set the class cats for this player's class
   TBag_SetClassCats(TBnkCfg, TBNK_PLAYERID, 1);
-  local cache_req, stackarr, emptyspec, specitems = TBag_UpdateItmCache(TBnkCfg, TBNK_PLAYERID, TBnkItm[TBNK_PLAYERID], TBnk_Bags, TBNK_ATBANK);
+  local cache_req = TBag_UpdateItmCache(TBnkCfg, TBNK_PLAYERID, TBnkItm[TBNK_PLAYERID], TBnk_Bags, stackarr, comparr, TBNK_ATBANK);
   resort_req = resort_req + cache_req;
 
   -- Consume a message for bag stacking
   if (TBnkCfg["stack_once"] == 1) then
     if (TBNK_PLAYERID == TBAG_PLAYERID) then
-      TBag_Stack(TBAG_STACK_BNK,TBnkItm[TBNK_PLAYERID], stackarr, emptyspec, specitems);
+      TBag_Stack(TBAG_STACK_BNK,TBnkItm[TBNK_PLAYERID], stackarr, comparr);
     end
   end
   TBnkCfg["stack_once"] = 0;
