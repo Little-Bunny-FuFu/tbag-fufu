@@ -647,6 +647,7 @@ function TBnk_Button_Reload_OnClick()
     if (TBNK_PLAYERID == TBAG_PLAYERID) then
       TBag_ClearItmCache(TBnkItm[TBNK_PLAYERID], TBnk_Bags);
       TBag_ClearStackSkip(TBnk_Bags);
+      TBag_ClearCompSkip(TBnk_Bags);
 
       -- Send a message to restack
       if (TBnkCfg["stack_resort"] == 1) then
