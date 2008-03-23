@@ -2178,6 +2178,15 @@ function TBag_UpdateItmCache(cfg, playerid, itmcache, bagarr, atbank)
       _, size = TBag_GetSlotInfo(playerid, bag);
       bagtype = TBag_GetBagType(playerid, bag);
 
+      -- If a bag decreases in size wipe the keys for the
+      -- slots, TBag_ClearItmCache() can't do this for us
+      -- becuase it doesn't know enough to do it.
+      if (size < #itmcache[bag]) then
+        for slot = size +1, #itmcache[bag] do
+          itmcache[bag][slot] = nil;
+        end
+      end
+
       if (size > 0) then
         -- Counting down makes stacking prefer existing stacks
         for slot = size, 1, -1 do
