@@ -2957,13 +2957,13 @@ function TBag_Stack(where, itmcache, sa, emptyspec, specitems)
     -- big the stack is in descending order give
     -- precedence to items in special bags.
     table.sort(itms,
-    function(a,b)
-      if (a[TBAG_I_COUNT] == b[TBAG_I_COUNT]) then
-        return (a[TBAG_I_BAGTYPE] or "") > (b[TBAG_I_BAGTYPE] or "")
-      else
-        return a[TBAG_I_COUNT] > b[TBAG_I_COUNT];
-      end
-    end);
+      function(a,b)
+        if (a[TBAG_I_COUNT] == b[TBAG_I_COUNT]) then
+          return (a[TBAG_I_BAGTYPE] or "") > (b[TBAG_I_BAGTYPE] or "")
+        else
+          return a[TBAG_I_COUNT] > b[TBAG_I_COUNT];
+        end
+      end);
 
     -- We start filling the largest stacks and pulling
     -- from the smallest stacks
@@ -3012,37 +3012,37 @@ function TBag_Stack(where, itmcache, sa, emptyspec, specitems)
         hasstacked = 1;
       end
     end
-    if (emptyspec and type(emptyspec) == "table" and
-        specitems and type(specitems) == "table") then
-      local empty_size = table.getn(emptyspec);
-      local items_size = table.getn(specitems);
+  end
+  if (emptyspec and type(emptyspec) == "table" and
+    specitems and type(specitems) == "table") then
+    local empty_size = table.getn(emptyspec);
+    local items_size = table.getn(specitems);
 
-      for empty = 1, empty_size do
-        if (emptyspec[empty]) then
-	  local emptybag,emptyslot = TBag_StringToBagSlot(emptyspec[empty]);
-          local emptyitm = itmcache[emptybag][emptyslot];
-          for item = 1, items_size do
-            if (specitems[item]) then
-	      local itembag,itemslot = TBag_StringToBagSlot(specitems[item]);
-              local itemitm = itmcache[itembag][itemslot]; 
-  	      if (not TBag_GetCompSkip(emptybag,emptyslot) and
-                  not TBag_GetCompSkip(itembag,itemslot)) then
-	        local bagtype = emptyitm[TBAG_I_BAGTYPE];
-                if (TBag_ContainerItems and TBag_ContainerItems[bagtype]) then
-	          -- Does the item go into this bag type?
-	          if (TBag_ContainerItems[bagtype][TBag_GetItemID(itemitm[TBAG_I_ITEMLINK])]) then
-                    -- Drop one onto the other
-		    TBag_ItemMover(itembag,itemslot,emptybag,emptyslot);
-            
-                    -- Empty out the dropped slot in the itmcache
-                    TBag_MakeEmptySlot(itmcache[itemitm[TBAG_I_BAG]][itemitm[TBAG_I_SLOT]]);
+    for empty = 1, empty_size do
+      if (emptyspec[empty]) then
+        local emptybag,emptyslot = TBag_StringToBagSlot(emptyspec[empty]);
+        local emptyitm = itmcache[emptybag][emptyslot];
+        for item = 1, items_size do
+          if (specitems[item]) then
+            local itembag,itemslot = TBag_StringToBagSlot(specitems[item]);
+            local itemitm = itmcache[itembag][itemslot]; 
+            if (not TBag_GetCompSkip(emptybag,emptyslot) and
+              not TBag_GetCompSkip(itembag,itemslot)) then
+              local bagtype = emptyitm[TBAG_I_BAGTYPE];
+              if (TBag_ContainerItems and TBag_ContainerItems[bagtype]) then
+                -- Does the item go into this bag type?
+                if (TBag_ContainerItems[bagtype][TBag_GetItemID(itemitm[TBAG_I_ITEMLINK])]) then
+                  -- Drop one onto the other
+                  TBag_ItemMover(itembag,itemslot,emptybag,emptyslot);
 
-		    -- Remove the item from consideration
-	            specitems[item] = nil; 
-		    break;
-	          end
-	        end
-	      end
+                  -- Empty out the dropped slot in the itmcache
+                  TBag_MakeEmptySlot(itmcache[itemitm[TBAG_I_BAG]][itemitm[TBAG_I_SLOT]]);
+
+                  -- Remove the item from consideration
+                  specitems[item] = nil; 
+                  break;
+                end
+              end
             end
           end
         end
