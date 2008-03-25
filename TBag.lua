@@ -493,17 +493,6 @@ function TBag_GetItemInfo(itemid)
   end
 end
 
-function TBag_GetItemTexture(itemid)
-  local invTexture;
-  if (GetItemIcon and type(GetItemIcon) == "function") then
-    invTexture = GetItemIcon(itemid);
-  else 
-    -- 2.3 backward compatability	  
-    _, _, _, _, _, _, _, _, _, invTexture = GetItemInfo(itemid); 
-  end
-  return invTexture;
-end
-
 function TBag_GetItemID(link)
   local itemid, itemlink;
   local a,b,c,d;
@@ -1480,7 +1469,7 @@ function TBag_GetBagTexture(playerid, bag)
     texture = "Interface\\ContainerFrame\\KeyRing-Bag-Icon";
   else
     if (itemlink) then
-	  texture = TBag_GetItemTexture(itemlink);
+	  texture = GetItemIcon(itemlink);
     else
       texture = "interface\\paperdoll\\UI-PaperDoll-Slot-Bag";
     end
@@ -2677,7 +2666,7 @@ function TBag_UpdateButton(cfg, playerid, framename, edit_mode,
   
   if (itm[TBAG_I_ITEMLINK] ~= nil) then
     ic_start, ic_duration, ic_enable = GetContainerItemCooldown(itm[TBAG_I_BAG], itm[TBAG_I_SLOT]);
-    texture  = TBag_GetItemTexture(itm[TBAG_I_ITEMLINK]);
+    texture  = GetItemIcon(itm[TBAG_I_ITEMLINK]);
   else
     if (cfg["show_bag_icons"] == 1) then
       texture = TBag_GetBagTexture(playerid, itm[TBAG_I_BAG]);
