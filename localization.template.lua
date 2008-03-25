@@ -743,6 +743,7 @@ TBAG_LOCALE = setmetatable({
   ["Primal %a+"] = "Primal %a+",
   ["Void Crystal"] = "Void Crystal",
   ["Nether Vortex"] = "Nether Vortex",
+  ["Sunmote"] = "Sunmote",
   ["Heart of Darkness"] = "Heart of Darkness",
   [" Vial"] = " Vial",
   ["[cC]loth"] = "[cC]loth",

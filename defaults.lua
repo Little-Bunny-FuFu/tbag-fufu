@@ -351,6 +351,7 @@ TBag_DefaultSearchList = {
   { L["REAGENT"], L[""], L["Void Crystal"], L["Trade Goods"], L[""]},
   { L["REAGENT"], L[""], L["Nether Vortex"], L["Trade Goods"], L[""]},
   { L["REAGENT"], L[""], L["Heart of Darkness"], L["Trade Goods"], L[""]},
+  { L["REAGENT"], L[""], L["Sunmote"], L["Trade Goods"], L[""]},
 
 -- Trades (fishing done above before equipment)
   { L["ALCHEMY"], L[""], L[" Vial"], L["Trade Goods"], L[""] },
