@@ -1394,7 +1394,9 @@ function TBag_GetBagPosName(bag)
 end
 
 function TBag_GetBagTypeName(bagType)
-  if (bagType == 1) then
+  if (bagType == 0) then
+    return L["BAG"];
+  elseif (bagType == 1) then
     return L["QUIV"];
   elseif (bagType == 2) then
     return L["AMMO"];
@@ -1414,6 +1416,10 @@ function TBag_GetBagTypeName(bagType)
     return L["GEM"];
   elseif (bagType == 1024) then
     return L["MINE"];
+  elseif (bagType == 2048) then
+    return L["PET"];
+  else
+    return L["UNKNOWN"];
   end
 end
 

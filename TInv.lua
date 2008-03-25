@@ -279,7 +279,9 @@ function TInv_UpdateBagGfx()
   for _, bag in ipairs(TInv_Bags) do
     local free, size = TBag_UpdateSlots(TINV_PLAYERID, "TInvNum", bag, TInvCfg["show_bag_sizes"]);
     local type = TBag_GetBagType(TINV_PLAYERID, bag);
-    if (type ~= L["AMMO"]) and (type ~= L["SOUL"]) and (type ~= L["KEYRING"]) then
+    -- Don't count ammo, quivers or keyring slots as empty slots 
+    -- quivers are type 1, ammo type 2, soul type 4 and keyring 256
+    if (type == nil or bit.band(263,type) == 0) then
       totalfree = totalfree + free;
       totalsize = totalsize + size;
     end
@@ -290,7 +292,7 @@ function TInv_UpdateBagGfx()
         TBag_GetBagTexture(TINV_PLAYERID, bag));
 
       -- Deal with the count of soulshards in a soulbag.
-      if (type == L["SOUL"] and TInvCfg["show_soulshard_count"] == 1) then
+      if (type and bit.band(4,type) ~= 0 and TInvCfg["show_soulshard_count"] == 1) then
         SetItemButtonCount(TBag_GetBagFrame(bag), size - free);
       else
         SetItemButtonCount(TBag_GetBagFrame(bag), 0);

@@ -275,6 +275,7 @@ TBAG_LOCALE = setmetatable({
   
   -- Short bag type names used for EMPTY_%s_SLOTS and IN_%s_BAG categories
   -- 3-4 characters is about right for these.
+  ["BAG"] = "BAG",
   ["QUIV"] = "QUIV",
   ["AMMO"] = "AMMO",
   ["SOUL"] = "SOUL",
@@ -284,6 +285,8 @@ TBAG_LOCALE = setmetatable({
   ["MINE"] = "MINE",
   ["ENCH"] = "ENCH",
   ["LTHR"] = "LTHR",
+  ["PET"] = "PET",
+  ["UNKNOWN"] = "UNKNOWN",
 
   -- Bag Position Names, also used for EMPTY_%s_SLOTS and IN_%s_BAG categories
   ["KEYRING"] = "KEYRING",
