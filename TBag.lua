@@ -373,7 +373,7 @@ function TBag_GetPlayerBag(playerid, bag)
     bags[bag] = { 
       [TBAG_I_BAGFREE] = 0, 
       [TBAG_I_BAGSIZE] = 0, 
-      [TBAG_I_BAGTYPE] = "", 
+      [TBAG_I_BAGTYPE] = 0, 
       [TBAG_I_ITEMLINK] = nil,
       [TBAG_I_ITEMID] = nil,
       [TBAG_I_NAME] = nil,
@@ -1393,70 +1393,69 @@ function TBag_GetBagPosName(bag)
   if (bag == 11) then return L["BBAG7"]; end
 end
 
+function TBag_GetBagTypeName(bagType)
+  if (bagType == 1) then
+    return L["QUIV"];
+  elseif (bagType == 2) then
+    return L["AMMO"];
+  elseif (bagType == 4) then
+    return L["SOUL"];
+  elseif (bagType == 8) then
+    return L["LTHR"];
+  elseif (bagType == 32) then
+    return L["HERB"];
+  elseif (bagType == 64) then
+    return L["ENCH"];
+  elseif (bagType == 128) then
+    return L["ENG"];
+  elseif (bagType == 256) then
+    return L["KEYRING"];
+  elseif (bagType == 512) then
+    return L["GEM"];
+  elseif (bagType == 1024) then
+    return L["MINE"];
+  end
+end
+
 -- Used for EMPTY_X_SLOTS and IN_X_BAG
 -- Redo this using system calls to the actual frame
 function TBag_GetBagType(playerid, bag)
-  local type = "";
+  local type = 0;
 
-  if ( bag < TBAG_BAGMIN ) or ( bag > TBAG_BAGMAX ) then return ""; end
+  if ( bag < TBAG_BAGMIN ) or ( bag > TBAG_BAGMAX ) then return nil; end
 
   -- get the live info if we are the current player, and at the bank
-  if (playerid == TBAG_PLAYERID) then
-    if (((TBNK_ATBANK == 1) or TBag_Member(TInv_Bags, bag)) and bag > BACKPACK_CONTAINER) then
-      local _, _, itemlink = strfind(GetInventoryItemLink("player", ContainerIDToInventoryID(bag)) or "", "^|%x+|H(.+)|h%[.+%]");
-      local id, itemlink = TBag_GetItemID(itemlink);
-      if (id) then 
-	    local name, itemType, subType, quality = TBag_GetItemInfo(id);
-        if (itemType == L["Quiver"]) then 
-	  if (subType == L["Quiver"]) then
-	    type = L["QUIV"];
-	  elseif (subType == L["Ammo Pouch"]) then
-            type = L["AMMO"];
-	  end
-        elseif (itemType == L["Container"]) then
-          if (subType == L["Soul Bag"]) then 
-            type = L["SOUL"];
-	  elseif (subType == L["Engineering Bag"]) then
-	    type = L["ENG"];
-	  elseif (subType == L["Gem Bag"]) then
-	    type = L["GEM"];
-	  elseif (subType == L["Herb Bag"]) then
-            type = L["HERB"];
-	  elseif (subType == L["Mining Bag"]) then
-	    type = L["MINE"];
-	  elseif (subType == L["Enchanting Bag"]) then
-            type = L["ENCH"];
-	  elseif (subType == L["Leatherworking Bag"]) then
-            type = L["LTHR"];
-          end
-        end
-        TBag_SetPlayerBagCfg(playerid, bag, TBAG_I_ITEMLINK, itemlink);
-        TBag_SetPlayerBagCfg(playerid, bag, TBAG_I_NAME, name);
-        TBag_SetPlayerBagCfg(playerid, bag, TBAG_I_COUNT, 1);
-        TBag_SetPlayerBagCfg(playerid, bag, TBAG_I_RARITY, quality);
-	-- ITEMID is obsolete since it's included in ITEMLINK
-	-- so always set it to nil.
-        TBag_SetPlayerBagCfg(playerid, bag, TBAG_I_ITEMID, nil);
-      else
-        TBag_SetPlayerBagCfg(playerid, bag, TBAG_I_ITEMLINK, nil);
-        TBag_SetPlayerBagCfg(playerid, bag, TBAG_I_ITEMID, nil);
-        TBag_SetPlayerBagCfg(playerid, bag, TBAG_I_NAME, nil);
-        TBag_SetPlayerBagCfg(playerid, bag, TBAG_I_COUNT, nil);
-        TBag_SetPlayerBagCfg(playerid, bag, TBAG_I_RARITY, nil);
-      end
-
-      -- Save the type to cache
-      TBag_SetPlayerBagCfg(playerid, bag, TBAG_I_BAGTYPE, type);
+  if (playerid == TBAG_PLAYERID and (TBNK_ATBANK == 1 or TBag_Member(TInv_Bags, bag))) then
+    local itemlinkid,name,itemType,subType;
+    if (bag > BACKPACK_CONTAINER) then
+      itemlink = GetInventoryItemLink("player", ContainerIDToInventoryID(bag));
+      id, itemlink = TBag_GetItemID(itemlink);
+      name, itemType, subType = TBag_GetItemInfo(id);
     end
+    TBag_SetPlayerBagCfg(playerid, bag, TBAG_I_ITEMLINK, itemlink);
+    -- ITEMID is obsolete since it's included in ITEMLINK so always set it to nil.
+    TBag_SetPlayerBagCfg(playerid, bag, TBAG_I_ITEMID, nil);
+    TBag_SetPlayerBagCfg(playerid, bag, TBAG_I_NAME, name);
+    _,type = GetContainerNumFreeSlots(bag);
+     
+    -- GetContainerNumFreeSlots doesn't return the bag type for the KEYRING.
+    if (bag == KEYRING_CONTAINER) then
+      type = 256;
+    end
+     
+    if (id) then 
+      TBag_SetPlayerBagCfg(playerid, bag, TBAG_I_COUNT, 1);
+    else
+      TBag_SetPlayerBagCfg(playerid, bag, TBAG_I_COUNT, nil);
+    end
+
+    -- Save the type to cache
+    TBag_SetPlayerBagCfg(playerid, bag, TBAG_I_BAGTYPE, type);
+  else
+    -- Fetch cached info if we can't get live info.
+    type = TBag_GetPlayerBagCfg(playerid, bag, TBAG_I_BAGTYPE);
   end
 
-  -- Special keyring setting
-  if (bag == KEYRING_CONTAINER) then
-    TBag_SetPlayerBagCfg(playerid, bag, TBAG_I_BAGTYPE, L["KEYRING"]);
-  end
-
-  -- Get the type from the cache always
-  type = TBag_GetPlayerBagCfg(playerid, bag, TBAG_I_BAGTYPE);
   return type;
 end
 
@@ -2089,7 +2088,7 @@ function TBag_InsertEmptyInCompArr(ca,itm)
   if (itm == nil or type(itm) ~= "table" or ca == nil) then
     return;
   end
-  if (itm[TBAG_I_BAGTYPE] and itm[TBAG_I_BAGTYPE] ~= "") then
+  if (itm[TBAG_I_BAGTYPE] and itm[TBAG_I_BAGTYPE] > 0) then
     table.insert(ca[TBAG_COMP_EMPTY], itm);
   end
 end
@@ -2099,15 +2098,13 @@ function TBag_InsertItemInCompArr(ca,itm,id)
     return;
   end
   local bagtype = itm[TBAG_I_BAGTYPE];
-  if (bagtype == nil or bagtype == "") then
-    if (TBag_ContainerItems) then
-      for _,items in pairs(TBag_ContainerItems) do
-        if (type(items) == "table") then
-          if (items[id] == 1) then
-            table.insert(ca[TBAG_COMP_ITEM], itm);
-          end
-        end
-      end
+  if (bagtype == nil or bagtype == 0) then
+    local itmfam = 0;
+    if (itm[TBAG_I_TYPE] ~= L["Container"]) then
+      itmfam = GetItemFamily(itm[TBAG_I_ITEMLINK]);
+    end
+    if (itmfam > 0) then
+      table.insert(ca[TBAG_COMP_ITEM], itm);
     end
   end
 end
@@ -2412,8 +2409,8 @@ end
 
 function TBag_PickBar(cfg, playerid, itm, trade1, trade2)
   if (itm[TBAG_I_ITEMLINK] == nil) then
-    if (itm[TBAG_I_BAGTYPE]) and (itm[TBAG_I_BAGTYPE] ~= "") then
-      itm[TBAG_I_CAT] = string.format(L["EMPTY_%s_SLOTS"],itm[TBAG_I_BAGTYPE]);
+    if (itm[TBAG_I_BAGTYPE]) and (itm[TBAG_I_BAGTYPE] > 0) then
+      itm[TBAG_I_CAT] = string.format(L["EMPTY_%s_SLOTS"],TBag_GetBagTypeName(itm[TBAG_I_BAGTYPE]));
     else
       itm[TBAG_I_CAT] = string.format(L["EMPTY_%s_SLOTS"],
                                       TBag_GetBagPosName(itm[TBAG_I_BAG]));
@@ -2431,9 +2428,9 @@ function TBag_PickBar(cfg, playerid, itm, trade1, trade2)
   local itemid = TBag_GetItemID(itm[TBAG_I_ITEMLINK]);
   
   -- reset item keywords
-  if (itm[TBAG_I_BAGTYPE]) and (itm[TBAG_I_BAGTYPE] ~= "") then
+  if (itm[TBAG_I_BAGTYPE]) and (itm[TBAG_I_BAGTYPE] > 0) then
     if (cfg["special_bag_sort"] == 1) then
-      itm[TBAG_I_CAT] = string.format(L["IN_%s_BAG"],itm[TBAG_I_BAGTYPE]);
+      itm[TBAG_I_CAT] = string.format(L["IN_%s_BAG"],TBag_GetBagTypeName(itm[TBAG_I_BAGTYPE]));
       itm[TBAG_I_KEYWORD] = {
         [itm[TBAG_I_CAT]] = 1,  -- this indicates that the special bag isn't empty
       };
@@ -2997,7 +2994,7 @@ function TBag_Stack(where, itmcache, sa, ca)
     table.sort(itms,
       function(a,b)
         if (a[TBAG_I_COUNT] == b[TBAG_I_COUNT]) then
-          return (a[TBAG_I_BAGTYPE] or "") > (b[TBAG_I_BAGTYPE] or "")
+          return (a[TBAG_I_BAGTYPE] or 0) > (b[TBAG_I_BAGTYPE] or 0)
         else
           return a[TBAG_I_COUNT] > b[TBAG_I_COUNT];
         end
@@ -3062,17 +3059,24 @@ function TBag_Stack(where, itmcache, sa, ca)
         local emptyitm = epts[empty] 
         local emptybag = emptyitm[TBAG_I_BAG];
 	local emptyslot = emptyitm[TBAG_I_SLOT]
-        for item = 1, items_size do
-          if (itms[item]) then
-            local itemitm = itms[item];
-            local itembag = itemitm[TBAG_I_BAG];
-	    local itemslot = itemitm[TBAG_I_SLOT]; 
-            if (not TBag_GetCompSkip(emptybag,emptyslot) and
-              not TBag_GetCompSkip(itembag,itemslot)) then
-              local bagtype = emptyitm[TBAG_I_BAGTYPE];
-              if (TBag_ContainerItems and TBag_ContainerItems[bagtype]) then
+        -- Is it really empty.
+	if (emptyitm[TBAG_I_ITEMLINK == nil) then
+          for item = 1, items_size do
+            if (itms[item]) then
+              local itemitm = itms[item];
+              local itembag = itemitm[TBAG_I_BAG];
+	      local itemslot = itemitm[TBAG_I_SLOT]; 
+              if (itemitm[TBAG_I_ITEMLINK] and 
+		not TBag_GetCompSkip(emptybag,emptyslot) and
+                not TBag_GetCompSkip(itembag,itemslot)) then
+                local bagtype = emptyitm[TBAG_I_BAGTYPE];
+		local itmfam = 0;
+		if (itemitm[TBAG_I_TYPE] ~= L["Container"]) then
+                  itmfam = GetItemFamily(itemitm[TBAG_I_ITEMLINK]);
+		end
+
                 -- Does the item go into this bag type?
-                if (TBag_ContainerItems[bagtype][TBag_GetItemID(itemitm[TBAG_I_ITEMLINK])]) then
+                if (bagtype and itmfam and bit.band(bagtype,itmfam) ~= 0) then
                   -- Drop one onto the other
                   TBag_ItemMover(itembag,itemslot,emptybag,emptyslot);
 
