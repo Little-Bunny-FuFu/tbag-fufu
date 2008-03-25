@@ -2083,7 +2083,11 @@ function TBag_InsertEmptyInCompArr(ca,itm)
   if (itm == nil or type(itm) ~= "table" or ca == nil) then
     return;
   end
-  if (itm[TBAG_I_BAGTYPE] and itm[TBAG_I_BAGTYPE] > 0) then
+  -- Note that while we aren't told we're working on the current
+  -- player it's true since we only update the itmcache and stack
+  -- when on the current player.
+  local bagtype = TBag_GetBagType(TBAG_PLAYERID, itm[TBAG_I_BAG]);
+  if (bagtype and bagtype > 0) then
     table.insert(ca[TBAG_COMP_EMPTY], itm);
   end
 end
@@ -2092,7 +2096,10 @@ function TBag_InsertItemInCompArr(ca,itm,id)
   if (itm == nil or type(itm) ~= "table" or ca == nil) then
     return;
   end
-  local bagtype = itm[TBAG_I_BAGTYPE];
+  -- Note that while we aren't told we're working on the current
+  -- player it's true since we only update the itmcache and stack
+  -- when on the current player.
+  local bagtype = TBag_GetBagType(TBAG_PLAYERID, itm[TBAG_I_BAG]);
   if (bagtype == nil or bagtype == 0) then
     local itmfam = 0;
     if (itm[TBAG_I_TYPE] ~= L["Container"]) then
@@ -2165,7 +2172,6 @@ function TBag_UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, comparr,
       end
 
       _, size = TBag_GetSlotInfo(playerid, bag);
-      bagtype = TBag_GetBagType(playerid, bag);
 
       -- If a bag decreases in size wipe the keys for the
       -- slots, TBag_ClearItmCache() can't do this for us
@@ -2190,7 +2196,6 @@ function TBag_UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, comparr,
           itm[TBAG_I_ITEMLINK] = GetContainerItemLink(bag, slot);
           itm[TBAG_I_BAG] = bag;
           itm[TBAG_I_SLOT] = slot;
-          itm[TBAG_I_BAGTYPE] = bagtype;
           -- take items from old position
           itm[TBAG_I_BAR] = itmcache[bag][slot][TBAG_I_BAR];
           itm[TBAG_I_TIMESTAMP] = itmcache[bag][slot][TBAG_I_TIMESTAMP];
@@ -2231,10 +2236,7 @@ function TBag_UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, comparr,
           if (itm[TBAG_I_SUBTYPE] == nil) then itm[TBAG_I_SUBTYPE] = ""; end
           if (itm[TBAG_I_NAME] == nil) then itm[TBAG_I_NAME] = ""; end
 
-          if (
-      (itm[TBAG_I_ITEMLINK] ~= itmcache[bag][slot][TBAG_I_ITEMLINK]) or
-      (itm[TBAG_I_BAGTYPE] ~= itmcache[bag][slot][TBAG_I_BAGTYPE])
-             ) then
+          if (itm[TBAG_I_ITEMLINK] ~= itmcache[bag][slot][TBAG_I_ITEMLINK]) then
             -- the item changed
             if (itm[TBAG_I_TIMESTAMP] ~= nil) then
               if (cfg["show_Bag"..bag] == 1) then
@@ -2403,9 +2405,15 @@ end
 
 
 function TBag_PickBar(cfg, playerid, itm, trade1, trade2)
+  local bagtype = TBag_GetBagType(playerid, itm[TBAG_I_BAG]);
   if (itm[TBAG_I_ITEMLINK] == nil) then
-    if (itm[TBAG_I_BAGTYPE]) and (itm[TBAG_I_BAGTYPE] > 0) then
-      itm[TBAG_I_CAT] = string.format(L["EMPTY_%s_SLOTS"],TBag_GetBagTypeName(itm[TBAG_I_BAGTYPE]));
+    if (bagtype and type(bagtype) == "number" and bagtype > 0) then
+      itm[TBAG_I_CAT] = string.format(L["EMPTY_%s_SLOTS"],TBag_GetBagTypeName(bagtype));
+    elseif (bagtype and type(bagtype) == "string" and bagtype ~= "") then
+      -- Support old style string bagtypes since our cache may still have some.
+      itm[TBAG_I_CAT] = string.format(L["EMPTY_%s_SLOTS"],bagtype);
+    elseif (bagtype and type(bagtype) == "string" and bagtype ~= "") then
+
     else
       itm[TBAG_I_CAT] = string.format(L["EMPTY_%s_SLOTS"],
                                       TBag_GetBagPosName(itm[TBAG_I_BAG]));
@@ -2423,9 +2431,16 @@ function TBag_PickBar(cfg, playerid, itm, trade1, trade2)
   local itemid = TBag_GetItemID(itm[TBAG_I_ITEMLINK]);
   
   -- reset item keywords
-  if (itm[TBAG_I_BAGTYPE]) and (itm[TBAG_I_BAGTYPE] > 0) then
+  if (bagtype and ((type(bagtype) == number and bagtype > 0) or
+      (type(bagtype) == "string" and bagtype ~= ""))) then
     if (cfg["special_bag_sort"] == 1) then
-      itm[TBAG_I_CAT] = string.format(L["IN_%s_BAG"],TBag_GetBagTypeName(itm[TBAG_I_BAGTYPE]));
+      if (type(bagtype) == "number") then
+        itm[TBAG_I_CAT] = string.format(L["IN_%s_BAG"],TBag_GetBagTypeName(bagtype));
+      else 
+	-- Support for old style string bag types.
+        itm[TBAG_I_CAT] = string.format(L["IN_%s_BAG"],bagtype);
+      end
+      
       itm[TBAG_I_KEYWORD] = {
         [itm[TBAG_I_CAT]] = 1,  -- this indicates that the special bag isn't empty
       };
@@ -2989,7 +3004,9 @@ function TBag_Stack(where, itmcache, sa, ca)
     table.sort(itms,
       function(a,b)
         if (a[TBAG_I_COUNT] == b[TBAG_I_COUNT]) then
-          return (a[TBAG_I_BAGTYPE] or 0) > (b[TBAG_I_BAGTYPE] or 0)
+          -- We only ever stack when on the current player so this is ok.
+          return (TBag_GetBagType(TBAG_PLAYERID,a[TBAG_I_BAG]) or 0) >
+                 (TBag_GetBagType(TBAG_PLAYERID,b[TBAG_I_BAG]) or 0)
         else
           return a[TBAG_I_COUNT] > b[TBAG_I_COUNT];
         end
@@ -3064,7 +3081,7 @@ function TBag_Stack(where, itmcache, sa, ca)
               if (itemitm[TBAG_I_ITEMLINK] and 
 		not TBag_GetCompSkip(emptybag,emptyslot) and
                 not TBag_GetCompSkip(itembag,itemslot)) then
-                local bagtype = emptyitm[TBAG_I_BAGTYPE];
+                local bagtype = TBag_GetBagType(TBAG_PLAYERID, emptyitm[TBAG_I_BAG]);
 		local itmfam = 0;
 		if (itemitm[TBAG_I_TYPE] ~= L["Container"]) then
                   itmfam = GetItemFamily(itemitm[TBAG_I_ITEMLINK]);
