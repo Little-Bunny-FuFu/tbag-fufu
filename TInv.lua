@@ -278,10 +278,17 @@ function TInv_UpdateBagGfx()
   local totalsize = 0;
   for _, bag in ipairs(TInv_Bags) do
     local free, size = TBag_UpdateSlots(TINV_PLAYERID, "TInvNum", bag, TInvCfg["show_bag_sizes"]);
-    local type = TBag_GetBagType(TINV_PLAYERID, bag);
+    local bagtype = TBag_GetBagType(TINV_PLAYERID, bag);
     -- Don't count ammo, quivers or keyring slots as empty slots 
     -- quivers are type 1, ammo type 2, soul type 4 and keyring 256
-    if (type == nil or bit.band(263,type) == 0) then
+    if (bagtype == nil or (type(bagtype) == "number" and  bit.band(263,bagtype) == 0)) then
+      totalfree = totalfree + free;
+      totalsize = totalsize + size;
+    end
+
+    -- Deal with old style string bag types.
+    if (bagtype == nil or (type(bagtpe) == "string" and
+        bagtype ~= L["AMMO"] and bagtype ~= L["SOUL"] and bagtype ~= L["KEYRING"])) then
       totalfree = totalfree + free;
       totalsize = totalsize + size;
     end
@@ -292,10 +299,17 @@ function TInv_UpdateBagGfx()
         TBag_GetBagTexture(TINV_PLAYERID, bag));
 
       -- Deal with the count of soulshards in a soulbag.
-      if (type and bit.band(4,type) ~= 0 and TInvCfg["show_soulshard_count"] == 1) then
-        SetItemButtonCount(TBag_GetBagFrame(bag), size - free);
+      if (TInvCfg["show_soulshard_count"] == 1) then
+        if (bagtype and type(bagtype) == "number" and bit.band(4,bagtype) ~= 0) then
+          SetItemButtonCount(TBag_GetBagFrame(bag), size - free);
+	-- Deal with old style string bagtypes.
+	elseif (bagtype and type(bagtype) == "string" and bagtype == L["SOUL"]) then
+          SetItemButtonCount(TBag_GetBagFrame(bag), size - free);
+        else
+          SetItemButtonCount(TBag_GetBagFrame(bag), 0);
+	end
       else
-        SetItemButtonCount(TBag_GetBagFrame(bag), 0);
+          SetItemButtonCount(TBag_GetBagFrame(bag), 0);
       end
     end
 
