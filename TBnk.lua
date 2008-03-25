@@ -281,7 +281,7 @@ function TBnk_UpdateBagGfx()
   end
   for i=numSlots+1, NUM_BANKBAGSLOTS do
     bag = i + 4;
-    TBag_SetPlayerBagCfg(TBNK_PLAYERID, bag, TBAG_I_BAGTYPE, "");
+    TBag_SetPlayerBagCfg(TBNK_PLAYERID, bag, TBAG_I_BAGTYPE, 0);
     TBag_SetPlayerBagCfg(TBNK_PLAYERID, bag, TBAG_I_BAGFREE, 0);
     TBag_SetPlayerBagCfg(TBNK_PLAYERID, bag, TBAG_I_BAGSIZE, 0);
     TBag_SetPlayerBagCfg(TBNK_PLAYERID, bag, TBAG_I_ITEMLINK, nil);
