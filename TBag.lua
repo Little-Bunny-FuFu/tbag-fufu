@@ -3072,7 +3072,7 @@ function TBag_Stack(where, itmcache, sa, ca)
         local emptybag = emptyitm[TBAG_I_BAG];
 	local emptyslot = emptyitm[TBAG_I_SLOT]
         -- Is it really empty.
-	if (emptyitm[TBAG_I_ITEMLINK == nil) then
+	if (emptyitm[TBAG_I_ITEMLINK] == nil) then
           for item = 1, items_size do
             if (itms[item]) then
               local itemitm = itms[item];
