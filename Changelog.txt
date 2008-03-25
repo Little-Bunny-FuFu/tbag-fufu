@@ -1,3 +1,31 @@
+* 20080325-r110-Shefki
+  - Bump interface to 20400, addon requires WoW 2.4.0 or newer now.
+  - Update the Item info database used in categorization to include
+    new 2.4 items.
+  - Use the new Blizzard API to decide what items can go in what bags,
+    this allows the bag compression routines to be 100% accurate now.
+  - Allow all modifier key/click combinations from Auctioneer to work.
+    Note that this means regardless if alt pickup is set you'll now
+    get alt pickup style behavior at the auction house if you have
+    Auctioneer installed.  Also note, alt auto panel is still enabled
+    so if you have this turned on you may see some mod+click doing
+    more than you expect.
+  - Add the statues from Jewelcrafting and Sunmotes to the default sort.
+    /tinv resetsorts and /tbnk resetsorts if you want to get the
+    new default sorts.
+  - Remove a bunch of unused code to make the addon slightly smaller.
+  - Several changes to diminish the amount of memory being used.
+    Users will see the minimal amount of memory the addon uses
+    (i.e. immediately after a garbage collection) drop slightly
+    and in some cases the maximum amount of memory the addon
+    will use (just before a garbage collection) drop significantly.
+    In general the addon will no longer grow in the amount of
+    memory use through general usage.
+  - Fix the quality on items found in a mailbox when searching.  Apparently,
+    Blizzard's API is bugged and doesn't give me the real quality of an item.
+  - Clicking the reload button wouldn't always force a compression on the
+    bank.
+
 * 20080317-r78-Shefki
   - When running on WoW 2.4.0 or newer, always show icons for items
     even if they are not in the item cache.  This is thanks to a new
