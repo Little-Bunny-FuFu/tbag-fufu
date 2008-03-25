@@ -26,20 +26,6 @@ my $item_tag = '?item=';
 my $trade_filter = '?items&filter=cr=86;crv=0;crs=';
 my $poison_filter = '?items=0.-3&filter=cl=4';
 
-# bagtype names as the key with an item id to one of these types of 
-# bags.
-my %bag_types = (
-  'SOUL' => '21342',
-	'HERB' => '22252',
-	'ENG'  => '30748',
-	'ENCH' => '21858',
-	'GEM'  => '24270',
-	'MINE' => '29540',
-	'LTHR' => '34490',
-	'QUIV' => '18714',
-	'AMMO' => '19320'
-);
-
 # Name of a trade as the key with the relative URL
 # for the filter to get the items made by that trade.
 my %trades = (
@@ -75,7 +61,6 @@ my %quality_levels =  (
 # Save current time for output
 my $time = time();
 
-my %TBag_ContainerItems;
 my %TBag_Reagents;
 my %TBag_TradeCreations;
 for my $trade (keys %trades) {
@@ -226,21 +211,6 @@ sub output_trades {
 	print "};\n\n\n";
 }
 
-# Iterate over the container items hash and output it as valid lua.
-sub output_container_items {
-  print "TBag_ContainerItems = {\n";
-	print qq(\t\t[TBAG_S_UPDATE] = "$time",\n);
-	print qq(\t\t[TBAG_S_VERSION] = 1,\n);
-  foreach my $bag_type (sort keys %TBag_ContainerItems) {
-    print qq(\t\t["$bag_type"] = {\n);
-    foreach my $id (sort {$a <=> $b} @{$TBag_ContainerItems{$bag_type}}) {
-      print qq(\t\t\t["$id"] = 1,\n);
-		}
-		print qq(\t\t},\n);
-	}	
-	print "};\n\n\n";
-}
-
 # Takes a data segment from wowhead and gets the itemids of the
 # reagents to make the item.
 sub parse_reagents {
@@ -306,23 +276,6 @@ sub handle_trade {
   }	
 }
 
-# Go through all the items that can be placed in a given bag type
-# and store their ids into the hash.
-sub handle_bag_type {
-	my $mech = shift;
-	my $bag_type = shift;
-	my ($url,$page_content,$contain_data,$ids);
-
-	$url = "${wowhead_url}${item_tag}${bag_types{$bag_type}}";
-	print STDERR "CONTAINER [$bag_type] = $url",$/;
-	$mech->get($url);
-	die("Couldn't get url") unless $mech->success();
-	$page_content = $mech->response()->decoded_content;
-	$contain_data = parse_data('item','can-contain',$page_content);
-	$ids = parse_item_ids($contain_data);
-	$TBag_ContainerItems{$bag_type} = $ids;
-}
-
 # Go through all the different trades and run handle_trade for each.
 # Then output all the data.
 sub scrape_trade_items {
@@ -342,16 +295,6 @@ sub scrape_trade_items {
 	output_reagents();
 }
 			           
-# Go through all the different bag types and run handle_bag_type for each.
-# Then output all the data.
-sub scrape_container_items {
-	my $mech = shift;
-	foreach my $bag_type (keys %bag_types) {
-		handle_bag_type($mech,$bag_type);
-	}
-  output_container_items();
-}
-
 ############
 ### Main ###
 ############
@@ -361,9 +304,6 @@ my $mech = WWW::Mechanize->new();
 
 # Output the file header.
 output_header();
-
-# Scrape what items can be held in what bag types.
-scrape_container_items($mech);
 
 # Scrape wowhead of the items created by professions and reagents
 scrape_trade_items($mech);
