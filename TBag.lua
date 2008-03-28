@@ -3283,28 +3283,18 @@ function TBag_UserDropdown_Init(onclickfunc, TItm, curplayer, selRealm,level)
 end
 
 -- Shit to bypass FluidFrames (Hook), very inefficient but FF works in this way.
--- Borrowed from EngBags 1.25
+-- Original version borrowed from EngBags 1.25 and then the current hooksecurefunc
+-- method from sag_ich_nicht.
 if (FluidFrames ~= nil) then
-        TBag_FF_Hook_Old = FluidFrames.InitTempDraggableFrames;
-        TBag_FF_Hook = function()
-                if (TBag_FF_Hook_Old ~= nil) then
-                        TBag_FF_Hook_Old();
-                        local titleRegion = TInvFrame:GetTitleRegion();
-                        if (titleRegion ~= nil) then
-                                titleRegion:SetPoint("BOTTOMLEFT", "TInvFrame", "BOTTOMLEFT", 0, 0);
-                                titleRegion:SetPoint("TOPLEFT", "TInvFrame", "BOTTOMLEFT", 0, 0);
-                                titleRegion:SetPoint("BOTTOMRIGHT", "TInvFrame", "BOTTOMLEFT", 0, 0);
-                                titleRegion:SetPoint("TOPRIGHT", "TInvFrame", "BOTTOMLEFT", 0, 0);
-                        end
-                        local titleRegion = TBnkFrame:GetTitleRegion();
-                        if (titleRegion ~= nil) then
-                                titleRegion:SetPoint("BOTTOMLEFT", "TBnkFrame", "BOTTOMLEFT", 0, 0);
-                                titleRegion:SetPoint("TOPLEFT", "TBnkFrame", "BOTTOMLEFT", 0, 0);
-                                titleRegion:SetPoint("BOTTOMRIGHT", "TBnkFrame", "BOTTOMLEFT", 0, 0);
-                                titleRegion:SetPoint("TOPRIGHT", "TBnkFrame", "BOTTOMLEFT", 0, 0);
-                        end
-                end
-        end
-        FluidFrames.InitTempDraggableFrames = TBag_FF_Hook;
+  hooksecurefunc(FluidFrames, "InitTempDraggableFrames",
+    function()
+      local titleRegion = TInvFrame:GetTitleRegion();
+      if (titleRegion ~= nil) then
+        titleRegion:ClearAllPoints();
+      end
+      titleRegion = TBnkFrame:GetTitleRegion();
+      if (titleRegion ~= nil) then
+        titleRegion:ClearAllPoints();
+      end
+    end)
 end
-
