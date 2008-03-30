@@ -2105,7 +2105,11 @@ function TBag_InsertItemInCompArr(ca,itm,id)
     if (itm[TBAG_I_TYPE] ~= L["Container"]) then
       itmfam = GetItemFamily(itm[TBAG_I_ITEMLINK]);
     end
-    if (itmfam > 0) then
+    -- It's possible to be receiving an item we've never seen before
+    -- as a result the itemfamily will not be cached and will end
+    -- up being nil.  Assume the item can not go in any special
+    -- bags if it's nil then.
+    if (itmfam and itmfam > 0) then
       table.insert(ca[TBAG_COMP_ITEM], itm);
     end
   end
