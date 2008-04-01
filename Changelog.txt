@@ -1,3 +1,12 @@
+* 20080331-r114-Shefki
+  - Fix an issue where the Blizzard API doesn't tell us the item family
+    which causes a lua error and breaks updating of the bag contents
+    until a reloadui.
+  - Fix a possible taint issue with the FluidFrames workaround.
+  - Sort Nightmare Seed and Giant Sunfish into the proper places
+    with the default config.  Requires /tinv resetsorts and 
+    /tbnk resetsorts to get the new default config.
+
 * 20080325-r110-Shefki
   - Bump interface to 20400, addon requires WoW 2.4.0 or newer now.
   - Update the Item info database used in categorization to include
