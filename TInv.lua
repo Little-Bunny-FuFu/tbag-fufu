@@ -597,22 +597,6 @@ function TInv_ItemButton_OnClick(button)
   end
 end
 
-function TInv_RightClick_PickupItem()
-  local bag, slot;
-
-  bag = this.value[TBAG_I_BAG];
-  slot = this.value[TBAG_I_SLOT];
-
-  HideDropDownMenu(2);
-  HideDropDownMenu(1);
-
-  if ( (bag ~= nil) and (slot ~= nil) ) then
-    PickupContainerItem(bag, slot);
-  else
-    TBag_PrintDEBUG("Error, value not found.");
-  end
-end
-
 function TInv_Button_HighlightToggle_OnClick()
   PlaySound("igMainMenuOptionCheckBoxOn");
   if (TInv_hilight_new == 0) then

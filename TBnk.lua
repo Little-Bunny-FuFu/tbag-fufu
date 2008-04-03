@@ -595,23 +595,6 @@ function TBnkFrameBagBank_OnClick()
   TBag_UpdateButtonHighlights();
 end
 
-
-function TBnk_RightClick_PickupItem()
-  local bag, slot;
-
-  bag = this.value[TBAG_I_BAG];
-  slot = this.value[TBAG_I_SLOT];
-
-  HideDropDownMenu(2);
-  HideDropDownMenu(1);
-
-  if ( (bag ~= nil) and (slot ~= nil) ) then
-    PickupContainerItem(bag, slot);
-  else
-    TBag_PrintDEBUG("Error, value not found.");
-  end
-end
-
 function TBnk_Button_HighlightToggle_OnClick()
   PlaySound("igMainMenuOptionCheckBoxOn");
   if (TBnk_hilight_new == 0) then
