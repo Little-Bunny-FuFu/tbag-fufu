@@ -1712,14 +1712,6 @@ function TInv_UpdateWindow(resort_req)
 
 end
 
-function TInv_UserDropdown_GetValue()
-  if ( TINV_PLAYERID ) then
-    return TINV_PLAYERID;
-  elseif (TBAG_PLAYERID) then
-    return TBAG_PLAYERID;
-  end
-end
-
 function TInv_UserDropdown_OnLoad()
   UIDropDownMenu_Initialize(this, TInv_UserDropdown_Initialize);
   UIDropDownMenu_SetSelectedValue(this, TINV_PLAYERID);

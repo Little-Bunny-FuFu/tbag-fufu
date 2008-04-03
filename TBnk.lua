@@ -1699,14 +1699,6 @@ function TBnk_SetReplaceBank()
 end
 
 
-function TBnk_UserDropdown_GetValue()
-  if ( TBNK_PLAYERID ) then
-    return TBNK_PLAYERID;
-  else
-    return TBAG_PLAYERID;
-  end
-end
-
 function TBnk_UserDropdown_OnLoad()
   UIDropDownMenu_Initialize(this, TBnk_UserDropdown_Initialize);
   UIDropDownMenu_SetSelectedValue(this, TBNK_PLAYERID);
