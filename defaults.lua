@@ -80,7 +80,7 @@ TBag_DefaultSearchList = {
   { L["NETHERWING"], L[""], L["Netherwing Egg"], L["Miscellaneous"], L[""]},
   { L["NETHERWING"], L[""], L["Nethercite Ore"], L["Trade Goods"], L[""]},
   { L["NETHERWING"], L[""], L["Netherdust Pollen"], L["Trade Goods"], L[""]},
-  { L["NETHERWING"], L[""], L["Netherwing Crystals"], L["Miscellaneous"], L[""]},
+  { L["NETHERWING"], L[""], L["Netherwing Crystal"], L["Miscellaneous"], L[""]},
   { L["NETHERWING"], L[""], L["Nethermine Cargo"], L["Quest"], L[""]},
   { L["CENARION_EXPEDITION"], L[""], L["Unidentified Plant Parts"], L["Quest"], L[""]},
   { L["CENARION_EXPEDITION"], L[""], L["Uncatalogued Species"], L["Consumable"], L[""]},
