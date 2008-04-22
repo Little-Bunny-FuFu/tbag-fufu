@@ -2166,7 +2166,7 @@ function TBag_UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, comparr,
 
   -- Don't update if we aren't at the bank
   if (atbank) and (atbank ~= 1) then
-    return TBAG_REQ_MUST;
+    return TBAG_REQ_NONE;
   end
 
   for index, bag in ipairs(bagarr) do
