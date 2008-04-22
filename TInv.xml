@@ -15,6 +15,32 @@
       </Anchor>
     </Anchors>
     <Frames>
+      <Button name="$parent_EditButton" hidden="true">
+        <Size>
+          <AbsDimension x="40" y="40"/>
+	</Size>
+	<Anchors>
+	  <Anchor point="CENTER">
+	    <Offset>
+              <AbsDimension x="0" y="0"/>
+	    </Offset>
+	  </Anchor>
+	</Anchors>
+	<Scripts>
+  	  <OnLoad>
+	    this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+          </OnLoad>
+  	  <OnClick>
+            TInv_ItemButton_OnClick(arg1);
+          </OnClick>
+          <OnEnter>
+            TInv_ItemButton_OnEnter(self);
+          </OnEnter>
+          <OnLeave>
+            TInv_ItemButton_OnLeave();
+          </OnLeave>
+        </Scripts>
+      </Button>
       <Cooldown name="$parent_Cooldown" inherits="CooldownFrameTemplate"/>
       <Frame name="$parentHighlightFrame" setAllPoints="true">
         <Layers>

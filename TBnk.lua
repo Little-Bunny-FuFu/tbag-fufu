@@ -413,7 +413,7 @@ end
 
 
 function TBnk_ItemButton_OnEnter(self)
-  local itm = TBag_GetItmFromFrame(TBAG_BUTTONS, self:GetName());
+  local itm = TBag_GetItmFromFrame(TBAG_BUTTONS, self);
   local bar;
   if (itm ~= nil) then
     bar = itm[TBAG_I_BAR];
@@ -428,14 +428,22 @@ function TBnk_ItemButton_OnEnter(self)
       GameTooltip:ClearLines();
       GameTooltip:AddLine(L["Empty Slot"], 1,1,1 );
 
-      GameTooltip:Show();
-    else
-      GameTooltip:Hide();
-    end
+      -- move by class
+      if (itm[TBAG_I_CAT] ~= nil) then
+        if (TBnk_edit_selected ~= "") then
+          GameTooltip:AddLine(string.format(L["|c%sLeft click to move category |r|c%s%s|r|c%s to bar |r|c%s%s|r"],TBAG_C_INST,TBAG_C_CAT,TBnk_edit_selected,TBAG_C_INST,TBAG_C_BAR,bar));
+        else
+          GameTooltip:AddLine(string.format(L["|c%sLeft click to select category to move:|r |c%s%s|r"],TBAG_C_INST,TBAG_C_CAT,itm[TBAG_I_CAT]));
+        end
+      else
+        GameTooltip:AddLine(L["Item has no category"], 1,0,0 );
+      end
 
-    if ( TBnk_edit_mode == 1 ) then
+      GameTooltip:Show();
       -- redraw the window to show the hilighting of entire class items
       TBnk_UpdateWindow();
+    else
+      GameTooltip:Hide();
     end
     return;
   end
@@ -466,6 +474,24 @@ function TBnk_ItemButton_OnEnter(self)
     TBag_PrintDEBUG('ShowCompareItem Called');
     GameTooltip_ShowCompareItem();
   end
+
+  if ( TBnk_edit_mode == 1 ) then
+    -- move by class
+    if (itm[TBAG_I_CAT] ~= nil) then
+      if (TBnk_edit_selected ~= "") then
+        GameTooltip:AddLine(" ", 0,0,0);
+        GameTooltip:AddLine(string.format(L["|c%sLeft click to move category |r|c%s%s|r|c%s to bar |r|c%s%s|r"],TBAG_C_INST,TBAG_C_CAT,TBnk_edit_selected,TBAG_C_INST,TBAG_C_BAR,bar));
+      else
+        GameTooltip:AddLine(" ", 0,0,0);
+	GameTooltip:AddLine(string.format(L["|c%sLeft click to select category to move:|r |c%s%s|r"],TBAG_C_INST,TBAG_C_CAT,itm[TBAG_I_CAT]));
+        GameTooltip:AddLine(L["Right click to assign this item to a different category"], 1,0,0 );
+      end
+    else
+      GameTooltip:AddLine(" ", 0,0,0);
+      GameTooltip:AddLine(L["Item has no category"], 1,0,0 );
+    end
+  end
+
   
   -- Then do a highlight to show the bag
   if (itm[TBAG_I_BAG] ~= KEYRING_CONTAINER) and (TBnkCfg["spotlight_hover"] == 1) then
@@ -475,13 +501,14 @@ function TBnk_ItemButton_OnEnter(self)
   end
 
   if ( TBnk_edit_mode == 1 ) then
+    GameTooltip:Show();
     -- redraw the window to show the hllighting of entire class items
     TBnk_UpdateWindow();
   end
 end
 
 function TBnk_ItemButton_OnLeave()
-  local itm = TBag_GetItmFromFrame(TBAG_BUTTONS, this:GetName());
+  local itm = TBag_GetItmFromFrame(TBAG_BUTTONS, this);
 
   TBag_PrintDEBUG("EB_button: OnLeave()  this="..this:GetName() );
 
@@ -506,7 +533,7 @@ function TBnk_ItemButton_OnLeave()
 end
 
 function TBnk_ItemButton_OnClick(button, ignoreShift)
-  local itm = TBag_GetItmFromFrame(TBAG_BUTTONS, this:GetName());
+  local itm = TBag_GetItmFromFrame(TBAG_BUTTONS, this);
   local bar, bag, slot;
 
   if (itm ~= nil) then
@@ -530,7 +557,7 @@ function TBnk_ItemButton_OnClick(button, ignoreShift)
         TBnk_edit_hilight = itm[TBAG_I_CAT];
 
         -- resort will force a window update
-        TBnk_UpdateWindow();
+        TBnk_UpdateWindow(TBAG_REQ_MUST);
       end
     elseif ( button == "RightButton" ) then
       HideDropDownMenu(1);

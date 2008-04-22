@@ -450,7 +450,7 @@ function TInvHooks_ToggleDropDownMenu(level, value, dropDownFrame, anchorName, x
 end
 
 function TInvHooks_ContainerFrameItemButton_OnModifiedClick(button)
-  local itm = TBag_GetItmFromFrame(TBAG_BUTTONS, this:GetName());
+  local itm = TBag_GetItmFromFrame(TBAG_BUTTONS, this);
   local alt_pickup = TBagCfg["Inv"]["alt_pickup"];
   local alt_panel = TBagCfg["Inv"]["alt_panel"];
   if (alt_pickup == 0) then alt_pickup = nil; end

@@ -413,7 +413,7 @@ TBAG_LOCALE = setmetatable({
   ["Decrease the number of columns displayed"] = "Decrease the number of columns displayed",
 
   ["Re-sort"] = "Re-sort",
- 
+
   ["Reset"] = "Reset",
   ["Close"] = "Close",
   ["Add New Cat"] = "Add New Cat",
@@ -480,6 +480,8 @@ TBAG_LOCALE = setmetatable({
   ["|c%sBar |r|c%s%s|r"] = "|c%sBar |r|c%s%s|r",
   ["|c%s%s|r"] = "|c%s%s|r",
   ["Right click for options"] = "Right click for options",
+  ["|c%sLeft click to select category to move:|r |c%s%s|r"] = "|c%sLeft click to select category to move:|r |c%s%s|r",
+  ["Right click to assign this item to a different category"] = "Right click to assign this item to a different category",
   ["You are viewing this player's bank."] = "You are viewing this player's bank.",
   ["You are viewing this player's inventory."] = "You are viewing this player's inventory.",
   ["Equip Container"] = "Equip Container",

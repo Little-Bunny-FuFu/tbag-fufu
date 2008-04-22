@@ -1982,11 +1982,14 @@ end
 -----------------------------------------------------------------------
 
 function TBag_GetItmFromFrame(butitmmap, frm)
-  if (butitmmap[frm] == nil) then
-    return nil;
-  else
-    return butitmmap[frm];
+  if frm and type(frm) == "table" then
+    if (butitmmap[frm:GetName()] ~= nil) then
+      return butitmmap[frm:GetName()];
+    elseif (butitmmap[frm:GetParent():GetName()] ~= nil) then
+      return butitmmap[frm:GetParent():GetName()];
+    end
   end
+  return nil;
 end
 
 function TBag_GetInvSlotID(bag, slot)
@@ -2668,6 +2671,7 @@ function TBag_UpdateButton(cfg, playerid, framename, edit_mode,
   local frame_bkgr = getglobal(framename.."_bkgr");
   local frame_stock = getglobal(framename.."Stock");
   local cooldownFrame = getglobal(framename.."_Cooldown");
+  local editFrame = getglobal(framename.."_EditButton");
 
   -- First, link to the button map
   itm = TBAG_BUTTONS[framename];
@@ -2715,6 +2719,7 @@ function TBag_UpdateButton(cfg, playerid, framename, edit_mode,
       frame_font:SetVertexColor(1,1,0.8,1);
       frame_bkgr:SetVertexColor(1,1,1,1);
     end
+    editFrame:Show();
   else
     -- no hilights, just do your normal work
 
@@ -2752,6 +2757,8 @@ function TBag_UpdateButton(cfg, playerid, framename, edit_mode,
     else
       TBag_SetRarityColor(nil, framename);
     end
+
+    editFrame:Hide();
   end
 
   -- Handle desaturation update for locked status

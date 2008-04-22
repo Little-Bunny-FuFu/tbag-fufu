@@ -426,7 +426,7 @@ end
 
 
 function TInv_ItemButton_OnEnter(self)
-  local itm = TBag_GetItmFromFrame(TBAG_BUTTONS, self:GetName());
+  local itm = TBag_GetItmFromFrame(TBAG_BUTTONS, self);
   local hasCooldown, repairCost;
   local bar;
   if (itm ~= nil) then
@@ -448,21 +448,19 @@ function TInv_ItemButton_OnEnter(self)
       -- move by class
       if (itm[TBAG_I_CAT] ~= nil) then
         if (TInv_edit_selected ~= "") then
---          GameTooltip:AddLine("|cFF00FF7FLeft click to move category |r"..TInv_edit_selected.."|cFF00FF7F to bar |r"..bar, 1,0.25,0.5 );
+          GameTooltip:AddLine(string.format(L["|c%sLeft click to move category |r|c%s%s|r|c%s to bar |r|c%s%s|r"],TBAG_C_INST,TBAG_C_CAT,TInv_edit_selected,TBAG_C_INST,TBAG_C_BAR,bar));
         else
---          GameTooltip:AddLine("|cFF00FF7FLeft click to select category to move:|r "..itm[TBAG_I_CAT], 1,0.25,0.5 );
+          GameTooltip:AddLine(string.format(L["|c%sLeft click to select category to move:|r |c%s%s|r"],TBAG_C_INST,TBAG_C_CAT,itm[TBAG_I_CAT]));
         end
       else
         GameTooltip:AddLine(L["Item has no category"], 1,0,0 );
       end
 
       GameTooltip:Show();
-    else
-      GameTooltip:Hide();
-    end
-    if ( TInv_edit_mode == 1 ) then
       -- redraw the window to show the hilighting of entire class items
       TInv_UpdateWindow();
+    else
+      GameTooltip:Hide();
     end
     return;
   end
@@ -506,14 +504,15 @@ function TInv_ItemButton_OnEnter(self)
     -- move by class
     if (itm[TBAG_I_CAT] ~= nil) then
       if (TInv_edit_selected ~= "") then
---        GameTooltip:AddLine("|cFF00FF7FLeft click to move category |r"..TInv_edit_selected.."|cFF00FF7F to bar |r"..bar, 1,0.25,0.5 );
+        GameTooltip:AddLine(" ", 0,0,0);
+        GameTooltip:AddLine(string.format(L["|c%sLeft click to move category |r|c%s%s|r|c%s to bar |r|c%s%s|r"],TBAG_C_INST,TBAG_C_CAT,TInv_edit_selected,TBAG_C_INST,TBAG_C_BAR,bar));
       else
---        GameTooltip:AddLine(" ", 0,0,0);
---        GameTooltip:AddLine("|cFF00FF7FLeft click to select category to move:|r "..itm[TBAG_I_CAT], 1,0.25,0.5 );
---        GameTooltip:AddLine("Right click to assign this item to a different category", 1,0,0 );
---        GameTooltip:AddLine(" ", 0,0,0);
+        GameTooltip:AddLine(" ", 0,0,0);
+	GameTooltip:AddLine(string.format(L["|c%sLeft click to select category to move:|r |c%s%s|r"],TBAG_C_INST,TBAG_C_CAT,itm[TBAG_I_CAT]));
+	GameTooltip:AddLine(L["Right click to assign this item to a different category"], 1,0,0 );
       end
     else
+      GameTooltip:AddLine(" ", 0,0,0);
       GameTooltip:AddLine(L["Item has no category"], 1,0,0 );
     end
   end
@@ -526,13 +525,14 @@ function TInv_ItemButton_OnEnter(self)
   end
 
   if ( TInv_edit_mode == 1 ) then
+    GameTooltip:Show();
     -- redraw the window to show the hllighting of entire class items
     TInv_UpdateWindow();
   end
 end
 
 function TInv_ItemButton_OnLeave()
-  local itm = TBag_GetItmFromFrame(TBAG_BUTTONS, this:GetName());
+  local itm = TBag_GetItmFromFrame(TBAG_BUTTONS, this);
 
   TBag_PrintDEBUG("TInv_ItemButton_OnLeave() this="..this:GetName().." id="..this:GetID().." parent"..this:GetParent():GetName().." id="..this:GetParent():GetID() );
 
@@ -557,7 +557,7 @@ function TInv_ItemButton_OnLeave()
 end
 
 function TInv_ItemButton_OnClick(button)
-  local itm = TBag_GetItmFromFrame(TBAG_BUTTONS, this:GetName());
+  local itm = TBag_GetItmFromFrame(TBAG_BUTTONS, this);
   local bar, bag, slot;
 
   if (itm ~= nil) then
@@ -581,7 +581,7 @@ function TInv_ItemButton_OnClick(button)
         TInv_edit_hilight = itm[TBAG_I_CAT];
 
         -- resort will force a window update
-        TInv_UpdateWindow();
+        TInv_UpdateWindow(TBAG_REQ_MUST);
       end
     elseif ( button == "RightButton" ) then
       HideDropDownMenu(1);
