@@ -1208,7 +1208,7 @@ function TBag_SetClassCats(cfg, playerid, reset)
   local class;
 
   if (group) and (group[TBAG_S_CLASS]) then
-    class = TBag_Cat(group[TBAG_S_CLASS]);
+    class = L[TBag_Cat(group[TBAG_S_CLASS])];
   else
     class = "";
   end
@@ -1216,19 +1216,19 @@ function TBag_SetClassCats(cfg, playerid, reset)
   TBag_SetCatForClass(c, L["REAGENT"])
   c[class] = L["CLASS_REAGENT"];
 
-  TBag_SetCatBar(cfg, string.format(L["%s_REAGENT"],L["WARLOCK"]), c["WARLOCK"], reset);
-  TBag_SetCatBar(cfg, string.format(L["%s_REAGENT"],L["ROGUE"]), c["ROGUE"], reset);
+  TBag_SetCatBar(cfg, string.format(L["%s_REAGENT"],L["WARLOCK"]), c[L["WARLOCK"]], reset);
+  TBag_SetCatBar(cfg, string.format(L["%s_REAGENT"],L["ROGUE"]), c[L["ROGUE"]], reset);
 
-  TBag_SetCatBar(cfg, string.format(L["%s_REAGENT"],L["DRUID"]), c["DRUID"], reset);
-  TBag_SetCatBar(cfg, string.format(L["%s_REAGENT"],L["MAGE"]), c["MAGE"], reset);
-  TBag_SetCatBar(cfg, string.format(L["%s_REAGENT"],L["PALADIN"]), c["PALADIN"], reset);
-  TBag_SetCatBar(cfg, string.format(L["%s_REAGENT"],L["PRIEST"]), c["PRIEST"], reset);
-  TBag_SetCatBar(cfg, string.format(L["%s_REAGENT"],L["SHAMAN"]), c["SHAMAN"], reset);
+  TBag_SetCatBar(cfg, string.format(L["%s_REAGENT"],L["DRUID"]), c[L["DRUID"]], reset);
+  TBag_SetCatBar(cfg, string.format(L["%s_REAGENT"],L["MAGE"]), c[L["MAGE"]], reset);
+  TBag_SetCatBar(cfg, string.format(L["%s_REAGENT"],L["PALADIN"]), c[L["PALADIN"]], reset);
+  TBag_SetCatBar(cfg, string.format(L["%s_REAGENT"],L["PRIEST"]), c[L["PRIEST"]], reset);
+  TBag_SetCatBar(cfg, string.format(L["%s_REAGENT"],L["SHAMAN"]), c[L["SHAMAN"]], reset);
 
   c[class] = L["CLASS_TOOL"];
 
-  TBag_SetCatBar(cfg, string.format(L["%s_TOOL"],L["ROGUE"]), c["ROGUE"], reset);
-  TBag_SetCatBar(cfg, string.format(L["%s_TOOL"],L["SHAMAN"]), c["SHAMAN"], reset);
+  TBag_SetCatBar(cfg, string.format(L["%s_TOOL"],L["ROGUE"]), c[L["ROGUE"]], reset);
+  TBag_SetCatBar(cfg, string.format(L["%s_TOOL"],L["SHAMAN"]), c[L["SHAMAN"]], reset);
 end
 
 function TBag_PrintCachedCharacters()

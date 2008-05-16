@@ -98,20 +98,6 @@ TBAG_LOCALE = setmetatable({
   ["Soulbound"] = ITEM_SOULBOUND,
 
 -----------------------------------------------------------------------
--- CLASSES
------------------------------------------------------------------------
-
-  ["Druid"] = "Druid",
-  ["Hunter"] = "Hunter",
-  ["Mage"] = "Mage",
-  ["Paladin"] = "Paladin",
-  ["Priest"] = "Priest",
-  ["Rogue"] = "Rogue",
-  ["Shaman"] = "Shaman",
-  ["Warlock"] = "Warlock",
-  ["Warrior"] = "Warrior",
-
------------------------------------------------------------------------
 -- BAG DISPLAY NAMES 
 -----------------------------------------------------------------------
 
