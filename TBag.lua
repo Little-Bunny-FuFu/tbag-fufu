@@ -2105,7 +2105,8 @@ function TBag_InsertItemInCompArr(ca,itm,id)
   local bagtype = TBag_GetBagType(TBAG_PLAYERID, itm[TBAG_I_BAG]);
   if (bagtype == nil or bagtype == 0) then
     local itmfam = 0;
-    if (itm[TBAG_I_TYPE] ~= L["Container"]) then
+    if (itm[TBAG_I_TYPE] ~= L["Container"] and
+        itm[TBAG_I_TYPE] ~= L["Quiver"]) then
       itmfam = GetItemFamily(itm[TBAG_I_ITEMLINK]);
     end
     -- It's possible to be receiving an item we've never seen before
@@ -3094,7 +3095,8 @@ function TBag_Stack(where, itmcache, sa, ca)
                 not TBag_GetCompSkip(itembag,itemslot)) then
                 local bagtype = TBag_GetBagType(TBAG_PLAYERID, emptyitm[TBAG_I_BAG]);
 		local itmfam = 0;
-		if (itemitm[TBAG_I_TYPE] ~= L["Container"]) then
+		if (itemitm[TBAG_I_TYPE] ~= L["Container"] and
+                    itemitm[TBAG_I_TYPE] ~= L["Quiver"]) then
                   itmfam = GetItemFamily(itemitm[TBAG_I_ITEMLINK]);
 		end
 
