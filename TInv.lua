@@ -154,9 +154,6 @@ function TInv_SetPlayer(playerid)
    TINV_PLAYERID = playerid;
 end
 
-local TINV_FRAMENAME = "TInvFrame";
-local TINV_SLOTTARGET = TINV_FRAMENAME.."SlotTarget";
-
 -- Set reset = 1 to restore default values
 function TInv_init(reset)
   TBag_Init();
