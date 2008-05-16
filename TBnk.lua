@@ -18,9 +18,6 @@ local BankFrame_Saved = nil;
 -- Graphics Settings
 local TBNK_BANKBUTTON_MAX = 28;
 TBNK_BUTTON_MAX = 240;
-TBNK_PAD_TOP_GFX = 63;
-TBNK_PAD_TOP_NORM = 25;
-TBNK_BORDER = 2;
 
 TBnkCfg = nil;
 TBNK_BARITM = {};
