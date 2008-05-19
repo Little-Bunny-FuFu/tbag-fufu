@@ -28,7 +28,7 @@
     <Color r="1" g="0" b="0.25"/>
   </FontString>
 
-  <Texture name="TBag_ButtonBkgrTemplate" alphaMode="ADD" file="Interface\AddOns\TBag\skin\ButtonBkgr" setAllPoints="true" virtual="true">
+  <Texture name="TBag_ButtonBkgrTemplate" alphaMode="ADD" file="Interface\AddOns\TBag\images\ButtonBkgr" setAllPoints="true" virtual="true">
     <Size>
       <AbsDimension x="64" y="64"/>
     </Size>
