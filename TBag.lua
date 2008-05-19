@@ -90,6 +90,8 @@ TBAG_STACK_INV = 2;
 -- Local graphics settings
 local TBAG_PAD_BOTTOM_EDIT = 30;
 local TBAG_PAD_BOTTOM_NORM = 30;
+local TBAG_PAD_BOTTOM_SEARCH = 30;
+local TBAG_PAD_BOTTOM_SPACER = 5;
 local TBAG_PAD_TOP_GFX = 63;
 local TBAG_PAD_TOP_NORM = 25;
 local TBAG_BORDER = 2;
@@ -2857,7 +2859,8 @@ end
 
 function TBag_LayoutWindow(cfg, framename, baritm, bar_x, edit_mode, buttonmax, assignfunc, fx, fy, sx, sy, px, py)
   local frame = getglobal(framename);
-  local TBAG_PAD_BOTTOM;
+  local TBAG_PAD_BOTTOM = 0;
+  local TBAG_PAD_TOP = 0;
   local calc_dat = {};
   local barnum, slot;
   local barframe = {};
@@ -2868,10 +2871,38 @@ function TBag_LayoutWindow(cfg, framename, baritm, bar_x, edit_mode, buttonmax, 
       + sx(bar_x-1) + px(bar_x+1) + (2 * TBAG_BORDER);
   local width_in_between;
 
-  if (edit_mode == 1) then
-    TBAG_PAD_BOTTOM = TBAG_PAD_BOTTOM_EDIT;
-  else
-    TBAG_PAD_BOTTOM = TBAG_PAD_BOTTOM_NORM;
+  if (framename == "TInvFrame") then
+    if (TInv_SearchBox:IsVisible() or TInvNumTotal:IsVisible() or
+        TInvacterBag3Slot:IsVisible() or TInv_MoneyFrame:IsVisible() or
+        TInv_MoneyViewFrame:IsVisible()) then
+        if (edit_mode == 1) then
+          TBAG_PAD_BOTTOM = TBAG_PAD_BOTTOM + TBAG_PAD_BOTTOM_EDIT;
+        else
+          TBAG_PAD_BOTTOM = TBAG_PAD_BOTTOM + TBAG_PAD_BOTTOM_NORM;
+        end
+    end
+     -- If we need the extra row...  add it in.
+    if (TInv_SearchBox:IsVisible()
+        and (TInvNumTotal:IsVisible() or TInvacterBag3Slot:IsVisible())) then
+      TBAG_PAD_BOTTOM = TBAG_PAD_BOTTOM + TBAG_PAD_BOTTOM_SEARCH;
+    end
+    if (TBAG_PAD_BOTTOM > 0) then
+      -- If there's anything at the bottom add the spacer
+      TBAG_PAD_BOTTOM = TBAG_PAD_BOTTOM + TBAG_PAD_BOTTOM_SPACER;
+    end
+    if (TInv_UserDropdown:IsVisible() or TInv_Button_HighlightToggle:IsVisible() or
+        TInv_Button_ChangeEditMode:IsVisible() or TInv_Button_ShowBank:IsVisible() or
+        TInv_Button_Reload:IsVisible() or TInv_Button_Close:IsVisible() or
+        TInv_Button_MoveLockToggle:IsVisible()) then
+       TBAG_PAD_TOP = TBAG_PAD_TOP_NORM;
+     end
+ else
+    if (edit_mode == 1) then
+      TBAG_PAD_BOTTOM = TBAG_PAD_BOTTOM_EDIT;
+    else
+      TBAG_PAD_BOTTOM = TBAG_PAD_BOTTOM_NORM;
+    end
+    TBAG_PAD_TOP = TBAG_PAD_TOP_NORM;
   end
 
   -- ITEM BUTTONS
@@ -2946,7 +2977,7 @@ function TBag_LayoutWindow(cfg, framename, baritm, bar_x, edit_mode, buttonmax, 
   end
 
   local new_height;
-  new_height = cur_y + TBAG_PAD_TOP_NORM + sy(1) + py(1) + TBAG_BORDER;
+  new_height = cur_y + TBAG_PAD_TOP + sy(1) + py(1) + TBAG_BORDER;
 
   frame:SetWidth( available_width );
   frame:SetHeight( new_height );

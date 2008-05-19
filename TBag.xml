@@ -90,7 +90,7 @@
   </Frame>
 
   <EditBox name="TBag_SearchBoxTemplate" inherits="InputBoxTemplate" hidden="false" virtual="true" autoFocus="false">
-    <Size><AbsDimension x="140" y="30"/></Size>
+    <Size><AbsDimension x="190" y="30"/></Size>
     <Scripts>
       <OnShow>
         this:SetText(SEARCH);   

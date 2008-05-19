@@ -240,12 +240,15 @@
       </Button>
 
 
-      <Button name="TInv_Button_Close" inherits="GameMenuButtonTemplate" text="X">
-        <Size><AbsDimension x="22" y="25"/></Size>
+      <Button name="TInv_Button_Close">
+        <Size><AbsDimension x="34" y="34"/></Size>
+        <NormalTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Up" />
+        <PushedTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Down" />
+        <HighlightTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Highlight" alphaMode="ADD" />
         <Anchors>
-          <Anchor point="TOPLEFT">
+          <Anchor point="TOPRIGHT">
             <Offset>
-              <AbsDimension x="4" y="-2"/>
+              <AbsDimension x="0" y="0"/>
             </Offset>
           </Anchor>
         </Anchors>
@@ -256,12 +259,15 @@
         </Scripts>
       </Button>
 
-      <Button name="TInv_Button_MoveLockToggle" inherits="GameMenuButtonTemplate" text="U">
-        <Size><AbsDimension x="22" y="25"/></Size>
+      <Button name="TInv_Button_MoveLockToggle">
+        <Size><AbsDimension x="34" y="34"/></Size>
+        <NormalTexture name="TInvLockNorm"/>
+        <PushedTexture name="TInvLockPush"/>
+        <HighlightTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Highlight" AlphaMode="ADD"/>
         <Anchors>
-          <Anchor point="TOPLEFT" relativeTo="TInv_Button_Close" relativePoint="TOPRIGHT">
+          <Anchor point="TOPRIGHT" relativeTo="TInv_Button_Close" relativePoint="TOPLEFT">
             <Offset>
-              <AbsDimension x="2" y="0"/>
+              <AbsDimension x="10" y="0"/>
             </Offset>
           </Anchor>
         </Anchors>
@@ -283,12 +289,31 @@
         </Scripts>
       </Button>
 
-      <Button name="TInv_Button_HighlightToggle" inherits="GameMenuButtonTemplate" text="Hilight">
-        <Size><AbsDimension x="65" y="25"/></Size>
+      <Frame name="TInv_UserDropdown" inherits="TBag_UserDropdownTemplate">
         <Anchors>
-        <Anchor point="TOPLEFT" relativeTo="TInv_Button_MoveLockToggle" relativePoint="TOPRIGHT">
+          <Anchor point="TOPLEFT">
             <Offset>
-              <AbsDimension x="4" y="0"/>
+              <AbsDimension x="-10" y="-5"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+        <Scripts>
+          <OnShow>
+            TInv_UserDropdown_OnLoad();
+          </OnShow>
+        </Scripts>
+      </Frame>
+
+
+      <Button name="TInv_Button_HighlightToggle">
+        <Size><AbsDimension x="20" y="20"/></Size>
+        <NormalTexture file="Interface\Icons\INV_Misc_Gem_Pearl_04" />
+        <PushedTexture file="Interface\Icons\INV_Misc_Gem_Pearl_04" />
+        <HighlightTexture file="Interface\Icons\INV_Misc_Gem_Pearl_04" alphaMode="ADD" />
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="TInv_UserDropdown" relativePoint="TOPRIGHT">
+            <Offset>
+              <AbsDimension x="-8" y="-3"/>
             </Offset>
           </Anchor>
         </Anchors>
@@ -310,8 +335,11 @@
         </Scripts>
       </Button>
 
-      <Button name="TInv_Button_ChangeEditMode" inherits="GameMenuButtonTemplate" text="Edit">
-        <Size><AbsDimension x="50" y="25"/></Size>
+      <Button name="TInv_Button_ChangeEditMode">
+        <Size><AbsDimension x="20" y="20"/></Size>
+        <NormalTexture file="Interface\Icons\Trade_Engineering" />
+        <PushedTexture file="Interface\Icons\Trade_Engineering" />
+        <HighlightTexture file="Interface\Icons\Trade_Engineering" alphaMode="ADD" />
         <Anchors>
           <Anchor point="TOPLEFT" relativeTo="TInv_Button_HighlightToggle" relativePoint="TOPRIGHT">
             <Offset>
@@ -334,8 +362,11 @@
       </Button>
 
 
-      <Button name="TInv_Button_ShowBank" inherits="GameMenuButtonTemplate" text="Show Bank">
-        <Size><AbsDimension x="95" y="25"/></Size>
+      <Button name="TInv_Button_ShowBank" inherits="GameMenuButtonTemplate">
+        <Size><AbsDimension x="20" y="20"/></Size>
+        <NormalTexture file="Interface\Icons\INV_Box_03" />
+        <PushedTexture file="Interface\Icons\INV_Box_03" />
+        <HighlightTexture file="Interface\Icons\INV_Box_03" alphaMode="ADD" />
         <Anchors>
           <Anchor point="TOPLEFT" relativeTo="TInv_Button_ChangeEditMode" relativePoint="TOPRIGHT">
             <Offset>
@@ -357,12 +388,15 @@
         </Scripts>
       </Button>
 
-      <Button name="TInv_Button_Reload" inherits="GameMenuButtonTemplate" text="Re-sort">
-        <Size><AbsDimension x="65" y="25"/></Size>
+      <Button name="TInv_Button_Reload">
+        <Size><AbsDimension x="20" y="20"/></Size>
+        <NormalTexture file="Interface\Icons\Spell_Frost_Stun" />
+        <PushedTexture file="Interface\Icons\Spell_Frost_Stun" />
+        <HighlightTexture file="Interface\Icons\Spell_Frost_Stun" alphaMode="ADD" />
         <Anchors>
           <Anchor point="TOPLEFT" relativeTo="TInv_Button_ShowBank" relativePoint="TOPRIGHT">
             <Offset>
-              <AbsDimension x="4" y="0"/>
+              <AbsDimension x="2" y="0"/>
             </Offset>
           </Anchor>
         </Anchors>
@@ -380,26 +414,11 @@
         </Scripts>
       </Button>
 
-      <Frame name="TInv_UserDropdown" inherits="TBag_UserDropdownTemplate">
-        <Anchors>
-          <Anchor point="TOPLEFT" relativeTo="TInvFrame" relativePoint="TOPLEFT">
-            <Offset>
-              <AbsDimension x="-14" y="27"/>
-            </Offset>
-          </Anchor>
-        </Anchors>
-        <Scripts>
-          <OnShow>
-            TInv_UserDropdown_OnLoad();
-          </OnShow>
-        </Scripts>
-      </Frame>
-
     <EditBox name="TInv_SearchBox" inherits="TBag_SearchBoxTemplate">
         <Anchors>
-          <Anchor point="LEFT" relativeTo="TInv_UserDropdown" relativePoint="RIGHT">
+          <Anchor point="BOTTOMLEFT">
             <Offset>
-              <AbsDimension x="5" y="0"/>
+              <AbsDimension x="10" y="4"/>
             </Offset>
           </Anchor>
         </Anchors>
@@ -438,9 +457,9 @@
             <AbsDimension x="28" y="28"/>
         </Size>
        <Anchors>
-          <Anchor point="BOTTOMLEFT">
+         <Anchor point="BOTTOMLEFT" relativeTo="TInv_SearchBox" relativePoint="TOPLEFT">
             <Offset>
-              <AbsDimension x="3" y="4"/>
+              <AbsDimension x="0" y="4"/>
             </Offset>
           </Anchor>
         </Anchors>

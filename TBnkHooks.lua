@@ -64,7 +64,6 @@ function TBnk_Open()
     TBnkFrame:Show();
 
     -- Also open the inventory, if it isn't showing already
-    TInv_SynchShowBank();
     if (not TInvFrame:IsVisible()) then
       TInv_Open();
     end
@@ -77,8 +76,6 @@ function TBnk_Close()
   TBag_PrintDEBUG("event: TBnk_Close()");
   if (TBnkFrame:IsVisible()) then
     TBnkFrame:Hide();
-
-    TInv_SynchShowBank();
   end
   if (TBNK_ATBANK == 1) then
     TBNK_ATBANK = 0;

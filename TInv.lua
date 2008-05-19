@@ -10,15 +10,6 @@ TINV_DEBUGMESSAGES = 0;   -- 0 = off, 1 = on
 TINV_SHOWITEMDEBUGINFO = 0;
 local TINV_WIPECONFIGONLOAD = 0;  -- for debugging, test it out on a new config every load
 
-TINV_BUTTONS = {
-  "TInv_Button_Close",
-  "TInv_Button_MoveLockToggle",
-  "TInv_Button_HighlightToggle",
-  "TInv_Button_ChangeEditMode",
-  "TInv_Button_ShowBank",
-  "TInv_Button_Reload",
-}
-
 -- View switching
 TINV_PLAYERID = "";
 
@@ -197,13 +188,12 @@ function TInv_init(reset)
   TInvHooks_Register(TBAG_HOOK_UNREGISTER);
   TInvHooks_Register(TBAG_HOOK_REGISTER);
 
-  TInv_Button_HighlightToggle:SetText(L["Hilight"]);
-  TInv_Button_ChangeEditMode:SetText(L["Edit"]);
-
   if (TInvCfg["moveLock"] == 0) then
-    TInv_Button_MoveLockToggle:SetText(L["L"]);
+    TInvLockNorm:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Locked-Up"); 
+    TInvLockPush:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Locked-Down"); 
   else
-    TInv_Button_MoveLockToggle:SetText(L["U"]);
+    TInvLockNorm:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Unlocked-Up"); 
+    TInvLockPush:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Unlocked-Down"); 
   end
 
   
@@ -220,8 +210,6 @@ function TInv_init(reset)
   end
   if (TInvCfg["show_userdropdown"] == 0) then
     TInv_UserDropdown:Hide();
-    TInv_SearchBox:ClearAllPoints();
-    TInv_SearchBox:SetPoint("TOPLEFT",TInvFrame,"TOPLEFT",6,27);
   end
   if (TInvCfg["show_reloadbutton"] == 0) then
     TInv_Button_Reload:Hide();
@@ -594,10 +582,8 @@ function TInv_Button_HighlightToggle_OnClick()
   PlaySound("igMainMenuOptionCheckBoxOn");
   if (TInv_hilight_new == 0) then
     TInv_hilight_new = 1;
-    TInv_Button_HighlightToggle:SetText(L["Normal"]);
   else
     TInv_hilight_new = 0;
-    TInv_Button_HighlightToggle:SetText(L["Hilight"]);
   end
   TInv_UpdateWindow();
 end
@@ -606,10 +592,8 @@ function TInv_Button_ChangeEditMode_OnClick()
   PlaySound("igMainMenuOptionCheckBoxOn");
   if (TInv_edit_mode == 0) then
     TInv_edit_mode = 1;
-    TInv_Button_ChangeEditMode:SetText(L["View"]);
   else
     TInv_edit_mode = 0;
-    TInv_Button_ChangeEditMode:SetText(L["Edit"]);
   end
   -- resort will force a window redraw
   TInv_UpdateWindow(TBAG_REQ_MUST);
@@ -632,14 +616,6 @@ function TInv_Button_Reload_OnClick()
   TBag_PrintDEBUG("TInv reloaded.");
 end
 
-function TInv_SynchShowBank()
-  if (TBnkFrame:IsVisible()) then
-    TInv_Button_ShowBank:SetText(L["Hide Bank"]);
-  else
-    TInv_Button_ShowBank:SetText(L["Show Bank"]);
-  end
-end
-
 function TInv_Button_ShowBank_OnClick()
   if (TBnkFrame:IsVisible()) then
     TBnk_UserDropdown:Hide();
@@ -652,17 +628,18 @@ function TInv_Button_ShowBank_OnClick()
     end
     TBnkFrame:Show();
   end
-  TInv_SynchShowBank();
 end
 
 function TInv_Button_MoveLockToggle_OnClick()
   PlaySound("igMainMenuOptionCheckBoxOn");
   if (TInvCfg["moveLock"] == 0) then
     TInvCfg["moveLock"] = 1;
-    TInv_Button_MoveLockToggle:SetText(L["U"]);
+    TInvLockNorm:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Unlocked-Up"); 
+    TInvLockPush:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Unlocked-Down"); 
   else
     TInvCfg["moveLock"] = 0;
-    TInv_Button_MoveLockToggle:SetText(L["L"]);
+    TInvLockNorm:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Locked-Up"); 
+    TInvLockPush:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Locked-Down"); 
   end
 end
 
@@ -759,16 +736,98 @@ function TInv_BagSlotButton_OnEnter(self)
   GameTooltip:Show();
 end
 
-function TInv_SetButton_Anchors()
+function TInv_SetTopLeftButton_Anchors()
+  local buttons = {
+    "TInv_Button_HighlightToggle",
+    "TInv_Button_ChangeEditMode",
+    "TInv_Button_ShowBank",
+    "TInv_Button_Reload",
+  };
   local button_left = nil;
- 
-  for _,button_name in ipairs(TINV_BUTTONS) do
+
+  -- Handle user dropdown list separately...
+  local dropdown = TInv_UserDropdown;
+  if (dropdown and dropdown:IsVisible()) then
+    dropdown:ClearAllPoints();
+    dropdown:SetPoint("TOPLEFT",TInvFrame,"TOPLEFT",-10,-5);
+    button_left = dropdown;
+  end
+  
+  for _,button_name in ipairs(buttons) do
+    button = getglobal(button_name);
+    if (button) then 
+      button:ClearAllPoints();
+      if (button_left) then
+        if (button_left == dropdown) then
+          -- First button after dropdown
+          button:SetPoint("TOPLEFT",button_left,"TOPRIGHT",-8,-3);
+        else
+          -- button following another button
+          button:SetPoint("TOPLEFT",button_left,"TOPRIGHT",2,0);
+        end
+      else
+        -- First button if dropdown is hidden
+        button:SetPoint("TOPLEFT",TInvFrame,"TOPLEFT",9,-8);
+      end
+      if (button:IsVisible()) then
+        button_left = button;
+      end
+    end
+  end
+end
+
+function TInv_SetTopRightButton_Anchors()
+  local buttons = {
+    "TInv_Button_Close",
+    "TInv_Button_MoveLockToggle",
+  }
+  local button_right = nil;
+
+  for _,button_name in ipairs(buttons) do
     local button = getglobal(button_name);
     if (button) then 
-      if (button_left) then
-        button:SetPoint("TOPLEFT",button_left,"TOPRIGHT",4,0);
+      if (button_right) then
+        button:SetPoint("TOPRIGHT",button_right,"TOPLEFT",10,0);
       else
-        button:SetPoint("TOPLEFT",TInvFrame,"TOPLEFT",4,-2);
+        button:SetPoint("TOPRIGHT",TInvFrame,"TOPRIGHT",0,0);
+      end
+      if (button:IsVisible()) then
+        button_right = button;
+      end
+    end
+  end
+end
+
+function TInv_SetBottomLeftButton_Anchors()
+  local buttons = {
+    "TInvNumTotal",
+    "TInvacterBag3Slot",
+  }
+  local button_left = nil;
+
+  -- Handle search box separate.
+  local search = TInv_SearchBox;
+  if (search and search:IsVisible()) then
+    search:ClearAllPoints();
+    search:SetPoint("BOTTOMLEFT",TInvFrame,"BOTTOMLEFT",10,4);
+    button_left = search;
+  end
+
+  for _,button_name in ipairs(buttons) do
+    button = getglobal(button_name);
+    if (button) then 
+      button:ClearAllPoints();
+      if (button_left) then
+        if (button_left == search) then
+          -- First button after search 
+          button:SetPoint("BOTTOMLEFT",button_left,"TOPLEFT",0,4);
+        else
+          -- button following another button
+          button:SetPoint("BOTTOMLEFT",button_left,"BOTTOMRIGHT",3,-1);
+        end
+      else
+        -- First button if dropdown is hidden
+        button:SetPoint("BOTTOMLEFT",TInvFrame,"BOTTOMLEFT",10,12);
       end
       if (button:IsVisible()) then
         button_left = button;
@@ -776,7 +835,15 @@ function TInv_SetButton_Anchors()
     end
   end
 
- 
+end
+
+function TInv_SetButton_Anchors()
+  TInv_SetTopLeftButton_Anchors();
+  TInv_SetTopRightButton_Anchors();
+  TInv_SetBottomLeftButton_Anchors();
+  TBag_LayoutWindow(TInvCfg, "TInvFrame", TINV_BARITM, TInvCfg["bar_x"],
+                    TInv_edit_mode, TINV_BUTTON_MAX, TInv_AssignButtonsToFrame,
+                    TInv_FrameX, TInv_FrameY, TInv_SpaceX, TInv_SpaceY, TInv_PoolX, TInv_PoolY);
 end
 
 function TInv_Toggle_CloseButton()
@@ -855,9 +922,11 @@ function TInv_Toggle_SearchBox()
   if (TInvCfg["show_searchbox"] == 1) then
     TInvCfg["show_searchbox"] = 0;
     TInv_SearchBox:Hide();
+    TInv_SetButton_Anchors();
   else
     TInvCfg["show_searchbox"] = 1;
     TInv_SearchBox:Show();
+    TInv_SetButton_Anchors();
   end
 end
 
@@ -865,13 +934,11 @@ function TInv_Toggle_UserDropdown()
   if (TInvCfg["show_userdropdown"] == 1) then
     TInvCfg["show_userdropdown"] = 0;
     TInv_UserDropdown:Hide();
-    TInv_SearchBox:ClearAllPoints();
-    TInv_SearchBox:SetPoint("TOPLEFT",TInvFrame,"TOPLEFT",6,27);
+    TInv_SetButton_Anchors();
   else
     TInvCfg["show_userdropdown"] = 1;
     TInv_UserDropdown:Show();
-    TInv_SearchBox:ClearAllPoints();
-    TInv_SearchBox:SetPoint("LEFT",TInv_UserDropdown,"RIGHT",5,0);
+    TInv_SetButton_Anchors();
   end
 end
 
@@ -880,10 +947,12 @@ function TInv_Toggle_Money()
     TInvCfg["show_money"] = 0;
     TInv_MoneyViewFrame:Hide();
     TInv_MoneyFrame:Hide();
+    TInv_SetButton_Anchors();
   else
     TInvCfg["show_money"] = 1;
     TInv_MoneyViewFrame:Show();
     TInv_MoneyFrame:Show();
+    TInv_SetButton_Anchors();
   end
 end
 
@@ -896,6 +965,7 @@ function TInv_Toggle_BagSlotButtons()
     TInvacterBag3Slot:Hide();
     TInvMenuBarBackpackButton:Hide();
     TInvingButton:Hide();
+    TInv_SetButton_Anchors();
   else
     TInvCfg["show_bagbuttons"] = 1;
     TInvacterBag0Slot:Show();
@@ -904,6 +974,7 @@ function TInv_Toggle_BagSlotButtons()
     TInvacterBag3Slot:Show();
     TInvMenuBarBackpackButton:Show();
     TInvingButton:Show();
+    TInv_SetButton_Anchors();
    end
 end
 
@@ -911,9 +982,11 @@ function TInv_Toggle_Total()
   if (TInvCfg["show_total"] == 1) then
     TInvCfg["show_total"] = 0;
     TInvNumTotal:Hide();
+    TInv_SetButton_Anchors();
   else
     TInvCfg["show_total"] = 1;
     TInvNumTotal:Show();
+    TInv_SetButton_Anchors();
   end
 end
 
@@ -1576,9 +1649,6 @@ function TInv_UpdateWindow(resort_req)
   
   -- Set the overall scale
   TInvFrame:SetScale(TInvCfg["scale"]);
-
-  -- Make the button display the right text
-  TInv_SynchShowBank();
 
   -- Consume a message from updated craft info
   if (TBagCfg["trades_changed"] == 1) then
