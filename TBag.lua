@@ -2897,12 +2897,54 @@ function TBag_LayoutWindow(cfg, framename, baritm, bar_x, edit_mode, buttonmax, 
        TBAG_PAD_TOP = TBAG_PAD_TOP_NORM;
      end
  else
-    if (edit_mode == 1) then
-      TBAG_PAD_BOTTOM = TBAG_PAD_BOTTOM_EDIT;
-    else
-      TBAG_PAD_BOTTOM = TBAG_PAD_BOTTOM_NORM;
+    -- TBnkFrame
+    if (TBnkNumTotal:IsVisible() or TBnkFrameBagBank:IsVisible() or
+        TBnk_MoneyFrame:IsVisible() or TBnk_MoneyViewFrame:IsVisible() or
+        TBnk_SlotCostFrame:IsVisible()) then
+      if (edit_mode == 1) then
+        TBAG_PAD_BOTTOM = TBAG_PAD_BOTTOM_EDIT;
+      else
+        TBAG_PAD_BOTTOM = TBAG_PAD_BOTTOM_NORM;
+      end
     end
-    TBAG_PAD_TOP = TBAG_PAD_TOP_NORM;
+   
+    -- Do we need an extra row
+    local bags_row = 0;
+    if (TBnkFrameBagBank:IsVisible()) then
+      bags_row = bags_row + 4;
+    end
+    if (TBnkNumTotal:IsVisible()) then
+      bags_row = bags_row + 1;
+    end
+    if (TBnk_MoneyFrame:IsVisible() or TBnk_MoneyViewFrame:IsVisible()) then
+      bags_row = bags_row + 4;
+    end
+    local slotpurchase_row = 0;
+    if (TBnkFrameBagBank:IsVisible()) then
+      slotpurchase_row = slotpurchase_row + 9;
+    end
+    if (TBnkNumTotal:IsVisible()) then
+      slotpurchase_row = slotpurchase_row + 1;
+    end
+    if (TBnk_MoneyFrame:IsVisible() or TBnk_MoneyViewFrame:IsVisible()) then
+      slotpurchase_row = slotpurchase_row + 4;
+    end
+    if (cfg["maxColumns"] <= bags_row or 
+       (cfg["maxColumns"] <= slotpurchase_row and TBnk_SlotCostFrame:IsVisible())) then
+      TBAG_PAD_BOTTOM = TBAG_PAD_BOTTOM + TBAG_PAD_BOTTOM_NORM;
+    end
+
+    if (TBAG_PAD_BOTTOM > 0) then
+      -- If there's anything at the bottom add the spacer
+      TBAG_PAD_BOTTOM = TBAG_PAD_BOTTOM + TBAG_PAD_BOTTOM_SPACER;
+    end
+
+    if (TBnk_UserDropdown:IsVisible() or TBnk_Button_HighlightToggle:IsVisible() or
+        TBnk_Button_ChangeEditMode:IsVisible() or TBnk_Button_ShowPurchase:IsVisible() or
+        TBnk_Button_Reload:IsVisible() or TBnk_Button_Close:IsVisible() or
+        TBnk_Button_MoveLockToggle:IsVisible()) then
+      TBAG_PAD_TOP = TBAG_PAD_TOP_NORM;
+    end
   end
 
   -- ITEM BUTTONS

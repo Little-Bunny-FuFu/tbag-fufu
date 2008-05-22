@@ -39,15 +39,6 @@ local TBNK_BF_PADHEIGHT = 36;
 local TBNK_BGF_WIDTH = 38;
 local TBNK_BGF_HEIGHT = 38;
 
-local TBNK_BUTTONS = {
-  "TBnk_Button_Close",
-  "TBnk_Button_MoveLockToggle",
-  "TBnk_Button_HighlightToggle",
-  "TBnk_Button_ChangeEditMode",
-  "TBnk_Button_ShowPurchase",
-  "TBnk_Button_Reload",
-}
-
 
 -- Param Functions
 
@@ -187,12 +178,22 @@ function TBnk_init(reset)
   TBnk_Button_ChangeEditMode:SetText(L["Edit"]);
 
   if (TBnkCfg["moveLock"] == 0) then
-    TBnk_Button_MoveLockToggle:SetText(L["L"]);
+    TBnkLockNorm:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Locked-Up");
+    TBnkLockPush:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Locked-Down");
   else
-    TBnk_Button_MoveLockToggle:SetText(L["U"]);
+    TBnkLockNorm:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Unlocked-Up");
+    TBnkLockPush:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Unlocked-Down");
   end
 
   if (TBnkCfg["show_bagbuttons"] == 0) then
+    TBnkFrameBag1:Hide();
+    TBnkFrameBag2:Hide();
+    TBnkFrameBag3:Hide();
+    TBnkFrameBag4:Hide();
+    TBnkFrameBag5:Hide();
+    TBnkFrameBag6:Hide();
+    TBnkFrameBag7:Hide();
+    TBnkFrameBagBank:Hide();
   end
   if (TBnkCfg["show_userdropdown"] == 0) then
     TBnk_UserDropdown:Hide();
@@ -676,16 +677,19 @@ function TBnk_Button_ShowPurchase_OnClick()
    TBnk_Button_ShowPurchase:SetText(L["Show Purchase"]);
  end
  TBnk_UpdatePurchaseGfx();
+ TBnk_SetButton_Anchors();
 end
 
 function TBnk_Button_MoveLockToggle_OnClick()
   PlaySound("igMainMenuOptionCheckBoxOn");
   if (TBnkCfg["moveLock"] == 0) then
-  TBnkCfg["moveLock"] = 1;
-  TBnk_Button_MoveLockToggle:SetText(L["U"]);
+    TBnkCfg["moveLock"] = 1;
+    TBnkLockNorm:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Unlocked-Up");
+    TBnkLockPush:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Unlocked-Down");
   else
-  TBnkCfg["moveLock"] = 0;
-  TBnk_Button_MoveLockToggle:SetText(L["L"]);
+    TBnkCfg["moveLock"] = 0;
+    TBnkLockNorm:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Locked-Up");
+    TBnkLockPush:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Locked-Down");
   end
 end
 
@@ -834,22 +838,163 @@ function TBnk_RightClick_SetItemOverride()
   end
 end
 
-function TBnk_SetButton_Anchors()
+function TBnk_SetTopLeftButton_Anchors()
+  local buttons = {
+    "TBnk_Button_HighlightToggle",
+    "TBnk_Button_ChangeEditMode",
+    "TBnk_Button_ShowPurchase",
+    "TBnk_Button_Reload",
+  };
   local button_left = nil;
 
-  for _,button_name in ipairs(TBNK_BUTTONS) do
-    local button = getglobal(button_name);
+  -- Handle user dropdown list separately...
+  local dropdown = TBnk_UserDropdown;
+  if (dropdown and dropdown:IsVisible()) then
+    dropdown:ClearAllPoints();
+    dropdown:SetPoint("TOPLEFT",TBnkFrame,"TOPLEFT",-10,-5);
+    button_left = dropdown;
+  end
+
+  for _,button_name in ipairs(buttons) do
+    button = getglobal(button_name);
     if (button) then
+      button:ClearAllPoints();
       if (button_left) then
-        button:SetPoint("TOPLEFT",button_left,"TOPRIGHT",4,0);
+        if (button_left == dropdown) then
+          -- First button after dropdown
+          button:SetPoint("TOPLEFT",button_left,"TOPRIGHT",-8,-3);
+        else
+          -- button following another button
+          button:SetPoint("TOPLEFT",button_left,"TOPRIGHT",2,0);
+        end
       else
-        button:SetPoint("TOPLEFT",TBnkFrame,"TOPLEFT",4,-2);
+        -- First button if dropdown is hidden
+        button:SetPoint("TOPLEFT",TBnkFrame,"TOPLEFT",9,-8);
       end
       if (button:IsVisible()) then
         button_left = button;
       end
     end
   end
+end
+
+function TBnk_SetTopRightButton_Anchors()
+  local buttons = {
+    "TBnk_Button_Close",
+    "TBnk_Button_MoveLockToggle",
+  }
+  local button_right = nil;
+
+  for _,button_name in ipairs(buttons) do
+    local button = getglobal(button_name);
+    if (button) then
+      if (button_right) then
+        button:SetPoint("TOPRIGHT",button_right,"TOPLEFT",10,0);
+      else
+        button:SetPoint("TOPRIGHT",TBnkFrame,"TOPRIGHT",0,0);
+      end
+      if (button:IsVisible()) then
+        button_right = button;
+      end
+    end
+  end
+end
+
+function TBnk_SetBottomLeftButton_Anchors()
+  local buttons = {
+    "TBnkNumTotal",
+    "TBnkFrameBagBank",
+  }
+  local button_left = nil;
+
+  for _,button_name in ipairs(buttons) do
+    button = getglobal(button_name);
+    if (button) then
+      button:ClearAllPoints();
+      if (button_left) then
+        -- button following another button
+        button:SetPoint("BOTTOMLEFT",button_left,"BOTTOMRIGHT",3,-1);
+      else
+        -- First button
+        button:SetPoint("BOTTOMLEFT",TBnkFrame,"BOTTOMLEFT",10,12);
+      end
+      if (button:IsVisible()) then
+        button_left = button;
+      end
+    end
+  end
+
+  -- Figure the number of columns needed to require the bag buttons
+  -- to be split into two rows
+  local bags_row = 0;
+  if (TBnkFrameBagBank:IsVisible()) then
+    bags_row = bags_row + 5;
+  end
+  if (TBnkNumTotal:IsVisible()) then
+    bags_row = bags_row + 1;
+  end
+  if (TBnk_MoneyFrame:IsVisible() or TBnk_MoneyViewFrame:IsVisible()) then
+    bags_row = bags_row + 3;
+  end
+
+  if (TBnkCfg["maxColumns"] <= bags_row) then
+    TBnkFrameBag4:ClearAllPoints()
+    TBnkFrameBag4:SetPoint("BOTTOMLEFT",TBnkFrameBagBank,"TOPLEFT",0,3);
+  else
+    -- Now separate row required 
+    TBnkFrameBag4:ClearAllPoints()
+    TBnkFrameBag4:SetPoint("BOTTOMLEFT",TBnkFrameBag3,"BOTTOMRIGHT",3,0);
+  end
+
+  -- Figure the number of columns needed to require a row for the 
+  -- slot purchase controls.
+  local slotpurchase_row = 0;
+  if (TBnkFrameBagBank:IsVisible()) then
+    slotpurchase_row = slotpurchase_row + 9;
+  end
+  if (TBnkNumTotal:IsVisible()) then
+    slotpurchase_row = slotpurchase_row + 1;
+  end
+  if (TBnk_MoneyFrame:IsVisible() or TBnk_MoneyViewFrame:IsVisible()) then
+    slotpurchase_row = slotpurchase_row + 4;
+  end
+
+
+  if (TBnkCfg["maxColumns"] <= slotpurchase_row) then
+    TBnk_PurchaseButton:ClearAllPoints();
+    TBnk_PurchaseButton:SetPoint("BOTTOMRIGHT",TBnkFrame,"BOTTOMRIGHT",-10,40);
+    TBnk_SlotCostFrame:ClearAllPoints();
+    TBnk_SlotCostFrame:SetPoint("RIGHT",TBnk_PurchaseButton,"LEFT",10,0);
+  else
+    -- No separate row is required 
+
+    -- Since the bag buttons show and hide together the previous button
+    -- is really the last bag button not the one in button_left.
+    if (button_left == TBnkFrameBagBank) then
+      button_left = TBnkFrameBag7;
+    end
+
+    -- Set the anchor for the SlotCostFrame
+    TBnk_SlotCostFrame:ClearAllPoints();
+    if (button_left) then
+      TBnk_SlotCostFrame:SetPoint("BOTTOMLEFT",button_left,"BOTTOMRIGHT",3,-1);
+    else
+      TBnk_SlotCostFrame:SetPoint("BOTTOMLEFT",TBnkFrame,"BOTTOMLEFT",10,12);
+    end
+    
+    -- Set the anchor for the PurchaseButton
+    TBnk_PurchaseButton:ClearAllPoints();
+    TBnk_PurchaseButton:SetPoint("LEFT",TBnk_SlotCostFrame,"RIGHT",-10,0);
+  end
+end
+
+function TBnk_SetButton_Anchors()
+  TBnk_SetTopLeftButton_Anchors();
+  TBnk_SetTopRightButton_Anchors();
+  TBnk_SetBottomLeftButton_Anchors();
+  TBag_LayoutWindow(TBnkCfg, "TBnkFrame", TBNK_BARITM, TBnkCfg["bar_x"],
+    TBnk_edit_mode, TBNK_BUTTON_MAX, TBnk_AssignButtonsToFrame, 
+    TBnk_FrameX, TBnk_FrameY, TBnk_SpaceX, TBnk_SpaceY, TBnk_PoolX, TBnk_PoolY);
 end
 
 
@@ -917,9 +1062,11 @@ function TBnk_Toggle_UserDropdown()
   if (TBnkCfg["show_userdropdown"] == 1) then
     TBnkCfg["show_userdropdown"] = 0;
     TBnk_UserDropdown:Hide();
+    TBnk_SetButton_Anchors();
   else
     TBnkCfg["show_userdropdown"] = 1;
     TBnk_UserDropdown:Show();
+    TBnk_SetButton_Anchors();
   end
 end
 
@@ -928,10 +1075,12 @@ function TBnk_Toggle_Money()
     TBnkCfg["show_money"] = 0;
     TBnk_MoneyViewFrame:Hide();
     TBnk_MoneyFrame:Hide();
+    TBnk_SetButton_Anchors();
   else
     TBnkCfg["show_money"] = 1;
     TBnk_MoneyViewFrame:Show();
     TBnk_MoneyFrame:Show();
+    TBnk_SetButton_Anchors();
   end
 end
 
@@ -946,6 +1095,7 @@ function TBnk_Toggle_BagSlotButtons()
     TBnkFrameBag6:Hide();
     TBnkFrameBag7:Hide();
     TBnkFrameBagBank:Hide();
+    TBnk_SetButton_Anchors();
   else
     TBnkCfg["show_bagbuttons"] = 1;
     TBnkFrameBag1:Show();
@@ -956,6 +1106,7 @@ function TBnk_Toggle_BagSlotButtons()
     TBnkFrameBag6:Show();
     TBnkFrameBag7:Show();
     TBnkFrameBagBank:Show();
+    TBnk_SetButton_Anchors();
    end
 end
 
@@ -963,9 +1114,11 @@ function TBnk_Toggle_Total()
   if (TBnkCfg["show_total"] == 1) then
     TBnkCfg["show_total"] = 0;
     TBnkNumTotal:Hide();
+    TBnk_SetButton_Anchors();
   else
     TBnkCfg["show_total"] = 1;
     TBnkNumTotal:Show();
+    TBnk_SetButton_Anchors();
   end
 end
 
@@ -976,8 +1129,11 @@ function TBnk_Toggle_Purchase()
     TBnk_SetButton_Anchors();
   else
     TBnkCfg["show_purchasetoggle"] = 1;
-    TBnk_Button_ShowPurchase:Show();
-    TBnk_SetButton_Anchors();
+    local _, full = TBag_GetNumBankSlots(TBNK_PLAYERID);   
+    if (TBNK_ATBANK == 1 and not full)  then
+      TBnk_Button_ShowPurchase:Show();
+      TBnk_SetButton_Anchors();
+    end
   end
 end
 
