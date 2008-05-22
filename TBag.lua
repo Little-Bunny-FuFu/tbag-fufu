@@ -2982,7 +2982,8 @@ function TBag_LayoutWindow(cfg, framename, baritm, bar_x, edit_mode, buttonmax, 
 
       -- Then position the frames appropriately
       for iBar = 0, bar_x - 1 do
-        if (calc_dat[iBar.."_width"] >= 0) then
+        if (calc_dat[iBar.."_width"] >= 0 and
+            (table.getn(baritm[barnum+iBar]) > 0 or edit_mode == 1)) then
           -- Keep width separate to get roundoff staggering
           if (bar_x == 1) then
             cur_width = 0;
