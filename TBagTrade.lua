@@ -211,7 +211,7 @@ function TBag_MakeTradeCreationKeyword(itm, id, trade, cat, docreated)
   if (trade ~= nil and type(trade) == "string"
     and cat ~= nil and type(cat) == "string" 
     and itm ~= nil) then
-    TBag_PrintDEBUG("TBag_MakeTradeKeyword: "..trade..", "..cat);
+--    TBag_PrintDEBUG("TBag_MakeTradeKeyword: "..trade..", "..cat);
     if (itm[TBAG_I_ITEMLINK] ~= nil) then
       local itemid;
       local aTrade = TBag_GetTradeCreated(trade);
@@ -228,7 +228,7 @@ function TBag_MakeTradeCreationKeyword(itm, id, trade, cat, docreated)
       end
     end
   end
-  TBag_PrintDEBUG("TBag_MakeTradeKeyword done");
+--  TBag_PrintDEBUG("TBag_MakeTradeKeyword done");
 end
 
 function TBag_MakeTradeReagentKeywords(itm, id, trade1, trade2)
