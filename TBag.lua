@@ -2746,7 +2746,7 @@ end
 -- Make an inventory slot usable with the item specified in itm
 -- cache entry is the array that comes directly from the cache
 function TBag_UpdateButton(cfg, playerid, framename, edit_mode,
-  edit_hilight, hilight_new)
+  edit_hilight, hilight_new, online)
   local ic_start, ic_duration, ic_enable;
   local showSell = nil;
   local frame = getglobal(framename);
@@ -2772,7 +2772,12 @@ function TBag_UpdateButton(cfg, playerid, framename, edit_mode,
   end
   
   if (itm[TBAG_I_ITEMLINK] ~= nil) then
-    ic_start, ic_duration, ic_enable = GetContainerItemCooldown(itm[TBAG_I_BAG], itm[TBAG_I_SLOT]);
+    if (online) then
+      -- This only works if we're actually viewing the current character.
+      ic_start, ic_duration, ic_enable = GetContainerItemCooldown(itm[TBAG_I_BAG], itm[TBAG_I_SLOT]);
+    else
+      ic_start, ic_duration, ic_enable = 0,0,0;
+    end
     texture  = GetItemIcon(itm[TBAG_I_ITEMLINK]);
   else
     if (cfg["show_bag_icons"] == 1) then

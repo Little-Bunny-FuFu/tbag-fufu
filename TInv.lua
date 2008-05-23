@@ -1780,7 +1780,8 @@ function TInv_UpdateWindow(resort_req)
     for slot = 1, size do
       TBag_UpdateButton(TInvCfg, TINV_PLAYERID,
         TBag_GetBagItemButtonName(bag, slot),
-        TInv_edit_mode, TInv_edit_hilight, TInv_hilight_new)
+        TInv_edit_mode, TInv_edit_hilight, TInv_hilight_new,
+        TINV_PLAYERID == TBAG_PLAYERID)
     end
     for slot = size+1, MAX_CONTAINER_ITEMS do
       getglobal(TBag_GetBagItemButtonName(bag, slot)):Hide();
