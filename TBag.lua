@@ -1267,6 +1267,19 @@ function TBag_DeleteCachedCharacter(char,realm)
   end
 end
 
+function TBag_SetFrameAnchor (frame,cfg,y,x)
+    -- Set the config
+    cfg["frameYRelativeTo"] = y;
+    cfg["frameXRelativeTo"] = x;
+
+    -- Set the anchor on the actual frame.
+    frame:ClearAllPoints();
+    frame:SetPoint(cfg["frameYRelativeTo"]..cfg["frameXRelativeTo"],
+      "UIParent", "BOTTOMLEFT",
+      cfg["frame"..cfg["frameXRelativeTo"]] / frame:GetScale(),
+      cfg["frame"..cfg["frameYRelativeTo"]] / frame:GetScale());
+end
+
 -----------------------------------------------------------------------
 -- Categories and Bars
 -----------------------------------------------------------------------

@@ -513,7 +513,12 @@ TBAG_LOCALE = setmetatable({
   ["You are viewing this player's bank."] = "You are viewing this player's bank.",
   ["You are viewing this player's inventory."] = "You are viewing this player's inventory.",
   ["Equip Container"] = "Equip Container",
-    
+  ["Anchor"] = "Anchor",
+  ["TOPLEFT"] = "TOPLEFT",
+  ["TOPRIGHT"] = "TOPRIGHT",
+  ["BOTTOMLEFT"] = "BOTTOMLEFT",
+  ["BOTTOMRIGHT"] = "BOTTOMRIGHT",
+
   -- Option Window Strings
   ["Main Sizing Preferences"] = "Main Sizing Preferences",
   ["Number of Item Columns:"] = "Number of Item Columns:",

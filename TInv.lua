@@ -1413,6 +1413,17 @@ function TInvFrame_RightClickMenu_populate(level)
       UIDropDownMenu_AddButton(info, level);
 
       info = {
+        ["text"] = L["Anchor"];
+        ["value"] = { ["opt"]="anchor" },
+        ["hasArrow"] = 1
+        };
+      UIDropDownMenu_AddButton(info, level);
+
+
+      info = { ["disabled"] = 1 };
+      UIDropDownMenu_AddButton(info, level);
+
+      info = {
         ["text"] = L["Hide"];
         ["value"] = { ["opt"]="hide_frames" },
         ["hasArrow"] = 1
@@ -1448,6 +1459,51 @@ function TInvFrame_RightClickMenu_populate(level)
           end
         elseif (UIDROPDOWNMENU_MENU_VALUE["opt"] == "set_colors") then
           TBag_MakeColorMenu(TInvCfg, TInv_UpdateWindow, level, TInv_Bags);
+        elseif (UIDROPDOWNMENU_MENU_VALUE["opt"] == "anchor") then
+          info = {
+            ["text"] = L["TOPLEFT"];
+            ["func"] = function ()
+                         TBag_SetFrameAnchor (TInvFrame,TInvCfg,"TOP","LEFT")
+                       end;
+            };
+          if (TInvCfg["frameXRelativeTo"] == "LEFT" and
+              TInvCfg["frameYRelativeTo"] == "TOP") then
+            info["checked"] = 1;
+          end
+          UIDropDownMenu_AddButton(info, level);
+          info = {
+            ["text"] = L["TOPRIGHT"];
+            ["func"] = function ()
+                         TBag_SetFrameAnchor (TInvFrame,TInvCfg,"TOP","RIGHT")
+                       end;
+            };
+          if (TInvCfg["frameXRelativeTo"] == "RIGHT" and
+              TInvCfg["frameYRelativeTo"] == "TOP") then
+            info["checked"] = 1;
+          end
+          UIDropDownMenu_AddButton(info, level);
+          info = {
+            ["text"] = L["BOTTOMLEFT"];
+            ["func"] = function ()
+                         TBag_SetFrameAnchor (TInvFrame,TInvCfg,"BOTTOM","LEFT")
+                       end;
+            };
+          if (TInvCfg["frameXRelativeTo"] == "LEFT" and
+              TInvCfg["frameYRelativeTo"] == "BOTTOM") then
+            info["checked"] = 1;
+          end
+          UIDropDownMenu_AddButton(info, level);
+          info = {
+            ["text"] = L["BOTTOMRIGHT"];
+            ["func"] = function ()
+                         TBag_SetFrameAnchor (TInvFrame,TInvCfg,"BOTTOM","RIGHT")
+                       end;
+            };
+          if (TInvCfg["frameXRelativeTo"] == "RIGHT" and
+              TInvCfg["frameYRelativeTo"] == "BOTTOM") then
+            info["checked"] = 1;
+          end
+          UIDropDownMenu_AddButton(info, level);
 	elseif (UIDROPDOWNMENU_MENU_VALUE["opt"] == "hide_frames") then
 	  info = {
             ["text"] = L["Hide Player Dropdown"];
