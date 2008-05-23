@@ -2648,7 +2648,7 @@ function TBag_ScanEquipped()
   -- Arrange by itemlink (for equipped) and player (for TBody)
   for key, value in pairs(TBody_Slots) do
 --    TBag_Print("Equipped ID="..GetInventorySlotInfo(key).." for "..key);
-    local slot = GetInventorySlotIinfo(key);
+    local slot = GetInventorySlotInfo(key);
     itemLink = GetInventoryItemLink("player", slot);
 
     TBodyItm[TBAG_PLAYERID][TBAG_D_BAG][value] = {};

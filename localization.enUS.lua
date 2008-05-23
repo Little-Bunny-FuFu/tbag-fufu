@@ -333,6 +333,20 @@ TBAG_LOCALE = setmetatable({
   ["<home location>"] = "<home location>",
 
 -----------------------------------------------------------------------
+-- CHARGES 
+-----------------------------------------------------------------------
+  -- Pattern to get the charges from a tooltip
+  -- Probably only need to chage the Charges.
+  -- The ? after the s implies that the s may not be there
+  -- as would be the case in a single Charge.
+  ["(%d+) Charges?"] = "(%d+) Charges?",
+  -- Format string for adding the charges tooltip.
+  -- %d is the number of charges.  |4 specifies this
+  -- is a plural/singular pair.  Up until the : is the
+  -- singular form after is the plural until the ;.
+  ["%d |4Charge:Charges;"] = "%d |4Charge:Charges;",
+
+-----------------------------------------------------------------------
 -- BINDING STRINGS 
 -----------------------------------------------------------------------
   ["Toggle Bank Window"] = "Toggle Bank Window",
