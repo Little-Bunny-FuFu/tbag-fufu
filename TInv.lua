@@ -319,8 +319,10 @@ function TInv_OnEvent(event)
         TInv_UpdateWindow();
       end
     elseif ( event == "BAG_UPDATE_COOLDOWN" ) then
-      -- Only process events related to the inventory window
-      if (arg1 and TBag_Member(TInv_Bags, arg1)) then
+      -- If we're given an argument check if it's a inventory bag and ignore the event
+      -- if it isn't.  If not argument is passed we have to update the window 
+      -- regardless.  /sigh
+      if (not arg1 or TBag_Member(TInv_Bags, arg1)) then
         TInv_UpdateWindow();
       end
     elseif ( event == "ITEM_LOCK_CHANGED" ) then

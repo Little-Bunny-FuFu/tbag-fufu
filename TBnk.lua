@@ -356,8 +356,10 @@ function TBnk_OnEvent(event)
         TBnk_UpdateWindow();
       end
     elseif ( event == "BAG_UPDATE_COOLDOWN" ) then
-      -- Only process for events that are related to the bank.
-      if (arg1 and TBag_Member(TBnk_Bags, arg1)) then	
+      -- If we're given an argument check if it's a bank bag and ignore the event
+      -- if it isn't.  If not argument is passed we have to update the window 
+      -- regardless.  /sigh
+      if (not arg1 or TBag_Member(TBnk_Bags, arg1)) then	
         TBnk_UpdateWindow();
       end
     elseif ( event == "ITEM_LOCK_CHANGED" ) then
