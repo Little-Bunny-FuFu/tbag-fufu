@@ -2702,8 +2702,8 @@ function TBag_ScanMail()
         itm[TBAG_I_COUNT] = count;
         itm[TBAG_I_ITEMLINK] = itemlink; 
 	itm[TBAG_I_RARITY] = quality;
-        local tooltip = TBagMakeToolTipStr(playerid, itm[TBAG_I_ITEMLINK], nil, nil,
-                                           idx, slot);
+        local tooltip = TBag_MakeToolTipStr(playerid, itm[TBAG_I_ITEMLINK], nil, nil,
+                                            idx, slot);
         itm[TBAG_I_CHARGES] = TBag_GetItmCharges(tooltip);
       end
     end
