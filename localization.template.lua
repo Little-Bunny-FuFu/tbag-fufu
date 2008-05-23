@@ -321,6 +321,26 @@ TBAG_LOCALE = setmetatable({
   [" as %s's %s"] = " as %s's %s", -- Used when an item is used as a container for a character
 
 -----------------------------------------------------------------------
+-- HEARTHSTONE 
+-----------------------------------------------------------------------
+  -- These two strings are used to replace the home location on the tooltip
+  -- for Hearthstones.  The first string should be translated to match the
+  -- text from the Use: up to the actual location and end on the period.
+  -- If you keep it to just 3 captures with the 2nd capture from the
+  -- expression being the location then you probably don't need to change
+  -- the 2nd line.  The 2nd line controls putting the string back together.
+  -- %%1 and %%3 represent the first and third captures from the previous
+  -- expresion.  %s is the location that will be replaced.
+  ["(Use: Returns you to )([^%.]*)(%.)"] = "(Use: Returns you to )([^%.]*)(%.)",
+  ["%%1%s%%3"] = "%%1%s%%3",
+
+  -- Generic name for the home location if we don't have it cached.
+  -- The tooltip should have something like this where in the text
+  -- where it describes how to change your bind point.  Brackets are
+  -- there to imply it's a placeholder.
+  ["<home location>"] = "<home location>",
+
+-----------------------------------------------------------------------
 -- BINDING STRINGS 
 -----------------------------------------------------------------------
   ["Toggle Bank Window"] = "Toggle Bank Window",

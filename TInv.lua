@@ -366,6 +366,8 @@ function TInv_OnEvent(event)
     TBag_ScanEquipped();
   elseif ( event == "MAIL_INBOX_UPDATE" ) then
     TBag_ScanMail();
+  elseif ( event == "PLAYER_LEAVING_WORLD" ) then
+    TBagInfo[TBAG_PLAYERID][TBAG_G_BASIC][TBAG_S_HEARTH] = GetBindLocation();
   end
 
   TBag_PrintDEBUG("TInv_Event: Finished "..event);

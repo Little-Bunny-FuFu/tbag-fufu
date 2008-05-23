@@ -779,7 +779,7 @@
           this:RegisterEvent("ITEM_LOCK_CHANGED");
           this:RegisterEvent("UNIT_INVENTORY_CHANGED");
           this:RegisterEvent("UPDATE_INVENTORY_ALERTS");
-
+          this:RegisterEvent("PLAYER_LEAVING_WORLD");
           this:RegisterEvent("CRAFT_SHOW");
           this:RegisterEvent("TRADE_SKILL_SHOW");
 

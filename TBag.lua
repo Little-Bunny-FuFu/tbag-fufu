@@ -123,6 +123,7 @@ TBAG_S_EQUIPPED  = "equip";
 
 TBAG_G_BASIC     = "basic";
 TBAG_S_CLASS     = "class";
+TBAG_S_HEARTH    = "hearth";
 
 -- Localization Support
 local L = TBAG_LOCALE;
@@ -249,6 +250,7 @@ function TBag_Init()
   local group;
   group = TBagInfo[TBAG_PLAYERID][TBAG_G_BASIC];
   _, group[TBAG_S_CLASS] = UnitClass("player");
+  group[TBAG_S_HEARTH] = GetBindLocation();
 
   -- Cleanout old trash
   TBag_CleanConfig();
@@ -2008,6 +2010,29 @@ function TBag_GetInvSlotID(bag, slot)
   return id;
 end
 
+function TBag_UpdateHearth(tt, itemlink, playerid)
+  -- Make sure we're looking at a hearthstone on another player if not
+  -- we end up doing nothing.
+  if (playerid ~= TBAG_PLAYERID and string.match(itemlink,"item:6948")) then
+    local hearth = TBagInfo[playerid][TBAG_G_BASIC][TBAG_S_HEARTH];
+    if (not hearth) then
+      hearth = L["<home location>"];
+    end
+    local repl = string.format(L["%%1%s%%3"],hearth);    local ttname = tt:GetName();
+    
+    for i=1, tt:NumLines() do 
+      local ttleft = getglobal(ttname.."TextLeft"..i);
+      if (ttleft) then        local line = ttleft:GetText();        if (line) then
+          local sub,match = string.gsub(line, L["(Use: Returns you to )([^%.]*)(%.)"],repl,1);          if (match == 1) then
+            ttleft:SetText(sub);
+            break;
+          end
+        end
+      end
+    end
+  end
+end 
+
 function TBag_SetInventoryItem(tt, playerid, itemlink, bag, slot)
   local hasCooldown, repairCost;
 
@@ -2023,10 +2048,12 @@ function TBag_SetInventoryItem(tt, playerid, itemlink, bag, slot)
     else
       -- otherwise, just set a link.  Not as good, but safe
       tt:SetHyperlink(itemlink);
+      TBag_UpdateHearth(tt, itemlink, playerid);
     end
   else
     -- Always just set links for other players
     tt:SetHyperlink(itemlink);
+    TBag_UpdateHearth(tt, itemlink, playerid);
   end
   
   return hasCooldown, repairCost;
