@@ -457,6 +457,13 @@ function TBnk_ItemButton_OnEnter(self)
   hasCooldown, repairCost = TBag_SetInventoryItem(GameTooltip, TBNK_PLAYERID, 
     itm[TBAG_I_ITEMLINK], itm[TBAG_I_BAG], itm[TBAG_I_SLOT]);
 
+  -- Set charges if remote viewing
+  if ((TBNK_PLAYERID ~= TBAG_PLAYERID or TBNK_ATBANK == 0) and itm[TBAG_I_CHARGES]) then
+    GameTooltip:AddLine(string.format(L["%d |4Charge:Charges;"],
+      tonumber(itm[TBAG_I_CHARGES])),255,255,255,1);
+    GameTooltip:Show();
+  end
+
   if ( InRepairMode() and (repairCost and repairCost > 0) ) then
     GameTooltip:AddLine(TEXT(REPAIR_COST), 1, 1, 1);
     SetTooltipMoney(GameTooltip, repairCost);

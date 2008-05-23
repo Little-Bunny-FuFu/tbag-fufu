@@ -68,6 +68,7 @@ TBAG_I_RARITY    = "ir";
 local TBAG_I_COUNT     = "ic";
 local TBAG_I_NEED      = "sn";
 local TBAG_I_SOULBOUND = "sb";
+TBAG_I_CHARGES         = "ch";
 
 -- Used in the item compression routines
 TBAG_COMP_EMPTY = "e";
@@ -2059,36 +2060,46 @@ function TBag_SetInventoryItem(tt, playerid, itemlink, bag, slot)
   return hasCooldown, repairCost;
 end
 
-function TBag_MakeToolTipStr(playerid, itemlink, bag, slot)
+function TBag_MakeToolTipStr(playerid, itemlink, bag, slot, mailitem, attach)
   local ttname = "TBag_tt";
-  local tt = getglobal(ttname);
-  local idx = 1;
-  local ttleft = getglobal(ttname.."TextLeft"..idx);
+  local tt = TBag_tt 
   local tooltip = "";
-  local tmpval;
   local hasCooldown, repairCost;
-  
+ 
+  if (not tt) then
+    tt = CreateFrame("GameTooltip","TBag_tt");
+    -- Allow tooltip set methods to dynamically add new lines based on these
+    TBag_tt:AddFontStrings(
+      TBag_tt:CreateFontString("$parentTextLeft1", nil, "GameTooltipText"),
+      TBag_tt:CreateFontString("$parentTextRight1", nil, "GameTooltipText")
+    );
+  end
   tt:SetOwner(UIParent, "ANCHOR_NONE");  -- this makes sure that tooltip.valid = true
+  tt:ClearLines();
 
   -- Set as much information as we have
   if (itemlink) and (bag) and (slot) then
     hasCooldown, repairCost = TBag_SetInventoryItem(tt, playerid, itemlink, bag, slot);
+  elseif (itemlink) and (bag) then
+    -- Just a bag id means it's a slotid used for scanning inventory items.
+    local slotid = bag;
+    _, hasCooldown, repairCost = tt:SetInventoryItem("player", slotid);
+  elseif (itemlink) and (mailitem) and (attach) then
+    tt:SetInboxItem(mailitem, attach);
   elseif (itemlink) then
     tt:SetHyperlink(itemlink);
   end
 
-  repeat
-    tmpval = ttleft:GetText();
+  for i=1, tt:NumLines() do
+    local ttleft = getglobal(ttname.."TextLeft"..i);
+    if (ttleft) then
+      local line = ttleft:GetText();
 
-    if (tmpval ~= nil) then
-      tooltip = tooltip.." "..tmpval;
+      if (line) then
+        tooltip = tooltip.." "..line;
+      end
     end
-
-    idx=idx + 1;
-    ttleft = getglobal(ttname.."TextLeft"..idx);
-  until (tmpval==nil) or (ttleft==nil);
-
-  tt:Hide();
+  end
 
   return tooltip, hasCooldown, repairCost;
 end
@@ -2175,6 +2186,10 @@ function TBag_CreateItm()
   return TBag_Itm;
 end
 
+function TBag_GetItmCharges(tooltip) 
+  return string.match(tooltip, L["(%d+) Charges?"]);
+end 
+
 function TBag_UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, comparr, atbank)
 --  UpdateAddOnMemoryUsage();
 --  TBag_PrintDEBUG('UpdateItmCache Start Memory = '..tostring(GetAddOnMemoryUsage("TBag")));
@@ -2225,6 +2240,7 @@ function TBag_UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, comparr,
           if (itmcache[bag][slot] == nil) then
             itmcache[bag][slot] = { [TBAG_I_KEYWORD] = {} };
           end
+          local tooltip = nil;
 
 	  itm = TBag_CreateItm();
 	  
@@ -2240,6 +2256,7 @@ function TBag_UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, comparr,
           itm[TBAG_I_CAT] = itmcache[bag][slot][TBAG_I_CAT];
           itm[TBAG_I_KEYWORD] = itmcache[bag][slot][TBAG_I_KEYWORD];
 	  itm[TBAG_I_SOULBOUND] = itmcache[bag][slot][TBAG_I_SOULBOUND];
+          itm[TBAG_I_CHARGES] = itmcache[bag][slot][TBAG_I_CHARGES];
 
           if (itm[TBAG_I_ITEMLINK] ~= nil) then
             -- there's an item in the bag, let's find out more about it
@@ -2253,6 +2270,16 @@ function TBag_UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, comparr,
               itm[TBAG_I_NEED] = stacksize - itm[TBAG_I_COUNT];
             else
               itm[TBAG_I_NEED] = 0;
+            end
+
+            if (itm[TBAG_I_CHARGES]) then
+              -- If the item has cached charges scan the tooltip again.
+              -- This is slow so we don't do it unless we've got cached charges
+              -- Down below we check the tooltip on every item the first time we
+              -- see it.  Since items can't just get charges this allows us
+              -- to still update charges without eating a huge performance hit.
+              tooltip = TBag_MakeToolTipStr(playerid, itm[TBAG_I_ITEMLINK], bag, slot);
+              itm[TBAG_I_CHARGES] = TBag_GetItmCharges(tooltip);
             end
 
           else
@@ -2283,10 +2310,14 @@ function TBag_UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, comparr,
               itm[TBAG_I_NEWSTR] = TBAG_V_NEWON;
 	      TBAG_FORCED_SHOW[TBag_BagSlotToString(itm[TBAG_I_BAG],itm[TBAG_I_SLOT])] = 1
             end
-            local tooltip = TBag_MakeToolTipStr(playerid, itm[TBAG_I_ITEMLINK], bag, slot);
+            if (not tooltip) then
+              -- Haven't already made it so make it now.
+              tooltip = TBag_MakeToolTipStr(playerid, itm[TBAG_I_ITEMLINK], bag, slot);
+            end
             if (string.find(tooltip, L["Soulbound"])) then
               itm[TBAG_I_SOULBOUND] = 1;
             end
+            itm[TBAG_I_CHARGES] = TBag_GetItmCharges(tooltip);
           else
             -- item has not changed, maybe the count did?
             if ( (itm[TBAG_I_COUNT] ~= itmcache[bag][slot][TBAG_I_COUNT]) and (itmcache[bag][slot][TBAG_I_COUNT] ~= nil) ) then
@@ -2617,7 +2648,8 @@ function TBag_ScanEquipped()
   -- Arrange by itemlink (for equipped) and player (for TBody)
   for key, value in pairs(TBody_Slots) do
 --    TBag_Print("Equipped ID="..GetInventorySlotInfo(key).." for "..key);
-    itemLink = GetInventoryItemLink("player", GetInventorySlotInfo(key) );
+    local slot = GetInventorySlotIinfo(key);
+    itemLink = GetInventoryItemLink("player", slot);
 
     TBodyItm[TBAG_PLAYERID][TBAG_D_BAG][value] = {};
     local dbag = TBodyItm[TBAG_PLAYERID][TBAG_D_BAG][value];
@@ -2628,6 +2660,9 @@ function TBag_ScanEquipped()
 
       dbag[TBAG_I_NAME],_,dbag[TBAG_I_RARITY] = GetItemInfo(dbag[TBAG_I_ITEMLINK]);
       dbag[TBAG_I_COUNT] = 1;
+
+      local tooltip = TBag_MakeToolTipStr(playerid, dbag[TBAG_I_ITEMLINK], slot);
+      dbag[TBAG_I_CHARGES] = TBag_GetItmCharges(tooltip);
     end
   end
 end
@@ -2667,6 +2702,9 @@ function TBag_ScanMail()
         itm[TBAG_I_COUNT] = count;
         itm[TBAG_I_ITEMLINK] = itemlink; 
 	itm[TBAG_I_RARITY] = quality;
+        local tooltip = TBagMakeToolTipStr(playerid, itm[TBAG_I_ITEMLINK], nil, nil,
+                                           idx, slot);
+        itm[TBAG_I_CHARGES] = TBag_GetItmCharges(tooltip);
       end
     end
   end

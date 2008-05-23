@@ -7,14 +7,6 @@
   <Script file="TBagTrade.lua"/>
   <Script file="TBagItemInfo.lua"/>
 
-  <GameTooltip name="TBag_tt" frameStrata="TOOLTIP" visible="false" hidden="true" parent="UIParent" inherits="GameTooltipTemplate">
-    <Scripts>
-      <OnLoad>
-        this:SetOwner(UIParent, "ANCHOR_NONE");
-      </OnLoad>
-    </Scripts>
-  </GameTooltip>
-
   <FontString name="TBag_BigFont"  font="Interface\AddOns\TBag\DAB_CooldownFont.ttf" virtual="true" justifyH="CENTER">
     <Shadow>
       <Offset>
