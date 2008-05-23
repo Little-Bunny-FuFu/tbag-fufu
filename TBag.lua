@@ -2013,8 +2013,11 @@ end
 
 function TBag_UpdateHearth(tt, itemlink, playerid)
   -- Make sure we're looking at a hearthstone on another player if not
-  -- we end up doing nothing.
-  if (playerid ~= TBAG_PLAYERID and string.match(itemlink,"item:6948")) then
+  -- we end up doing nothing.  Ruby Slippers count as a hearthstone
+  -- as well.
+  if (playerid ~= TBAG_PLAYERID and
+      (string.match(itemlink,"item:6948:") or
+      string.match(itemlink,"item:28585:"))) then
     local hearth = TBagInfo[playerid][TBAG_G_BASIC][TBAG_S_HEARTH];
     if (not hearth) then
       hearth = L["<home location>"];
