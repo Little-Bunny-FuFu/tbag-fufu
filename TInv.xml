@@ -389,7 +389,7 @@
             TInv_Button_ShowBank_OnClick();
           </OnClick>
           <OnEnter>
-		  GameTooltip_AddNewbieTip(TBAG_LOCALE["View Bank"], 1.0, 1.0, 1.0, TBAG_LOCALE["Displays bank contents in a view-only mode.  You may select another player's bank to view from the dropdown."]);
+		  GameTooltip_AddNewbieTip(TBAG_LOCALE["Toggle Bank"], 1.0, 1.0, 1.0, TBAG_LOCALE["Displays bank contents in a view-only mode.  You may select another player's bank to view from the dropdown."]);
           </OnEnter>
           <OnLeave>
             GameTooltip:Hide();

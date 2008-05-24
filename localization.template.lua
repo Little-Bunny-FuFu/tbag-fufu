@@ -424,7 +424,7 @@ TBAG_LOCALE = setmetatable({
 
   ["Show Bank"] = "Show Bank",
   ["Hide Bank"] = "Hide Bank",
-  ["View Bank"] = "View Bank",
+  ["Toggle Bank"] = "Toggle Bank",
   ["Displays bank contents in a view-only mode.  You may select another player's bank to view from the dropdown."] = "Displays bank contents in a view-only mode.  You may select another player's bank to view from the dropdown.",
 
   ["Show Purchase"] = "Show Purchase",
