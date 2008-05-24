@@ -1525,94 +1525,94 @@ function TInvFrame_RightClickMenu_populate(level)
           end
           UIDropDownMenu_AddButton(info, level);
 	elseif (UIDROPDOWNMENU_MENU_VALUE["opt"] == "hide_frames") then
-	  info = {
+          info = {
             ["text"] = L["Hide Player Dropdown"];
-	    ["func"] = TInv_Toggle_UserDropdown;
-	    };
+            ["func"] = TInv_Toggle_UserDropdown;
+            };
           if (TInvCfg["show_userdropdown"] == 0) then
             info["checked"] = 1;
           end
-	  UIDropDownMenu_AddButton(info, level);
-	  info = {
-            ["text"] = L["Hide Search Box"];
-	    ["func"] = TInv_Toggle_SearchBox;
-	    };
-          if (TInvCfg["show_searchbox"] == 0) then
-            info["checked"] = 1;
-          end
-	  UIDropDownMenu_AddButton(info, level);
-	  info = {
-            ["text"] = L["Hide Re-sort Button"];
-	    ["func"] = TInv_Toggle_ReloadButton;
-	    };
-          if (TInvCfg["show_reloadbutton"] == 0) then
-            info["checked"] = 1;
-          end
-	  UIDropDownMenu_AddButton(info, level);
-	  info = {
-            ["text"] = L["Hide Bank Button"];
-	    ["func"] = TInv_Toggle_BankButton;
-	    };
-          if (TInvCfg["show_bankbutton"] == 0) then
-            info["checked"] = 1;
-          end
-	  UIDropDownMenu_AddButton(info, level);
-	  info = {
-            ["text"] = L["Hide Edit Button"];
-	    ["func"] = TInv_Toggle_EditButton;
-	    };
-          if (TInvCfg["show_editbutton"] == 0) then
-            info["checked"] = 1;
-          end
-	  UIDropDownMenu_AddButton(info, level);
-	  info = {
+          UIDropDownMenu_AddButton(info, level);
+          info = {
             ["text"] = L["Hide Hilight Button"];
-	    ["func"] = TInv_Toggle_HighlightButton;
-	    };
+            ["func"] = TInv_Toggle_HighlightButton;
+            };
           if (TInvCfg["show_hilightbutton"] == 0) then
             info["checked"] = 1;
           end
-	  UIDropDownMenu_AddButton(info, level);
-	  info = {
+          UIDropDownMenu_AddButton(info, level);
+          info = {
+            ["text"] = L["Hide Edit Button"];
+            ["func"] = TInv_Toggle_EditButton;
+            };
+          if (TInvCfg["show_editbutton"] == 0) then
+            info["checked"] = 1;
+          end
+          UIDropDownMenu_AddButton(info, level);
+          info = {
+            ["text"] = L["Hide Bank Button"];
+            ["func"] = TInv_Toggle_BankButton;
+            };
+          if (TInvCfg["show_bankbutton"] == 0) then
+            info["checked"] = 1;
+          end
+          UIDropDownMenu_AddButton(info, level);
+          info = {
+            ["text"] = L["Hide Re-sort Button"];
+            ["func"] = TInv_Toggle_ReloadButton;
+            };
+          if (TInvCfg["show_reloadbutton"] == 0) then
+            info["checked"] = 1;
+          end
+          UIDropDownMenu_AddButton(info, level);
+          info = {
             ["text"] = L["Hide Lock Button"];
-	    ["func"] = TInv_Toggle_LockButton;
-	    };
+            ["func"] = TInv_Toggle_LockButton;
+            };
           if (TInvCfg["show_lockbutton"] == 0) then
             info["checked"] = 1;
           end
-	  UIDropDownMenu_AddButton(info, level);
-	  info = {
+          UIDropDownMenu_AddButton(info, level);
+          info = {
             ["text"] = L["Hide Close Button"];
-	    ["func"] = TInv_Toggle_CloseButton;
-	    };
+            ["func"] = TInv_Toggle_CloseButton;
+            };
           if (TInvCfg["show_closebutton"] == 0) then
             info["checked"] = 1;
           end
-	  UIDropDownMenu_AddButton(info, level);
-	  info = {
+          UIDropDownMenu_AddButton(info, level);
+          info = {
+            ["text"] = L["Hide Search Box"];
+            ["func"] = TInv_Toggle_SearchBox;
+            };
+          if (TInvCfg["show_searchbox"] == 0) then
+            info["checked"] = 1;
+          end
+          UIDropDownMenu_AddButton(info, level);
+          info = {
             ["text"] = L["Hide Total"];
-	    ["func"] = TInv_Toggle_Total;
-	    };
+            ["func"] = TInv_Toggle_Total;
+            };
           if (TInvCfg["show_total"] == 0) then
             info["checked"] = 1;
           end
-	  UIDropDownMenu_AddButton(info, level);
-	  info = {
+          UIDropDownMenu_AddButton(info, level);
+          info = {
             ["text"] = L["Hide Bag Buttons"];
-	    ["func"] = TInv_Toggle_BagSlotButtons;
-	    };
+            ["func"] = TInv_Toggle_BagSlotButtons;
+            };
           if (TInvCfg["show_bagbuttons"] == 0) then
             info["checked"] = 1;
           end
-	  UIDropDownMenu_AddButton(info, level);
-	  info = {
+          UIDropDownMenu_AddButton(info, level);
+          info = {
             ["text"] = L["Hide Money"];
-	    ["func"] = TInv_Toggle_Money;
-	    };
+            ["func"] = TInv_Toggle_Money;
+            };
           if (TInvCfg["show_money"] == 0) then
             info["checked"] = 1;
           end
-	  UIDropDownMenu_AddButton(info, level);
+          UIDropDownMenu_AddButton(info, level);
 	elseif (UIDROPDOWNMENU_MENU_VALUE["opt"] == "select_character") then
 	  TInv_UserDropdown_Initialize(level);
         end

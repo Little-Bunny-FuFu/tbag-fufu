@@ -1629,10 +1629,18 @@ function TBnkFrame_RightClickMenu_populate(level)
           end
           UIDropDownMenu_AddButton(info, level);
           info = {
-            ["text"] = L["Hide Re-sort Button"];
-            ["func"] = TBnk_Toggle_ReloadButton;
+            ["text"] = L["Hide Hilight Button"];
+            ["func"] = TBnk_Toggle_HighlightButton;
             };
-          if (TBnkCfg["show_reloadbutton"] == 0) then
+          if (TBnkCfg["show_hilightbutton"] == 0) then
+            info["checked"] = 1;
+          end
+          UIDropDownMenu_AddButton(info, level);
+          info = {
+            ["text"] = L["Hide Edit Button"];
+            ["func"] = TBnk_Toggle_EditButton;
+           };
+          if (TBnkCfg["show_editbutton"] == 0) then
             info["checked"] = 1;
           end
           UIDropDownMenu_AddButton(info, level);
@@ -1644,19 +1652,11 @@ function TBnkFrame_RightClickMenu_populate(level)
             info["checked"] = 1;
           end
           UIDropDownMenu_AddButton(info, level);
-           info = {
-            ["text"] = L["Hide Edit Button"];
-            ["func"] = TBnk_Toggle_EditButton;
-            };
-          if (TBnkCfg["show_editbutton"] == 0) then
-            info["checked"] = 1;
-          end
-          UIDropDownMenu_AddButton(info, level);
           info = {
-            ["text"] = L["Hide Hilight Button"];
-            ["func"] = TBnk_Toggle_HighlightButton;
+            ["text"] = L["Hide Re-sort Button"];
+            ["func"] = TBnk_Toggle_ReloadButton;
             };
-          if (TBnkCfg["show_hilightbutton"] == 0) then
+          if (TBnkCfg["show_reloadbutton"] == 0) then
             info["checked"] = 1;
           end
           UIDropDownMenu_AddButton(info, level);
