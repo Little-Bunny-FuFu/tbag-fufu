@@ -402,7 +402,7 @@
         <Anchors>
         <Anchor point="TOPLEFT" relativeTo="TBnk_UserDropdown" relativePoint="TOPRIGHT">
             <Offset>
-              <AbsDimension x="-8" y="-3"/>
+              <AbsDimension x="15" y="-3"/>
             </Offset>
           </Anchor>
         </Anchors>

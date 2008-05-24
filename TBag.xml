@@ -56,19 +56,6 @@
   </Frame>
 
   <Frame name="TBag_UserDropdownTemplate" inherits="UIDropDownMenuTemplate" enableMouse="true" virtual="true">
-  <Layers>
-    <Layer level="BACKGROUND">
-      <FontString name="$parentLabel" inherits="GameFontNormalSmall" text=" ">
-        <Anchors>
-          <Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT">
-            <Offset>
-              <AbsDimension x="-70" y="-20"/>
-            </Offset>
-          </Anchor>
-        </Anchors>
-      </FontString>
-    </Layer>
-  </Layers>
   <Scripts>
     <OnEnter>
       GameTooltip:SetOwner(this, "ANCHOR_TOPRIGHT");

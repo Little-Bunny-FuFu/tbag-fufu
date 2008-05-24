@@ -878,7 +878,7 @@ function TBnk_SetTopLeftButton_Anchors()
       if (button_left) then
         if (button_left == dropdown) then
           -- First button after dropdown
-          button:SetPoint("TOPLEFT",button_left,"TOPRIGHT",-8,-3);
+          button:SetPoint("TOPLEFT",button_left,"TOPRIGHT",15,-3);
         else
           -- button following another button
           button:SetPoint("TOPLEFT",button_left,"TOPRIGHT",2,0);
@@ -1952,6 +1952,9 @@ function TBnk_UserDropdown_OnLoad()
   UIDropDownMenu_SetSelectedValue(this, TBNK_PLAYERID);
   TBnk_UserDropdown.tooltip = L["You are viewing the selected player's bank."];
   UIDropDownMenu_SetWidth(TBAG_USERDD_WIDTH, TBnk_UserDropdown);
+  -- UIDropDownMenu_SetWidth actually adds 50 to our width, we really only want
+  -- 25 to avoid the control running into our buttons on the right.
+  this:SetWidth(TBAG_USERDD_WIDTH + 25);
 --  OptionsFrame_EnableDropDown(TBnk_UserDropdown);
 end
 

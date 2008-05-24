@@ -787,7 +787,7 @@ function TInv_SetTopLeftButton_Anchors()
       if (button_left) then
         if (button_left == dropdown) then
           -- First button after dropdown
-          button:SetPoint("TOPLEFT",button_left,"TOPRIGHT",-8,-3);
+          button:SetPoint("TOPLEFT",button_left,"TOPRIGHT",15,-3);
         else
           -- button following another button
           button:SetPoint("TOPLEFT",button_left,"TOPRIGHT",2,0);
@@ -1866,6 +1866,9 @@ function TInv_UserDropdown_OnLoad()
   UIDropDownMenu_SetSelectedValue(this, TINV_PLAYERID);
   TInv_UserDropdown.tooltip = L["You are viewing the selected player's inventory."];
   UIDropDownMenu_SetWidth(TBAG_USERDD_WIDTH, this);
+  -- UIDropDownMenu_SetWidth actually adds 50 to our width, we really only want
+  -- 25 to avoid the control running into our buttons on the right.
+  this:SetWidth(TBAG_USERDD_WIDTH+25);
 --  OptionsFrame_EnableDropDown(this);
 end
 
