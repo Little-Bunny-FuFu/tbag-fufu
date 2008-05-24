@@ -593,8 +593,16 @@ function TInv_Button_HighlightToggle_OnClick()
   PlaySound("igMainMenuOptionCheckBoxOn");
   if (TInv_hilight_new == 0) then
     TInv_hilight_new = 1;
+    if (GameTooltip:GetOwner() == TInv_Button_HighlightToggle) then
+      GameTooltip_AddNewbieTip(L["Normal"], 1.0, 1.0, 1.0,
+                               L["Highlight of new items is ON."]);
+    end
   else
     TInv_hilight_new = 0;
+    if (GameTooltip:GetOwner() == TInv_Button_HighlightToggle) then
+      GameTooltip_AddNewbieTip(L["Hilight"], 1.0, 1.0, 1.0,
+                               L["Highlight of new items is OFF."]);
+    end
   end
   TInv_UpdateWindow();
 end
@@ -647,10 +655,18 @@ function TInv_Button_MoveLockToggle_OnClick()
     TInvCfg["moveLock"] = 1;
     TInvLockNorm:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Unlocked-Up"); 
     TInvLockPush:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Unlocked-Down"); 
+    if (GameTooltip:GetOwner() == TInv_Button_MoveLockToggle) then
+      GameTooltip_AddNewbieTip(L["Lock Window"], 1.0, 1.0, 1.0, 
+                               L["Prevent window from being moved by dragging it."]);
+    end
   else
     TInvCfg["moveLock"] = 0;
     TInvLockNorm:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Locked-Up"); 
     TInvLockPush:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Locked-Down"); 
+    if (GameTooltip:GetOwner() == TInv_Button_MoveLockToggle) then
+      GameTooltip_AddNewbieTip(L["Unlock Window"], 1.0, 1.0, 1.0,
+                               L["Allow window to be moved by dragging it."]);
+    end
   end
 end
 
@@ -1340,14 +1356,14 @@ function TInvFrame_RightClickMenu_populate(level)
       UIDropDownMenu_AddButton(info, level);
 
       info = {
-        ["text"] = L["Reload bags"],
+        ["text"] = L["Reload and Sort"],
         ["value"] = nil,
         ["func"] = TInv_Button_Reload_OnClick
         };
       UIDropDownMenu_AddButton(info, level);
 
       info = {
-        ["text"] = L["Show Bank"],
+        ["text"] = L["Toggle Bank"],
         ["value"] = nil,
         ["func"] = TInv_Button_ShowBank_OnClick
         };
@@ -1848,7 +1864,7 @@ end
 function TInv_UserDropdown_OnLoad()
   UIDropDownMenu_Initialize(this, TInv_UserDropdown_Initialize);
   UIDropDownMenu_SetSelectedValue(this, TINV_PLAYERID);
-  TInv_UserDropdown.tooltip = L["You are viewing this player's inventory."];
+  TInv_UserDropdown.tooltip = L["You are viewing the selected player's inventory."];
   UIDropDownMenu_SetWidth(TBAG_USERDD_WIDTH, this);
 --  OptionsFrame_EnableDropDown(this);
 end

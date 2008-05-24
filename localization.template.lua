@@ -406,41 +406,35 @@ TBAG_LOCALE = setmetatable({
 -----------------------------------------------------------------------
   ["TBag v%s"] = "TBag v%s",
 
-  ["L"] = "L",
-  ["U"] = "U",
-
   ["Normal"] = "Normal",
   ["Highlight of new items is ON."] = "Highlight of new items is ON.",
   ["Hilight"] = "Hilight",
   ["Highlight of new items is OFF."] = "Highlight of new items is OFF.",
 
-  ["View"] = "View",
-  ["Edit"] = "Edit",
-  ["Edit Mode"] = "Edit Mode",
+  ["Toggle Edit Mode"] = "Toggle Edit Mode",
   ["Select this option to move classes of items into different 'bars' (the red numbers)."] = "Select this option to move classes of items into different 'bars' (the red numbers).",
 
-  ["Re-sort View"] = "Re-sort View",
-  ["Reloads your items and re-sorts their view."] = "Reloads your items and re-sorts their view.",
+  ["Reload and Sort"] = "Reload and Sort",
+  ["Reloads your items and sorts them."] = "Reloads your items and sorts them.",
 
-  ["Show Bank"] = "Show Bank",
-  ["Hide Bank"] = "Hide Bank",
   ["Toggle Bank"] = "Toggle Bank",
   ["Displays bank contents in a view-only mode.  You may select another player's bank to view from the dropdown."] = "Displays bank contents in a view-only mode.  You may select another player's bank to view from the dropdown.",
 
-  ["Show Purchase"] = "Show Purchase",
-  ["Hide Purchase"] = "Hide Purchase",
-  ["View Purchase Info"] = "View Purchase Info",
+  ["Toggle Purchase Info"] = "Toggle Purchase Info",
   ["Displays the purchase button and cost to buy a new bank slot.  This is disabled in read-only views and edit mode."] = "Displays the purchase button and cost to buy a new bank slot.  This is disabled in read-only views and edit mode.",
 
+  ["Unlock Window"] = "Unlock Window",
+  ["Allow window to be moved by dragging it."] = "Allow window to be moved by dragging it.",
+  ["Lock Window"] = "Lock Window",
+  ["Prevent window from being moved by dragging it."] = "Prevent window from being moved by dragging it.",
+  
   ["<++>"] = "<++>",
-  ["Window Size"] = "Window Size",
+  ["Increase Window Size"] = "Increase Window Size",
   ["Increase the number of columns displayed"] = "Increase the number of columns displayed",
 
   [">--<"] = ">--<",
-  ["Window Size"] = "Window Size",
+  ["Decrease Window Size"] = "Decrease Window Size",
   ["Decrease the number of columns displayed"] = "Decrease the number of columns displayed",
-
-  ["Re-sort"] = "Re-sort",
 
   ["Reset"] = "Reset",
   ["Close"] = "Close",
@@ -481,8 +475,6 @@ TBAG_LOCALE = setmetatable({
   ["Select Character"] = "Select Character",
   ["Edit Mode"] = "Edit Mode",
   ["Lock window"] = "Lock window",
-  ["Reload bags"] = "Reload bags",
-  ["Show Bank"] = "Show Bank",
   ["Show Purchase Info"] = "Show Purchase Info",
   ["Close Inventory"] = "Close Inventory",
   ["Hilight New Items"] = "Hilight New Items",
@@ -510,8 +502,8 @@ TBAG_LOCALE = setmetatable({
   ["Right click for options"] = "Right click for options",
   ["|c%sLeft click to select category to move:|r |c%s%s|r"] = "|c%sLeft click to select category to move:|r |c%s%s|r",
   ["Right click to assign this item to a different category"] = "Right click to assign this item to a different category",
-  ["You are viewing this player's bank."] = "You are viewing this player's bank.",
-  ["You are viewing this player's inventory."] = "You are viewing this player's inventory.",
+  ["You are viewing the selected player's bank."] = "You are viewing the selected player's bank.",
+  ["You are viewing the selected player's inventory."] = "You are viewing the selected player's inventory.",
   ["Equip Container"] = "Equip Container",
   ["Anchor"] = "Anchor",
   ["TOPLEFT"] = "TOPLEFT",

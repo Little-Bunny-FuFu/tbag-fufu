@@ -280,7 +280,7 @@
           </OnClick>
           <OnEnter>
             GameTooltip_AddNewbieTip(
-              TBAG_LOCALE["Window Size"],
+              TBAG_LOCALE["Increase Window Size"],
               1.0, 1.0, 1.0,
               TBAG_LOCALE["Increase the number of columns displayed"] );
           </OnEnter>
@@ -314,7 +314,7 @@
 
           <OnEnter>
             GameTooltip_AddNewbieTip(
-              TBAG_LOCALE["Window Size"],
+              TBAG_LOCALE["Decrease Window Size"],
               1.0, 1.0, 1.0,
 	      TBAG_LOCALE["Decrease the number of columns displayed"] );
           </OnEnter>
@@ -364,9 +364,11 @@
           </OnClick>
           <OnEnter>
             if (TBnkCfg["moveLock"] == 0) then
-              GameTooltip_AddNewbieTip("Window Dragging: Off", 1.0, 1.0, 1.0, "Window is currently locked in place.");
+              GameTooltip_AddNewbieTip(TBAG_LOCALE["Unlock Window"], 1.0, 1.0, 1.0,
+                                       TBAG_LOCALE["Allow window to be moved by dragging it."]);
             else
-              GameTooltip_AddNewbieTip("Window Dragging: On", 1.0, 1.0, 1.0, "Window is currently unlocked.");
+              GameTooltip_AddNewbieTip(TBAG_LOCALE["Lock Window"], 1.0, 1.0, 1.0,
+                                       TBAG_LOCALE["Prevent window from being moved by dragging it."]);
             end
           </OnEnter>
           <OnLeave>
@@ -439,7 +441,7 @@
             TBnk_Button_ChangeEditMode_OnClick();
           </OnClick>
           <OnEnter>
-		  GameTooltip_AddNewbieTip(TBAG_LOCALE["Edit Mode"], 1.0, 1.0, 1.0, TBAG_LOCALE["Select this option to move classes of items into different 'bars' (the red numbers)."]);
+		  GameTooltip_AddNewbieTip(TBAG_LOCALE["Toggle Edit Mode"], 1.0, 1.0, 1.0, TBAG_LOCALE["Select this option to move classes of items into different 'bars' (the red numbers)."]);
           </OnEnter>
           <OnLeave>
             GameTooltip:Hide();
@@ -465,7 +467,7 @@
             TBnk_Button_ShowPurchase_OnClick();
           </OnClick>
           <OnEnter>
-		  GameTooltip_AddNewbieTip(TBAG_LOCALE["View Purchase Info"], 1.0, 1.0, 1.0, TBAG_LOCALE["Displays the purchase button and cost to buy a new bank slot.  This is disabled in read-only views and edit mode."]);
+		  GameTooltip_AddNewbieTip(TBAG_LOCALE["Toggle Purchase Info"], 1.0, 1.0, 1.0, TBAG_LOCALE["Displays the purchase button and cost to buy a new bank slot.  This is disabled in read-only views and edit mode."]);
           </OnEnter>
           <OnLeave>
             GameTooltip:Hide();
@@ -491,7 +493,7 @@
             TBnk_Button_Reload_OnClick();
           </OnClick>
           <OnEnter>
-		  GameTooltip_AddNewbieTip(TBAG_LOCALE["Re-sort View"], 1.0, 1.0, 1.0, TBAG_LOCALE["Reloads your items and re-sorts their view."]);
+		  GameTooltip_AddNewbieTip(TBAG_LOCALE["Reload and Sort"], 1.0, 1.0, 1.0, TBAG_LOCALE["Reloads your items and sorts them."]);
           </OnEnter>
           <OnLeave>
             GameTooltip:Hide();
@@ -891,7 +893,6 @@
       <OnLoad> 
         this:RegisterEvent("VARIABLES_LOADED"); 
 	tinsert(UISpecialFrames,this:GetName());
-	TBnk_Button_Reload:SetText(TBAG_LOCALE["Re-sort"]);
       </OnLoad> 
       <OnEvent> 
         if (event == "VARIABLES_LOADED") then 

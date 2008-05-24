@@ -174,9 +174,6 @@ function TBnk_init(reset)
   TBnkHooks_Register(TBAG_HOOK_UNREGISTER);
   TBnkHooks_Register(TBAG_HOOK_REGISTER);
 
-  TBnk_Button_HighlightToggle:SetText(L["Hilight"]);
-  TBnk_Button_ChangeEditMode:SetText(L["Edit"]);
-
   if (TBnkCfg["moveLock"] == 0) then
     TBnkLockNorm:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Locked-Up");
     TBnkLockPush:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Locked-Down");
@@ -632,11 +629,17 @@ end
 function TBnk_Button_HighlightToggle_OnClick()
   PlaySound("igMainMenuOptionCheckBoxOn");
   if (TBnk_hilight_new == 0) then
-  TBnk_hilight_new = 1;
-  TBnk_Button_HighlightToggle:SetText(L["Normal"]);
+    TBnk_hilight_new = 1;
+    if (GameTooltip:GetOwner() == TBnk_Button_HighlightToggle) then
+      GameTooltip_AddNewbieTip(L["Normal"], 1.0, 1.0, 1.0,
+                               L["Highlight of new items is ON."]);
+    end
   else
-  TBnk_hilight_new = 0;
-  TBnk_Button_HighlightToggle:SetText(L["Hilight"]);
+    TBnk_hilight_new = 0;
+    if (GameTooltip:GetOwner() == TBnk_Button_HighlightToggle) then
+      GameTooltip_AddNewbieTip(L["Hilight"], 1.0, 1.0, 1.0,
+                               L["Highlight of new items is OFF."]);
+    end
   end
   TBnk_UpdateWindow();
 end
@@ -645,12 +648,10 @@ function TBnk_Button_ChangeEditMode_OnClick()
   PlaySound("igMainMenuOptionCheckBoxOn");
   if (TBnk_edit_mode == 0) then
     TBnk_edit_mode = 1;
-    TBnk_Button_ChangeEditMode:SetText(L["View"]);
     -- Always hide the purchase info on edit
     TBnk_UpdatePurchaseGfx();
   else
     TBnk_edit_mode = 0;
-    TBnk_Button_ChangeEditMode:SetText(L["Edit"]);
   end
 
   -- resort will force a window redraw
@@ -680,10 +681,8 @@ end
 function TBnk_Button_ShowPurchase_OnClick()
  if (TBnkCfg["show_purchase_button"] == 0) then
    TBnkCfg["show_purchase_button"] = 1;
-   TBnk_Button_ShowPurchase:SetText(L["Hide Purchase"]);
  else
    TBnkCfg["show_purchase_button"] = 0;
-   TBnk_Button_ShowPurchase:SetText(L["Show Purchase"]);
  end
  TBnk_UpdatePurchaseGfx();
  TBnk_SetButton_Anchors();
@@ -695,10 +694,18 @@ function TBnk_Button_MoveLockToggle_OnClick()
     TBnkCfg["moveLock"] = 1;
     TBnkLockNorm:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Unlocked-Up");
     TBnkLockPush:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Unlocked-Down");
+    if (GameTooltip:GetOwner() == TBnk_Button_MoveLockToggle) then
+      GameTooltip_AddNewbieTip(L["Lock Window"], 1.0, 1.0, 1.0,
+                               L["Prevent window from being moved by dragging it."]);
+    end
   else
     TBnkCfg["moveLock"] = 0;
     TBnkLockNorm:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Locked-Up");
     TBnkLockPush:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Locked-Down");
+    if (GameTooltip:GetOwner() == TBnk_Button_MoveLockToggle) then
+      GameTooltip_AddNewbieTip(L["Unlock Window"], 1.0, 1.0, 1.0,
+                               L["Allow window to be moved by dragging it."]);
+    end
   end
 end
 
@@ -1442,7 +1449,7 @@ function TBnkFrame_RightClickMenu_populate(level)
     UIDropDownMenu_AddButton(info, level);
 
   info = {
-  ["text"] = L["Reload bags"],
+  ["text"] = L["Reload and Sort"],
   ["value"] = nil,
   ["func"] = TBnk_Button_Reload_OnClick
   };
@@ -1943,7 +1950,7 @@ end
 function TBnk_UserDropdown_OnLoad()
   UIDropDownMenu_Initialize(this, TBnk_UserDropdown_Initialize);
   UIDropDownMenu_SetSelectedValue(this, TBNK_PLAYERID);
-  TBnk_UserDropdown.tooltip = L["You are viewing this player's bank."];
+  TBnk_UserDropdown.tooltip = L["You are viewing the selected player's bank."];
   UIDropDownMenu_SetWidth(TBAG_USERDD_WIDTH, TBnk_UserDropdown);
 --  OptionsFrame_EnableDropDown(TBnk_UserDropdown);
 end
