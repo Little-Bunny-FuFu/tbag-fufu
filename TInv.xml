@@ -184,9 +184,14 @@
       <Button name="TInv_Button_ColumnsAdd" inherits="GameMenuButtonTemplate" text="++">
         <Size><AbsDimension x="45" y="22"/></Size>
         <Anchors>
-          <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOM">
+          <Anchor point="CENTER" relativePoint="CENTER">
+            <OffSet>
+              <AbsDimension x="24" y="0"/>
+            </OffSet>
+          </Anchor>
+          <Anchor point="BOTTOM" relativePoint="BOTTOM">
             <Offset>
-              <AbsDimension x="38" y="-22"/>
+              <AbsDimension x="0" y="5"/>
             </Offset>
           </Anchor>
         </Anchors>
@@ -213,9 +218,14 @@
       <Button name="TInv_Button_ColumnsDel" inherits="GameMenuButtonTemplate" text="--">
         <Size><AbsDimension x="45" y="22"/></Size>
         <Anchors>
-          <Anchor point="BOTTOMLEFT" relativePoint="BOTTOM">
+          <Anchor point="CENTER" relativePoint="CENTER">
+            <OffSet>
+              <AbsDimension x="-24" y="0"/>
+            </OffSet>
+          </Anchor>
+          <Anchor point="BOTTOM" relativePoint="BOTTOM">
             <Offset>
-              <AbsDimension x="42" y="-22"/>
+              <AbsDimension x="0" y="5"/>
             </Offset>
           </Anchor>
         </Anchors>

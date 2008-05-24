@@ -925,7 +925,11 @@ function TBnk_SetBottomLeftButton_Anchors()
         button:SetPoint("BOTTOMLEFT",button_left,"BOTTOMRIGHT",3,-1);
       else
         -- First button
-        button:SetPoint("BOTTOMLEFT",TBnkFrame,"BOTTOMLEFT",10,12);
+        local y = 12;
+        if (TBnk_edit_mode == 1) then
+          y = y + 30;
+        end
+        button:SetPoint("BOTTOMLEFT",TBnkFrame,"BOTTOMLEFT",10,y);
       end
       if (button:IsVisible()) then
         button_left = button;
@@ -995,12 +999,23 @@ function TBnk_SetBottomLeftButton_Anchors()
     TBnk_PurchaseButton:ClearAllPoints();
     TBnk_PurchaseButton:SetPoint("LEFT",TBnk_SlotCostFrame,"RIGHT",-10,0);
   end
+
+end
+
+function TBnk_SetBottomRightButton_Anchors()
+  local y = 5;
+  if (TBnk_edit_mode == 1) then
+    y = y + 30;
+  end
+  TBnk_MoneyFrame:SetPoint("BOTTOMRIGHT",TBnkFrame,"BOTTOMRIGHT",5,y);
+  TBnk_MoneyViewFrame:SetPoint("BOTTOMRIGHT",TBnkFrame,"BOTTOMRIGHT",5,y);
 end
 
 function TBnk_SetButton_Anchors()
   TBnk_SetTopLeftButton_Anchors();
   TBnk_SetTopRightButton_Anchors();
   TBnk_SetBottomLeftButton_Anchors();
+  TBnk_SetBottomRightButton_Anchors();
   TBag_LayoutWindow(TBnkCfg, "TBnkFrame", TBNK_BARITM, TBnkCfg["bar_x"],
     TBnk_edit_mode, TBNK_BUTTON_MAX, TBnk_AssignButtonsToFrame, 
     TBnk_FrameX, TBnk_FrameY, TBnk_SpaceX, TBnk_SpaceY, TBnk_PoolX, TBnk_PoolY);

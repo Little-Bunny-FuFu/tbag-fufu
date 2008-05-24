@@ -2961,11 +2961,10 @@ function TBag_LayoutWindow(cfg, framename, baritm, bar_x, edit_mode, buttonmax, 
     if (TInv_SearchBox:IsVisible() or TInvNumTotal:IsVisible() or
         TInvacterBag3Slot:IsVisible() or TInv_MoneyFrame:IsVisible() or
         TInv_MoneyViewFrame:IsVisible()) then
-        if (edit_mode == 1) then
-          TBAG_PAD_BOTTOM = TBAG_PAD_BOTTOM + TBAG_PAD_BOTTOM_EDIT;
-        else
-          TBAG_PAD_BOTTOM = TBAG_PAD_BOTTOM + TBAG_PAD_BOTTOM_NORM;
-        end
+        TBAG_PAD_BOTTOM = TBAG_PAD_BOTTOM + TBAG_PAD_BOTTOM_NORM;
+    end
+    if (edit_mode == 1) then
+      TBAG_PAD_BOTTOM = TBAG_PAD_BOTTOM + TBAG_PAD_BOTTOM_EDIT;
     end
      -- If we need the extra row...  add it in.
     if (TInv_SearchBox:IsVisible()
@@ -2987,11 +2986,10 @@ function TBag_LayoutWindow(cfg, framename, baritm, bar_x, edit_mode, buttonmax, 
     if (TBnkNumTotal:IsVisible() or TBnkFrameBagBank:IsVisible() or
         TBnk_MoneyFrame:IsVisible() or TBnk_MoneyViewFrame:IsVisible() or
         TBnk_SlotCostFrame:IsVisible()) then
-      if (edit_mode == 1) then
-        TBAG_PAD_BOTTOM = TBAG_PAD_BOTTOM_EDIT;
-      else
-        TBAG_PAD_BOTTOM = TBAG_PAD_BOTTOM_NORM;
-      end
+      TBAG_PAD_BOTTOM = TBAG_PAD_BOTTOM + TBAG_PAD_BOTTOM_NORM;
+    end
+    if (edit_mode == 1) then
+      TBAG_PAD_BOTTOM = TBAG_PAD_BOTTOM + TBAG_PAD_BOTTOM_EDIT;
     end
    
     -- Do we need an extra row

@@ -819,8 +819,12 @@ function TInv_SetBottomLeftButton_Anchors()
   -- Handle search box separate.
   local search = TInv_SearchBox;
   if (search and search:IsVisible()) then
+    local y = 4;
+    if (TInv_edit_mode == 1) then
+      y = y + 30;
+    end
     search:ClearAllPoints();
-    search:SetPoint("BOTTOMLEFT",TInvFrame,"BOTTOMLEFT",10,4);
+    search:SetPoint("BOTTOMLEFT",TInvFrame,"BOTTOMLEFT",10,y);
     button_left = search;
   end
 
@@ -838,7 +842,11 @@ function TInv_SetBottomLeftButton_Anchors()
         end
       else
         -- First button if dropdown is hidden
-        button:SetPoint("BOTTOMLEFT",TInvFrame,"BOTTOMLEFT",10,12);
+        local y = 12;
+        if (TInv_edit_mode == 1) then
+          y = y + 30;
+        end
+        button:SetPoint("BOTTOMLEFT",TInvFrame,"BOTTOMLEFT",10,y);
       end
       if (button:IsVisible()) then
         button_left = button;
@@ -848,10 +856,20 @@ function TInv_SetBottomLeftButton_Anchors()
 
 end
 
+function TInv_SetBottomRightButton_Anchors()
+  local y = 5;
+  if (TInv_edit_mode == 1) then
+    y = y + 30;
+  end
+  TInv_MoneyFrame:SetPoint("BOTTOMRIGHT",TInvFrame,"BOTTOMRIGHT",5,y);
+  TInv_MoneyViewFrame:SetPoint("BOTTOMRIGHT",TInvFrame,"BOTTOMRIGHT",5,y);
+end
+
 function TInv_SetButton_Anchors()
   TInv_SetTopLeftButton_Anchors();
   TInv_SetTopRightButton_Anchors();
   TInv_SetBottomLeftButton_Anchors();
+  TInv_SetBottomRightButton_Anchors();
   TBag_LayoutWindow(TInvCfg, "TInvFrame", TINV_BARITM, TInvCfg["bar_x"],
                     TInv_edit_mode, TINV_BUTTON_MAX, TInv_AssignButtonsToFrame,
                     TInv_FrameX, TInv_FrameY, TInv_SpaceX, TInv_SpaceY, TInv_PoolX, TInv_PoolY);
