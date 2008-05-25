@@ -551,6 +551,7 @@ end
 -- Searching
 -----------------------------------------------------------------------
 
+TBag_SrchText = nil;
 local TBag_SrchResults = {};
 local SC_NONE   = "|cffff1111";
 local SC_PLAYER = "|cff11ccee";
@@ -666,12 +667,14 @@ function TBag_DoSearch(srch)
   if (srch) then
     local found;
     
+    TBag_SrchText = string.lower(srch);
+
     -- Gather all the search info
-    TBag_GatherSearchResults(string.lower(srch), TInvItm, L["bags"]);
-    TBag_GatherSearchResults(string.lower(srch), TBnkItm, L["bank"]);
-    TBag_GatherSearchResults(string.lower(srch), TContItm, L["container"]);
-    TBag_GatherSearchResults(string.lower(srch), TBodyItm, L["body"]);
-    TBag_GatherSearchResults(string.lower(srch), TMailItm, L["mail"]);
+    TBag_GatherSearchResults(TBag_SrchText, TInvItm, L["bags"]);
+    TBag_GatherSearchResults(TBag_SrchText, TBnkItm, L["bank"]);
+    TBag_GatherSearchResults(TBag_SrchText, TContItm, L["container"]);
+    TBag_GatherSearchResults(TBag_SrchText, TBodyItm, L["body"]);
+    TBag_GatherSearchResults(TBag_SrchText, TMailItm, L["mail"]);
 
     -- Sort it alphabetically
     table.sort(TBag_SrchResults);
@@ -692,9 +695,20 @@ function TBag_DoSearch(srch)
     if (not found) then
       DEFAULT_CHAT_FRAME:AddMessage(TBAG_SCP..SC_NONE..string.format(L["No results|r for %q"],srch));
     end
+
+    TInv_UpdateWindow();
+    TBnk_UpdateWindow();
   end
 end
 
+function TBag_ClearSearch()
+  if (TBag_SrchText) then
+    TBag_SrchText = nil;
+    TInv_UpdateWindow();
+    TBnk_UpdateWindow();
+  end
+  TInv_SearchBox:SetText(SEARCH);
+end
 
 -----------------------------------------------------------------------
 -- Configuration
@@ -2746,7 +2760,7 @@ end
 -- Make an inventory slot usable with the item specified in itm
 -- cache entry is the array that comes directly from the cache
 function TBag_UpdateButton(cfg, playerid, framename, edit_mode,
-  edit_hilight, hilight_new, online)
+  edit_hilight, hilight_new, online, srch)
   local ic_start, ic_duration, ic_enable;
   local showSell = nil;
   local frame = getglobal(framename);
@@ -2841,6 +2855,18 @@ function TBag_UpdateButton(cfg, playerid, framename, edit_mode,
       end
     end
 
+    if (srch) then
+      if (string.find(string.lower(itm[TBAG_I_NAME]), srch)) then
+        frame_texture:SetVertexColor(1,1,1,1);
+        frame_font:SetVertexColor(1,1,1,1);
+        frame_stock:SetAlpha(1);
+      else
+        frame_texture:SetVertexColor(1,1,1,0.15);
+        frame_font:SetVertexColor(1,1,1,0.5);
+        frame_stock:SetAlpha(0.5);
+      end
+    end
+    
     if (cfg["show_rarity_color"] == 1) then
       TBag_SetRarityColor(itm[TBAG_I_RARITY], framename);
     else

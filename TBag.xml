@@ -72,7 +72,7 @@
     <Size><AbsDimension x="190" y="30"/></Size>
     <Scripts>
       <OnShow>
-        this:SetText(SEARCH);   
+        TBag_ClearSearch();
       </OnShow>
       <OnTabPressed>
         this:ClearFocus();
@@ -89,7 +89,7 @@
       <OnEditFocusLost>
         this:HighlightText(0, 0);
         if ( this:GetText() == "" ) then
-          this:SetText(SEARCH);
+          TBag_ClearSearch();
         end
       </OnEditFocusLost>
       <OnEditFocusGained>

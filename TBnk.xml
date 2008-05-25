@@ -411,10 +411,12 @@
             TBnk_Button_HighlightToggle_OnClick();
           </OnClick>
           <OnEnter>
-            if (TBnk_hilight_new == 0) then
-	    GameTooltip_AddNewbieTip(TBAG_LOCALE["Hilight"], 1.0, 1.0, 1.0, TBAG_LOCALE["Highlight of new items is OFF."]);
+            if (TBag_SrchText) then
+            GameTooltip_AddNewbieTip(TBAG_LOCALE["Clear Search"], 1.0, 1.0, 1.0, TBAG_LOCALE["Stop highlighting search results."]);
+            elseif (TBnk_hilight_new == 0) then
+	    GameTooltip_AddNewbieTip(TBAG_LOCALE["Highlight New"], 1.0, 1.0, 1.0, TBAG_LOCALE["Highlight items marked as new."]);
             else
-	    GameTooltip_AddNewbieTip(TBAG_LOCALE["Normal"], 1.0, 1.0, 1.0, TBAG_LOCALE["Highlight of new items is ON."]);
+	    GameTooltip_AddNewbieTip(TBAG_LOCALE["Normal"], 1.0, 1.0, 1.0, TBAG_LOCALE["Stop highlighting new items."]);
             end
           </OnEnter>
           <OnLeave>

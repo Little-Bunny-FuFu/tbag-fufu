@@ -591,17 +591,29 @@ end
 
 function TInv_Button_HighlightToggle_OnClick()
   PlaySound("igMainMenuOptionCheckBoxOn");
-  if (TInv_hilight_new == 0) then
+  if (TBag_SrchText) then
+    TBag_ClearSearch();
+    if (GameTooltip:GetOwner() == TInv_Button_HighlightToggle) then
+      if (TInv_highlight_new == 1) then
+        GameTooltip_AddNewbieTip(L["Normal"], 1.0, 1.0, 1.0,
+                                 L["Stop highlighting new items."]);
+      else
+        GameTooltip_AddNewbieTip(L["Highlight New"], 1.0, 1.0, 1.0,
+                                 L["Highlight items marked as new."]);
+      end
+    end
+    return;    
+  elseif (TInv_hilight_new == 0) then
     TInv_hilight_new = 1;
     if (GameTooltip:GetOwner() == TInv_Button_HighlightToggle) then
       GameTooltip_AddNewbieTip(L["Normal"], 1.0, 1.0, 1.0,
-                               L["Highlight of new items is ON."]);
+                               L["Stop highlighting new items."]);
     end
   else
     TInv_hilight_new = 0;
     if (GameTooltip:GetOwner() == TInv_Button_HighlightToggle) then
-      GameTooltip_AddNewbieTip(L["Hilight"], 1.0, 1.0, 1.0,
-                               L["Highlight of new items is OFF."]);
+      GameTooltip_AddNewbieTip(L["Highlight New"], 1.0, 1.0, 1.0,
+                               L["Highlight items marked as new."]);
     end
   end
   TInv_UpdateWindow();
@@ -1273,7 +1285,7 @@ function TInvFrame_RightClickMenu_populate(level)
     info = { ["disabled"] = 1 };
     UIDropDownMenu_AddButton(info, level);
 
-    info = { ["text"] = L["Hilight new items:"], ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
+    info = { ["text"] = L["Highlight new items:"], ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
     UIDropDownMenu_AddButton(info, level);
 
     for key,value in pairs({
@@ -1381,12 +1393,16 @@ function TInvFrame_RightClickMenu_populate(level)
       UIDropDownMenu_AddButton(info, level);
 
       info = {
-        ["text"] = L["Hilight New Items"],
         ["value"] = nil,
         ["func"] = TInv_Button_HighlightToggle_OnClick
         };
-      if (TInv_hilight_new == 1) then
-        info["checked"] = 1;
+      if (TBag_SrchText) then
+        info["text"] = L["Clear Search"];
+      else
+        info["text"] = L["Highlight New Items"];
+        if (TInv_hilight_new == 1) then
+          info["checked"] = 1;
+        end
       end
       UIDropDownMenu_AddButton(info, level);
 
@@ -1550,7 +1566,7 @@ function TInvFrame_RightClickMenu_populate(level)
           end
           UIDropDownMenu_AddButton(info, level);
           info = {
-            ["text"] = L["Hide Hilight Button"];
+            ["text"] = L["Hide Highlight Button"];
             ["func"] = TInv_Toggle_HighlightButton;
             };
           if (TInvCfg["show_hilightbutton"] == 0) then
@@ -1815,7 +1831,7 @@ function TInv_UpdateWindow(resort_req)
       TBag_UpdateButton(TInvCfg, TINV_PLAYERID,
         TBag_GetBagItemButtonName(bag, slot),
         TInv_edit_mode, TInv_edit_hilight, TInv_hilight_new,
-        TINV_PLAYERID == TBAG_PLAYERID)
+        TINV_PLAYERID == TBAG_PLAYERID, TBag_SrchText)
     end
     for slot = size+1, MAX_CONTAINER_ITEMS do
       getglobal(TBag_GetBagItemButtonName(bag, slot)):Hide();
