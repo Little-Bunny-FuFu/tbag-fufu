@@ -1,8 +1,8 @@
 -- $Id$
 
--- German translation maintained by Dessa.
+-- German translation maintained by Dessa <dessa@gmake.de>.
 
--- localization files should be edited with a utf-8 
+-- localization files should be edited with a utf-8
 -- compatable editor and done so with utf-8 encoding.
 
 -- See localization.template.lua to start a new translation.
@@ -317,7 +317,7 @@ TBAG_LOCALE = setmetatable({
   -- Probably only need to chage the Charges.
   -- The ? after the s implies that the s may not be there
   -- as would be the case in a single Charge.
-  ["(%d+) Charges?"] = "(%d+) Aufladung?",
+  ["(%d+) Charges?"] = "(%d+) Aufladung(en)",
   -- Format string for adding the charges tooltip.
   -- %d is the number of charges.  |4 specifies this
   -- is a plural/singular pair.  Up until the : is the
@@ -377,12 +377,14 @@ TBAG_LOCALE = setmetatable({
   ["TBag v%s"] = "TBag v%s",
 
   ["Normal"] = "Normal",
-  ["Highlight of new items is ON."] = "Hervorheben neuer Items ist AN..",
-  ["Hilight"] = "Hervorheben",
-  ["Highlight of new items is OFF."] = "Hervorheben neuer Items ist AUS.",
+  ["Stop highlighting new items."] = "Neue Items nicht mehr hervorheben.",
+  ["Highlight New"] = "Neue Hervorheben",
+  ["Highlight items marked as new."] = "Items die als neu Markiert sind hervorheben.",
+  ["Clear Search"] = "Suche l\195\182schen",
+  ["Stop highlighting search results."] = "Suchergebnisse nicht mehr hervorheben.",
 
   ["Toggle Edit Mode"] = "Bearbeitungsmodus Ein- und Ausschalten",
-  ["Select this option to move classes of items into different 'bars' (the red numbers)."] = "W\195\164hle diese Option um Gegnstandsklassen in andere \"Felder\" zu verschieben (die roten Zahlen).",
+  ["Select this option to move classes of items into different 'bars' (the red numbers)."] = "W\195\164hle diese Option um Itemklassen in andere \"Felder\" zu verschieben (die roten Zahlen).",
 
   ["Reload and Sort"] = "Neuladen und Sortieren",
   ["Reloads your items and sorts them."] = "L\195\164d die Items neu und sortiert sie.",
@@ -433,7 +435,7 @@ TBAG_LOCALE = setmetatable({
   ["No sort"] = "Keine Sortierung",
   ["Sort by name"] = "nach Name Sortieren",
   ["Sort last words first"] = "nach letzter Verwendung Sotieren",
-  ["Hilight new items:"] = "Neue Items hervorheben:",
+  ["Highlight new items:"] = "Neue Items hervorheben:",
   ["Don't tag new items"] = "Neue Items nicht Markieren",
   ["Tag new items"] = "neue Items Markieren",
   ["Hide Bar:"] = "Verstecke Feld:",
@@ -447,7 +449,7 @@ TBAG_LOCALE = setmetatable({
   ["Lock window"] = "Fenster sperren",
   ["Show Purchase Info"] = "Zeige Kauf Info",
   ["Close Inventory"] = "Inventar Schliessen",
-  ["Hilight New Items"] = "Neue Items Hervorheben",
+  ["Highlight New Items"] = "Neue Items Hervorheben",
   ["Reset NEW tag"] = "Setze NEU Markierung zur\195\188ck",
   ["Advanced Configuration"] = "Erweiterte Konfiguration",
   ["Set Size"] = "Gr\195\182\195\159e setzen",
@@ -459,7 +461,7 @@ TBAG_LOCALE = setmetatable({
   ["Hide Bank Button"] = "Verstecke Bank Knopf",
   ["Hide Show Purchase Button"] = "Verstecke Zeige Kaufen Knopf",
   ["Hide Edit Button"] = "Verstecke bearbeiten Knopf",
-  ["Hide Hilight Button"] = "Verstecke Hervorheben Knopf",
+  ["Hide Highlight Button"] = "Verstecke Hervorheben Knopf",
   ["Hide Lock Button"] = "Verstecke Sperren Knopf",
   ["Hide Close Button"] = "Verstecke Schliessen Knopf",
   ["Hide Total"] = "Verstecke Gesamt",
@@ -469,9 +471,9 @@ TBAG_LOCALE = setmetatable({
   ["|c%sLeft click to move category |r|c%s%s|r|c%s to bar |r|c%s%s|r"] = "|c%sLinksklick um Kategorie |r|c%s%s|r|c%s zu Felder zu verschieben |r|c%s%s|r",
   ["|c%sBar |r|c%s%s|r"] = "|c%sFeld |r|c%s%s|r",
   ["|c%s%s|r"] = "|c%s%s|r",
-  ["|c%sLeft click to select category to move:|r |c%s%s|r"] = "|c%sLinksklick um die Kategorie zum Verschieben zu w\195\164hlen:|r |c%s%s|r",
-  ["Right click to assign this item to a different category"] = "Rechtsklick um diesen Gegenstand einer anderen Kategorie zuzuweisen",
   ["Right click for options"] = "Rechtsklick f\195\188r Optionen",
+  ["|c%sLeft click to select category to move:|r |c%s%s|r"] = "|c%sLinksklick um die Kategorie zum Verschieben zu w\195\164hlen:|r |c%s%s|r",
+  ["Right click to assign this item to a different category"] = "Rechtsklick um dieses Item einer anderen Kategorie zuzuweisen",
   ["You are viewing the selected player's bank."] = "Du siehst die Bank des ausgew\195\164hlten Spielers an",
   ["You are viewing the selected player's inventory."] = "Du siehst das Inventar des ausgew\195\164hlten Spielers an.",
   ["Equip Container"] = "Tasche anlegen",
@@ -532,7 +534,7 @@ TBAG_LOCALE = setmetatable({
   ["Spirit Shard"] = "Geistsplitter",
   ["Use: Permanently"] = "Benutzen: .*dauerhaft",
   ["Hearthstone"] = "Ruhestein",
-  ["Right Click to summon and dismiss"] = "Mit Rechtsklick %a+ %a+ beschw\195\182ren und freigeben", 
+  ["Right Click to summon and dismiss"] = "Mit Rechtsklick [%a ]* beschw\195\182ren und freigeben.", 
   ["Summons or dismisses a Spirit of Summer"] = "Beschw\195\182rt einen Geist des Sommers oder gibt ihn frei",
   ["Requires Riding %("] = "Ben\195\182tigt Reiten %(",
   ["%a+ Scarab"] = "%a+skarab\195\164us",
@@ -543,8 +545,8 @@ TBAG_LOCALE = setmetatable({
   ["Crypt Fiend Parts"] = "Teile eines Gruftscheusals",
   ["Dark Iron Scraps"] = "Dunkeleisenfragmente",
   ["Savage Frond"] = "Wildwedel",
-  ["Insignia of the Crusade"] = "Insignie des Kreuzzugs",
-  ["Insignia of the Dawn"] = "Insignie der D\195\164mmerung",
+  ["Insignia of the Crusade"] = "Insigne des Kreuzzugs",
+  ["Insignia of the Dawn"] = "Insigne der D\195\164mmerung",
   ["Argent Dawn Valor Token"] = "Ehrenmarke der Argentumd\195\164mmerung",
   ["Mantle of the Dawn"] = "Mantel der D\195\164mmerung",
   ["Vitreous Focuser"] = "Glasartiger Fokussierer",
@@ -602,7 +604,7 @@ TBAG_LOCALE = setmetatable({
   ["Obsidian Warbeards"] = "Obsidiankriegsperlen",
   ["Oshu'gun Crystal Fragment"] = "Kristallfragment von Oshu'gun",
   ["Pair of Ivory Tusks"] = "Paar Elfenbeinsto\195\159z\195\164hne",
-  ["Zaxxis Insignia"] = "Insignie der Zaxxis",
+  ["Zaxxis Insignia"] = "Insigne der Zaxxis",
   ["Ethereum Prisoner I.D. Tag"] = "Identifikationsmarke eines Gefangenen des Astraleums",
   ["Ethereum Prison Key"] = "Gef\195\164ngnisschl\195\188ssel des Astraleums",
   ["Halaa Research Token"] = "Forschermarke von Halaa",
@@ -614,7 +616,7 @@ TBAG_LOCALE = setmetatable({
   ["Arcane Rune"] = "Arkane Rune",
   ["Dreadfang Venom Sac"] = "Schreckensgiftbeutel",
   ["Mark of Kil'jaeden"] = "Mal von Kil'jaeden",
-  ["Mark of Sargeras"] = "Mal von Sargeras",
+  ["Mark of Sargeras"] = "Mal des Sargeras",
   ["Fel Armament"] = "Teuflische Waffen",
   ["Holy Dust"] = "Heiliger Staub",
   ["Mark of the Illidari"] = "Mal der Illidari",
@@ -684,21 +686,22 @@ TBAG_LOCALE = setmetatable({
   ["[Rr]estores %d+ to %d+ mana"] = "[Ss]tellt %d+ bis %d+ Mana wieder her.",
   ["Healing Potion"] = "Heiltrank",
   ["[Rr]estores %d+ to %d+ health"] = "[Ss]tellt %d+ bis %d+ Gesundheit wieder her.",
+  ["Place a %a+ stone statue"] = "Stellt eine %a+ Steinstatue",
   [" [Cc]ure.* poison"] = " [Hh]eil.* Gift",
   [" [Cc]ure.* disease"] = " [Hh]eil.* Krankheit",
   [" [Cc]ure.* curse"] = " [Hh]eil.* Fluch",
   [" [Cc]ure.* magic"] = " [Hh]eil.* Magie",
-  [" [Rr]emoves %d+ .*effect"] = " [Hh[]ebt %d+ .*effekt auf",
-  [" Dynamite"] = "%a+Dynamit",
-  [" Bomb"] = "%a+[Bb]ombe",
-  [" Mortar"] = "%a+[Mm]\195\182rser",
+  [" [Rr]emoves %d+ .*effect"] = " [Hh]ebt %d+ .*effekt auf",
+  [" Dynamite"] = "[%a+]*Dynamit",
+  [" Bomb"] = "[%a+]*[Bb]ombe",
+  [" Mortar"] = "[%a+]*[Mm]\195\182rser",
   ["Scroll"] = "Rolle",
   ["Use: Increases "] = "Benutzen: Erh\195\182ht ",
   ["Use: Absorbs "] = "Benutzen: Absorbiert ",
   ["Use: Regenerate "] = "Benutzen: Stellt ",
   ["Use: While applied to target weapon"] = "Benutzen: Erh\195\182ht bei Anwendung auf eine Waffe",
-  [" Sharpening Stone"] = "%a+[Ww]etzstein",
-  [" Weightstone"] = "%a+[Gg]ewichtsstein",
+  [" Sharpening Stone"] = "[%a+]*[Ww]etzstein",
+  [" Weightstone"] = "[%a+]*[Gg]ewichtsstein",
   ["Mistletoe"] = "Mistelzweig",
   ["Flame Cap"] = "Flammenkappe",
   ["Allows the Imbiber to "] = "Der Anwender kann ",
@@ -708,7 +711,7 @@ TBAG_LOCALE = setmetatable({
   ["Demonic Figurine"] = "D\195\164monenstatuette",
   ["Blinding Powder"] = "Blendungspulver",
   ["Flash Powder"] = "Blitzstrahlpulver",
-  [" Seed"] = "sa[ma][et](nkorn)?",
+  [" Seed"] = "sa[ma][et](nkorn)",
   ["Wild "] = "Wilde ",
   ["Arcane Powder"] = "Arkanes Pulver",
   ["Rune of "] = "Rune der ",
@@ -739,9 +742,9 @@ TBAG_LOCALE = setmetatable({
   ["Raw "] = "Roher ",
   ["[Ff]ish"] = "[Ff]isch",
   [" Meat"] = " Fleisch",
-  ["%a+ Dust"] = "%a+ Staub",
-  ["Lesser %a+ Essence"] = "Kleine %a+ Essenz",
-  ["Greater %a+ Essence"] = "Gro\195\159e %a+ Essenz",
-  ["Small %a+ Shard"] = "Kleiner %a+splitter",
-  ["Large %a+ Shard"] = "Gro\195\159er %a+splitter",
+  ["%a+ Dust"] = "%a+%s?[Ss]taub",
+  ["Lesser %a+ Essence"] = "Geringe %a+%s?[Ee]ssenz",
+  ["Greater %a+ Essence"] = "Gro\195\159e %a+%s?[Ee]ssenz",
+  ["Small %a+ Shard"] = "Kleiner %a+%s?[Ss]plitter",
+  ["Large %a+ Shard"] = "Gro\195\159er %a+%s?[Ss]plitter",
 }, { __index = TBAG_LOCALE }); 
