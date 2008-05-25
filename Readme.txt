@@ -37,15 +37,19 @@ textbox just to the left of the name dropdown.
 
 Todo/Known Issues
 
-* Searching.  Text results alone suck.  Should be able to use the highlighting 
-  like we have for new items for searches.  
+* Configuration improvement.  Implement configuration that's integrated into the
+  Blizzard configuration panels.
 
-* Easier way to recatagorize single items.  Having to add a pattern to put
-  a single item in a different category is annoying.  Bring back the behavior
-  EngBags had of allowing you to assign items to a category via right click.
+* Guild Bank support.  It'll get done but not till I can do it "right."
 
-* UI design review.  Improve the look and the usablity of the addon.  Especially
-  the configuration.
+* Search.  Highlighting is now done, get the text results out of the chat box.
+
+* Add item counts to tooltips.
+
+* Skins.  Think something that looks very much like Blizzard's bags.
+
+* Viewing modes for the body and mail info we're already caching and that's available
+  from search.
 
 * Messy/dead code.  The addon is filled with messy and dead code.  It needs a good
   clean out and review of essentially every single line.  There is a lot of code
@@ -64,4 +68,4 @@ in every day.  Curse Gaming and WowInterface will be kept up to date with the
 latest update and I will read the forums there.  No gurantees anywhere else.
 
 Bug reports and feature requests should be directed to the ticket system on Curse:
-http://www.curse.com/downloads/details/8064/tickets/new/
+http://wow.curseforge.com/projects/tbag-shefki/tickets/
