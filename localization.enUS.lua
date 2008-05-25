@@ -440,7 +440,7 @@ TBAG_LOCALE = setmetatable({
   ["Yes"] = "Yes",
   ["Category"] = "Category",
   ["Keywords"] = "Keywords",
-  ["Tooltip Search"] = "Tooltip Searach",
+  ["Tooltip Search"] = "Tooltip Search",
   ["Type"] = "Type",
   ["SubType"] = "SubType",
   
