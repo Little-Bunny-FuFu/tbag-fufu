@@ -54,7 +54,8 @@
   - Stop attempting to put Quivers and Ammo-pouches inside other
     Quivers and Ammo-pouches.
   - Improve performance when in edit mode in the bank window.
-  - Fix the sort for Netherwing Crystal.
+  - Fix a variety of sorting issues.  /tinv resetsorts and
+    /tbnk resetsorts will get you a fresh copy of the defaults. 
   - Improvements to the text of the tooltips and menus
     for buttons.
   - Change class handling to support other locales.
