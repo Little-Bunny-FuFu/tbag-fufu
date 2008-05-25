@@ -3,6 +3,8 @@
 -- localization files should be edited with a utf-8 
 -- compatable editor and done so with utf-8 encoding.
 
+-- See localization.template.lua to start a new translation.
+
 local debug = true;
 
 -- A few of these translations are set to constants from 

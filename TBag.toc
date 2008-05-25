@@ -1,16 +1,24 @@
-## Interface: 20400 
+## Interface: 20400
 ## Title: TBag
 ## Notes: The last bag addon you'll ever need.  Autosorting, viewable anywhere, easy to use yet amazingly configurable
+## Notes-deDE: Translate me
+## X-Category: Inventory
 ## Author: Talos, Modified by Shefki
+## X-Email: shefki@shefki.org
+## X-Website: http://wow.curse.com/downloads/details/8064/
+## X-Feedback: http://wow.curseforge.com/projects/tbag-shefki/tickets/ 
 ## RequiredDeps: 
 ## OptionalDeps: Auctioneer
 ## SavedVariables: TBagCfg, TBagInfo, TBnkItm, TInvItm, TContItm, TBodyItm, TMailItm
 ## Dependencies: 
+## X-Localizations: enUS, deDE
+## X-CompatibleLocales: enUS, deDE
+## 
 localization.enUS.lua
+localization.deDE.lua
 defaults.lua
 TBag.xml
 TInv.xml
 TInvOpts.xml
 TBnk.xml
 TBnkOpts.xml
-
