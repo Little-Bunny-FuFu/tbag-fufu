@@ -1,3 +1,66 @@
+* 200805xx-r14x-Shefki
+  - UI rework.  Text buttons are gone, close and lock buttons
+    back in topright corner.  Search box at the bottom now.
+    All controls are actually inside the window now.
+    Special thanks to Daniel Gilbert for permission to use
+    the lock buttons.
+  - Using the search box will now initiate a new highlight mode.
+    The items that match your search will be highlighted in the
+    window.  This will persist until you clear the text out
+    of the search box, click the highlight button, click the 
+    Clear Search menu option in the right click menu or simply
+    close the inventory window.  The mode is shared between
+    the inventory and bank windows.  It overrides the highlight
+    mode for the window and the window will return to its 
+    previous highlight mode.  Note: You have to hit enter
+    after typing your search before the highlight mode will
+    be entered, text results are still shown in the first
+    chat frame.
+  - deDE Translation by Dessa.  Thanks to his hard work on
+    making this a reality.  Users switching from English
+    to the translation will likely want to reset their 
+    configuration to get the full functionality of the 
+    translation.
+  - You can recategorize individaul items in edit mode again by
+    right-clicking on them like you could with EngBags.
+  - Empty catagories/bars will no longer result in lines through
+    the window.  The lines often looked like a cursor in a text
+    editor and were ugly.
+  - You can set the anchor point of the inventory and bank windows.
+    The window will grow from the the selected corner and that
+    corner will never move.  The anchor selection can be
+    found by right clicking on blank space in the window
+    and using the Anchor sub-menu.
+  - When viewing a Hearthstone (or Ruby Slippers) on another
+    character it will show the location that hearthstone
+    will send you to.  You will have to log onto the character
+    after updating before this will fully work.  If the hearth
+    destination is unknown it'll simply show <home location>.
+  - The number of charges on items (e.g. Mana Oil) will be visible
+    on the tooltips when viewing items on other characters
+    or items in your bank while not at the bank.  Requires
+    having seen the item after updating before this will work.
+    The entry on the tooltip may not show exactly where it does
+    on live views simply because other addons add their text first.
+  - Hiding buttons and other controls will shrink the window
+    to remove blank space.
+  - Buttons will no longer end up overlapping when the number
+    of columns is set low.
+  - Fix cooldowns.  The cooldown sweep will show imediately upon
+    using an item.  Previously it would only start showing after
+    the next reload or toggle of the window.
+  - No longer incorrectly show cooldown sweeps when viewing
+    items on other characters.
+  - Stop attempting to put Quivers and Ammo-pouches inside other
+    Quivers and Ammo-pouches.
+  - Improve performance when in edit mode in the bank window.
+  - Fix the sort for Netherwing Crystal.
+  - Improvements to the text of the tooltips and menus
+    for buttons.
+  - Change class handling to support other locales.
+  - Remove some more old and unused code.
+  
+
 * 20080331-r114-Shefki
   - Fix an issue where the Blizzard API doesn't tell us the item family
     which causes a lua error and breaks updating of the bag contents
