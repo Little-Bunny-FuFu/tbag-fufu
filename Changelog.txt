@@ -1,4 +1,4 @@
-* 200805xx-r14x-Shefki
+* 200805xx-r15x-Shefki
   - UI rework.  Text buttons are gone, close and lock buttons
     back in topright corner.  Search box at the bottom now.
     All controls are actually inside the window now.
@@ -21,7 +21,7 @@
     to the translation will likely want to reset their 
     configuration to get the full functionality of the 
     translation.
-  - You can recategorize individaul items in edit mode again by
+  - You can recategorize individual items in edit mode again by
     right-clicking on them like you could with EngBags.
   - Empty catagories/bars will no longer result in lines through
     the window.  The lines often looked like a cursor in a text
