@@ -365,6 +365,10 @@ local tests = {
   [14343] = L["ENCHANTING"],
   [14343] = L["ENCHANTING"],
   [14344] = L["ENCHANTING"],
+  [22445] = L["ENCHANTING"],
+  [22449] = L["ENCHANTING"],
+  [22202] = L["BLACKSMITHING"], -- Similar to enchanting but shouldn't match
+  [22203] = L["BLACKSMITHING"], -- ditto
 
 }
 
