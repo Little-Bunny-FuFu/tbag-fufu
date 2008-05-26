@@ -179,7 +179,7 @@ TBAG_LOCALE = setmetatable({
   ["RAGE_RESTORE"] = "RAGE_RESTORE",
   ["ENERGY_RESTORE"] = "ENERGY_RESTORE",
   ["CURE"] = "CURE",
-  ["EXPLOSIVES"] = "EXPLOSVIES",
+  ["EXPLOSIVES"] = "EXPLOSIVES",
   ["HEARTH"] = "HEARTH",
   ["MISC"] = "MISC",
   ["UNKNOWN"] = "UNKNOWN",
@@ -374,6 +374,7 @@ TBAG_LOCALE = setmetatable({
   ["printchars"] = "printchars",
   ["deletechar"] = "deletechar",
   ["config"] = "config",
+  ["tests"] = "tests",
 
   -- /tbnk help text
   ["TBnk Commands:"] = "TBnk Commands",
@@ -552,6 +553,14 @@ TBAG_LOCALE = setmetatable({
   ["Show Keyring Empty Slots (Enable Show above):"] = "Show Keyring Empty Slots (Enable Show above):",
   ["Show Soul Shard Count On Soul Bags:"] = "Show Soul Shard Count On Soul Bags:",
 
+-----------------------------------------------------------------------
+-- Unit Tests 
+-----------------------------------------------------------------------
+  ["TEST RUN STARTING"] = "TEST RUN STARTING",
+  [" Retrieving item information"] = " Retrieving item information",
+  ["SUCCESS: %s"] = "SUCCESS: %s",
+  ["FAIL: %s (%s) expected %q but got %q"] = "FAIL: %s (%s) expected %q but got %q",
+  ["ALL TESTS SUCCESSFUL"] = "ALL TESTS SUCCESSFUL",
 
 -----------------------------------------------------------------------
 -- Default Search List Strings 
@@ -623,7 +632,6 @@ TBAG_LOCALE = setmetatable({
   ["Netherwing Crystal"] = "Netherwing Crystal",
   ["Nethermine Cargo"] = "Nethermine Cargo",
   ["Unidentified Plant Parts"] = "Unidentified Plant Parts",
-  ["Uncatalogued Species"] = "Uncatalogued Species",
   ["Coilfang Armaments"] = "Coilfang Armaments",
   ["Mature Spore Sac"] = "Mature Spore Sac",
   ["Bog Lord Tendril"] = "Bog Lord Tendril",
@@ -735,7 +743,6 @@ TBAG_LOCALE = setmetatable({
   ["Light Feather"] = "Light Feather",
   ["Infernal Stone"] = "Infernal Stone",
   ["Demonic Figurine"] = "Demonic Figurine",
-  ["Blinding Powder"] = "Blinding Powder",
   ["Flash Powder"] = "Flash Powder",
   [" Seed"] = " Seed",
   ["Wild "] = "Wild ",
@@ -757,6 +764,7 @@ TBAG_LOCALE = setmetatable({
   ["Heart of Fire"] = "Heart of Fire",
   ["Core of Earth"] = "Core of Earth",
   ["Mote of %a+"] = "Mote of %a+",
+  ["Primal Nether"] = "Primal Nether",
   ["Primal %a+"] = "Primal %a+",
   ["Void Crystal"] = "Void Crystal",
   ["Nether Vortex"] = "Nether Vortex",

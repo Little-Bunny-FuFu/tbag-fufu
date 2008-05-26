@@ -2045,7 +2045,10 @@ function TBag_UpdateHearth(tt, itemlink, playerid)
   if (playerid ~= TBAG_PLAYERID and
       (string.match(itemlink,"item:6948:") or
       string.match(itemlink,"item:28585:"))) then
-    local hearth = TBagInfo[playerid][TBAG_G_BASIC][TBAG_S_HEARTH];
+    local hearth;
+    if (TBagInfo[playerid] and TBagInfo[playerid][TBAG_G_BASIC]) then
+      hearth = TBagInfo[playerid][TBAG_G_BASIC][TBAG_S_HEARTH];
+    end
     if (not hearth) then
       hearth = L["<home location>"];
     end

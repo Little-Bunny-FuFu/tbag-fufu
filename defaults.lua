@@ -18,7 +18,7 @@ TBag_DefaultSearchList = {
   { L["PVP"], L[""], L["Mark of Honor"], L["Consumable"], L[""] },
   { L["PVP"], L[""], L["Halaa Battle Token"], L["Miscellaneous"], L[""] },
   { L["PVP"], L[""], L["Spirit Shard"], L["Quest"], L[""] },
-  { L["ENCHANTS"], L[""], L["Use: Permanently"], L["Miscellaneous"], L[""] },
+  { L["ENCHANTS"], L[""], L["Use: Permanently"], L[""], L[""] },
   { L["HEARTH"], L[""], L["Hearthstone"], L["Miscellaneous"], L[""] },
 
   { L["MINIPET"], L[""], L["Right Click to summon and dismiss"], L[""], L[""] },
@@ -84,7 +84,6 @@ TBag_DefaultSearchList = {
   { L["NETHERWING"], L[""], L["Netherwing Crystal"], L["Miscellaneous"], L[""]},
   { L["NETHERWING"], L[""], L["Nethermine Cargo"], L["Quest"], L[""]},
   { L["CENARION_EXPEDITION"], L[""], L["Unidentified Plant Parts"], L["Quest"], L[""]},
-  { L["CENARION_EXPEDITION"], L[""], L["Uncatalogued Species"], L["Consumable"], L[""]},
   { L["CENARION_EXPEDITION"], L[""], L["Coilfang Armaments"], L["Quest"], L[""]},
   { L["SPOREGGAR"], L[""], L["Mature Spore Sac"], L["Quest"], L[""]},
   { L["SPOREGGAR"], L[""], L["Bog Lord Tendril"], L["Quest"], L[""]},
@@ -312,7 +311,6 @@ TBag_DefaultSearchList = {
   { string.format(L["%s_REAGENT"],L["WARLOCK"]), L[""],
     L["Demonic Figurine"], L["Miscellaneous"], L["Reagent"] },
 
-  { string.format(L["%s_REAGENT"],L["ROGUE"]), L[""], L["Blinding Powder"], L[""], L[""] },
   { string.format(L["%s_REAGENT"],L["ROGUE"]), L[""], L["Flash Powder"], L[""], L[""] },
 
   { string.format(L["%s_REAGENT"],L["DRUID"]), L[""],
@@ -347,6 +345,7 @@ TBag_DefaultSearchList = {
   { L["REAGENT"], L[""], L["Heart of Fire"], L["Trade Goods"], L["Elemental"]},
   { L["REAGENT"], L[""], L["Core of Earth"], L["Trade Goods"], L["Elemental"]},
   { L["REAGENT"], L[""], L["Mote of %a+"], L["Trade Goods"], L["Elemental"]},
+  { L["REAGENT"], L[""], L["Primal Nether"], L["Trade Goods"], L[""]},
   { L["REAGENT"], L[""], L["Primal %a+"], L["Trade Goods"], L["Elemental"]},
   { L["REAGENT"], L[""], L["Void Crystal"], L["Trade Goods"], L[""]},
   { L["REAGENT"], L[""], L["Nether Vortex"], L["Trade Goods"], L[""]},

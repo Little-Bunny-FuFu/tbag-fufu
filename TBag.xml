@@ -6,6 +6,7 @@
   <Script file="TBagOpt.lua"/>
   <Script file="TBagTrade.lua"/>
   <Script file="TBagItemInfo.lua"/>
+  <Script file="TBagTest.lua"/>
 
   <FontString name="TBag_BigFont"  font="Interface\AddOns\TBag\DAB_CooldownFont.ttf" virtual="true" justifyH="CENTER">
     <Shadow>
