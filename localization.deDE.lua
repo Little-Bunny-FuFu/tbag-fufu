@@ -40,6 +40,34 @@ TBAG_LOCALE = setmetatable({
   ["Poisons"] = "Gifte",
 
 -----------------------------------------------------------------------
+-- SKILLS REVERSE deDE -> enUS
+-----------------------------------------------------------------------
+  
+-- Secondary skills
+  ["Kochen"] = "Cooking",
+  ["Angeln"] = "Fishing",
+  ["Erste Hilfe"] = "First Aid",
+
+-- Primary professions
+  ["Alchemie"] = "Alchemy",
+  ["Schmiedekunst"] = "Blacksmithing",
+  ["Verzauberkunst"] = "Enchanting",
+  ["Ingenieurskunst"] = "Engineering",
+  ["Juwelenschleifen"] = "Jewelcrafting",
+  ["Lederverarbeitung"] = "Leatherworking",
+  ["Schneiderei"] = "Tailoring",
+
+-- Gathering
+  ["K\195\188rschnerei"] = "Skinning",
+  ["Bergbau"] = "Mining",
+  ["Kr\195\164uterkunde"] = "Herbalism",
+
+-- Other skills
+  ["Schlo\195\159knacken"] = "Lockpicking",
+  ["Gifte"] = "Poisons",
+
+
+-----------------------------------------------------------------------
 -- ITEM TYPES
 -----------------------------------------------------------------------
 

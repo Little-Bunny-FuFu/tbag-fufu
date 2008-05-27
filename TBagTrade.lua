@@ -61,13 +61,13 @@ function TBag_GetTradeType(trade)
   else
 --    TBag_PrintDEBUG("TBag_GetTradeType: "..trade);
 
-    if ((trade == L["Cooking"]) or (trade == L["First Aid"]) 
-      or (trade == L["Fishing"])) then
+    if ((trade == "Cooking") or (trade == "First Aid") 
+      or (trade == "Fishing")) then
       return TBAG_S_SECOND;
-    elseif ((trade == L["Alchemy"]) or (trade == L["Blacksmithing"]) 
-      or (trade == L["Enchanting"]) or (trade == L["Engineering"]) 
-      or (trade == L["Leatherworking"]) or (trade == L["Tailoring"])
-      or (trade == L["Jewelcrafting"])) then
+    elseif ((trade == "Alchemy") or (trade == "Blacksmithing") 
+      or (trade == "Enchanting") or (trade == "Engineering") 
+      or (trade == "Leatherworking") or (trade == "Tailoring")
+      or (trade == "Jewelcrafting")) then
       return TBAG_S_TRADES;
     else
       return TBAG_S_SKILLS;
@@ -141,6 +141,8 @@ function TBag_Craft()
     local created;
     local reagent;
 
+    tradeskillName = L[tradeskillName]; -- reverse for localized to enUS
+    
     -- hunter training window shows up as a craft with a nil tradeskillName
     if (tradeskillName ~= nil) then
       TBag_SetPlayerTrade(TBAG_PLAYERID, tradeskillName)
@@ -175,6 +177,8 @@ function TBag_Trade()
     local reagentItemLink;
     local created;
     local reagent;
+
+    tradeskillName = L[tradeskillName]; -- reverse for localized to enUS
 
     if (tradeskillName ~= nil) then
       TBag_SetPlayerTrade(TBAG_PLAYERID, tradeskillName)
@@ -251,7 +255,7 @@ function TBag_MakeTradeReagentKeywords(itm, id, trade1, trade2)
 	  end
         end
 	for trade,_ in pairs (counts[max_count]) do
-	    itm[TBAG_I_KEYWORD][TBag_Cat(trade)] = 1;
+	    itm[TBAG_I_KEYWORD][L[TBag_Cat(trade)]] = 1;
 	    if (trade == trade1) then
 	      itm[TBAG_I_KEYWORD][L["TRADE1"]] = 1;
 	    end
@@ -291,19 +295,19 @@ function TBag_MakeAllTradeKeywords(itm, docreated, trade1, trade2)
   for trade, _ in pairs(TBag_GetAllProfessions()) do
     if (trade ~= 'version' and trade ~= TBAG_S_UPDATE) then
 --    TBag_PrintDEBUG("profession ="..trade );
-      TBag_MakeTradeCreationKeyword(itm, id, trade, TBag_Cat(trade), docreated);
+      TBag_MakeTradeCreationKeyword(itm, id, trade, L[TBag_Cat(trade)], docreated);
     end
   end
   for trade, _ in pairs(TBag_GetAllSeconds()) do
     if (trade ~= 'version' and trade ~= TBAG_S_UPDATE) then
 --    TBag_PrintDEBUG("second ="..trade );
-      TBag_MakeTradeCreationKeyword(itm, id, trade, TBag_Cat(trade), docreated);
+      TBag_MakeTradeCreationKeyword(itm, id, trade, L[TBag_Cat(trade)], docreated);
     end
   end
   for trade, _ in pairs(TBag_GetAllSkills()) do
     if (trade ~= 'version' and trade ~= TBAG_S_UPDATE) then
 --    TBag_PrintDEBUG("skill ="..trade );
-      TBag_MakeTradeCreationKeyword(itm, id, trade, TBag_Cat(trade), docreated);
+      TBag_MakeTradeCreationKeyword(itm, id, trade, L[TBag_Cat(trade)], docreated);
     end
   end
   TBag_MakeTradeReagentKeywords(itm, id, trade1, trade2);
