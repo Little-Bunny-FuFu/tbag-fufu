@@ -23,11 +23,11 @@
     translation.
   - You can recategorize individual items in edit mode again by
     right-clicking on them like you could with EngBags.
-  - Empty catagories/bars will no longer result in lines through
+  - Empty categories/bars will no longer result in lines through
     the window.  The lines often looked like a cursor in a text
     editor and were ugly.
   - You can set the anchor point of the inventory and bank windows.
-    The window will grow from the the selected corner and that
+    The window will grow from the selected corner and that
     corner will never move.  The anchor selection can be
     found by right clicking on blank space in the window
     and using the Anchor sub-menu.
@@ -46,7 +46,7 @@
     to remove blank space.
   - Buttons will no longer end up overlapping when the number
     of columns is set low.
-  - Fix cooldowns.  The cooldown sweep will show imediately upon
+  - Fix cooldowns.  The cooldown sweep will show immediately upon
     using an item.  Previously it would only start showing after
     the next reload or toggle of the window.
   - No longer incorrectly show cooldown sweeps when viewing
@@ -105,7 +105,7 @@
     functionality of the game.  Will prevent the situation with
     slots showing no icon after a major update until a few viewings
     or actually logging into all characters.  Change is backwards
-    comptable, this version will still work with 2.3.x
+    compatible, this version will still work with 2.3.x
   - When shift clicking to insert a link of an item in the built in
     bank slots don't include the link twice.
   - Search results will be consolidated again.  Apparently when I fixed
@@ -148,7 +148,7 @@
 * 20071128-r45-Shefki
   - Fix a taint bug that happened when you died.
   - Fix sort of class reagents and darkmoon faire cards.  Hopefully,
-    this is all correct now for 2.3.0.  Requies another /tinv resetsorts
+    this is all correct now for 2.3.0.  Requires another /tinv resetsorts
     and /tbnk resetsorts
 
 * 20071113-r40-Shefki
@@ -254,7 +254,7 @@
     this would never cause the loss of an item it could cause an item to be
     stuck in locked state until the UI was reloaded.  The problem wasn't very
     common because it required a lot of small stacks that needed combining to
-    show up but did present itself ocassionally when taking AH purchases from
+    show up but did present itself occasionally when taking AH purchases from
     the mailbox.
   - Updated the categorization rules to include a number of new items and
     added categories for various "collectables" for various factions.
@@ -264,8 +264,8 @@
     a much more organized look.
   - Profession bags now have their own category for each type of Profession
     bag.  This allows people with multiple profession bags of differing
-    professions to keep them more orgaanized.
-  - Quivers and Ammmo pouches are now categorized separately.  Again should
+    professions to keep them more organized.
+  - Quivers and Ammo pouches are now categorized separately.  Again should
     allow people with both to have things more organized.
   - The item information on which items belong to which tradeskills has
     been updated to be current.  It has been restructured to allow automated
@@ -274,7 +274,7 @@
     result in categorization for items used in crafting that stays current.
   - Reagents for crafting no longer receive the keyword for every craft
     they are used for.  This prevents leather from sorting into tailoring
-    and gems from sorting into say alchemy simply becuase a few recipes
+    and gems from sorting into say alchemy simply because a few recipes
     from these crafts happen to use these items and these trades were
     the last to be categorized.  Keywords are now set by the  craft that
     uses an item in the most recipes.  If multiple trades use the item
@@ -290,7 +290,7 @@
 
   MISC:
   - Updated mail item cache to work with 2.3 mailboxes.  This changes is
-    backwards compatable with older versions of the mailbox API and as
+    backwards compatible with older versions of the mailbox API and as
     a result this will still work with 2.2.  However, the format of the
     mailbox cache has changed as so you will have to reopen mailboxes on
     all characters to refresh the data.
@@ -301,12 +301,12 @@
     click menu for the slot box in edit mode without forcing a reload of the
     UI.
   - Fixed: Improper tooltip display while in edit mode on the bank window
-    and mousing over the slot target buttons.  2.2.0 compatabilty issue
+    and mousing over the slot target buttons.  2.2.0 compatibility issue
     I missed.
   - Fixed: Properly cache mailbox itemlinks.  TBag was guessing an items link
     from the name which could cause the game to crash when linking mailbox
     items shown in the item link or for items in the mailbox to show incorrect
-    info when searched.  Should improve performance when opening the mailboox
+    info when searched.  Should improve performance when opening the mailbox
     too because it was brute force searching all items looking for one that
     had the same name.  
   - Fixed: New tags were at times turning themselves on for no apparent
@@ -315,7 +315,7 @@
     sessions.  Some of this may still happen until the bad timestamps
     are cleared (reset NEW tag from right click menu) or replaced by new
     timestamps through normal operation.  Could also show up as items that
-    are not new hilighting.
+    are not new highlighting.
   - Fixed: The highlight around the backpack button on the main menu bar
     will now stay in sync properly.  Yay for Blizzard for finally changing
     their code so I could fix this.
@@ -333,7 +333,7 @@
     OpenAllBags().
   - Try to avoid sound lag issues from multiple blizzard bag frames 
     opening.  Caused by an apparent bug in the 2.2.0 sound system,
-    which I've reported, but at least try to avoid excercising the bug. 
+    which I've reported, but at least try to avoid exercising the bug. 
   - Upped max bag size to 40 slots since there are now 36 slot bags 
     on the PTR (at least for premades).
   - Fixed: When show blizzard bag frames was enabled and you were viewing
@@ -413,7 +413,7 @@
     functionality is available.
   - Added support for Item Comparisons added with WoW 2.1.  Holding
     down shift while hovering over an item will show you what you
-    have equiped in the same slots as that item.  Works for
+    have equipped in the same slots as that item.  Works for
     the bank (offline or online) and bags (current character or not).
     Note: Some items this will not work with.  This is a Blizzard bug,
     if it is not properly set to Class: Armor the comparison tooltips

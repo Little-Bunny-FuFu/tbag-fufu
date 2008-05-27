@@ -9,11 +9,13 @@
 --- WILL BE OVERWRITTEN ON THE NEXT RELEASE OF THE ADDON!         ---
 ---------------------------------------------------------------------
 
+-- Localization Support
+local L = TBAG_LOCALE;
 
 local TBag_TradeCreations = {
 		[TBAG_S_UPDATE] = "1211753828",
 		[TBAG_S_VERSION] = 1,
-		["Alchemy"] = {
+		[L["Alchemy"]] = {
 			["118"] = 1,
 			["858"] = 1,
 			["929"] = 1,
@@ -190,7 +192,7 @@ local TBag_TradeCreations = {
 			["35750"] = 1,
 			["35751"] = 1,
 		},
-		["Blacksmithing"] = {
+		[L["Blacksmithing"]] = {
 			["2844"] = 1,
 			["2845"] = 1,
 			["2847"] = 1,
@@ -567,7 +569,7 @@ local TBag_TradeCreations = {
 			["34379"] = 1,
 			["34380"] = 1,
 		},
-		["Enchanting"] = {
+		[L["Enchanting"]] = {
 			["6218"] = 1,
 			["6339"] = 1,
 			["11130"] = 1,
@@ -597,7 +599,7 @@ local TBag_TradeCreations = {
 			["22521"] = 1,
 			["22522"] = 1,
 		},
-		["Engineering"] = {
+		[L["Engineering"]] = {
 			["4357"] = 1,
 			["4358"] = 1,
 			["4359"] = 1,
@@ -842,7 +844,7 @@ local TBag_TradeCreations = {
 			["35185"] = 1,
 			["35581"] = 1,
 		},
-		["Jewelcrafting"] = {
+		[L["Jewelcrafting"]] = {
 			["20816"] = 1,
 			["20817"] = 1,
 			["20818"] = 1,
@@ -1105,7 +1107,7 @@ local TBag_TradeCreations = {
 			["35945"] = 1,
 			["37503"] = 1,
 		},
-		["Leatherworking"] = {
+		[L["Leatherworking"]] = {
 			["2300"] = 1,
 			["2302"] = 1,
 			["2303"] = 1,
@@ -1479,7 +1481,7 @@ local TBag_TradeCreations = {
 			["34482"] = 1,
 			["34490"] = 1,
 		},
-		["Tailoring"] = {
+		[L["Tailoring"]] = {
 			["2568"] = 1,
 			["2569"] = 1,
 			["2570"] = 1,
@@ -1803,7 +1805,7 @@ local TBag_TradeCreations = {
 local TBag_SecondCreations = {
 		[TBAG_S_UPDATE] = "1211753828",
 		[TBAG_S_VERSION] = 1,
-		["Cooking"] = {
+		[L["Cooking"]] = {
 			["724"] = 1,
 			["733"] = 1,
 			["787"] = 1,
@@ -1921,7 +1923,7 @@ local TBag_SecondCreations = {
 			["35563"] = 1,
 			["35565"] = 1,
 		},
-		["First Aid"] = {
+		[L["First Aid"]] = {
 			["1251"] = 1,
 			["2581"] = 1,
 			["3530"] = 1,
@@ -1944,7 +1946,7 @@ local TBag_SecondCreations = {
 local TBag_SkillCreations = {
 		[TBAG_S_UPDATE] = "1211753828",
 		[TBAG_S_VERSION] = 1,
-		["Mining"] = {
+		[L["Mining"]] = {
 			["2840"] = 1,
 			["2841"] = 1,
 			["2842"] = 1,
@@ -1967,7 +1969,7 @@ local TBag_SkillCreations = {
 			["23573"] = 1,
 			["35128"] = 1,
 		},
-		["Poisons"] = {
+		[L["Poisons"]] = {
 			["2892"] = 1,
 			["2893"] = 1,
 			["3775"] = 1,
@@ -2001,12 +2003,12 @@ local TBag_Reagents = {
 		[TBAG_S_UPDATE] = "1211753828",
 		[TBAG_S_VERSION] = 1,
 		["118"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["858"] =1,
 			},
 		},
 		["159"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["5525"] =1,
 				["7676"] =1,
 				["10841"] =1,
@@ -2015,39 +2017,39 @@ local TBag_Reagents = {
 				["13931"] =1,
 				["13933"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["4367"] =1,
 				["4398"] =1,
 				["18594"] =1,
 			},
 		},
 		["164"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["12417"] =1,
 			},
 		},
 		["723"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["724"] =1,
 			},
 		},
 		["729"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["733"] =1,
 			},
 		},
 		["730"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["733"] =1,
 			},
 		},
 		["731"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["733"] =1,
 			},
 		},
 		["765"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["118"] =1,
 				["2454"] =1,
 				["2455"] =1,
@@ -2056,92 +2058,92 @@ local TBag_Reagents = {
 			},
 		},
 		["769"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["2681"] =1,
 			},
 		},
 		["774"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["3474"] =1,
 				["3488"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["4401"] =1,
 				["4405"] =1,
 				["7506"] =1,
 				["10506"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["20821"] =1,
 				["25438"] =1,
 				["30804"] =1,
 			},
 		},
 		["783"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["4231"] =1,
 			},
 		},
 		["785"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["2455"] =1,
 				["2456"] =1,
 				["3383"] =1,
 				["3384"] =1,
 				["3385"] =1,
 			},
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["33924"] =1,
 			},
 		},
 		["814"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["7148"] =1,
 				["7506"] =1,
 			},
 		},
 		["818"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["3474"] =1,
 				["3487"] =1,
 				["3848"] =1,
 				["6731"] =1,
 				["33791"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["4368"] =1,
 				["7506"] =1,
 				["10506"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["21934"] =1,
 				["25439"] =1,
 				["30804"] =1,
 			},
 		},
 		["929"] = {
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["7049"] =1,
 			},
 		},
 		["1015"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["1017"] =1,
 				["12209"] =1,
 			},
 		},
 		["1080"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["1082"] =1,
 			},
 		},
 		["1081"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["1082"] =1,
 			},
 		},
 		["1179"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["5526"] =1,
 				["16766"] =1,
 				["17198"] =1,
@@ -2149,78 +2151,78 @@ local TBag_Reagents = {
 			},
 		},
 		["1206"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["2870"] =1,
 				["3491"] =1,
 				["3844"] =1,
 				["7944"] =1,
 				["12259"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["4372"] =1,
 				["4381"] =1,
 				["4385"] =1,
 				["4406"] =1,
 				["5507"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["20826"] =1,
 				["20831"] =1,
 				["20950"] =1,
 				["20956"] =1,
 				["30419"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["5963"] =1,
 			},
 		},
 		["1210"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["2864"] =1,
 				["3490"] =1,
 				["3491"] =1,
 				["7945"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["4373"] =1,
 				["7148"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["20823"] =1,
 				["20828"] =1,
 				["21933"] =1,
 				["30804"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["18238"] =1,
 			},
 		},
 		["1288"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["3386"] =1,
 			},
-			["First Aid"] = {
+			[L["First Aid"]] = {
 				["6453"] =1,
 			},
 		},
 		["1468"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["3663"] =1,
 			},
 		},
 		["1475"] = {
-			["First Aid"] = {
+			[L["First Aid"]] = {
 				["6452"] =1,
 			},
 		},
 		["1529"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["3844"] =1,
 				["3850"] =1,
 				["3854"] =1,
 				["7954"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["4388"] =1,
 				["4397"] =1,
 				["4407"] =1,
@@ -2228,7 +2230,7 @@ local TBag_Reagents = {
 				["10716"] =1,
 				["10725"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["20955"] =1,
 				["20956"] =1,
 				["20959"] =1,
@@ -2237,17 +2239,17 @@ local TBag_Reagents = {
 				["29157"] =1,
 				["30420"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["4262"] =1,
 				["15066"] =1,
 				["15067"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["10041"] =1,
 			},
 		},
 		["1705"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["2870"] =1,
 				["3492"] =1,
 				["3846"] =1,
@@ -2257,11 +2259,11 @@ local TBag_Reagents = {
 				["6043"] =1,
 				["7944"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["4383"] =1,
 				["4397"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["20826"] =1,
 				["20830"] =1,
 				["20832"] =1,
@@ -2271,28 +2273,28 @@ local TBag_Reagents = {
 			},
 		},
 		["2251"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["3666"] =1,
 			},
 		},
 		["2312"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["4248"] =1,
 			},
 		},
 		["2318"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["3488"] =1,
 				["3489"] =1,
 				["6214"] =1,
 				["7166"] =1,
 				["7955"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["4367"] =1,
 				["4368"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["2300"] =1,
 				["2302"] =1,
 				["2303"] =1,
@@ -2322,7 +2324,7 @@ local TBag_Reagents = {
 				["7281"] =1,
 				["7282"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["2569"] =1,
 				["2578"] =1,
 				["2583"] =1,
@@ -2332,7 +2334,7 @@ local TBag_Reagents = {
 			},
 		},
 		["2319"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["2848"] =1,
 				["2849"] =1,
 				["2850"] =1,
@@ -2347,7 +2349,7 @@ local TBag_Reagents = {
 				["7958"] =1,
 				["29201"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["4369"] =1,
 				["4373"] =1,
 				["4381"] =1,
@@ -2358,7 +2360,7 @@ local TBag_Reagents = {
 				["21558"] =1,
 				["21559"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["2313"] =1,
 				["2314"] =1,
 				["2315"] =1,
@@ -2382,13 +2384,13 @@ local TBag_Reagents = {
 				["7359"] =1,
 				["20575"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["4315"] =1,
 				["4320"] =1,
 			},
 		},
 		["2320"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["2300"] =1,
 				["2302"] =1,
 				["2303"] =1,
@@ -2414,7 +2416,7 @@ local TBag_Reagents = {
 				["7280"] =1,
 				["7281"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["2568"] =1,
 				["2569"] =1,
 				["2570"] =1,
@@ -2440,10 +2442,10 @@ local TBag_Reagents = {
 			},
 		},
 		["2321"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["3473"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["2308"] =1,
 				["2314"] =1,
 				["2315"] =1,
@@ -2497,7 +2499,7 @@ local TBag_Reagents = {
 				["18662"] =1,
 				["20575"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["2578"] =1,
 				["2579"] =1,
 				["2582"] =1,
@@ -2552,10 +2554,10 @@ local TBag_Reagents = {
 			},
 		},
 		["2324"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["2311"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["2576"] =1,
 				["4331"] =1,
 				["4334"] =1,
@@ -2569,7 +2571,7 @@ local TBag_Reagents = {
 			},
 		},
 		["2325"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["7373"] =1,
 				["7378"] =1,
 				["7387"] =1,
@@ -2581,14 +2583,14 @@ local TBag_Reagents = {
 				["15088"] =1,
 				["25681"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["4336"] =1,
 				["5765"] =1,
 				["10053"] =1,
 			},
 		},
 		["2447"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["118"] =1,
 				["2456"] =1,
 				["2458"] =1,
@@ -2597,7 +2599,7 @@ local TBag_Reagents = {
 			},
 		},
 		["2449"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["2454"] =1,
 				["2458"] =1,
 				["3382"] =1,
@@ -2606,7 +2608,7 @@ local TBag_Reagents = {
 			},
 		},
 		["2450"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["858"] =1,
 				["929"] =1,
 				["2459"] =1,
@@ -2616,19 +2618,19 @@ local TBag_Reagents = {
 			},
 		},
 		["2452"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["2457"] =1,
 				["2459"] =1,
 				["3390"] =1,
 				["6051"] =1,
 				["6372"] =1,
 			},
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["7676"] =1,
 			},
 		},
 		["2453"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["929"] =1,
 				["3386"] =1,
 				["3388"] =1,
@@ -2637,45 +2639,45 @@ local TBag_Reagents = {
 			},
 		},
 		["2457"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["7285"] =1,
 			},
 		},
 		["2459"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["3490"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["7391"] =1,
 			},
 		},
 		["2589"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["2844"] =1,
 				["2845"] =1,
 				["2847"] =1,
 				["3239"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["4358"] =1,
 				["4360"] =1,
 				["4363"] =1,
 				["4365"] =1,
 			},
-			["First Aid"] = {
+			[L["First Aid"]] = {
 				["1251"] =1,
 				["2581"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["2996"] =1,
 			},
 		},
 		["2592"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["3240"] =1,
 				["3241"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["4366"] =1,
 				["4374"] =1,
 				["4375"] =1,
@@ -2684,39 +2686,39 @@ local TBag_Reagents = {
 				["4384"] =1,
 				["6714"] =1,
 			},
-			["First Aid"] = {
+			[L["First Aid"]] = {
 				["3530"] =1,
 				["3531"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["2997"] =1,
 			},
 		},
 		["2593"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["33048"] =1,
 				["33924"] =1,
 			},
 		},
 		["2594"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["34832"] =1,
 			},
 		},
 		["2596"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["12214"] =1,
 				["34832"] =1,
 			},
 		},
 		["2604"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["23769"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["25683"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["2572"] =1,
 				["2575"] =1,
 				["4313"] =1,
@@ -2746,7 +2748,7 @@ local TBag_Reagents = {
 			},
 		},
 		["2605"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["3484"] =1,
 				["3485"] =1,
 				["3835"] =1,
@@ -2754,15 +2756,15 @@ local TBag_Reagents = {
 				["3840"] =1,
 				["3842"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["23771"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["4255"] =1,
 				["4257"] =1,
 				["4259"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["2579"] =1,
 				["2582"] =1,
 				["4241"] =1,
@@ -2775,39 +2777,39 @@ local TBag_Reagents = {
 			},
 		},
 		["2665"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["1017"] =1,
 			},
 		},
 		["2672"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["2679"] =1,
 				["2680"] =1,
 			},
 		},
 		["2673"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["2684"] =1,
 			},
 		},
 		["2674"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["2683"] =1,
 			},
 		},
 		["2675"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["2682"] =1,
 			},
 		},
 		["2677"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["2685"] =1,
 				["2687"] =1,
 			},
 		},
 		["2678"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["724"] =1,
 				["2680"] =1,
 				["2682"] =1,
@@ -2829,7 +2831,7 @@ local TBag_Reagents = {
 			},
 		},
 		["2692"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["2685"] =1,
 				["3663"] =1,
 				["3664"] =1,
@@ -2855,74 +2857,74 @@ local TBag_Reagents = {
 			},
 		},
 		["2770"] = {
-			["Mining"] = {
+			[L["Mining"]] = {
 				["2840"] =1,
 			},
 		},
 		["2771"] = {
-			["Mining"] = {
+			[L["Mining"]] = {
 				["3576"] =1,
 			},
 		},
 		["2772"] = {
-			["Mining"] = {
+			[L["Mining"]] = {
 				["3575"] =1,
 			},
 		},
 		["2775"] = {
-			["Mining"] = {
+			[L["Mining"]] = {
 				["2842"] =1,
 			},
 		},
 		["2776"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["3577"] =1,
 			},
-			["Mining"] = {
+			[L["Mining"]] = {
 				["3577"] =1,
 			},
 		},
 		["2835"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["2862"] =1,
 				["3239"] =1,
 				["3470"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["4357"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["25498"] =1,
 			},
 		},
 		["2836"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["2863"] =1,
 				["3240"] =1,
 				["3478"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["4364"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["25880"] =1,
 			},
 		},
 		["2838"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["2871"] =1,
 				["3241"] =1,
 				["3486"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["4377"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["25881"] =1,
 			},
 		},
 		["2840"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["2844"] =1,
 				["2845"] =1,
 				["2847"] =1,
@@ -2947,7 +2949,7 @@ local TBag_Reagents = {
 				["10421"] =1,
 				["33791"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["4359"] =1,
 				["4360"] =1,
 				["4361"] =1,
@@ -2958,7 +2960,7 @@ local TBag_Reagents = {
 				["8067"] =1,
 				["8068"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["20816"] =1,
 				["20820"] =1,
 				["20821"] =1,
@@ -2966,15 +2968,15 @@ local TBag_Reagents = {
 				["21932"] =1,
 				["21934"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["34086"] =1,
 			},
-			["Mining"] = {
+			[L["Mining"]] = {
 				["2841"] =1,
 			},
 		},
 		["2841"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["2848"] =1,
 				["2849"] =1,
 				["2850"] =1,
@@ -2999,7 +3001,7 @@ local TBag_Reagents = {
 				["10423"] =1,
 				["29201"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["4366"] =1,
 				["4371"] =1,
 				["4374"] =1,
@@ -3011,7 +3013,7 @@ local TBag_Reagents = {
 				["7506"] =1,
 				["8069"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["20817"] =1,
 				["20828"] =1,
 				["20907"] =1,
@@ -3022,7 +3024,7 @@ local TBag_Reagents = {
 			},
 		},
 		["2842"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["2869"] =1,
 				["2870"] =1,
 				["3481"] =1,
@@ -3035,11 +3037,11 @@ local TBag_Reagents = {
 				["12611"] =1,
 				["15869"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["4379"] =1,
 				["4404"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["20818"] =1,
 				["20826"] =1,
 				["20827"] =1,
@@ -3048,7 +3050,7 @@ local TBag_Reagents = {
 			},
 		},
 		["2880"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["2844"] =1,
 				["2845"] =1,
 				["2847"] =1,
@@ -3063,43 +3065,43 @@ local TBag_Reagents = {
 				["7166"] =1,
 				["7955"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["4361"] =1,
 				["4371"] =1,
 				["6712"] =1,
 			},
 		},
 		["2886"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["2888"] =1,
 			},
 		},
 		["2894"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["2888"] =1,
 			},
 		},
 		["2924"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["3662"] =1,
 			},
 		},
 		["2928"] = {
-			["Poisons"] = {
+			[L["Poisons"]] = {
 				["5237"] =1,
 				["6947"] =1,
 				["6949"] =1,
 			},
 		},
 		["2930"] = {
-			["Poisons"] = {
+			[L["Poisons"]] = {
 				["3775"] =1,
 				["10918"] =1,
 				["10920"] =1,
 			},
 		},
 		["2931"] = {
-			["Poisons"] = {
+			[L["Poisons"]] = {
 				["21835"] =1,
 				["21927"] =1,
 				["22053"] =1,
@@ -3107,12 +3109,12 @@ local TBag_Reagents = {
 			},
 		},
 		["2934"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["2318"] =1,
 			},
 		},
 		["2996"] = {
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["2568"] =1,
 				["2569"] =1,
 				["2570"] =1,
@@ -3144,12 +3146,12 @@ local TBag_Reagents = {
 			},
 		},
 		["2997"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["5958"] =1,
 				["7359"] =1,
 				["34086"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["2582"] =1,
 				["2583"] =1,
 				["2584"] =1,
@@ -3180,31 +3182,31 @@ local TBag_Reagents = {
 			},
 		},
 		["3164"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["4596"] =1,
 			},
 		},
 		["3172"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["3220"] =1,
 			},
 		},
 		["3173"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["3220"] =1,
 				["6890"] =1,
 			},
 		},
 		["3174"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["3220"] =1,
 			},
 		},
 		["3182"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["4253"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["4320"] =1,
 				["4321"] =1,
 				["5766"] =1,
@@ -3212,7 +3214,7 @@ local TBag_Reagents = {
 			},
 		},
 		["3355"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["3384"] =1,
 				["3389"] =1,
 				["3390"] =1,
@@ -3222,7 +3224,7 @@ local TBag_Reagents = {
 			},
 		},
 		["3356"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["1710"] =1,
 				["3391"] =1,
 				["3827"] =1,
@@ -3230,19 +3232,19 @@ local TBag_Reagents = {
 				["6048"] =1,
 				["6373"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["7349"] =1,
 			},
 		},
 		["3357"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["1710"] =1,
 				["3826"] =1,
 				["6052"] =1,
 			},
 		},
 		["3358"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["3828"] =1,
 				["3829"] =1,
 				["3928"] =1,
@@ -3253,13 +3255,13 @@ local TBag_Reagents = {
 			},
 		},
 		["3369"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["3824"] =1,
 				["6048"] =1,
 			},
 		},
 		["3371"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["118"] =1,
 				["2454"] =1,
 				["2455"] =1,
@@ -3281,17 +3283,17 @@ local TBag_Reagents = {
 				["6372"] =1,
 				["6662"] =1,
 			},
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["20744"] =1,
 			},
-			["Poisons"] = {
+			[L["Poisons"]] = {
 				["3775"] =1,
 				["5237"] =1,
 				["6947"] =1,
 			},
 		},
 		["3372"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["929"] =1,
 				["1710"] =1,
 				["3386"] =1,
@@ -3322,11 +3324,11 @@ local TBag_Reagents = {
 				["13423"] =1,
 				["17708"] =1,
 			},
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["20745"] =1,
 				["20746"] =1,
 			},
-			["Poisons"] = {
+			[L["Poisons"]] = {
 				["2892"] =1,
 				["2893"] =1,
 				["6949"] =1,
@@ -3337,39 +3339,39 @@ local TBag_Reagents = {
 			},
 		},
 		["3383"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["4250"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["4318"] =1,
 			},
 		},
 		["3389"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["4253"] =1,
 			},
 		},
 		["3390"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["4252"] =1,
 			},
 		},
 		["3391"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["3492"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["20831"] =1,
 				["20954"] =1,
 			},
 		},
 		["3404"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["4457"] =1,
 			},
 		},
 		["3466"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["3490"] =1,
 				["3491"] =1,
 				["3492"] =1,
@@ -3390,7 +3392,7 @@ local TBag_Reagents = {
 			},
 		},
 		["3470"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["2854"] =1,
 				["2864"] =1,
 				["3471"] =1,
@@ -3410,7 +3412,7 @@ local TBag_Reagents = {
 			},
 		},
 		["3478"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["2868"] =1,
 				["2869"] =1,
 				["3480"] =1,
@@ -3431,7 +3433,7 @@ local TBag_Reagents = {
 			},
 		},
 		["3486"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["3837"] =1,
 				["3840"] =1,
 				["3841"] =1,
@@ -3463,11 +3465,11 @@ local TBag_Reagents = {
 			},
 		},
 		["3575"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["3577"] =1,
 				["9149"] =1,
 			},
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["3484"] =1,
 				["3485"] =1,
 				["3492"] =1,
@@ -3491,7 +3493,7 @@ local TBag_Reagents = {
 				["7916"] =1,
 				["7917"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["4387"] =1,
 				["4389"] =1,
 				["4390"] =1,
@@ -3499,24 +3501,24 @@ local TBag_Reagents = {
 				["4395"] =1,
 				["7148"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["20833"] =1,
 				["20909"] =1,
 				["20954"] =1,
 				["30420"] =1,
 			},
-			["Mining"] = {
+			[L["Mining"]] = {
 				["3577"] =1,
 				["3859"] =1,
 			},
 		},
 		["3576"] = {
-			["Mining"] = {
+			[L["Mining"]] = {
 				["2841"] =1,
 			},
 		},
 		["3577"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["3837"] =1,
 				["3841"] =1,
 				["3843"] =1,
@@ -3532,17 +3534,17 @@ local TBag_Reagents = {
 				["12633"] =1,
 				["15870"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["10558"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["20831"] =1,
 				["20955"] =1,
 				["20967"] =1,
 				["21756"] =1,
 				["29157"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["14100"] =1,
 				["14101"] =1,
 				["14103"] =1,
@@ -3550,23 +3552,23 @@ local TBag_Reagents = {
 			},
 		},
 		["3667"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["3664"] =1,
 				["20074"] =1,
 			},
 		},
 		["3685"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["3665"] =1,
 			},
 		},
 		["3712"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["3729"] =1,
 			},
 		},
 		["3713"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["3728"] =1,
 				["3729"] =1,
 				["12215"] =1,
@@ -3586,18 +3588,18 @@ local TBag_Reagents = {
 			},
 		},
 		["3730"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["3726"] =1,
 			},
 		},
 		["3731"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["3727"] =1,
 				["3728"] =1,
 			},
 		},
 		["3818"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["3823"] =1,
 				["3824"] =1,
 				["3828"] =1,
@@ -3605,14 +3607,14 @@ local TBag_Reagents = {
 			},
 		},
 		["3819"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["3829"] =1,
 				["6050"] =1,
 				["17708"] =1,
 			},
 		},
 		["3820"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["3385"] =1,
 				["3389"] =1,
 				["3827"] =1,
@@ -3623,7 +3625,7 @@ local TBag_Reagents = {
 			},
 		},
 		["3821"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["3825"] =1,
 				["4623"] =1,
 				["6050"] =1,
@@ -3636,72 +3638,72 @@ local TBag_Reagents = {
 				["9187"] =1,
 				["10592"] =1,
 			},
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["10841"] =1,
 			},
 		},
 		["3823"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["7961"] =1,
 			},
 		},
 		["3824"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["13459"] =1,
 			},
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["3856"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["20833"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["4256"] =1,
 				["7374"] =1,
 				["7390"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["4323"] =1,
 			},
 		},
 		["3827"] = {
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["20832"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["4326"] =1,
 				["7063"] =1,
 			},
 		},
 		["3829"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["3854"] =1,
 				["17704"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["4386"] =1,
 				["17716"] =1,
 				["18634"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["4327"] =1,
 			},
 		},
 		["3857"] = {
-			["Mining"] = {
+			[L["Mining"]] = {
 				["3859"] =1,
 			},
 		},
 		["3858"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["4623"] =1,
 			},
-			["Mining"] = {
+			[L["Mining"]] = {
 				["3860"] =1,
 			},
 		},
 		["3859"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["3837"] =1,
 				["3841"] =1,
 				["3845"] =1,
@@ -3720,15 +3722,15 @@ local TBag_Reagents = {
 				["17704"] =1,
 				["29202"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["10498"] =1,
 			},
 		},
 		["3860"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["6037"] =1,
 			},
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["7918"] =1,
 				["7919"] =1,
 				["7920"] =1,
@@ -3768,7 +3770,7 @@ local TBag_Reagents = {
 				["30072"] =1,
 				["30073"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["10506"] =1,
 				["10508"] =1,
 				["10510"] =1,
@@ -3796,16 +3798,16 @@ local TBag_Reagents = {
 				["18984"] =1,
 				["18986"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["20961"] =1,
 				["20963"] =1,
 			},
-			["Mining"] = {
+			[L["Mining"]] = {
 				["6037"] =1,
 			},
 		},
 		["3864"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["3836"] =1,
 				["3846"] =1,
 				["3856"] =1,
@@ -3813,7 +3815,7 @@ local TBag_Reagents = {
 				["7941"] =1,
 				["7954"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["4393"] =1,
 				["4396"] =1,
 				["4397"] =1,
@@ -3825,7 +3827,7 @@ local TBag_Reagents = {
 				["10543"] =1,
 				["18660"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["20958"] =1,
 				["20961"] =1,
 				["20967"] =1,
@@ -3834,20 +3836,20 @@ local TBag_Reagents = {
 				["29157"] =1,
 				["29158"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["4262"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["4329"] =1,
 			},
 		},
 		["4096"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["4264"] =1,
 			},
 		},
 		["4231"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["2312"] =1,
 				["2314"] =1,
 				["4242"] =1,
@@ -3861,12 +3863,12 @@ local TBag_Reagents = {
 			},
 		},
 		["4232"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["4233"] =1,
 			},
 		},
 		["4233"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["4248"] =1,
 				["4249"] =1,
 				["4251"] =1,
@@ -3874,7 +3876,7 @@ local TBag_Reagents = {
 			},
 		},
 		["4234"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["3849"] =1,
 				["3850"] =1,
 				["3851"] =1,
@@ -3891,7 +3893,7 @@ local TBag_Reagents = {
 				["17704"] =1,
 				["29202"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["4391"] =1,
 				["4392"] =1,
 				["4393"] =1,
@@ -3908,7 +3910,7 @@ local TBag_Reagents = {
 				["21590"] =1,
 				["21592"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["3719"] =1,
 				["4254"] =1,
 				["4255"] =1,
@@ -3946,7 +3948,7 @@ local TBag_Reagents = {
 				["18662"] =1,
 				["18948"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["4245"] =1,
 				["4319"] =1,
 				["4329"] =1,
@@ -3957,12 +3959,12 @@ local TBag_Reagents = {
 			},
 		},
 		["4235"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["4236"] =1,
 			},
 		},
 		["4236"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["4256"] =1,
 				["4257"] =1,
 				["4258"] =1,
@@ -3980,29 +3982,29 @@ local TBag_Reagents = {
 			},
 		},
 		["4243"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["4244"] =1,
 			},
 		},
 		["4246"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["4249"] =1,
 			},
 		},
 		["4255"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["3844"] =1,
 			},
 		},
 		["4289"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["4231"] =1,
 				["4233"] =1,
 				["4236"] =1,
 			},
 		},
 		["4291"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["4260"] =1,
 				["4264"] =1,
 				["5783"] =1,
@@ -4026,7 +4028,7 @@ local TBag_Reagents = {
 				["8218"] =1,
 				["17721"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["4323"] =1,
 				["4325"] =1,
 				["4326"] =1,
@@ -4054,7 +4056,7 @@ local TBag_Reagents = {
 			},
 		},
 		["4304"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["7928"] =1,
 				["7932"] =1,
 				["7933"] =1,
@@ -4069,7 +4071,7 @@ local TBag_Reagents = {
 				["7960"] =1,
 				["7961"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["10501"] =1,
 				["10502"] =1,
 				["10503"] =1,
@@ -4079,7 +4081,7 @@ local TBag_Reagents = {
 				["21574"] =1,
 				["21576"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["8170"] =1,
 				["8173"] =1,
 				["8175"] =1,
@@ -4119,7 +4121,7 @@ local TBag_Reagents = {
 				["8367"] =1,
 				["18238"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["7064"] =1,
 				["10026"] =1,
 				["10031"] =1,
@@ -4127,12 +4129,12 @@ local TBag_Reagents = {
 			},
 		},
 		["4305"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["5962"] =1,
 				["5965"] =1,
 				["7387"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["4245"] =1,
 				["4319"] =1,
 				["4320"] =1,
@@ -4177,32 +4179,32 @@ local TBag_Reagents = {
 			},
 		},
 		["4306"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["7965"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["4388"] =1,
 				["4390"] =1,
 				["4852"] =1,
 				["7148"] =1,
 				["10507"] =1,
 			},
-			["First Aid"] = {
+			[L["First Aid"]] = {
 				["6450"] =1,
 				["6451"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["4305"] =1,
 			},
 		},
 		["4337"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["10720"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["7391"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["4322"] =1,
 				["4325"] =1,
 				["4327"] =1,
@@ -4210,35 +4212,35 @@ local TBag_Reagents = {
 			},
 		},
 		["4338"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["7919"] =1,
 				["7927"] =1,
 				["7931"] =1,
 				["7944"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["10560"] =1,
 				["10646"] =1,
 				["10726"] =1,
 				["11590"] =1,
 				["18588"] =1,
 			},
-			["First Aid"] = {
+			[L["First Aid"]] = {
 				["8544"] =1,
 				["8545"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["8192"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["4339"] =1,
 			},
 		},
 		["4339"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["10518"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["4327"] =1,
 				["4329"] =1,
 				["7054"] =1,
@@ -4282,7 +4284,7 @@ local TBag_Reagents = {
 			},
 		},
 		["4340"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["2315"] =1,
 				["2316"] =1,
 				["2317"] =1,
@@ -4291,7 +4293,7 @@ local TBag_Reagents = {
 				["4252"] =1,
 				["5961"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["2585"] =1,
 				["2587"] =1,
 				["4333"] =1,
@@ -4300,34 +4302,34 @@ local TBag_Reagents = {
 			},
 		},
 		["4341"] = {
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["4332"] =1,
 			},
 		},
 		["4342"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["9210"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["25886"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["25680"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["4335"] =1,
 				["10054"] =1,
 			},
 		},
 		["4357"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["4358"] =1,
 				["4360"] =1,
 				["8067"] =1,
 			},
 		},
 		["4359"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["4360"] =1,
 				["4362"] =1,
 				["4363"] =1,
@@ -4340,14 +4342,14 @@ local TBag_Reagents = {
 			},
 		},
 		["4361"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["4362"] =1,
 				["4369"] =1,
 				["4405"] =1,
 			},
 		},
 		["4363"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["4366"] =1,
 				["4367"] =1,
 				["4401"] =1,
@@ -4355,7 +4357,7 @@ local TBag_Reagents = {
 			},
 		},
 		["4364"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["4365"] =1,
 				["4367"] =1,
 				["4370"] =1,
@@ -4369,12 +4371,12 @@ local TBag_Reagents = {
 			},
 		},
 		["4368"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["4385"] =1,
 			},
 		},
 		["4371"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["4372"] =1,
 				["4379"] =1,
 				["4381"] =1,
@@ -4387,7 +4389,7 @@ local TBag_Reagents = {
 			},
 		},
 		["4375"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["4376"] =1,
 				["4379"] =1,
 				["4381"] =1,
@@ -4401,7 +4403,7 @@ local TBag_Reagents = {
 			},
 		},
 		["4377"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["4378"] =1,
 				["4380"] =1,
 				["4384"] =1,
@@ -4420,7 +4422,7 @@ local TBag_Reagents = {
 			},
 		},
 		["4382"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["4384"] =1,
 				["4391"] =1,
 				["4392"] =1,
@@ -4428,12 +4430,12 @@ local TBag_Reagents = {
 			},
 		},
 		["4385"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["10500"] =1,
 			},
 		},
 		["4387"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["4391"] =1,
 				["4392"] =1,
 				["4396"] =1,
@@ -4441,7 +4443,7 @@ local TBag_Reagents = {
 			},
 		},
 		["4389"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["4391"] =1,
 				["4392"] =1,
 				["4395"] =1,
@@ -4453,18 +4455,18 @@ local TBag_Reagents = {
 			},
 		},
 		["4394"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["11825"] =1,
 			},
 		},
 		["4399"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["4362"] =1,
 				["4369"] =1,
 			},
 		},
 		["4400"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["4372"] =1,
 				["4379"] =1,
 				["4383"] =1,
@@ -4474,18 +4476,18 @@ local TBag_Reagents = {
 			},
 		},
 		["4402"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["6049"] =1,
 			},
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["12217"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["4376"] =1,
 			},
 		},
 		["4404"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["4370"] =1,
 				["4374"] =1,
 				["4380"] =1,
@@ -4493,91 +4495,91 @@ local TBag_Reagents = {
 			},
 		},
 		["4407"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["10587"] =1,
 			},
 		},
 		["4461"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["4455"] =1,
 				["4456"] =1,
 				["18948"] =1,
 			},
 		},
 		["4470"] = {
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["11287"] =1,
 				["11288"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["20475"] =1,
 				["34504"] =1,
 			},
 		},
 		["4536"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["5477"] =1,
 				["12212"] =1,
 			},
 		},
 		["4539"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["33052"] =1,
 			},
 		},
 		["4589"] = {
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["10030"] =1,
 			},
 		},
 		["4603"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["6887"] =1,
 			},
 		},
 		["4611"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["4852"] =1,
 			},
 		},
 		["4625"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["8956"] =1,
 				["9061"] =1,
 				["9149"] =1,
 				["21546"] =1,
 			},
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["20749"] =1,
 				["20750"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["21154"] =1,
 				["21542"] =1,
 			},
 		},
 		["4655"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["6038"] =1,
 			},
 		},
 		["5051"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["5478"] =1,
 			},
 		},
 		["5082"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["5081"] =1,
 			},
 		},
 		["5116"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["7348"] =1,
 			},
 		},
 		["5173"] = {
-			["Poisons"] = {
+			[L["Poisons"]] = {
 				["2892"] =1,
 				["2893"] =1,
 				["8984"] =1,
@@ -4589,141 +4591,141 @@ local TBag_Reagents = {
 			},
 		},
 		["5373"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["7358"] =1,
 			},
 		},
 		["5465"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["5472"] =1,
 			},
 		},
 		["5466"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["5473"] =1,
 			},
 		},
 		["5467"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["5474"] =1,
 			},
 		},
 		["5468"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["5476"] =1,
 			},
 		},
 		["5469"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["5477"] =1,
 			},
 		},
 		["5470"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["5479"] =1,
 			},
 		},
 		["5471"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["5480"] =1,
 			},
 		},
 		["5498"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["3485"] =1,
 				["5540"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["20820"] =1,
 				["20832"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["6709"] =1,
 				["18948"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["4311"] =1,
 				["5542"] =1,
 			},
 		},
 		["5500"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["2870"] =1,
 				["5541"] =1,
 			},
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["11130"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["4262"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["4317"] =1,
 				["4320"] =1,
 				["4331"] =1,
 			},
 		},
 		["5503"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["5525"] =1,
 				["5526"] =1,
 			},
 		},
 		["5504"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["5527"] =1,
 			},
 		},
 		["5633"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["4264"] =1,
 			},
 		},
 		["5635"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["5631"] =1,
 			},
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["7913"] =1,
 				["7915"] =1,
 			},
 		},
 		["5637"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["5633"] =1,
 			},
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["7915"] =1,
 				["7916"] =1,
 				["7917"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["20909"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["4254"] =1,
 				["18948"] =1,
 			},
 		},
 		["5784"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["5780"] =1,
 				["5781"] =1,
 			},
 		},
 		["5785"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["5782"] =1,
 				["5783"] =1,
 			},
 		},
 		["5966"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["7938"] =1,
 			},
 		},
 		["6037"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["7926"] =1,
 				["7927"] =1,
 				["7928"] =1,
@@ -4750,7 +4752,7 @@ local TBag_Reagents = {
 				["20550"] =1,
 				["20551"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["10506"] =1,
 				["10548"] =1,
 				["10576"] =1,
@@ -4763,7 +4765,7 @@ local TBag_Reagents = {
 				["16023"] =1,
 				["18631"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["20960"] =1,
 				["20969"] =1,
 				["21748"] =1,
@@ -4776,35 +4778,35 @@ local TBag_Reagents = {
 				["21769"] =1,
 				["29158"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["10041"] =1,
 			},
 		},
 		["6048"] = {
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["7047"] =1,
 			},
 		},
 		["6149"] = {
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["20969"] =1,
 			},
 		},
 		["6217"] = {
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["6218"] =1,
 			},
 		},
 		["6218"] = {
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["6339"] =1,
 			},
 		},
 		["6260"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["23770"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["2577"] =1,
 				["4319"] =1,
 				["4324"] =1,
@@ -4821,112 +4823,112 @@ local TBag_Reagents = {
 			},
 		},
 		["6261"] = {
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["10052"] =1,
 				["10056"] =1,
 			},
 		},
 		["6289"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["4592"] =1,
 			},
 		},
 		["6291"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["6290"] =1,
 			},
 		},
 		["6303"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["787"] =1,
 			},
 		},
 		["6308"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["4593"] =1,
 			},
 		},
 		["6317"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["6316"] =1,
 			},
 		},
 		["6338"] = {
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["6339"] =1,
 			},
 		},
 		["6339"] = {
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["11130"] =1,
 			},
 		},
 		["6358"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["6370"] =1,
 			},
 		},
 		["6359"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["6371"] =1,
 			},
 		},
 		["6361"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["5095"] =1,
 			},
 		},
 		["6362"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["4594"] =1,
 			},
 		},
 		["6370"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["5634"] =1,
 				["5996"] =1,
 				["6372"] =1,
 			},
 		},
 		["6371"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["6049"] =1,
 				["6373"] =1,
 				["21546"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["7056"] =1,
 				["7059"] =1,
 				["7064"] =1,
 			},
 		},
 		["6470"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["6466"] =1,
 				["6467"] =1,
 				["6468"] =1,
 			},
 		},
 		["6471"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["6468"] =1,
 			},
 		},
 		["6522"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["6662"] =1,
 			},
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["6657"] =1,
 			},
 		},
 		["6530"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["6533"] =1,
 			},
 		},
 		["6889"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["6888"] =1,
 				["17197"] =1,
 				["17198"] =1,
@@ -4934,48 +4936,48 @@ local TBag_Reagents = {
 			},
 		},
 		["7067"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["9030"] =1,
 				["13458"] =1,
 			},
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["7929"] =1,
 				["12259"] =1,
 				["18262"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["10542"] =1,
 				["18631"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["20959"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["7352"] =1,
 				["7359"] =1,
 				["7377"] =1,
 				["17721"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["7051"] =1,
 				["7054"] =1,
 				["7061"] =1,
 			},
 		},
 		["7068"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["13457"] =1,
 			},
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["12260"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["10500"] =1,
 				["10508"] =1,
 				["10543"] =1,
 				["10577"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["7054"] =1,
 				["7063"] =1,
 				["7064"] =1,
@@ -4983,45 +4985,45 @@ local TBag_Reagents = {
 			},
 		},
 		["7069"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["17704"] =1,
 				["29202"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["18631"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["7054"] =1,
 			},
 		},
 		["7070"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["13456"] =1,
 			},
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["17704"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["20961"] =1,
 				["20967"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["7377"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["7052"] =1,
 				["7054"] =1,
 			},
 		},
 		["7071"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["4257"] =1,
 				["4258"] =1,
 				["4264"] =1,
 				["5739"] =1,
 				["7387"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["4328"] =1,
 				["4329"] =1,
 				["7052"] =1,
@@ -5030,36 +5032,36 @@ local TBag_Reagents = {
 			},
 		},
 		["7072"] = {
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["7060"] =1,
 			},
 		},
 		["7075"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["7946"] =1,
 				["7954"] =1,
 				["30069"] =1,
 				["30071"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["11826"] =1,
 				["18986"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["21760"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["8346"] =1,
 				["8348"] =1,
 				["15054"] =1,
 			},
 		},
 		["7076"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["7080"] =1,
 				["12803"] =1,
 			},
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["12618"] =1,
 				["12620"] =1,
 				["12639"] =1,
@@ -5073,31 +5075,31 @@ local TBag_Reagents = {
 				["22198"] =1,
 				["22385"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["16007"] =1,
 				["18168"] =1,
 				["18283"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["21775"] =1,
 				["21793"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["15053"] =1,
 				["15055"] =1,
 				["19163"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["14152"] =1,
 				["19047"] =1,
 				["19050"] =1,
 			},
 		},
 		["7077"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["7068"] =1,
 			},
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["7935"] =1,
 				["11604"] =1,
 				["11605"] =1,
@@ -5114,19 +5116,19 @@ local TBag_Reagents = {
 				["12792"] =1,
 				["30073"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["10576"] =1,
 				["11825"] =1,
 				["18984"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["21763"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["8348"] =1,
 				["29971"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["10042"] =1,
 				["10044"] =1,
 				["14042"] =1,
@@ -5135,24 +5137,24 @@ local TBag_Reagents = {
 			},
 		},
 		["7078"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["12631"] =1,
 				["12777"] =1,
 				["17193"] =1,
 			},
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["11811"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["7191"] =1,
 				["16007"] =1,
 				["18634"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["21769"] =1,
 				["21779"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["15053"] =1,
 				["15054"] =1,
 				["15055"] =1,
@@ -5160,7 +5162,7 @@ local TBag_Reagents = {
 				["20480"] =1,
 				["20481"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["14044"] =1,
 				["14045"] =1,
 				["14134"] =1,
@@ -5176,26 +5178,26 @@ local TBag_Reagents = {
 			},
 		},
 		["7079"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["18986"] =1,
 				["21277"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["21760"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["8346"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["13868"] =1,
 				["13869"] =1,
 			},
 		},
 		["7080"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["7082"] =1,
 			},
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["12618"] =1,
 				["12619"] =1,
 				["12625"] =1,
@@ -5205,10 +5207,10 @@ local TBag_Reagents = {
 				["22670"] =1,
 				["22671"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["18638"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["15056"] =1,
 				["15057"] =1,
 				["15058"] =1,
@@ -5222,7 +5224,7 @@ local TBag_Reagents = {
 				["22665"] =1,
 				["22666"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["13870"] =1,
 				["13871"] =1,
 				["14136"] =1,
@@ -5235,27 +5237,27 @@ local TBag_Reagents = {
 			},
 		},
 		["7081"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["7960"] =1,
 				["7961"] =1,
 				["30070"] =1,
 				["30072"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["21763"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["29964"] =1,
 			},
 		},
 		["7082"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["18168"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["21793"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["15056"] =1,
 				["15057"] =1,
 				["15058"] =1,
@@ -5263,12 +5265,12 @@ local TBag_Reagents = {
 				["18511"] =1,
 				["21278"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["14152"] =1,
 			},
 		},
 		["7191"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["4396"] =1,
 				["4397"] =1,
 				["7148"] =1,
@@ -5280,35 +5282,35 @@ local TBag_Reagents = {
 			},
 		},
 		["7286"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["7283"] =1,
 				["20575"] =1,
 			},
 		},
 		["7287"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["7284"] =1,
 			},
 		},
 		["7387"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["10721"] =1,
 			},
 		},
 		["7392"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["7375"] =1,
 				["7386"] =1,
 			},
 		},
 		["7428"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["7390"] =1,
 				["18238"] =1,
 			},
 		},
 		["7909"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["7934"] =1,
 				["7936"] =1,
 				["7938"] =1,
@@ -5316,14 +5318,14 @@ local TBag_Reagents = {
 				["7944"] =1,
 				["7961"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["10501"] =1,
 				["10504"] =1,
 				["10546"] =1,
 				["10721"] =1,
 				["18986"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["20964"] =1,
 				["21753"] =1,
 				["21754"] =1,
@@ -5332,7 +5334,7 @@ local TBag_Reagents = {
 			},
 		},
 		["7910"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["7939"] =1,
 				["7947"] =1,
 				["7960"] =1,
@@ -5348,7 +5350,7 @@ local TBag_Reagents = {
 				["19690"] =1,
 				["19691"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["10502"] =1,
 				["10503"] =1,
 				["10548"] =1,
@@ -5360,7 +5362,7 @@ local TBag_Reagents = {
 				["18645"] =1,
 				["18984"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["20969"] =1,
 				["21763"] =1,
 				["21764"] =1,
@@ -5370,34 +5372,34 @@ local TBag_Reagents = {
 				["29158"] =1,
 				["30421"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["14130"] =1,
 				["18408"] =1,
 			},
 		},
 		["7911"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["6037"] =1,
 			},
-			["Mining"] = {
+			[L["Mining"]] = {
 				["6037"] =1,
 			},
 		},
 		["7912"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["7964"] =1,
 				["7965"] =1,
 				["7966"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["10505"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["25882"] =1,
 			},
 		},
 		["7966"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["7922"] =1,
 				["7926"] =1,
 				["7927"] =1,
@@ -5423,100 +5425,100 @@ local TBag_Reagents = {
 			},
 		},
 		["7971"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["7939"] =1,
 				["7945"] =1,
 			},
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["11145"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["20969"] =1,
 				["21758"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["8349"] =1,
 				["15092"] =1,
 				["18238"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["15802"] =1,
 			},
 		},
 		["7972"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["18294"] =1,
 			},
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["7959"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["10645"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["21340"] =1,
 			},
 		},
 		["7974"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["16766"] =1,
 			},
 		},
 		["8146"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["12640"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["8345"] =1,
 			},
 		},
 		["8150"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["21023"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["19026"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["8172"] =1,
 			},
 		},
 		["8151"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["10545"] =1,
 				["10716"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["20964"] =1,
 				["21758"] =1,
 				["21760"] =1,
 				["21763"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["8200"] =1,
 				["8201"] =1,
 			},
 		},
 		["8152"] = {
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["21769"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["8202"] =1,
 				["8216"] =1,
 			},
 		},
 		["8153"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["9144"] =1,
 			},
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["12624"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["10504"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["8210"] =1,
 				["8211"] =1,
 				["8212"] =1,
@@ -5525,14 +5527,14 @@ local TBag_Reagents = {
 				["8215"] =1,
 				["29970"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["10019"] =1,
 				["10021"] =1,
 				["10041"] =1,
 			},
 		},
 		["8154"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["8203"] =1,
 				["8204"] =1,
 				["8205"] =1,
@@ -5543,14 +5545,14 @@ local TBag_Reagents = {
 			},
 		},
 		["8165"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["8347"] =1,
 				["8367"] =1,
 				["29971"] =1,
 			},
 		},
 		["8167"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["8185"] =1,
 				["8187"] =1,
 				["8189"] =1,
@@ -5559,21 +5561,21 @@ local TBag_Reagents = {
 			},
 		},
 		["8168"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["12636"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["8349"] =1,
 				["29970"] =1,
 			},
 		},
 		["8169"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["8172"] =1,
 			},
 		},
 		["8170"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["12409"] =1,
 				["12424"] =1,
 				["12773"] =1,
@@ -5584,10 +5586,10 @@ local TBag_Reagents = {
 				["12792"] =1,
 				["29203"] =1,
 			},
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["12810"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["15996"] =1,
 				["16004"] =1,
 				["16023"] =1,
@@ -5597,7 +5599,7 @@ local TBag_Reagents = {
 				["21716"] =1,
 				["21718"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["15045"] =1,
 				["15046"] =1,
 				["15047"] =1,
@@ -5667,7 +5669,7 @@ local TBag_Reagents = {
 				["29971"] =1,
 				["34086"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["13863"] =1,
 				["13864"] =1,
 				["13867"] =1,
@@ -5680,12 +5682,12 @@ local TBag_Reagents = {
 			},
 		},
 		["8171"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["15407"] =1,
 			},
 		},
 		["8172"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["8210"] =1,
 				["8211"] =1,
 				["8212"] =1,
@@ -5706,7 +5708,7 @@ local TBag_Reagents = {
 			},
 		},
 		["8343"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["8185"] =1,
 				["8187"] =1,
 				["8189"] =1,
@@ -5728,7 +5730,7 @@ local TBag_Reagents = {
 				["8367"] =1,
 				["18238"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["10001"] =1,
 				["10002"] =1,
 				["10003"] =1,
@@ -5766,17 +5768,17 @@ local TBag_Reagents = {
 			},
 		},
 		["8365"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["8364"] =1,
 			},
 		},
 		["8368"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["8345"] =1,
 			},
 		},
 		["8831"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["9036"] =1,
 				["9144"] =1,
 				["9149"] =1,
@@ -5784,22 +5786,22 @@ local TBag_Reagents = {
 				["12190"] =1,
 				["18294"] =1,
 			},
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["20747"] =1,
 				["20748"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["22251"] =1,
 			},
 		},
 		["8836"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["9088"] =1,
 				["9154"] =1,
 			},
 		},
 		["8838"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["3928"] =1,
 				["9172"] =1,
 				["9187"] =1,
@@ -5809,7 +5811,7 @@ local TBag_Reagents = {
 			},
 		},
 		["8839"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["3387"] =1,
 				["9088"] =1,
 				["9155"] =1,
@@ -5818,7 +5820,7 @@ local TBag_Reagents = {
 			},
 		},
 		["8845"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["3387"] =1,
 				["9172"] =1,
 				["9210"] =1,
@@ -5827,7 +5829,7 @@ local TBag_Reagents = {
 			},
 		},
 		["8846"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["9206"] =1,
 				["9224"] =1,
 				["9233"] =1,
@@ -5838,7 +5840,7 @@ local TBag_Reagents = {
 			},
 		},
 		["8923"] = {
-			["Poisons"] = {
+			[L["Poisons"]] = {
 				["3776"] =1,
 				["6951"] =1,
 				["9186"] =1,
@@ -5848,7 +5850,7 @@ local TBag_Reagents = {
 			},
 		},
 		["8924"] = {
-			["Poisons"] = {
+			[L["Poisons"]] = {
 				["6950"] =1,
 				["8926"] =1,
 				["8927"] =1,
@@ -5856,7 +5858,7 @@ local TBag_Reagents = {
 			},
 		},
 		["8925"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["3387"] =1,
 				["3928"] =1,
 				["8956"] =1,
@@ -5905,11 +5907,11 @@ local TBag_Reagents = {
 				["21546"] =1,
 				["34440"] =1,
 			},
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["20747"] =1,
 				["20750"] =1,
 			},
-			["Poisons"] = {
+			[L["Poisons"]] = {
 				["3776"] =1,
 				["8926"] =1,
 				["8927"] =1,
@@ -5928,17 +5930,17 @@ local TBag_Reagents = {
 			},
 		},
 		["8949"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["8217"] =1,
 			},
 		},
 		["8951"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["8218"] =1,
 			},
 		},
 		["9060"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["10576"] =1,
 				["10645"] =1,
 				["10725"] =1,
@@ -5948,10 +5950,10 @@ local TBag_Reagents = {
 			},
 		},
 		["9061"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["21023"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["7189"] =1,
 				["10576"] =1,
 				["10586"] =1,
@@ -5962,12 +5964,12 @@ local TBag_Reagents = {
 			},
 		},
 		["9149"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["13503"] =1,
 			},
 		},
 		["9210"] = {
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["14141"] =1,
 				["14142"] =1,
 				["14143"] =1,
@@ -5978,27 +5980,27 @@ local TBag_Reagents = {
 			},
 		},
 		["9260"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["9061"] =1,
 			},
 		},
 		["9262"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["9149"] =1,
 			},
 		},
 		["10026"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["7189"] =1,
 				["10724"] =1,
 			},
 		},
 		["10285"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["10518"] =1,
 				["10720"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["10002"] =1,
 				["10004"] =1,
 				["10023"] =1,
@@ -6008,40 +6010,40 @@ local TBag_Reagents = {
 			},
 		},
 		["10286"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["18253"] =1,
 				["20008"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["10504"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["21765"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["10019"] =1,
 				["10021"] =1,
 				["10041"] =1,
 			},
 		},
 		["10290"] = {
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["10055"] =1,
 			},
 		},
 		["10500"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["10545"] =1,
 				["16008"] =1,
 			},
 		},
 		["10502"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["15999"] =1,
 			},
 		},
 		["10505"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["4398"] =1,
 				["10507"] =1,
 				["10512"] =1,
@@ -6064,23 +6066,23 @@ local TBag_Reagents = {
 			},
 		},
 		["10507"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["10586"] =1,
 			},
 		},
 		["10543"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["10588"] =1,
 			},
 		},
 		["10546"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["15995"] =1,
 				["16004"] =1,
 			},
 		},
 		["10558"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["4389"] =1,
 				["10545"] =1,
 				["10577"] =1,
@@ -6099,7 +6101,7 @@ local TBag_Reagents = {
 			},
 		},
 		["10559"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["7189"] =1,
 				["10508"] =1,
 				["10510"] =1,
@@ -6116,7 +6118,7 @@ local TBag_Reagents = {
 			},
 		},
 		["10560"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["7189"] =1,
 				["10508"] =1,
 				["10510"] =1,
@@ -6137,7 +6139,7 @@ local TBag_Reagents = {
 			},
 		},
 		["10561"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["10506"] =1,
 				["10514"] =1,
 				["10562"] =1,
@@ -6153,185 +6155,185 @@ local TBag_Reagents = {
 			},
 		},
 		["10576"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["16022"] =1,
 			},
 		},
 		["10577"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["10577"] =1,
 			},
 		},
 		["10586"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["18984"] =1,
 			},
 		},
 		["10592"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["10501"] =1,
 			},
 		},
 		["10620"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["13455"] =1,
 			},
-			["Mining"] = {
+			[L["Mining"]] = {
 				["12359"] =1,
 			},
 		},
 		["10647"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["10644"] =1,
 				["10713"] =1,
 			},
 		},
 		["10648"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["10644"] =1,
 				["10713"] =1,
 			},
 		},
 		["10938"] = {
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["6218"] =1,
 				["11287"] =1,
 			},
 		},
 		["10939"] = {
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["6339"] =1,
 				["11288"] =1,
 			},
 		},
 		["10940"] = {
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["6218"] =1,
 				["6339"] =1,
 				["20744"] =1,
 			},
 		},
 		["11040"] = {
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["22251"] =1,
 			},
 		},
 		["11082"] = {
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["11130"] =1,
 			},
 		},
 		["11083"] = {
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["11130"] =1,
 				["11289"] =1,
 				["20745"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["20832"] =1,
 			},
 		},
 		["11128"] = {
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["11130"] =1,
 			},
 		},
 		["11130"] = {
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["11145"] =1,
 			},
 		},
 		["11134"] = {
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["11289"] =1,
 			},
 		},
 		["11135"] = {
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["11145"] =1,
 				["11290"] =1,
 			},
 		},
 		["11137"] = {
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["11145"] =1,
 				["11290"] =1,
 				["20746"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["21748"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["22246"] =1,
 			},
 		},
 		["11144"] = {
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["11145"] =1,
 			},
 		},
 		["11145"] = {
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["16207"] =1,
 			},
 		},
 		["11176"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["13461"] =1,
 			},
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["12655"] =1,
 				["20747"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["14128"] =1,
 				["14130"] =1,
 				["14132"] =1,
 			},
 		},
 		["11178"] = {
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["21766"] =1,
 			},
 		},
 		["11184"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["12408"] =1,
 			},
 		},
 		["11185"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["12409"] =1,
 			},
 		},
 		["11186"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["12406"] =1,
 				["12414"] =1,
 			},
 		},
 		["11188"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["12405"] =1,
 				["12410"] =1,
 			},
 		},
 		["11291"] = {
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["11289"] =1,
 				["11290"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["34060"] =1,
 			},
 		},
 		["11370"] = {
-			["Mining"] = {
+			[L["Mining"]] = {
 				["11371"] =1,
 			},
 		},
 		["11371"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["11604"] =1,
 				["11605"] =1,
 				["11606"] =1,
@@ -6354,100 +6356,100 @@ local TBag_Reagents = {
 				["20039"] =1,
 				["22384"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["16004"] =1,
 				["16005"] =1,
 				["18283"] =1,
 				["18638"] =1,
 				["18639"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["21789"] =1,
 			},
 		},
 		["11382"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["17015"] =1,
 				["17016"] =1,
 				["17193"] =1,
 				["19164"] =1,
 				["19166"] =1,
 			},
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["11811"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["21780"] =1,
 			},
 		},
 		["11754"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["20551"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["21784"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["18506"] =1,
 			},
 		},
 		["12037"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["12213"] =1,
 				["12214"] =1,
 				["12217"] =1,
 			},
 		},
 		["12184"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["12210"] =1,
 			},
 		},
 		["12202"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["12212"] =1,
 			},
 		},
 		["12203"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["13851"] =1,
 			},
 		},
 		["12204"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["12215"] =1,
 			},
 		},
 		["12205"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["17222"] =1,
 			},
 		},
 		["12206"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["12216"] =1,
 			},
 		},
 		["12207"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["12218"] =1,
 			},
 		},
 		["12208"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["18045"] =1,
 			},
 		},
 		["12223"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["12224"] =1,
 			},
 		},
 		["12359"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["12360"] =1,
 			},
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["12405"] =1,
 				["12406"] =1,
 				["12408"] =1,
@@ -6501,10 +6503,10 @@ local TBag_Reagents = {
 				["22671"] =1,
 				["29203"] =1,
 			},
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["12655"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["15846"] =1,
 				["15993"] =1,
 				["15994"] =1,
@@ -6515,7 +6517,7 @@ local TBag_Reagents = {
 				["18232"] =1,
 				["18645"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["21752"] =1,
 				["21774"] =1,
 				["21777"] =1,
@@ -6524,7 +6526,7 @@ local TBag_Reagents = {
 			},
 		},
 		["12360"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["12610"] =1,
 				["12611"] =1,
 				["12612"] =1,
@@ -6563,13 +6565,13 @@ local TBag_Reagents = {
 				["22671"] =1,
 				["22762"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["16006"] =1,
 				["16007"] =1,
 				["18168"] =1,
 				["18282"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["21774"] =1,
 				["21777"] =1,
 				["21784"] =1,
@@ -6577,15 +6579,15 @@ local TBag_Reagents = {
 				["21792"] =1,
 				["21793"] =1,
 			},
-			["Mining"] = {
+			[L["Mining"]] = {
 				["17771"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["18413"] =1,
 			},
 		},
 		["12361"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["12405"] =1,
 				["12619"] =1,
 				["12628"] =1,
@@ -6597,26 +6599,26 @@ local TBag_Reagents = {
 				["12782"] =1,
 				["12797"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["16004"] =1,
 				["18634"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["21768"] =1,
 				["21774"] =1,
 				["21790"] =1,
 			},
 		},
 		["12363"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["12360"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["21778"] =1,
 			},
 		},
 		["12364"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["12612"] =1,
 				["12618"] =1,
 				["12619"] =1,
@@ -6631,41 +6633,41 @@ local TBag_Reagents = {
 				["19169"] =1,
 				["22196"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["16008"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["21774"] =1,
 				["21777"] =1,
 				["21791"] =1,
 				["29160"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["14146"] =1,
 			},
 		},
 		["12365"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["12404"] =1,
 				["12643"] =1,
 				["12644"] =1,
 				["18262"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["15992"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["25883"] =1,
 			},
 		},
 		["12607"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["18509"] =1,
 				["19157"] =1,
 			},
 		},
 		["12644"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["12645"] =1,
 				["12773"] =1,
 				["12774"] =1,
@@ -6682,7 +6684,7 @@ local TBag_Reagents = {
 			},
 		},
 		["12655"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["12618"] =1,
 				["12619"] =1,
 				["12620"] =1,
@@ -6708,19 +6710,19 @@ local TBag_Reagents = {
 				["22764"] =1,
 				["29203"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["16022"] =1,
 			},
 		},
 		["12662"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["12628"] =1,
 				["12782"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["21778"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["14106"] =1,
 				["14112"] =1,
 				["14153"] =1,
@@ -6728,15 +6730,15 @@ local TBag_Reagents = {
 			},
 		},
 		["12753"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["22384"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["18511"] =1,
 			},
 		},
 		["12799"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["12620"] =1,
 				["12636"] =1,
 				["12639"] =1,
@@ -6749,19 +6751,19 @@ local TBag_Reagents = {
 				["19694"] =1,
 				["19695"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["16004"] =1,
 				["16009"] =1,
 				["18639"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["21766"] =1,
 				["21767"] =1,
 				["21774"] =1,
 			},
 		},
 		["12800"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["12618"] =1,
 				["12620"] =1,
 				["12633"] =1,
@@ -6774,23 +6776,23 @@ local TBag_Reagents = {
 				["19170"] =1,
 				["22191"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["16007"] =1,
 				["18638"] =1,
 				["18639"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["21784"] =1,
 				["21792"] =1,
 				["29159"] =1,
 				["30422"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["14140"] =1,
 			},
 		},
 		["12803"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["12624"] =1,
 				["19043"] =1,
 				["19048"] =1,
@@ -6798,16 +6800,16 @@ local TBag_Reagents = {
 				["22763"] =1,
 				["22764"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["15996"] =1,
 				["18168"] =1,
 				["18639"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["21779"] =1,
 				["21791"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["15059"] =1,
 				["15060"] =1,
 				["15061"] =1,
@@ -6823,7 +6825,7 @@ local TBag_Reagents = {
 				["22760"] =1,
 				["22761"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["19047"] =1,
 				["19050"] =1,
 				["22660"] =1,
@@ -6833,74 +6835,74 @@ local TBag_Reagents = {
 			},
 		},
 		["12804"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["19931"] =1,
 			},
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["12776"] =1,
 				["12781"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["19998"] =1,
 				["19999"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["21775"] =1,
 				["21777"] =1,
 				["21791"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["18504"] =1,
 				["19044"] =1,
 				["19049"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["19682"] =1,
 				["19683"] =1,
 			},
 		},
 		["12808"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["7080"] =1,
 			},
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["12782"] =1,
 				["12798"] =1,
 				["22384"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["10645"] =1,
 				["18639"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["21778"] =1,
 				["21790"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["14136"] =1,
 				["14153"] =1,
 				["18407"] =1,
 			},
 		},
 		["12809"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["12796"] =1,
 				["19168"] =1,
 				["22191"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["18511"] =1,
 				["19052"] =1,
 				["19058"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["18413"] =1,
 				["19056"] =1,
 				["19059"] =1,
 			},
 		},
 		["12810"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["12783"] =1,
 				["12784"] =1,
 				["12790"] =1,
@@ -6917,7 +6919,7 @@ local TBag_Reagents = {
 				["22195"] =1,
 				["22383"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["15999"] =1,
 				["16007"] =1,
 				["16008"] =1,
@@ -6925,7 +6927,7 @@ local TBag_Reagents = {
 				["19998"] =1,
 				["19999"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["15049"] =1,
 				["15051"] =1,
 				["15052"] =1,
@@ -6946,7 +6948,7 @@ local TBag_Reagents = {
 				["22760"] =1,
 				["22761"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["14140"] =1,
 				["14146"] =1,
 				["16979"] =1,
@@ -6961,30 +6963,30 @@ local TBag_Reagents = {
 			},
 		},
 		["12811"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["12790"] =1,
 				["19051"] =1,
 				["19057"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["14154"] =1,
 			},
 		},
 		["12938"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["19931"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["21780"] =1,
 			},
 		},
 		["13422"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["13423"] =1,
 			},
 		},
 		["13423"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["13445"] =1,
 				["13455"] =1,
 				["13506"] =1,
@@ -6992,7 +6994,7 @@ local TBag_Reagents = {
 			},
 		},
 		["13463"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["13444"] =1,
 				["13447"] =1,
 				["13454"] =1,
@@ -7010,7 +7012,7 @@ local TBag_Reagents = {
 			},
 		},
 		["13464"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["13446"] =1,
 				["18253"] =1,
 				["20002"] =1,
@@ -7019,7 +7021,7 @@ local TBag_Reagents = {
 			},
 		},
 		["13465"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["13446"] =1,
 				["13452"] =1,
 				["13454"] =1,
@@ -7032,7 +7034,7 @@ local TBag_Reagents = {
 			},
 		},
 		["13466"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["13447"] =1,
 				["13452"] =1,
 				["13453"] =1,
@@ -7042,19 +7044,19 @@ local TBag_Reagents = {
 			},
 		},
 		["13467"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["13444"] =1,
 				["13462"] =1,
 				["13511"] =1,
 				["13513"] =1,
 				["20008"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["18634"] =1,
 			},
 		},
 		["13468"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["13506"] =1,
 				["13510"] =1,
 				["13511"] =1,
@@ -7062,12 +7064,12 @@ local TBag_Reagents = {
 				["13513"] =1,
 				["19931"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["22252"] =1,
 			},
 		},
 		["13503"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["35748"] =1,
 				["35749"] =1,
 				["35750"] =1,
@@ -7075,71 +7077,71 @@ local TBag_Reagents = {
 			},
 		},
 		["13510"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["22385"] =1,
 			},
 		},
 		["13512"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["22194"] =1,
 				["22383"] =1,
 			},
 		},
 		["13754"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["13927"] =1,
 			},
 		},
 		["13755"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["13928"] =1,
 			},
 		},
 		["13756"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["13929"] =1,
 			},
 		},
 		["13757"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["33866"] =1,
 			},
 		},
 		["13758"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["13930"] =1,
 			},
 		},
 		["13759"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["13931"] =1,
 			},
 		},
 		["13760"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["13932"] =1,
 			},
 		},
 		["13888"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["13933"] =1,
 			},
 		},
 		["13889"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["13935"] =1,
 			},
 		},
 		["13893"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["13934"] =1,
 			},
 		},
 		["13926"] = {
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["16207"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["14146"] =1,
 				["14154"] =1,
 				["18409"] =1,
@@ -7148,15 +7150,15 @@ local TBag_Reagents = {
 			},
 		},
 		["14044"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["15138"] =1,
 			},
 		},
 		["14047"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["12643"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["15993"] =1,
 				["15994"] =1,
 				["15999"] =1,
@@ -7167,11 +7169,11 @@ local TBag_Reagents = {
 				["18641"] =1,
 				["19026"] =1,
 			},
-			["First Aid"] = {
+			[L["First Aid"]] = {
 				["14529"] =1,
 				["14530"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["15090"] =1,
 				["15091"] =1,
 				["15092"] =1,
@@ -7180,16 +7182,16 @@ local TBag_Reagents = {
 				["15095"] =1,
 				["15096"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["14048"] =1,
 			},
 		},
 		["14048"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["18258"] =1,
 				["18258"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["13856"] =1,
 				["13857"] =1,
 				["13858"] =1,
@@ -7274,11 +7276,11 @@ local TBag_Reagents = {
 			},
 		},
 		["14227"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["16006"] =1,
 				["18587"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["19049"] =1,
 				["19149"] =1,
 				["19157"] =1,
@@ -7293,7 +7295,7 @@ local TBag_Reagents = {
 				["22665"] =1,
 				["22666"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["13857"] =1,
 				["13858"] =1,
 				["13860"] =1,
@@ -7332,10 +7334,10 @@ local TBag_Reagents = {
 			},
 		},
 		["14256"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["15085"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["14106"] =1,
 				["14107"] =1,
 				["14108"] =1,
@@ -7353,7 +7355,7 @@ local TBag_Reagents = {
 			},
 		},
 		["14341"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["15045"] =1,
 				["15046"] =1,
 				["15047"] =1,
@@ -7480,7 +7482,7 @@ local TBag_Reagents = {
 				["34482"] =1,
 				["34490"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["13856"] =1,
 				["13857"] =1,
 				["13858"] =1,
@@ -7578,10 +7580,10 @@ local TBag_Reagents = {
 			},
 		},
 		["14342"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["15059"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["14137"] =1,
 				["14138"] =1,
 				["14139"] =1,
@@ -7608,28 +7610,28 @@ local TBag_Reagents = {
 			},
 		},
 		["14343"] = {
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["11811"] =1,
 			},
 		},
 		["14344"] = {
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["16207"] =1,
 				["20748"] =1,
 				["20749"] =1,
 				["22461"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["14156"] =1,
 				["18405"] =1,
 				["22249"] =1,
 			},
 		},
 		["15407"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["21277"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["15048"] =1,
 				["15049"] =1,
 				["15050"] =1,
@@ -7686,7 +7688,7 @@ local TBag_Reagents = {
 			},
 		},
 		["15408"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["15076"] =1,
 				["15077"] =1,
 				["15078"] =1,
@@ -7700,37 +7702,37 @@ local TBag_Reagents = {
 			},
 		},
 		["15409"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["15407"] =1,
 			},
 		},
 		["15410"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["15138"] =1,
 			},
 		},
 		["15412"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["15045"] =1,
 				["15046"] =1,
 				["20296"] =1,
 			},
 		},
 		["15414"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["15047"] =1,
 				["18509"] =1,
 			},
 		},
 		["15415"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["15048"] =1,
 				["15049"] =1,
 				["20295"] =1,
 			},
 		},
 		["15416"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["15050"] =1,
 				["15051"] =1,
 				["15052"] =1,
@@ -7740,29 +7742,29 @@ local TBag_Reagents = {
 			},
 		},
 		["15417"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["22384"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["15062"] =1,
 				["15063"] =1,
 			},
 		},
 		["15419"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["15064"] =1,
 				["15065"] =1,
 			},
 		},
 		["15420"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["15066"] =1,
 				["15067"] =1,
 				["18508"] =1,
 			},
 		},
 		["15422"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["15068"] =1,
 				["15069"] =1,
 				["15070"] =1,
@@ -7770,7 +7772,7 @@ local TBag_Reagents = {
 			},
 		},
 		["15423"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["15072"] =1,
 				["15073"] =1,
 				["15074"] =1,
@@ -7778,7 +7780,7 @@ local TBag_Reagents = {
 			},
 		},
 		["15992"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["15993"] =1,
 				["15997"] =1,
 				["16005"] =1,
@@ -7791,7 +7793,7 @@ local TBag_Reagents = {
 			},
 		},
 		["15994"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["15993"] =1,
 				["15995"] =1,
 				["15996"] =1,
@@ -7808,7 +7810,7 @@ local TBag_Reagents = {
 			},
 		},
 		["16000"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["16004"] =1,
 				["16007"] =1,
 				["16023"] =1,
@@ -7818,7 +7820,7 @@ local TBag_Reagents = {
 			},
 		},
 		["16006"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["16009"] =1,
 				["16022"] =1,
 				["16040"] =1,
@@ -7833,37 +7835,37 @@ local TBag_Reagents = {
 			},
 		},
 		["16202"] = {
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["12810"] =1,
 			},
 		},
 		["16203"] = {
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["16207"] =1,
 				["22461"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["22248"] =1,
 			},
 		},
 		["16204"] = {
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["16207"] =1,
 				["20750"] =1,
 			},
 		},
 		["16206"] = {
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["16207"] =1,
 			},
 		},
 		["16207"] = {
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["22461"] =1,
 			},
 		},
 		["17010"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["16988"] =1,
 				["16989"] =1,
 				["17013"] =1,
@@ -7879,10 +7881,10 @@ local TBag_Reagents = {
 				["19170"] =1,
 				["20039"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["18282"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["16982"] =1,
 				["16983"] =1,
 				["16984"] =1,
@@ -7890,10 +7892,10 @@ local TBag_Reagents = {
 				["19162"] =1,
 				["19163"] =1,
 			},
-			["Mining"] = {
+			[L["Mining"]] = {
 				["17771"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["16979"] =1,
 				["16980"] =1,
 				["18263"] =1,
@@ -7902,7 +7904,7 @@ local TBag_Reagents = {
 			},
 		},
 		["17011"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["16988"] =1,
 				["16989"] =1,
 				["17013"] =1,
@@ -7918,11 +7920,11 @@ local TBag_Reagents = {
 				["19170"] =1,
 				["20039"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["18282"] =1,
 				["18283"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["16982"] =1,
 				["16983"] =1,
 				["16984"] =1,
@@ -7930,90 +7932,90 @@ local TBag_Reagents = {
 				["19157"] =1,
 				["19163"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["16980"] =1,
 				["19156"] =1,
 				["19165"] =1,
 			},
 		},
 		["17012"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["19164"] =1,
 				["20039"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["16982"] =1,
 				["16983"] =1,
 				["18251"] =1,
 				["19157"] =1,
 				["19162"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["14156"] =1,
 				["21342"] =1,
 			},
 		},
 		["17020"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["23826"] =1,
 			},
 		},
 		["17034"] = {
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["20744"] =1,
 				["20745"] =1,
 			},
 		},
 		["17035"] = {
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["20746"] =1,
 			},
 		},
 		["17056"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["34105"] =1,
 			},
 		},
 		["17194"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["17197"] =1,
 				["17198"] =1,
 				["34411"] =1,
 			},
 		},
 		["17196"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["17198"] =1,
 				["34411"] =1,
 			},
 		},
 		["17202"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["17716"] =1,
 			},
 		},
 		["17203"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["17193"] =1,
 			},
 		},
 		["18240"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["18258"] =1,
 				["18258"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["18258"] =1,
 				["18258"] =1,
 			},
 		},
 		["18255"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["18254"] =1,
 			},
 		},
 		["18256"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["18253"] =1,
 				["22823"] =1,
 				["22824"] =1,
@@ -8062,7 +8064,7 @@ local TBag_Reagents = {
 				["32068"] =1,
 				["33208"] =1,
 			},
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["20748"] =1,
 				["20749"] =1,
 				["22521"] =1,
@@ -8070,17 +8072,17 @@ local TBag_Reagents = {
 			},
 		},
 		["18335"] = {
-			["First Aid"] = {
+			[L["First Aid"]] = {
 				["2581"] =1,
 				["2581"] =1,
 				["2581"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["21784"] =1,
 			},
 		},
 		["18512"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["18508"] =1,
 				["18510"] =1,
 				["20476"] =1,
@@ -8090,17 +8092,17 @@ local TBag_Reagents = {
 			},
 		},
 		["18562"] = {
-			["Mining"] = {
+			[L["Mining"]] = {
 				["17771"] =1,
 			},
 		},
 		["18567"] = {
-			["Mining"] = {
+			[L["Mining"]] = {
 				["17771"] =1,
 			},
 		},
 		["18631"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["18587"] =1,
 				["18634"] =1,
 				["18637"] =1,
@@ -8113,28 +8115,28 @@ local TBag_Reagents = {
 			},
 		},
 		["19441"] = {
-			["First Aid"] = {
+			[L["First Aid"]] = {
 				["19440"] =1,
 			},
 		},
 		["19726"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["19690"] =1,
 				["19691"] =1,
 				["19692"] =1,
 				["22762"] =1,
 				["22763"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["19998"] =1,
 				["19999"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["19688"] =1,
 				["19689"] =1,
 				["22759"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["19682"] =1,
 				["19683"] =1,
 				["19684"] =1,
@@ -8144,20 +8146,20 @@ local TBag_Reagents = {
 			},
 		},
 		["19767"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["19685"] =1,
 				["19686"] =1,
 				["19687"] =1,
 			},
 		},
 		["19768"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["19688"] =1,
 				["19689"] =1,
 			},
 		},
 		["19774"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["19690"] =1,
 				["19691"] =1,
 				["19692"] =1,
@@ -8165,28 +8167,28 @@ local TBag_Reagents = {
 				["19694"] =1,
 				["19695"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["19998"] =1,
 				["19999"] =1,
 			},
 		},
 		["19943"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["19931"] =1,
 			},
 		},
 		["20381"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["20380"] =1,
 			},
 		},
 		["20424"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["20452"] =1,
 			},
 		},
 		["20498"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["20476"] =1,
 				["20477"] =1,
 				["20478"] =1,
@@ -8196,27 +8198,27 @@ local TBag_Reagents = {
 			},
 		},
 		["20500"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["20479"] =1,
 				["20480"] =1,
 				["20481"] =1,
 			},
 		},
 		["20501"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["20476"] =1,
 				["20477"] =1,
 				["20478"] =1,
 			},
 		},
 		["20520"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["20549"] =1,
 				["20550"] =1,
 				["20551"] =1,
 				["22384"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["20537"] =1,
 				["20538"] =1,
 				["20539"] =1,
@@ -8224,18 +8226,18 @@ local TBag_Reagents = {
 			},
 		},
 		["20725"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["22383"] =1,
 			},
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["22448"] =1,
 			},
 		},
 		["20816"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["7191"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["20823"] =1,
 				["20906"] =1,
 				["20955"] =1,
@@ -8248,7 +8250,7 @@ local TBag_Reagents = {
 			},
 		},
 		["20817"] = {
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["20820"] =1,
 				["20823"] =1,
 				["20826"] =1,
@@ -8264,7 +8266,7 @@ local TBag_Reagents = {
 			},
 		},
 		["20963"] = {
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["20958"] =1,
 				["20960"] =1,
 				["20966"] =1,
@@ -8274,22 +8276,22 @@ local TBag_Reagents = {
 			},
 		},
 		["21024"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["21023"] =1,
 			},
 		},
 		["21071"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["21072"] =1,
 			},
 		},
 		["21153"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["21217"] =1,
 			},
 		},
 		["21752"] = {
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["20969"] =1,
 				["21753"] =1,
 				["21754"] =1,
@@ -8307,10 +8309,10 @@ local TBag_Reagents = {
 			},
 		},
 		["21840"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["35581"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["21841"] =1,
 				["21842"] =1,
 				["21844"] =1,
@@ -8336,7 +8338,7 @@ local TBag_Reagents = {
 			},
 		},
 		["21842"] = {
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["21843"] =1,
 				["21845"] =1,
 				["21859"] =1,
@@ -8370,18 +8372,18 @@ local TBag_Reagents = {
 			},
 		},
 		["21844"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["33122"] =1,
 				["33204"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["21863"] =1,
 				["21864"] =1,
 				["21865"] =1,
 			},
 		},
 		["21845"] = {
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["21873"] =1,
 				["21874"] =1,
 				["21875"] =1,
@@ -8398,11 +8400,11 @@ local TBag_Reagents = {
 			},
 		},
 		["21877"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["28420"] =1,
 				["28421"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["23768"] =1,
 				["23769"] =1,
 				["23770"] =1,
@@ -8411,17 +8413,17 @@ local TBag_Reagents = {
 				["25886"] =1,
 				["32423"] =1,
 			},
-			["First Aid"] = {
+			[L["First Aid"]] = {
 				["21990"] =1,
 				["21991"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["21840"] =1,
 				["24268"] =1,
 			},
 		},
 		["21881"] = {
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["21843"] =1,
 				["21846"] =1,
 				["21847"] =1,
@@ -8449,12 +8451,12 @@ local TBag_Reagents = {
 			},
 		},
 		["21882"] = {
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["21844"] =1,
 			},
 		},
 		["21884"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["22452"] =1,
 				["22457"] =1,
 				["22841"] =1,
@@ -8462,7 +8464,7 @@ local TBag_Reagents = {
 				["32849"] =1,
 				["35749"] =1,
 			},
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["23506"] =1,
 				["23507"] =1,
 				["23508"] =1,
@@ -8488,7 +8490,7 @@ local TBag_Reagents = {
 				["34377"] =1,
 				["34378"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["23786"] =1,
 				["23828"] =1,
 				["23829"] =1,
@@ -8499,7 +8501,7 @@ local TBag_Reagents = {
 				["34354"] =1,
 				["34847"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["24082"] =1,
 				["24089"] =1,
 				["24092"] =1,
@@ -8508,7 +8510,7 @@ local TBag_Reagents = {
 				["31398"] =1,
 				["35700"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["25683"] =1,
 				["29486"] =1,
 				["29492"] =1,
@@ -8525,10 +8527,10 @@ local TBag_Reagents = {
 				["29517"] =1,
 				["29975"] =1,
 			},
-			["Mining"] = {
+			[L["Mining"]] = {
 				["22574"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["21846"] =1,
 				["21847"] =1,
 				["21848"] =1,
@@ -8546,14 +8548,14 @@ local TBag_Reagents = {
 			},
 		},
 		["21885"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["22451"] =1,
 				["22456"] =1,
 				["22842"] =1,
 				["23571"] =1,
 				["32850"] =1,
 			},
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["23513"] =1,
 				["23514"] =1,
 				["23515"] =1,
@@ -8573,20 +8575,20 @@ local TBag_Reagents = {
 				["31371"] =1,
 				["34379"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["23828"] =1,
 				["32423"] =1,
 				["35182"] =1,
 				["35183"] =1,
 				["35184"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["24080"] =1,
 				["24092"] =1,
 				["24093"] =1,
 				["31398"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["25692"] =1,
 				["25693"] =1,
 				["25694"] =1,
@@ -8603,7 +8605,7 @@ local TBag_Reagents = {
 				["32574"] =1,
 				["32575"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["21845"] =1,
 				["21869"] =1,
 				["21870"] =1,
@@ -8616,7 +8618,7 @@ local TBag_Reagents = {
 			},
 		},
 		["21886"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["22452"] =1,
 				["22844"] =1,
 				["22847"] =1,
@@ -8624,7 +8626,7 @@ local TBag_Reagents = {
 				["32851"] =1,
 				["35750"] =1,
 			},
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["23527"] =1,
 				["23536"] =1,
 				["23538"] =1,
@@ -8638,7 +8640,7 @@ local TBag_Reagents = {
 				["34379"] =1,
 				["34380"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["23821"] =1,
 				["23825"] =1,
 				["35181"] =1,
@@ -8646,7 +8648,7 @@ local TBag_Reagents = {
 				["35184"] =1,
 				["35185"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["24085"] =1,
 				["24095"] =1,
 				["24097"] =1,
@@ -8654,7 +8656,7 @@ local TBag_Reagents = {
 				["31399"] =1,
 				["34363"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["25681"] =1,
 				["29483"] =1,
 				["29505"] =1,
@@ -8676,7 +8678,7 @@ local TBag_Reagents = {
 				["34372"] =1,
 				["34376"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["21845"] =1,
 				["21873"] =1,
 				["21874"] =1,
@@ -8699,15 +8701,15 @@ local TBag_Reagents = {
 			},
 		},
 		["21887"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["23504"] =1,
 				["23508"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["33092"] =1,
 				["33093"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["23793"] =1,
 				["25650"] =1,
 				["25654"] =1,
@@ -8734,7 +8736,7 @@ local TBag_Reagents = {
 				["34100"] =1,
 				["34482"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["21851"] =1,
 				["21853"] =1,
 				["21860"] =1,
@@ -8747,10 +8749,10 @@ local TBag_Reagents = {
 			},
 		},
 		["21929"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["23761"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["21779"] =1,
 				["23098"] =1,
 				["23099"] =1,
@@ -8762,7 +8764,7 @@ local TBag_Reagents = {
 			},
 		},
 		["22202"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["22191"] =1,
 				["22194"] =1,
 				["22195"] =1,
@@ -8772,7 +8774,7 @@ local TBag_Reagents = {
 			},
 		},
 		["22203"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["22191"] =1,
 				["22194"] =1,
 				["22196"] =1,
@@ -8780,25 +8782,25 @@ local TBag_Reagents = {
 			},
 		},
 		["22445"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["23509"] =1,
 				["23510"] =1,
 				["23511"] =1,
 				["23512"] =1,
 			},
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["22521"] =1,
 				["22522"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["23758"] =1,
 				["23761"] =1,
 				["23835"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["25653"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["21842"] =1,
 				["21866"] =1,
 				["21867"] =1,
@@ -8806,57 +8808,57 @@ local TBag_Reagents = {
 			},
 		},
 		["22446"] = {
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["22462"] =1,
 				["22463"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["21843"] =1,
 				["21858"] =1,
 			},
 		},
 		["22448"] = {
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["22449"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["23762"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["25653"] =1,
 			},
 		},
 		["22449"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["23509"] =1,
 				["23510"] =1,
 				["23511"] =1,
 				["23512"] =1,
 				["23526"] =1,
 			},
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["22448"] =1,
 				["22460"] =1,
 				["22462"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["23763"] =1,
 				["23835"] =1,
 			},
 		},
 		["22450"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["32401"] =1,
 				["32402"] =1,
 				["32403"] =1,
 				["32404"] =1,
 			},
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["22449"] =1,
 				["22459"] =1,
 				["22463"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["32393"] =1,
 				["32394"] =1,
 				["32395"] =1,
@@ -8866,7 +8868,7 @@ local TBag_Reagents = {
 				["32399"] =1,
 				["32400"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["32389"] =1,
 				["32390"] =1,
 				["32391"] =1,
@@ -8875,12 +8877,12 @@ local TBag_Reagents = {
 			},
 		},
 		["22451"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["21884"] =1,
 				["23571"] =1,
 				["35748"] =1,
 			},
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["23526"] =1,
 				["23534"] =1,
 				["23563"] =1,
@@ -8896,7 +8898,7 @@ local TBag_Reagents = {
 				["32570"] =1,
 				["34378"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["23828"] =1,
 				["23838"] =1,
 				["30544"] =1,
@@ -8904,10 +8906,10 @@ local TBag_Reagents = {
 				["34355"] =1,
 				["34356"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["34361"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["25695"] =1,
 				["25696"] =1,
 				["25697"] =1,
@@ -8942,18 +8944,18 @@ local TBag_Reagents = {
 				["34105"] =1,
 				["34374"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["24259"] =1,
 			},
 		},
 		["22452"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["21885"] =1,
 				["21886"] =1,
 				["23571"] =1,
 				["31080"] =1,
 			},
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["23506"] =1,
 				["23507"] =1,
 				["23508"] =1,
@@ -8968,7 +8970,7 @@ local TBag_Reagents = {
 				["30086"] =1,
 				["30093"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["23784"] =1,
 				["23828"] =1,
 				["23829"] =1,
@@ -8976,13 +8978,13 @@ local TBag_Reagents = {
 				["23839"] =1,
 				["35185"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["24124"] =1,
 				["25884"] =1,
 				["31079"] =1,
 				["35694"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["25651"] =1,
 				["25682"] =1,
 				["25689"] =1,
@@ -9002,10 +9004,10 @@ local TBag_Reagents = {
 				["34106"] =1,
 				["34207"] =1,
 			},
-			["Mining"] = {
+			[L["Mining"]] = {
 				["22573"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["24249"] =1,
 				["24250"] =1,
 				["24253"] =1,
@@ -9014,13 +9016,13 @@ local TBag_Reagents = {
 			},
 		},
 		["22456"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["21885"] =1,
 				["22846"] =1,
 				["32852"] =1,
 				["35751"] =1,
 			},
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["23537"] =1,
 				["23563"] =1,
 				["28425"] =1,
@@ -9035,13 +9037,13 @@ local TBag_Reagents = {
 				["34377"] =1,
 				["34378"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["23825"] =1,
 				["23829"] =1,
 				["34353"] =1,
 				["34847"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["24079"] =1,
 				["24095"] =1,
 				["24097"] =1,
@@ -9049,7 +9051,7 @@ local TBag_Reagents = {
 				["31399"] =1,
 				["35702"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["25680"] =1,
 				["25685"] =1,
 				["25686"] =1,
@@ -9074,7 +9076,7 @@ local TBag_Reagents = {
 				["33204"] =1,
 				["34370"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["24250"] =1,
 				["24252"] =1,
 				["24272"] =1,
@@ -9089,14 +9091,14 @@ local TBag_Reagents = {
 			},
 		},
 		["22457"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["21884"] =1,
 				["22845"] =1,
 				["23571"] =1,
 				["31080"] =1,
 				["32839"] =1,
 			},
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["23523"] =1,
 				["23524"] =1,
 				["23525"] =1,
@@ -9107,7 +9109,7 @@ local TBag_Reagents = {
 				["28441"] =1,
 				["28484"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["23827"] =1,
 				["23838"] =1,
 				["34847"] =1,
@@ -9116,7 +9118,7 @@ local TBag_Reagents = {
 				["35184"] =1,
 				["35185"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["24086"] =1,
 				["24098"] =1,
 				["24123"] =1,
@@ -9124,7 +9126,7 @@ local TBag_Reagents = {
 				["30825"] =1,
 				["35703"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["25652"] =1,
 				["25692"] =1,
 				["25693"] =1,
@@ -9145,7 +9147,7 @@ local TBag_Reagents = {
 				["29520"] =1,
 				["29521"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["21875"] =1,
 				["24252"] =1,
 				["24257"] =1,
@@ -9159,78 +9161,78 @@ local TBag_Reagents = {
 			},
 		},
 		["22461"] = {
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["22462"] =1,
 			},
 		},
 		["22462"] = {
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["22463"] =1,
 			},
 		},
 		["22572"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["22451"] =1,
 			},
 		},
 		["22573"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["22452"] =1,
 				["22849"] =1,
 			},
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["23528"] =1,
 				["23529"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["23781"] =1,
 			},
 		},
 		["22574"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["21884"] =1,
 				["22833"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["23781"] =1,
 			},
 		},
 		["22575"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["21886"] =1,
 			},
 		},
 		["22576"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["22457"] =1,
 			},
 		},
 		["22577"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["22456"] =1,
 			},
 		},
 		["22578"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["21885"] =1,
 				["22827"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["32508"] =1,
 			},
 		},
 		["22644"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["22645"] =1,
 			},
 		},
 		["22682"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["22669"] =1,
 				["22670"] =1,
 				["22671"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["22661"] =1,
 				["22662"] =1,
 				["22663"] =1,
@@ -9238,7 +9240,7 @@ local TBag_Reagents = {
 				["22665"] =1,
 				["22666"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["22652"] =1,
 				["22654"] =1,
 				["22655"] =1,
@@ -9246,7 +9248,7 @@ local TBag_Reagents = {
 			},
 		},
 		["22785"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["22823"] =1,
 				["22824"] =1,
 				["22826"] =1,
@@ -9264,7 +9266,7 @@ local TBag_Reagents = {
 			},
 		},
 		["22786"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["22825"] =1,
 				["22832"] =1,
 				["22836"] =1,
@@ -9275,7 +9277,7 @@ local TBag_Reagents = {
 			},
 		},
 		["22787"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["22823"] =1,
 				["22826"] =1,
 				["22830"] =1,
@@ -9288,7 +9290,7 @@ local TBag_Reagents = {
 			},
 		},
 		["22789"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["22828"] =1,
 				["22830"] =1,
 				["22831"] =1,
@@ -9302,7 +9304,7 @@ local TBag_Reagents = {
 			},
 		},
 		["22790"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["22827"] =1,
 				["22833"] =1,
 				["22834"] =1,
@@ -9315,7 +9317,7 @@ local TBag_Reagents = {
 			},
 		},
 		["22791"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["22829"] =1,
 				["22838"] =1,
 				["22839"] =1,
@@ -9326,12 +9328,12 @@ local TBag_Reagents = {
 				["22871"] =1,
 				["33208"] =1,
 			},
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["22521"] =1,
 			},
 		},
 		["22792"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["22835"] =1,
 				["22836"] =1,
 				["22839"] =1,
@@ -9340,12 +9342,12 @@ local TBag_Reagents = {
 				["31677"] =1,
 				["31679"] =1,
 			},
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["22522"] =1,
 			},
 		},
 		["22793"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["22841"] =1,
 				["22842"] =1,
 				["22844"] =1,
@@ -9368,7 +9370,7 @@ local TBag_Reagents = {
 			},
 		},
 		["22794"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["13503"] =1,
 				["22851"] =1,
 				["22853"] =1,
@@ -9379,33 +9381,33 @@ local TBag_Reagents = {
 			},
 		},
 		["22824"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["23520"] =1,
 				["23521"] =1,
 				["23522"] =1,
 			},
 		},
 		["22829"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["33092"] =1,
 				["33092"] =1,
 			},
 		},
 		["22831"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["23526"] =1,
 			},
 		},
 		["22832"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["33093"] =1,
 			},
 		},
 		["23077"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["23758"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["23094"] =1,
 				["23095"] =1,
 				["23096"] =1,
@@ -9417,10 +9419,10 @@ local TBag_Reagents = {
 			},
 		},
 		["23079"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["23762"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["23103"] =1,
 				["23104"] =1,
 				["23105"] =1,
@@ -9430,7 +9432,7 @@ local TBag_Reagents = {
 			},
 		},
 		["23107"] = {
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["23108"] =1,
 				["23109"] =1,
 				["23110"] =1,
@@ -9441,10 +9443,10 @@ local TBag_Reagents = {
 			},
 		},
 		["23112"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["23764"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["23113"] =1,
 				["23114"] =1,
 				["23115"] =1,
@@ -9458,7 +9460,7 @@ local TBag_Reagents = {
 			},
 		},
 		["23117"] = {
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["23118"] =1,
 				["23119"] =1,
 				["23120"] =1,
@@ -9469,33 +9471,33 @@ local TBag_Reagents = {
 			},
 		},
 		["23424"] = {
-			["Mining"] = {
+			[L["Mining"]] = {
 				["23445"] =1,
 			},
 		},
 		["23425"] = {
-			["Mining"] = {
+			[L["Mining"]] = {
 				["23446"] =1,
 			},
 		},
 		["23426"] = {
-			["Mining"] = {
+			[L["Mining"]] = {
 				["23449"] =1,
 			},
 		},
 		["23427"] = {
-			["Mining"] = {
+			[L["Mining"]] = {
 				["23447"] =1,
 			},
 		},
 		["23436"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["23829"] =1,
 				["32461"] =1,
 				["32476"] =1,
 				["32478"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["24027"] =1,
 				["24028"] =1,
 				["24029"] =1,
@@ -9511,12 +9513,12 @@ local TBag_Reagents = {
 			},
 		},
 		["23437"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["23828"] =1,
 				["32473"] =1,
 				["32480"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["24062"] =1,
 				["24065"] =1,
 				["24066"] =1,
@@ -9528,11 +9530,11 @@ local TBag_Reagents = {
 			},
 		},
 		["23438"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["23766"] =1,
 				["32494"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["24033"] =1,
 				["24035"] =1,
 				["24037"] =1,
@@ -9542,12 +9544,12 @@ local TBag_Reagents = {
 			},
 		},
 		["23439"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["23748"] =1,
 				["32475"] =1,
 				["32495"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["24058"] =1,
 				["24059"] =1,
 				["24060"] =1,
@@ -9558,12 +9560,12 @@ local TBag_Reagents = {
 			},
 		},
 		["23440"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["23765"] =1,
 				["32472"] =1,
 				["32479"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["24047"] =1,
 				["24048"] =1,
 				["24050"] =1,
@@ -9580,11 +9582,11 @@ local TBag_Reagents = {
 			},
 		},
 		["23441"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["23763"] =1,
 				["32474"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["24054"] =1,
 				["24055"] =1,
 				["24056"] =1,
@@ -9597,7 +9599,7 @@ local TBag_Reagents = {
 			},
 		},
 		["23445"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["23482"] =1,
 				["23484"] =1,
 				["23487"] =1,
@@ -9622,24 +9624,24 @@ local TBag_Reagents = {
 				["28420"] =1,
 				["33173"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["23772"] =1,
 				["23774"] =1,
 				["23782"] =1,
 				["23783"] =1,
 				["34060"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["24074"] =1,
 				["24075"] =1,
 				["24076"] =1,
 			},
-			["Mining"] = {
+			[L["Mining"]] = {
 				["23448"] =1,
 			},
 		},
 		["23446"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["23502"] =1,
 				["23503"] =1,
 				["23504"] =1,
@@ -9665,7 +9667,7 @@ local TBag_Reagents = {
 				["32403"] =1,
 				["32404"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["20475"] =1,
 				["23737"] =1,
 				["23764"] =1,
@@ -9674,16 +9676,16 @@ local TBag_Reagents = {
 				["34113"] =1,
 				["34504"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["24077"] =1,
 				["24078"] =1,
 			},
-			["Mining"] = {
+			[L["Mining"]] = {
 				["23573"] =1,
 			},
 		},
 		["23447"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["23554"] =1,
 				["23556"] =1,
 				["23576"] =1,
@@ -9692,7 +9694,7 @@ local TBag_Reagents = {
 				["28437"] =1,
 				["28483"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["24088"] =1,
 				["24089"] =1,
 				["24114"] =1,
@@ -9703,12 +9705,12 @@ local TBag_Reagents = {
 				["35700"] =1,
 				["35703"] =1,
 			},
-			["Mining"] = {
+			[L["Mining"]] = {
 				["23448"] =1,
 			},
 		},
 		["23448"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["23517"] =1,
 				["23518"] =1,
 				["23519"] =1,
@@ -9735,10 +9737,10 @@ local TBag_Reagents = {
 				["32570"] =1,
 				["32854"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["23787"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["24087"] =1,
 				["24092"] =1,
 				["24093"] =1,
@@ -9753,7 +9755,7 @@ local TBag_Reagents = {
 			},
 		},
 		["23449"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["23520"] =1,
 				["23521"] =1,
 				["23522"] =1,
@@ -9786,7 +9788,7 @@ local TBag_Reagents = {
 				["34377"] =1,
 				["34379"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["23748"] =1,
 				["23762"] =1,
 				["23763"] =1,
@@ -9795,7 +9797,7 @@ local TBag_Reagents = {
 				["23786"] =1,
 				["32756"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["24079"] =1,
 				["24080"] =1,
 				["24082"] =1,
@@ -9810,25 +9812,25 @@ local TBag_Reagents = {
 				["35693"] =1,
 				["35694"] =1,
 			},
-			["Mining"] = {
+			[L["Mining"]] = {
 				["35128"] =1,
 			},
 		},
 		["23563"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["23564"] =1,
 			},
 		},
 		["23564"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["23565"] =1,
 			},
 		},
 		["23571"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["13503"] =1,
 			},
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["23531"] =1,
 				["23532"] =1,
 				["23533"] =1,
@@ -9852,18 +9854,18 @@ local TBag_Reagents = {
 				["32854"] =1,
 				["34380"] =1,
 			},
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["22462"] =1,
 				["22463"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["34355"] =1,
 				["34357"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["34362"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["25653"] =1,
 				["29522"] =1,
 				["29523"] =1,
@@ -9880,7 +9882,7 @@ local TBag_Reagents = {
 				["34375"] =1,
 				["34376"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["24261"] =1,
 				["24262"] =1,
 				["24263"] =1,
@@ -9890,7 +9892,7 @@ local TBag_Reagents = {
 			},
 		},
 		["23572"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["23531"] =1,
 				["23532"] =1,
 				["23533"] =1,
@@ -9929,7 +9931,7 @@ local TBag_Reagents = {
 				["34377"] =1,
 				["34379"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["32461"] =1,
 				["32472"] =1,
 				["32473"] =1,
@@ -9954,10 +9956,10 @@ local TBag_Reagents = {
 				["35184"] =1,
 				["35185"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["34358"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["29502"] =1,
 				["29503"] =1,
 				["29504"] =1,
@@ -9993,7 +9995,7 @@ local TBag_Reagents = {
 				["34373"] =1,
 				["34375"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["24255"] =1,
 				["24256"] =1,
 				["24257"] =1,
@@ -10015,7 +10017,7 @@ local TBag_Reagents = {
 			},
 		},
 		["23573"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["23509"] =1,
 				["23510"] =1,
 				["23511"] =1,
@@ -10047,26 +10049,26 @@ local TBag_Reagents = {
 				["34377"] =1,
 				["34379"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["23785"] =1,
 				["23839"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["24116"] =1,
 				["24128"] =1,
 				["35702"] =1,
 			},
-			["Mining"] = {
+			[L["Mining"]] = {
 				["35128"] =1,
 			},
 		},
 		["23676"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["24105"] =1,
 			},
 		},
 		["23781"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["23736"] =1,
 				["23737"] =1,
 				["23768"] =1,
@@ -10084,14 +10086,14 @@ local TBag_Reagents = {
 			},
 		},
 		["23782"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["32839"] =1,
 				["32849"] =1,
 				["32850"] =1,
 				["32851"] =1,
 				["32852"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["23736"] =1,
 				["23742"] =1,
 				["23746"] =1,
@@ -10110,7 +10112,7 @@ local TBag_Reagents = {
 			},
 		},
 		["23783"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["20475"] =1,
 				["23736"] =1,
 				["23737"] =1,
@@ -10138,7 +10140,7 @@ local TBag_Reagents = {
 			},
 		},
 		["23784"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["23746"] =1,
 				["23767"] =1,
 				["23820"] =1,
@@ -10149,7 +10151,7 @@ local TBag_Reagents = {
 			},
 		},
 		["23785"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["23747"] =1,
 				["23748"] =1,
 				["23765"] =1,
@@ -10173,7 +10175,7 @@ local TBag_Reagents = {
 			},
 		},
 		["23786"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["23824"] =1,
 				["23825"] =1,
 				["23835"] =1,
@@ -10197,7 +10199,7 @@ local TBag_Reagents = {
 			},
 		},
 		["23787"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["23747"] =1,
 				["23766"] =1,
 				["23824"] =1,
@@ -10220,10 +10222,10 @@ local TBag_Reagents = {
 			},
 		},
 		["23793"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["29204"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["23758"] =1,
 				["23761"] =1,
 				["23762"] =1,
@@ -10243,7 +10245,7 @@ local TBag_Reagents = {
 				["32494"] =1,
 				["32495"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["25651"] =1,
 				["25652"] =1,
 				["25653"] =1,
@@ -10348,25 +10350,25 @@ local TBag_Reagents = {
 			},
 		},
 		["23819"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["34060"] =1,
 			},
 		},
 		["23826"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["30542"] =1,
 			},
 		},
 		["24243"] = {
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["31079"] =1,
 			},
 		},
 		["24271"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["23828"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["21846"] =1,
 				["21847"] =1,
 				["21848"] =1,
@@ -10383,10 +10385,10 @@ local TBag_Reagents = {
 			},
 		},
 		["24272"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["23838"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["21869"] =1,
 				["21870"] =1,
 				["21871"] =1,
@@ -10399,12 +10401,12 @@ local TBag_Reagents = {
 			},
 		},
 		["24477"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["30155"] =1,
 			},
 		},
 		["24478"] = {
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["32508"] =1,
 				["32772"] =1,
 				["32776"] =1,
@@ -10412,7 +10414,7 @@ local TBag_Reagents = {
 			},
 		},
 		["24479"] = {
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["32508"] =1,
 				["32774"] =1,
 				["32776"] =1,
@@ -10420,12 +10422,12 @@ local TBag_Reagents = {
 			},
 		},
 		["25649"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["21887"] =1,
 			},
 		},
 		["25699"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["25692"] =1,
 				["25693"] =1,
 				["25694"] =1,
@@ -10439,7 +10441,7 @@ local TBag_Reagents = {
 			},
 		},
 		["25700"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["25654"] =1,
 				["25655"] =1,
 				["25656"] =1,
@@ -10460,7 +10462,7 @@ local TBag_Reagents = {
 			},
 		},
 		["25707"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["25685"] =1,
 				["25686"] =1,
 				["25687"] =1,
@@ -10482,7 +10484,7 @@ local TBag_Reagents = {
 			},
 		},
 		["25708"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["25689"] =1,
 				["25690"] =1,
 				["25691"] =1,
@@ -10498,30 +10500,30 @@ local TBag_Reagents = {
 			},
 		},
 		["25719"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["34100"] =1,
 			},
 		},
 		["25843"] = {
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["22461"] =1,
 			},
 		},
 		["25844"] = {
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["22462"] =1,
 			},
 		},
 		["25845"] = {
-			["Enchanting"] = {
+			[L["Enchanting"]] = {
 				["22463"] =1,
 			},
 		},
 		["25867"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["13503"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["25896"] =1,
 				["25897"] =1,
 				["25898"] =1,
@@ -10532,10 +10534,10 @@ local TBag_Reagents = {
 			},
 		},
 		["25868"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["13503"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["25890"] =1,
 				["25893"] =1,
 				["25894"] =1,
@@ -10546,182 +10548,182 @@ local TBag_Reagents = {
 			},
 		},
 		["27422"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["27661"] =1,
 				["33048"] =1,
 			},
 		},
 		["27425"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["27662"] =1,
 			},
 		},
 		["27429"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["27663"] =1,
 			},
 		},
 		["27435"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["27664"] =1,
 			},
 		},
 		["27437"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["27665"] =1,
 			},
 		},
 		["27438"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["27666"] =1,
 			},
 		},
 		["27439"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["27667"] =1,
 			},
 		},
 		["27503"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["33173"] =1,
 			},
 		},
 		["27515"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["33052"] =1,
 			},
 		},
 		["27516"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["33053"] =1,
 			},
 		},
 		["27668"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["27635"] =1,
 			},
 		},
 		["27669"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["27636"] =1,
 			},
 		},
 		["27671"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["27651"] =1,
 				["33874"] =1,
 			},
 		},
 		["27674"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["27655"] =1,
 			},
 		},
 		["27676"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["27656"] =1,
 			},
 		},
 		["27677"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["27657"] =1,
 			},
 		},
 		["27678"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["27658"] =1,
 				["33866"] =1,
 			},
 		},
 		["27681"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["27659"] =1,
 			},
 		},
 		["27682"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["27660"] =1,
 				["33872"] =1,
 			},
 		},
 		["27860"] = {
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["32833"] =1,
 				["32836"] =1,
 			},
 		},
 		["28425"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["28426"] =1,
 			},
 		},
 		["28426"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["28427"] =1,
 			},
 		},
 		["28428"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["28429"] =1,
 			},
 		},
 		["28429"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["28430"] =1,
 			},
 		},
 		["28431"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["28432"] =1,
 			},
 		},
 		["28432"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["28433"] =1,
 			},
 		},
 		["28434"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["28435"] =1,
 			},
 		},
 		["28435"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["28436"] =1,
 			},
 		},
 		["28437"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["28438"] =1,
 			},
 		},
 		["28438"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["28439"] =1,
 			},
 		},
 		["28440"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["28441"] =1,
 			},
 		},
 		["28441"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["28442"] =1,
 			},
 		},
 		["28483"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["28484"] =1,
 			},
 		},
 		["28484"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["28485"] =1,
 			},
 		},
 		["29539"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["25680"] =1,
 				["25681"] =1,
 				["25682"] =1,
@@ -10733,7 +10735,7 @@ local TBag_Reagents = {
 			},
 		},
 		["29547"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["29504"] =1,
 				["29507"] =1,
 				["29509"] =1,
@@ -10755,7 +10757,7 @@ local TBag_Reagents = {
 			},
 		},
 		["29548"] = {
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["29508"] =1,
 				["29510"] =1,
 				["29511"] =1,
@@ -10775,13 +10777,13 @@ local TBag_Reagents = {
 			},
 		},
 		["30183"] = {
-			["Alchemy"] = {
+			[L["Alchemy"]] = {
 				["35748"] =1,
 				["35749"] =1,
 				["35750"] =1,
 				["35751"] =1,
 			},
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["23565"] =1,
 				["28427"] =1,
 				["28430"] =1,
@@ -10793,25 +10795,25 @@ local TBag_Reagents = {
 				["30032"] =1,
 				["30034"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["30040"] =1,
 				["30042"] =1,
 				["30044"] =1,
 				["30046"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["30036"] =1,
 				["30038"] =1,
 			},
 		},
 		["30817"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["30816"] =1,
 				["33924"] =1,
 			},
 		},
 		["31079"] = {
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["24077"] =1,
 				["24078"] =1,
 				["24079"] =1,
@@ -10847,17 +10849,17 @@ local TBag_Reagents = {
 			},
 		},
 		["31670"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["31672"] =1,
 			},
 		},
 		["31671"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["31673"] =1,
 			},
 		},
 		["32227"] = {
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["32193"] =1,
 				["32194"] =1,
 				["32195"] =1,
@@ -10870,7 +10872,7 @@ local TBag_Reagents = {
 			},
 		},
 		["32228"] = {
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["32200"] =1,
 				["32201"] =1,
 				["32202"] =1,
@@ -10880,7 +10882,7 @@ local TBag_Reagents = {
 			},
 		},
 		["32229"] = {
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["32204"] =1,
 				["32205"] =1,
 				["32206"] =1,
@@ -10892,7 +10894,7 @@ local TBag_Reagents = {
 			},
 		},
 		["32230"] = {
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["32211"] =1,
 				["32212"] =1,
 				["32213"] =1,
@@ -10904,7 +10906,7 @@ local TBag_Reagents = {
 			},
 		},
 		["32231"] = {
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["32217"] =1,
 				["32218"] =1,
 				["32219"] =1,
@@ -10916,7 +10918,7 @@ local TBag_Reagents = {
 			},
 		},
 		["32249"] = {
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["32223"] =1,
 				["32224"] =1,
 				["32225"] =1,
@@ -10928,12 +10930,12 @@ local TBag_Reagents = {
 			},
 		},
 		["32423"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["32413"] =1,
 			},
 		},
 		["32428"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["32401"] =1,
 				["32402"] =1,
 				["32403"] =1,
@@ -10943,7 +10945,7 @@ local TBag_Reagents = {
 				["32571"] =1,
 				["32573"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["32393"] =1,
 				["32394"] =1,
 				["32395"] =1,
@@ -10961,7 +10963,7 @@ local TBag_Reagents = {
 				["32582"] =1,
 				["32583"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["32389"] =1,
 				["32390"] =1,
 				["32391"] =1,
@@ -10974,115 +10976,115 @@ local TBag_Reagents = {
 			},
 		},
 		["32461"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["34354"] =1,
 			},
 		},
 		["32472"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["35185"] =1,
 			},
 		},
 		["32473"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["34357"] =1,
 			},
 		},
 		["32474"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["34356"] =1,
 			},
 		},
 		["32475"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["35184"] =1,
 			},
 		},
 		["32476"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["34355"] =1,
 			},
 		},
 		["32478"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["34353"] =1,
 			},
 		},
 		["32479"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["35183"] =1,
 			},
 		},
 		["32480"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["35182"] =1,
 			},
 		},
 		["32494"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["34847"] =1,
 			},
 		},
 		["32495"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["35181"] =1,
 			},
 		},
 		["33823"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["33867"] =1,
 			},
 		},
 		["33824"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["33825"] =1,
 			},
 		},
 		["34060"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["34061"] =1,
 			},
 		},
 		["34249"] = {
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["34061"] =1,
 			},
 		},
 		["34412"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["34411"] =1,
 			},
 		},
 		["34664"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["34378"] =1,
 				["34380"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["34361"] =1,
 				["34362"] =1,
 				["34363"] =1,
 			},
-			["Leatherworking"] = {
+			[L["Leatherworking"]] = {
 				["34370"] =1,
 				["34372"] =1,
 				["34374"] =1,
 				["34376"] =1,
 			},
-			["Tailoring"] = {
+			[L["Tailoring"]] = {
 				["34366"] =1,
 				["34367"] =1,
 			},
 		},
 		["35128"] = {
-			["Blacksmithing"] = {
+			[L["Blacksmithing"]] = {
 				["34378"] =1,
 				["34380"] =1,
 			},
-			["Engineering"] = {
+			[L["Engineering"]] = {
 				["34357"] =1,
 			},
-			["Jewelcrafting"] = {
+			[L["Jewelcrafting"]] = {
 				["34358"] =1,
 				["34361"] =1,
 				["34362"] =1,
@@ -11090,7 +11092,7 @@ local TBag_Reagents = {
 			},
 		},
 		["35562"] = {
-			["Cooking"] = {
+			[L["Cooking"]] = {
 				["35563"] =1,
 				["35565"] =1,
 			},

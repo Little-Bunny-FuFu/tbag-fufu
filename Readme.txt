@@ -4,7 +4,7 @@ TBag is a WoW Addon that provides an alternative bag and bank interface.  It was
 built by modifying Engbags an addon who has essnetially the same functionality 
 is missing some of the features of TBag.
 
-Talos the original author of Tbag his this to say about it when he released it: 
+Talos the original author of TBag has this to say about it when he released it: 
 
 "In addition to the auto-sorting you've come to know and love, I've added many new
 features, including searching for items (in mail, etc.) You can also see and use
@@ -17,7 +17,7 @@ to completely configure every aspect of TBag."
 This is a modification of his 070123 release for WoW 2.0.3.  The modificatoins were
 done by Shefki.  See the Changelog file for details of the changes I made.  The
 ToDo.txt file consists of ToDo items that were found in the original TBag release.
-Some of them are not terribly relevent to my my intentions, some I'm unclear on
+Some of them are not terribly relevent to my intentions, some I'm unclear on
 what he meant and others seem to have already been fixed.  See my Todo List below.
 
 Getting Started
@@ -32,8 +32,8 @@ TBag can only "see" something you've seen, so for every character:
 
 This allows you to view the bag and bank contents of your characters at any time
 (sorted according to their trade skills) by clicking the name dropdown in the
-upper right. It also enables you to do a full item search from the search
-textbox just to the left of the name dropdown. 
+upper left. It also enables you to do a full item search from the search
+textbox in the lower left corner of the bagframe. 
 
 Todo/Known Issues
 
@@ -65,7 +65,7 @@ Contacting Me
 I will do my best to check in on the addon forums from time to time.  More so
 around major patch releases.  Less so between.  I certainly won't be checking
 in every day.  Curse Gaming and WowInterface will be kept up to date with the
-latest update and I will read the forums there.  No gurantees anywhere else.
+latest update and I will read the forums there.  No guarantees anywhere else.
 
 Bug reports and feature requests should be directed to the ticket system on Curse:
 http://wow.curseforge.com/projects/tbag-shefki/tickets/

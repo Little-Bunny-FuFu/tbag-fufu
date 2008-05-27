@@ -93,6 +93,8 @@ sub output_header {
 --- WILL BE OVERWRITTEN ON THE NEXT RELEASE OF THE ADDON!         ---
 ---------------------------------------------------------------------
 
+-- Localization Support
+local L = TBAG_LOCALE;
 
 EOH
 }
@@ -183,7 +185,7 @@ sub output_reagents {
 	foreach my $reagent (sort {$a <=> $b} keys %TBag_Reagents) {
     print qq(\t\t["$reagent"] = {\n);
 		foreach my $trade (sort keys %{$TBag_Reagents{$reagent}}) {
-      print qq(\t\t\t["$trade"] = {\n);
+      print qq(\t\t\t[L["$trade"]] = {\n);
       foreach my $id (sort {$a <=> $b} @{$TBag_Reagents{$reagent}->{$trade}}) {
         print qq(\t\t\t\t["$id"] =1,\n);
 		  }
@@ -202,7 +204,7 @@ sub output_trades {
 	print qq(\t\t[TBAG_S_UPDATE] = "$time",\n);
 	print qq(\t\t[TBAG_S_VERSION] = 1,\n);
 	foreach my $trade (sort keys %$source_hash) {
-    print qq(\t\t["$trade"] = {\n);
+    print qq(\t\t[L["$trade"]] = {\n);
 		foreach my $id (sort {$a <=> $b} keys %{$source_hash->{$trade}}) {
       print qq(\t\t\t["$id"] = 1,\n);
 		}
