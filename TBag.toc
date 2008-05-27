@@ -1,7 +1,7 @@
 ## Interface: 20400
 ## Title: TBag
-## Notes: The last bag addon you'll ever need.  Autosorting, viewable anywhere, easy to use yet amazingly configurable
-## Notes-deDE: Translate me
+## Notes: The last bag addon you'll ever need.  Autosorting, viewable anywhere, easy to use yet amazingly configurable.
+## Notes-deDE: Das einzige Taschenaddon was du jemals brauchen wirst. Automatisches sortieren, \195\188berall einsehbar, Benutzerfreundlich, dabei aber unglaublich gut Konfigurierbar. 
 ## X-Category: Inventory
 ## Author: Talos, Modified by Shefki
 ## X-Email: shefki@shefki.org
