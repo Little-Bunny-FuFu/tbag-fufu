@@ -129,12 +129,12 @@ end
 
 
 function TBagOpt_GetItemSearch(cfg, key, idx)
-  return cfg["item_search_list"][key][idx]
+  return TBag_EscapeNL(cfg["item_search_list"][key][idx])
 end
 
 function TBagOpt_AssignItemSearch(v, cfg, key, idx)
   if (key ~= nil) then
-    cfg["item_search_list"][key][idx] = v;
+    cfg["item_search_list"][key][idx] = TBag_UnEscapeNL(v);
   end
 end
 

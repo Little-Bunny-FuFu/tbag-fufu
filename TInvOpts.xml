@@ -192,7 +192,7 @@
         </Scripts>
       </Button>
       <Button name="TInv_OptsFrame_Button_Close" inherits="GameMenuButtonTemplate" text="Close">
-        <Size><AbsDimension x="50" y="25"/></Size>
+        <Size><AbsDimension x="70" y="25"/></Size>
         <Anchors>
           <Anchor point="BOTTOM">
             <Offset>
@@ -210,7 +210,7 @@
         </Scripts>
       </Button>
       <Button name="TInv_OptsFrame_Button_AddCat" inherits="GameMenuButtonTemplate" text="Add New Cat">
-        <Size><AbsDimension x="110" y="25"/></Size>
+        <Size><AbsDimension x="130" y="25"/></Size>
         <Anchors>
           <Anchor point="BOTTOMRIGHT">
             <Offset>
@@ -228,7 +228,7 @@
         </Scripts>
       </Button>
       <Button name="TInv_OptsFrame_Button_AssignCat" inherits="GameMenuButtonTemplate" text="Assign Cats">
-        <Size><AbsDimension x="100" y="25"/></Size>
+        <Size><AbsDimension x="120" y="25"/></Size>
         <Anchors>
           <Anchor point="RIGHT" relativePoint="LEFT" relativeTo="TInv_OptsFrame_Button_AddCat">
             <Offset>

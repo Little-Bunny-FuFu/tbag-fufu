@@ -547,6 +547,16 @@ function TBag_StringToBagSlot(string)
   return tonumber(bag),tonumber(slot);
 end
 
+function TBag_EscapeNL(str)
+  str = string.gsub(str, "\n", "\\n");
+  return str
+end
+
+function TBag_UnEscapeNL(str)
+  str = string.gsub(str, "\\n", "\n");
+  return str
+end
+
 -----------------------------------------------------------------------
 -- Searching
 -----------------------------------------------------------------------

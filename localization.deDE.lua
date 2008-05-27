@@ -22,7 +22,7 @@ TBAG_LOCALE = setmetatable({
   ["First Aid"] = "Erste Hilfe",
 
 -- Primary professions
-  ["Alchemy"] = "Alchemie",
+  ["Alchemy"] = "Alchimie",
   ["Blacksmithing"] = "Schmiedekunst",
   ["Enchanting"] = "Verzauberkunst",
   ["Engineering"] = "Ingenieurskunst",
@@ -49,7 +49,7 @@ TBAG_LOCALE = setmetatable({
   ["Erste Hilfe"] = "First Aid",
 
 -- Primary professions
-  ["Alchemie"] = "Alchemy",
+  ["Alchimie"] = "Alchemy",
   ["Schmiedekunst"] = "Blacksmithing",
   ["Verzauberkunst"] = "Enchanting",
   ["Ingenieurskunst"] = "Engineering",
@@ -207,7 +207,7 @@ TBAG_LOCALE = setmetatable({
   -- Tradeskill categories
   ["TRADE1"] = "TRADE1",
   ["TRADE2"] = "TRADE2",
-  ["ALCHEMY"] = "ALCHEMIE",
+  ["ALCHEMY"] = "ALCHIMIE",
   ["BLACKSMITHING"] = "SCHMIEDEKUNST",
   ["ENCHANTING"] = "VERZAUBERKUNST",
   ["ENGINEERING"] = "INGENIEURSKUNST",
