@@ -2129,7 +2129,7 @@ function TBag_MakeToolTipStr(playerid, itemlink, bag, slot, mailitem, attach)
       local line = ttleft:GetText();
 
       if (line) then
-        tooltip = tooltip.." "..line;
+        tooltip = tooltip.."\n"..line;
       end
     end
   end
