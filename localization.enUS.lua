@@ -5,7 +5,7 @@
 
 -- See localization.template.lua to start a new translation.
 
-local debug = true;
+local debug = (GetLocale() == "enUS"); 
 
 -- A few of these translations are set to constants from 
 -- Blizzard's GlobalStrings.lua which should be translated

@@ -1,4 +1,4 @@
-* 200805xx-r15x-Shefki
+* 20080527-r161-Shefki
   - UI rework.  Text buttons are gone, close and lock buttons
     back in topright corner.  Search box at the bottom now.
     All controls are actually inside the window now.
