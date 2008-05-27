@@ -300,7 +300,7 @@ TBag_DefaultSearchList = {
   { L["BUFF"], L[""], L[" Weightstone"], L[""], L[""] },
   { L["BUFF"], L[""], L["Mistletoe"], L["Miscellaneous"], L[""] },
   { L["BUFF"], L[""], L["Flame Cap"], L["Trade Goods"], L[""]},
-  { L["BUFF"], L[""], L["Allows the Imbiber to "], L["Consumable"], L[""]},
+  { L["BUFF"], L[""], L["[AG][li][lv][oe]w?s the [Ii]mbiber "], L["Consumable"], L[""]},
   { L["KEY_OPEN"], L[""], L[" Key"], L["Trade Goods"], L[""] },
   { L["KEY_QUEST"], L[""], L[" Key"], L["Key"], L[""] },
 
