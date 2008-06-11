@@ -1,3 +1,6 @@
+* 20080611-r163-Shefki
+  - Fix an error when opening the Hunter Training window.
+
 * 20080527-r161-Shefki
   - UI rework.  Text buttons are gone, close and lock buttons
     back in topright corner.  Search box at the bottom now.
