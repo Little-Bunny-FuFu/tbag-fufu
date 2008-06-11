@@ -141,10 +141,11 @@ function TBag_Craft()
     local created;
     local reagent;
 
-    tradeskillName = L[tradeskillName]; -- reverse for localized to enUS
     
     -- hunter training window shows up as a craft with a nil tradeskillName
     if (tradeskillName ~= nil) then
+      tradeskillName = L[tradeskillName]; -- reverse for localized to enUS
+
       TBag_SetPlayerTrade(TBAG_PLAYERID, tradeskillName)
 
       -- Then save to the global item cache
