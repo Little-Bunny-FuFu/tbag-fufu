@@ -153,39 +153,3 @@ function TBnkHooks_CloseAllWindows()
   end
 end
 hooksecurefunc('CloseAllWindows', TBnkHooks_CloseAllWindows);
-
-function TBnkHooks_ToggleDropDownMenu(level, value, dropDownFrame, anchorName, xOffset, yOffset)
-  TBag_PrintDEBUG("event: ToggleDropDownMenu()");
-
-  TBnkHooks_savedfuncs["ToggleDropDownMenu"](level, value, dropDownFrame, anchorName, xOffset, yOffset);
-
-  local frame = getglobal("DropDownList"..UIDROPDOWNMENU_MENU_LEVEL);  
-
-  local adjustX, adjustY;
-  
-  if ( frame and frame:GetLeft() and frame:GetLeft() * frame:GetScale() < UIParent:GetLeft() * UIParent:GetScale() ) then
-    adjustX = ( (UIParent:GetLeft()*UIParent:GetScale()) - (frame:GetLeft()*frame:GetScale()) ) / frame:GetScale();
-  elseif ( frame and frame:GetRight() and frame:GetRight()*frame:GetScale() > UIParent:GetRight()*UIParent:GetScale() ) then
-    adjustX = ( (UIParent:GetRight()*UIParent:GetScale()) - (frame:GetRight()*frame:GetScale()) ) / frame:GetScale();
-  else
-    adjustX = 0;
-  end
-
-  if ( frame and frame:GetTop() and frame:GetTop()*frame:GetScale() > UIParent:GetTop()*UIParent:GetScale() ) then
-    adjustY = ( (UIParent:GetTop()*UIParent:GetScale()) - (frame:GetTop()*frame:GetScale()) ) / frame:GetScale();
-  elseif ( frame and frame:GetBottom() and frame:GetBottom() * frame:GetScale() < UIParent:GetBottom() * UIParent:GetScale() ) then
-    adjustY = ( (UIParent:GetBottom()*UIParent:GetScale()) - (frame:GetBottom()*frame:GetScale()) ) / frame:GetScale();
-  else
-    adjustY = 0;
-  end
-
-  if ( (adjustY ~= 0) or (adjustX ~= 0) ) then
-    TBag_PrintDEBUG("ToggleDropDownMenu() - adjusting window position by "..adjustX..", "..adjustY);
-
-    adjustX = frame:GetLeft() + adjustX;
-    adjustY = frame:GetTop() + adjustY;
-
-    frame:ClearAllPoints();
-    frame:SetPoint("TOPLEFT", "UIParent", "BOTTOMLEFT", adjustX, adjustY);
-  end
-end
