@@ -28,16 +28,16 @@
 	</Anchors>
 	<Scripts>
   	  <OnLoad>
-	    this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+	    self:RegisterForClicks("LeftButtonUp", "RightButtonUp");
           </OnLoad>
   	  <OnClick>
-            TInv_ItemButton_OnClick(arg1);
+            TInv_ItemButton_OnClick(self, button, down);
           </OnClick>
           <OnEnter>
-            TInv_ItemButton_OnEnter(self);
+            TInv_ItemButton_OnEnter(self, motion);
           </OnEnter>
           <OnLeave>
-            TInv_ItemButton_OnLeave();
+            TInv_ItemButton_OnLeave(self, motion);
           </OnLeave>
         </Scripts>
       </Button>
@@ -57,14 +57,14 @@
     </Layers>
     <Scripts>
       <OnLoad>
-        ContainerFrameItemButton_OnLoad();
-        this.UpdateTooltip = TInv_ItemButton_OnEnter;
+        ContainerFrameItemButton_OnLoad(self);
+        self.UpdateTooltip = TInv_ItemButton_OnEnter;
       </OnLoad>
       <OnEnter>
-        TInv_ItemButton_OnEnter(self);
+        TInv_ItemButton_OnEnter(self, motion);
       </OnEnter>
       <OnLeave>
-        TInv_ItemButton_OnLeave();
+        TInv_ItemButton_OnLeave(self, motion);
       </OnLeave>
     </Scripts>
   </Button>
@@ -99,28 +99,28 @@
     </Layers>
     <Scripts>
       <OnClick>
-        TInv_SlotTargetButton_OnClick(arg1);
+        TInv_SlotTargetButton_OnClick(self, button, down);
       </OnClick>
       <OnDragStart>
-        TInv_SlotTargetButton_OnClick("LeftButton", 1);
+        TInv_SlotTargetButton_OnClick(self, button);
       </OnDragStart>
       <OnReceiveDrag>
-        TInv_SlotTargetButton_OnClick("LeftButton", 1);
+        TInv_SlotTargetButton_OnClick(self, "LeftButton");
       </OnReceiveDrag>
       <OnLoad>
-        this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
-        this:RegisterForDrag("LeftButton");
+        self:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+        self:RegisterForDrag("LeftButton");
       </OnLoad>
       <OnHide>
-        if ( this.hasStackSplit and (this.hasStackSplit == 1) ) then
+        if ( self.hasStackSplit and (self.hasStackSplit == 1) ) then
           StackSplitFrame:Hide();
         end
       </OnHide>
       <OnEnter>
-        TInv_SlotTargetButton_OnEnter(self);
+        TInv_SlotTargetButton_OnEnter(self, motion);
       </OnEnter>
       <OnLeave>
-        TInv_SlotTargetButton_OnLeave();
+        TInv_SlotTargetButton_OnLeave(self, motion);
       </OnLeave>
     </Scripts>
   </Button>
@@ -147,13 +147,13 @@
     </Frames>
     <Scripts>
       <OnLoad>
-        PaperDollItemSlotButton_OnLoad();
-        this:RegisterEvent("BAG_UPDATE");
-        this.isBag = 1;	
-        this.UpdateTooltip = TInv_BagSlotButton_OnEnter;
+        PaperDollItemSlotButton_OnLoad(self);
+        self:RegisterEvent("BAG_UPDATE");
+        self.isBag = 1;	
+        self.UpdateTooltip = TInv_BagSlotButton_OnEnter;
       </OnLoad>
       <OnEnter>
-        TInv_BagSlotButton_OnEnter(self);
+        TInv_BagSlotButton_OnEnter(self, motion);
       </OnEnter>
     </Scripts>
   </CheckButton>
@@ -283,7 +283,7 @@
         </Anchors>
         <Scripts>
           <OnClick>
-            TInv_Button_MoveLockToggle_OnClick();
+            TInv_Button_MoveLockToggle_OnClick(self, button);
           </OnClick>
           <OnEnter>
             if (TInvCfg["moveLock"] == 0) then
@@ -311,7 +311,7 @@
         </Anchors>
         <Scripts>
           <OnShow>
-            TInv_UserDropdown_OnLoad();
+            TInv_UserDropdown_OnLoad(self);
           </OnShow>
         </Scripts>
       </Frame>
@@ -331,7 +331,7 @@
         </Anchors>
         <Scripts>
           <OnClick>
-            TInv_Button_HighlightToggle_OnClick();
+            TInv_Button_HighlightToggle_OnClick(self, button, down);
           </OnClick>
           <OnEnter>
             if (TBag_SrchText) then
@@ -363,7 +363,7 @@
         </Anchors>
         <Scripts>
           <OnClick>
-            TInv_Button_ChangeEditMode_OnClick();
+            TInv_Button_ChangeEditMode_OnClick(self, button, down);
           </OnClick>
           <OnEnter>
 		  GameTooltip_AddNewbieTip(TBAG_LOCALE["Toggle Edit Mode"], 1.0, 1.0, 1.0, TBAG_LOCALE["Select this option to move classes of items into different 'bars' (the red numbers)."]);
@@ -390,7 +390,7 @@
         </Anchors>
         <Scripts>
           <OnClick>
-            TInv_Button_ShowBank_OnClick();
+            TInv_Button_ShowBank_OnClick(self, button, down);
           </OnClick>
           <OnEnter>
 		  GameTooltip_AddNewbieTip(TBAG_LOCALE["Toggle Bank"], 1.0, 1.0, 1.0, TBAG_LOCALE["Displays bank contents in a view-only mode.  You may select another player's bank to view from the dropdown."]);
@@ -416,7 +416,7 @@
         </Anchors>
         <Scripts>
           <OnClick>
-            TInv_Button_Reload_OnClick();
+            TInv_Button_Reload_OnClick(self, button, down);
           </OnClick>
           <OnEnter>
 		  GameTooltip_AddNewbieTip(TBAG_LOCALE["Reload and Sort"], 1.0, 1.0, 1.0, TBAG_LOCALE["Reloads your items and sorts them."]);
@@ -553,21 +553,21 @@
         </Frames>
         <Scripts>
           <OnLoad>
-            this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+            self:RegisterForClicks("LeftButtonUp", "RightButtonUp");
             TInvMenuBarBackpackButtonIconTexture:SetTexture("Interface\\Buttons\\Button-Backpack-Up");
           </OnLoad>
 	  <OnClick>
 	    if ( IsModifiedClick() ) then
-              BackpackButton_OnModifiedClick();
+              BackpackButton_OnModifiedClick(self, button, down);
 	    else
-	      BackpackButton_OnClick();
+	      BackpackButton_OnClick(self, button, down);
 	    end
           </OnClick>
           <OnReceiveDrag>
             BackpackButton_OnClick();
           </OnReceiveDrag>
           <OnEnter>
-            GameTooltip:SetOwner(this, "ANCHOR_LEFT");
+            GameTooltip:SetOwner(self, "ANCHOR_LEFT");
             GameTooltip:SetText(TEXT(BACKPACK_TOOLTIP), 1.0, 1.0, 1.0);
             local keyBinding = GetBindingKey("TOGGLEBACKPACK");
             if ( keyBinding ) then
@@ -610,8 +610,8 @@
     </Frames>
     <Scripts>
       <OnLoad>
-        this:SetID(KEYRING_CONTAINER);
-        this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+        self:SetID(KEYRING_CONTAINER);
+	self:RegisterForClicks("LeftButtonUp", "RightButtonUp");
       </OnLoad>
       <OnClick>
         if (CursorHasItem()) then
@@ -626,7 +626,7 @@
         end
       </OnReceiveDrag>
       <OnEnter>
-        GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
 	GameTooltip:SetText(TBAG_LOCALE["Keyring"], HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
         GameTooltip:AddLine();
       </OnEnter>
@@ -770,10 +770,10 @@
       <Frame name="$parent_RightClickMenu" inherits="UIDropDownMenuTemplate" id="5" hidden="true">
         <Scripts>
           <OnLoad>
-            this:RegisterEvent("VARIABLES_LOADED");
+            self:RegisterEvent("VARIABLES_LOADED");
           </OnLoad>
           <OnEvent>
-            TInvFrame_RightClickMenu_OnLoad();
+            TInvFrame_RightClickMenu_OnLoad(self);
           </OnEvent>
         </Scripts>
       </Frame>
@@ -781,58 +781,58 @@
 
     <Scripts>
       <OnLoad>
-        this:RegisterEvent("VARIABLES_LOADED");
-	tinsert(UISpecialFrames,this:GetName());
+        self:RegisterEvent("VARIABLES_LOADED");
+	tinsert(UISpecialFrames,self:GetName());
       </OnLoad> 
       <OnEvent>
         if (event == "VARIABLES_LOADED") then 
           TInv_init(0);
-          this:RegisterEvent("BAG_UPDATE");
-          this:RegisterEvent("BAG_UPDATE_COOLDOWN");
-          this:RegisterEvent("ITEM_LOCK_CHANGED");
-          this:RegisterEvent("UNIT_INVENTORY_CHANGED");
-          this:RegisterEvent("UPDATE_INVENTORY_ALERTS");
-          this:RegisterEvent("PLAYER_LEAVING_WORLD");
-          this:RegisterEvent("CRAFT_SHOW");
-          this:RegisterEvent("TRADE_SKILL_SHOW");
+          self:RegisterEvent("BAG_UPDATE");
+          self:RegisterEvent("BAG_UPDATE_COOLDOWN");
+          self:RegisterEvent("ITEM_LOCK_CHANGED");
+	  self:RegisterEvent("UNIT_INVENTORY_CHANGED");
+	  self:RegisterEvent("UPDATE_INVENTORY_ALERTS");
+          self:RegisterEvent("PLAYER_LEAVING_WORLD");
+          self:RegisterEvent("CRAFT_SHOW");
+          self:RegisterEvent("TRADE_SKILL_SHOW");
 
-          this:RegisterEvent("AUCTION_HOUSE_SHOW");
---          this:RegisterEvent("AUCTION_HOUSE_CLOSED");
---          this:RegisterEvent("BANKFRAME_OPENED");
---          this:RegisterEvent("BANKFRAME_CLOSED");
-          this:RegisterEvent("MAIL_SHOW");
-          this:RegisterEvent("MAIL_INBOX_UPDATE");
---          this:RegisterEvent("MAIL_CLOSED");
-          this:RegisterEvent("MERCHANT_SHOW");
---          this:RegisterEvent("MERCHANT_CLOSED");
---          this:RegisterEvent("TRADE_SHOW");
---          this:RegisterEvent("TRADE_CLOSED");
+	  self:RegisterEvent("AUCTION_HOUSE_SHOW");
+--          self:RegisterEvent("AUCTION_HOUSE_CLOSED");
+--          self:RegisterEvent("BANKFRAME_OPENED");
+--          self:RegisterEvent("BANKFRAME_CLOSED");
+          self:RegisterEvent("MAIL_SHOW");
+          self:RegisterEvent("MAIL_INBOX_UPDATE");
+--          self:RegisterEvent("MAIL_CLOSED");
+          self:RegisterEvent("MERCHANT_SHOW");
+--          self:RegisterEvent("MERCHANT_CLOSED");
+--          self:RegisterEvent("TRADE_SHOW");
+--          self:RegisterEvent("TRADE_CLOSED");
         else
-          TInv_OnEvent(event);
+          TInv_OnEvent(self, event, ...);
         end
       </OnEvent> 
       <OnMouseDown>
-        TInv_OnMouseDown(arg1, this);
+        TInv_OnMouseDown(self, button);
       </OnMouseDown>
       <OnMouseUp>
-        TInv_StopMoving(this);
+        TInv_StopMoving(self);
       </OnMouseUp>
       <OnDragStart>
-        TInv_StartMoving(this);
+        TInv_StartMoving(self);
       </OnDragStart>
       <OnDragStop>
-        TInv_StopMoving(this);
+        TInv_StopMoving(self);
       </OnDragStop>
       <OnShow>
         PlaySound("igBackPackOpen");
 	TInv_UpdateWindow(TBAG_REQ_PART);
       </OnShow>
       <OnUpdate>
-        TBag_OnUpdate();
+        TBag_OnUpdate(self, elapsed);
       </OnUpdate>
       <OnHide>
         PlaySound("igBackPackClose");
-        TInv_StopMoving(this);
+        TInv_StopMoving(self);
       </OnHide>
     </Scripts>
   </Frame> 

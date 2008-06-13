@@ -299,13 +299,14 @@ function TInv_UpdateBagGfx()
   TBag_SetFreeStr(getglobal("TInvNumTotalText"), totalfree, totalsize, TInvCfg["show_bag_sizes"]);
 end
 
-function TInv_OnEvent(event)
+function TInv_OnEvent(self, event, ...)
   -- TBag_Print("TInv_Event: '"..event.."'");
 
   if ( TInvFrame:IsVisible() ) then
     if ( event == "BAG_UPDATE" ) then
       -- Only process events related to the inventory window
-      if (arg1 and TBag_Member(TInv_Bags, arg1)) then
+      local bag = select(1, ...)
+      if (bag and TBag_Member(TInv_Bags, bag)) then
         -- Stack the bags if we are in a state to
         if (CursorHasItem() == nil and CursorHasMoney() == nil and CursorHasSpell() == nil and TBag_IsStacking(TBAG_STACK_INV) == nil) then
           -- Stack the bags if configured to
@@ -322,13 +323,14 @@ function TInv_OnEvent(event)
       -- If we're given an argument check if it's a inventory bag and ignore the event
       -- if it isn't.  If not argument is passed we have to update the window 
       -- regardless.  /sigh
-      if (not arg1 or TBag_Member(TInv_Bags, arg1)) then
+      local bag = select(1, ...)
+      if (not bag or TBag_Member(TInv_Bags, bag)) then
         TInv_UpdateWindow();
       end
     elseif ( event == "ITEM_LOCK_CHANGED" ) then
-      -- arg1 = bag, arg2 = slot
-      if (arg1 and arg2 and type(arg2) == "number" and TBag_Member(TInv_Bags, arg1)) then
-        TBag_UpdateLockedItem(TINV_PLAYERID,getglobal(TBag_GetBagItemButtonName(arg1,arg2)));
+      local bag,slot = select(1, ...) 
+      if (bag and slot and type(slot) == "number" and TBag_Member(TInv_Bags, bag)) then
+        TBag_UpdateLockedItem(TINV_PLAYERID,getglobal(TBag_GetBagItemButtonName(bag,slot)));
       end
 --    elseif ( event == "AUCTION_HOUSE_CLOSED" ) then
 --      TInv_Close();
@@ -375,32 +377,32 @@ function TInv_OnEvent(event)
   TBag_PrintDEBUG("TInv_Event: Finished "..event);
 end
 
-function TInv_StartMoving(frame)
-  if ( not frame.isMoving ) and ( TInvCfg["moveLock"] == 1 ) then
-    frame:StartMoving();
-    frame.isMoving = true;
+function TInv_StartMoving(self)
+  if ( not self.isMoving ) and ( TInvCfg["moveLock"] == 1 ) then
+    self:StartMoving();
+    self.isMoving = true;
   end
 end
 
-function TInv_StopMoving(frame)
-  if ( frame.isMoving ) then
-    frame:StopMovingOrSizing();
-    frame.isMoving = false;
+function TInv_StopMoving(self)
+  if ( self.isMoving ) then
+    self:StopMovingOrSizing();
+    self.isMoving = false;
 
     -- save the position
-    TInvCfg["frameLEFT"] = frame:GetLeft() * frame:GetScale();
-    TInvCfg["frameRIGHT"] = frame:GetRight() * frame:GetScale();
-    TInvCfg["frameTOP"] = frame:GetTop() * frame:GetScale();
-    TInvCfg["frameBOTTOM"] = frame:GetBottom() * frame:GetScale();
+    TInvCfg["frameLEFT"] = self:GetLeft() * self:GetScale();
+    TInvCfg["frameRIGHT"] = self:GetRight() * self:GetScale();
+    TInvCfg["frameTOP"] = self:GetTop() * self:GetScale();
+    TInvCfg["frameBOTTOM"] = self:GetBottom() * self:GetScale();
 
     TBag_PrintDEBUG("new position:  top="..TInvCfg["frameTOP"]..", bottom="..TInvCfg["frameBOTTOM"]..", left="..TInvCfg["frameLEFT"]..", right="..TInvCfg["frameRIGHT"] );
   end
 end
 
-function TInv_OnMouseDown(button, frame)
+function TInv_OnMouseDown(self, button)
 
   if ( button == "LeftButton" ) then
-    TInv_StartMoving(frame);
+    TInv_StartMoving(self);
   elseif ( button == "RightButton" ) then
     HideDropDownMenu(1);
     TInv_RightClickMenu_mode = "mainwindow";
@@ -523,16 +525,16 @@ function TInv_ItemButton_OnEnter(self)
   end
 end
 
-function TInv_ItemButton_OnLeave()
-  local itm = TBag_GetItmFromFrame(TBAG_BUTTONS, this);
+function TInv_ItemButton_OnLeave(self)
+  local itm = TBag_GetItmFromFrame(TBAG_BUTTONS, self);
 
-  TBag_PrintDEBUG("TInv_ItemButton_OnLeave() this="..this:GetName().." id="..this:GetID().." parent"..this:GetParent():GetName().." id="..this:GetParent():GetID() );
+  TBag_PrintDEBUG("TInv_ItemButton_OnLeave() self="..self:GetName().." id="..self:GetID().." parent"..self:GetParent():GetName().." id="..self:GetParent():GetID() );
 
   if (TInv_edit_selected == "") then
     TInv_edit_hilight = "";
   end
-  this.updateTooltip = nil;
-  if ( GameTooltip:IsOwned(this) ) then
+  self.updateTooltip = nil;
+  if ( GameTooltip:IsOwned(self) ) then
     GameTooltip:Hide();
     ResetCursor();
   end
@@ -548,8 +550,8 @@ function TInv_ItemButton_OnLeave()
   end
 end
 
-function TInv_ItemButton_OnClick(button)
-  local itm = TBag_GetItmFromFrame(TBAG_BUTTONS, this);
+function TInv_ItemButton_OnClick(self, button)
+  local itm = TBag_GetItmFromFrame(TBAG_BUTTONS, self);
   local bar, bag, slot;
 
   if (itm ~= nil) then
@@ -583,7 +585,7 @@ function TInv_ItemButton_OnClick(button)
         [TBAG_I_BAG] = bag,
         [TBAG_I_SLOT] = slot
         };
-      ToggleDropDownMenu(1, nil, TInvFrame_RightClickMenu, this:GetName(), -50, 0);
+      ToggleDropDownMenu(1, nil, TInvFrame_RightClickMenu, self:GetName(), -50, 0);
     end
     TInv_UpdateWindow();
   end
@@ -682,11 +684,11 @@ function TInv_Button_MoveLockToggle_OnClick()
   end
 end
 
-function TInv_SlotTargetButton_OnClick(button, ignoreShift)
+function TInv_SlotTargetButton_OnClick(self, button)
   local bar, tmp;
 
   if (TInv_edit_mode == 1) then
-    for tmp in string.gmatch(this:GetName(), "TInvFrame_SlotTarget_(%d+)") do
+    for tmp in string.gmatch(self:GetName(), "TInvFrame_SlotTarget_(%d+)") do
       bar = tonumber(tmp);
     end
 
@@ -712,7 +714,7 @@ function TInv_SlotTargetButton_OnClick(button, ignoreShift)
       TInv_RightClickMenu_opts = {
         [TBAG_I_BAR] = bar
       };
-      ToggleDropDownMenu(1, nil, TInvFrame_RightClickMenu, this:GetName(), -50, 0);
+      ToggleDropDownMenu(1, nil, TInvFrame_RightClickMenu, self:GetName(), -50, 0);
     end
   end
 end
@@ -751,9 +753,9 @@ function TInv_SlotTargetButton_OnEnter(self)
   end
 end
 
-function TInv_SlotTargetButton_OnLeave()
-  this.updateTooltip = nil;
-  if ( GameTooltip:IsOwned(this) ) then
+function TInv_SlotTargetButton_OnLeave(self)
+  self.updateTooltip = nil;
+  if ( GameTooltip:IsOwned(self) ) then
     GameTooltip:Hide();
     ResetCursor();
   end
@@ -1655,8 +1657,8 @@ end
 
 
 -- Main "right click menu"
-function TInvFrame_RightClickMenu_OnLoad()
-  UIDropDownMenu_Initialize(this, TInvFrame_RightClickMenu_populate, "MENU");
+function TInvFrame_RightClickMenu_OnLoad(self)
+  UIDropDownMenu_Initialize(self, TInvFrame_RightClickMenu_populate, "MENU");
 end
 
 
@@ -1877,15 +1879,15 @@ function TInv_UpdateWindow(resort_req)
 
 end
 
-function TInv_UserDropdown_OnLoad()
-  UIDropDownMenu_Initialize(this, TInv_UserDropdown_Initialize);
-  UIDropDownMenu_SetSelectedValue(this, TINV_PLAYERID);
+function TInv_UserDropdown_OnLoad(self)
+  UIDropDownMenu_Initialize(self, TInv_UserDropdown_Initialize);
+  UIDropDownMenu_SetSelectedValue(self, TINV_PLAYERID);
   TInv_UserDropdown.tooltip = L["You are viewing the selected player's inventory."];
-  UIDropDownMenu_SetWidth(TBAG_USERDD_WIDTH, this);
+  UIDropDownMenu_SetWidth(TBAG_USERDD_WIDTH, self);
   -- UIDropDownMenu_SetWidth actually adds 50 to our width, we really only want
   -- 25 to avoid the control running into our buttons on the right.
-  this:SetWidth(TBAG_USERDD_WIDTH+25);
---  OptionsFrame_EnableDropDown(this);
+  self:SetWidth(TBAG_USERDD_WIDTH+25);
+--  OptionsFrame_EnableDropDown(self);
 end
 
 function TInv_UserDropdown_OnClick()

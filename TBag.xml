@@ -59,8 +59,8 @@
   <Frame name="TBag_UserDropdownTemplate" inherits="UIDropDownMenuTemplate" enableMouse="true" virtual="true">
   <Scripts>
     <OnEnter>
-      GameTooltip:SetOwner(this, "ANCHOR_TOPRIGHT");
-      GameTooltip:SetText(this.tooltip, nil, nil, nil, nil, 1);
+      GameTooltip:SetOwner(self, "ANCHOR_TOPRIGHT");
+      GameTooltip:SetText(self.tooltip, nil, nil, nil, nil, 1);
     </OnEnter>
     <OnLeave>
       GameTooltip:Hide();
@@ -76,27 +76,27 @@
         TBag_ClearSearch();
       </OnShow>
       <OnTabPressed>
-        this:ClearFocus();
+        self:ClearFocus();
       </OnTabPressed>
       <OnEscapePressed>
-        this:ClearFocus();
+        self:ClearFocus();
       </OnEscapePressed>
       <OnEnterPressed>
-        if (this:GetText() ~= "") then    
-	  TBag_DoSearch(this:GetText());
+        if (self:GetText() ~= "") then    
+	  TBag_DoSearch(self:GetText());
 	end
-        this:ClearFocus();
+        self:ClearFocus();
       </OnEnterPressed>
       <OnEditFocusLost>
-        this:HighlightText(0, 0);
-        if ( this:GetText() == "" ) then
+        self:HighlightText(0, 0);
+        if ( self:GetText() == "" ) then
           TBag_ClearSearch();
         end
       </OnEditFocusLost>
       <OnEditFocusGained>
-        this:HighlightText(0, 0);
-        if ( this:GetText() == SEARCH ) then
-          this:SetText("");
+        self:HighlightText(0, 0);
+        if ( self:GetText() == SEARCH ) then
+          self:SetText("");
         end
       </OnEditFocusGained>
     </Scripts>

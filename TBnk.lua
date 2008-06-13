@@ -321,7 +321,7 @@ function TBnk_InitBagGfx()
 end
 
 
-function TBnk_OnEvent(event)
+function TBnk_OnEvent(self, event, ...)
   -- TBag_Print("TBnk_OnEvent: '"..event.."'");
 
   if (event == "BANKFRAME_OPENED") then
@@ -339,7 +339,8 @@ function TBnk_OnEvent(event)
   if ( TBnkFrame:IsVisible() ) then
     if ( event == "BAG_UPDATE" ) then
       -- Only process for events that are related to the bank.
-      if (arg1 and TBag_Member(TBnk_Bags, arg1)) then
+      local bag = select(1, ...);
+      if (bag and TBag_Member(TBnk_Bags, bag)) then
         -- Stack the bags if we are in a state to
         if (CursorHasItem() == nil and CursorHasMoney() == nil and CursorHasSpell() == nil and TBag_IsStacking(TBAG_STACK_BNK) == nil) then
           -- Stack the bags if configured to
@@ -356,13 +357,14 @@ function TBnk_OnEvent(event)
       -- If we're given an argument check if it's a bank bag and ignore the event
       -- if it isn't.  If not argument is passed we have to update the window 
       -- regardless.  /sigh
-      if (not arg1 or TBag_Member(TBnk_Bags, arg1)) then	
+      local bag = select(1, ...)
+      if (not bag or TBag_Member(TBnk_Bags, bag)) then	
         TBnk_UpdateWindow();
       end
     elseif ( event == "ITEM_LOCK_CHANGED" ) then
-      -- arg1 = bag, arg2 = slot
-      if (arg1 and arg2 and type(arg2) == "number" and TBag_Member(TBnk_Bags, arg1)) then
-        TBag_UpdateLockedItem(TBNK_PLAYERID,getglobal(TBag_GetBagItemButtonName(arg1,arg2)));
+      local bag,slot = select(1, ...)
+      if (bag and slot and type(slot) == "number" and TBag_Member(TBnk_Bags, bag)) then
+        TBag_UpdateLockedItem(TBNK_PLAYERID,getglobal(TBag_GetBagItemButtonName(bag,slot)));
       end 
     else
       TBag_PrintDEBUG("OnEvent: No event handler found.");
@@ -374,32 +376,32 @@ function TBnk_OnEvent(event)
   TBag_PrintDEBUG("OnEvent: Finished "..event);
 end
 
-function TBnk_StartMoving(frame)
-  if ( not frame.isMoving ) and ( TBnkCfg["moveLock"] == 1 ) then
-    frame:StartMoving();
-    frame.isMoving = true;
+function TBnk_StartMoving(self)
+  if ( not self.isMoving ) and ( TBnkCfg["moveLock"] == 1 ) then
+    self:StartMoving();
+    self.isMoving = true;
   end
 end
 
-function TBnk_StopMoving(frame)
-  if ( frame.isMoving ) then
-    frame:StopMovingOrSizing();
-    frame.isMoving = false;
+function TBnk_StopMoving(self)
+  if ( self.isMoving ) then
+    self:StopMovingOrSizing();
+    self.isMoving = false;
 
     -- save the position
-    TBnkCfg["frameLEFT"] = frame:GetLeft() * frame:GetScale();
-    TBnkCfg["frameRIGHT"] = frame:GetRight() * frame:GetScale();
-    TBnkCfg["frameTOP"] = frame:GetTop() * frame:GetScale();
-    TBnkCfg["frameBOTTOM"] = frame:GetBottom() * frame:GetScale();
+    TBnkCfg["frameLEFT"] = self:GetLeft() * self:GetScale();
+    TBnkCfg["frameRIGHT"] = self:GetRight() * self:GetScale();
+    TBnkCfg["frameTOP"] = self:GetTop() * self:GetScale();
+    TBnkCfg["frameBOTTOM"] = self:GetBottom() * self:GetScale();
 
                 TBag_PrintDEBUG("new position:  top="..TBnkCfg["frameTOP"]..", bottom="..TBnkCfg["frameBOTTOM"]..", left="..TBnkCfg["frameLEFT"]..", right="..TBnkCfg["frameRIGHT"] );
         end
 end
 
-function TBnk_OnMouseDown(button, frame)
+function TBnk_OnMouseDown(self, button)
 
   if ( button == "LeftButton" ) then
-    TBnk_StartMoving(frame);
+    TBnk_StartMoving(self);
   elseif ( button == "RightButton" ) then
     HideDropDownMenu(1);
     TBnk_RightClickMenu_mode = "mainwindow";
@@ -511,16 +513,16 @@ function TBnk_ItemButton_OnEnter(self)
   end
 end
 
-function TBnk_ItemButton_OnLeave()
-  local itm = TBag_GetItmFromFrame(TBAG_BUTTONS, this);
+function TBnk_ItemButton_OnLeave(self)
+  local itm = TBag_GetItmFromFrame(TBAG_BUTTONS, self);
 
-  TBag_PrintDEBUG("EB_button: OnLeave()  this="..this:GetName() );
+  TBag_PrintDEBUG("EB_button: OnLeave()  self="..self:GetName() );
 
   if (TBnk_edit_selected == "") then
     TBnk_edit_hilight = "";
   end
-  this.updateTooltip = nil;
-  if ( GameTooltip:IsOwned(this) ) then
+  self.updateTooltip = nil;
+  if ( GameTooltip:IsOwned(self) ) then
     GameTooltip:Hide();
     ResetCursor();
   end
@@ -536,8 +538,8 @@ function TBnk_ItemButton_OnLeave()
   end
 end
 
-function TBnk_ItemButton_OnClick(button, ignoreShift)
-  local itm = TBag_GetItmFromFrame(TBAG_BUTTONS, this);
+function TBnk_ItemButton_OnClick(self, button)
+  local itm = TBag_GetItmFromFrame(TBAG_BUTTONS, self);
   local bar, bag, slot;
 
   if (itm ~= nil) then
@@ -571,7 +573,7 @@ function TBnk_ItemButton_OnClick(button, ignoreShift)
         [TBAG_I_BAG] = bag,
         [TBAG_I_SLOT] = slot
       };
-      ToggleDropDownMenu(1, nil, TBnkFrame_RightClickMenu, this:GetName(), -50, 0);
+      ToggleDropDownMenu(1, nil, TBnkFrame_RightClickMenu, self:GetName(), -50, 0);
     end
   else
     -- process normal clicks
@@ -587,12 +589,12 @@ function TBnk_ItemButton_OnClick(button, ignoreShift)
           return;
         end
         if ( MerchantFrame:IsShown() and IsModifiedClick("SPLITSTACK") ) then
-          this.SplitStack = function(button, split)
+          self.SplitStack = function(button, split)
             SplitContainerItem(itm[TBAG_I_BAG], itm[TBAG_I_SLOT], split);
             MerchantItemButton_OnClick("LeftButton");
           end
 
-          OpenStackSplitFrame(this.count, this, "BOTTOMRIGHT", "TOPRIGHT");
+          OpenStackSplitFrame(self.count, self, "BOTTOMRIGHT", "TOPRIGHT");
         else
           -- Shift-click is used for auto-looting and socketing
           UseContainerItem(itm[TBAG_I_BAG], itm[TBAG_I_SLOT]);
@@ -604,7 +606,7 @@ function TBnk_ItemButton_OnClick(button, ignoreShift)
   end
 end
 
-function TBnkFrameBagBank_OnClick()
+function TBnkFrameBagBank_OnClick(self)
 -- We need to find the function that drops into bank on right click
 --  local hadItem = PutItemInBag(BankButtonIDToInvSlotID(slot));
   local hadItem;
@@ -621,7 +623,7 @@ function TBnkFrameBagBank_OnClick()
   end
   if (IsModifiedClick("OPENALLBAGS") or
       (TBNK_ATBANK == 0 and TBnkCfg["show_Bag"..BANK_CONTAINER] == 0)) then
-    this:SetChecked(0);
+    self:SetChecked(0);
   end
   TBag_UpdateButtonHighlights();
 end
@@ -721,11 +723,11 @@ function TBnk_Button_MoveLockToggle_OnClick()
   end
 end
 
-function TBnk_SlotTargetButton_OnClick(button, ignoreShift)
+function TBnk_SlotTargetButton_OnClick(self, button)
   local bar, tmp;
 
   if (TBnk_edit_mode == 1) then
-  for tmp in string.gmatch(this:GetName(), "TBnkFrame_SlotTarget_(%d+)") do
+  for tmp in string.gmatch(self:GetName(), "TBnkFrame_SlotTarget_(%d+)") do
     bar = tonumber(tmp);
   end
 
@@ -753,7 +755,7 @@ function TBnk_SlotTargetButton_OnClick(button, ignoreShift)
     TBnk_RightClickMenu_opts = {
   [TBAG_I_BAR] = bar
   };
-    ToggleDropDownMenu(1, nil, TBnkFrame_RightClickMenu, this:GetName(), -50, 0);
+    ToggleDropDownMenu(1, nil, TBnkFrame_RightClickMenu, self:GetName(), -50, 0);
 
   end
   end
@@ -794,9 +796,9 @@ function TBnk_SlotTargetButton_OnEnter(self)
   end
 end
 
-function TBnk_SlotTargetButton_OnLeave()
-  this.updateTooltip = nil;
-  if ( GameTooltip:IsOwned(this) ) then
+function TBnk_SlotTargetButton_OnLeave(self, motion)
+  self.updateTooltip = nil;
+  if ( GameTooltip:IsOwned(self) ) then
     GameTooltip:Hide();
     ResetCursor();
   end
@@ -1733,8 +1735,8 @@ end
 
 
 -- Main "right click menu"
-function TBnkFrame_RightClickMenu_OnLoad()
-  UIDropDownMenu_Initialize(this, TBnkFrame_RightClickMenu_populate, "MENU");
+function TBnkFrame_RightClickMenu_OnLoad(self)
+  UIDropDownMenu_Initialize(self, TBnkFrame_RightClickMenu_populate, "MENU");
 end
 
 
@@ -1963,14 +1965,14 @@ function TBnk_SetReplaceBank()
 end
 
 
-function TBnk_UserDropdown_OnLoad()
-  UIDropDownMenu_Initialize(this, TBnk_UserDropdown_Initialize);
-  UIDropDownMenu_SetSelectedValue(this, TBNK_PLAYERID);
+function TBnk_UserDropdown_OnLoad(self)
+  UIDropDownMenu_Initialize(self, TBnk_UserDropdown_Initialize);
+  UIDropDownMenu_SetSelectedValue(self, TBNK_PLAYERID);
   TBnk_UserDropdown.tooltip = L["You are viewing the selected player's bank."];
   UIDropDownMenu_SetWidth(TBAG_USERDD_WIDTH, TBnk_UserDropdown);
   -- UIDropDownMenu_SetWidth actually adds 50 to our width, we really only want
   -- 25 to avoid the control running into our buttons on the right.
-  this:SetWidth(TBAG_USERDD_WIDTH + 25);
+  self:SetWidth(TBAG_USERDD_WIDTH + 25);
 --  OptionsFrame_EnableDropDown(TBnk_UserDropdown);
 end
 

@@ -27,16 +27,16 @@
         </Anchors>
         <Scripts>
           <OnLoad>
-            this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+            self:RegisterForClicks("LeftButtonUp", "RightButtonUp");
           </OnLoad>
           <OnClick>
-            TBnk_ItemButton_OnClick(arg1);
+            TBnk_ItemButton_OnClick(self, button, down);
           </OnClick>
           <OnEnter>
-            TBnk_ItemButton_OnEnter(self);
+            TBnk_ItemButton_OnEnter(self, motion);
           </OnEnter>
           <OnLeave>
-            TBnk_ItemButton_OnLeave();
+            TBnk_ItemButton_OnLeave(self, motion);
           </OnLeave>
         </Scripts>
       </Button>
@@ -56,16 +56,16 @@
     </Layers>
     <Scripts>
       <OnLoad>
-        this:RegisterEvent("MODIFIER_STATE_CHANGED");
-        this:RegisterForClicks("LeftButtonUp", "RightButtonUp");	   
-        BankFrameItemButton_OnLoad();
-	this.UpdateTooltip = TBnk_ItemButton_OnEnter;
+        self:RegisterEvent("MODIFIER_STATE_CHANGED");
+        self:RegisterForClicks("LeftButtonUp", "RightButtonUp");	   
+        BankFrameItemButton_OnLoad(self);
+	self.UpdateTooltip = TBnk_ItemButton_OnEnter;
       </OnLoad>
       <OnEnter>
-        TBnk_ItemButton_OnEnter(self);
+        TBnk_ItemButton_OnEnter(self, motion);
       </OnEnter>
       <OnLeave>
-        TBnk_ItemButton_OnLeave();
+        TBnk_ItemButton_OnLeave(self, motion);
       </OnLeave>
     </Scripts>
   </Button>
@@ -95,16 +95,16 @@
         </Anchors>
         <Scripts>
           <OnLoad>
-            this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+            self:RegisterForClicks("LeftButtonUp", "RightButtonUp");
           </OnLoad>
           <OnClick>
-            TBnk_ItemButton_OnClick(arg1);
+            TBnk_ItemButton_OnClick(self, button, down);
           </OnClick>
           <OnEnter>
-            TBnk_ItemButton_OnEnter(self);
+            TBnk_ItemButton_OnEnter(self, motion);
           </OnEnter>
           <OnLeave>
-            TBnk_ItemButton_OnLeave();
+            TBnk_ItemButton_OnLeave(self, motion);
           </OnLeave>
         </Scripts>
       </Button>
@@ -124,14 +124,14 @@
     </Layers>
     <Scripts>
       <OnLoad>
-        ContainerFrameItemButton_OnLoad();
-        this.UpdateTooltip = TBnk_ItemButton_OnEnter;
+        ContainerFrameItemButton_OnLoad(self);
+        self.UpdateTooltip = TBnk_ItemButton_OnEnter;
       </OnLoad>
       <OnEnter>
-        TBnk_ItemButton_OnEnter(self);
+        TBnk_ItemButton_OnEnter(self, motion);
       </OnEnter>
       <OnLeave>
-        TBnk_ItemButton_OnLeave();
+        TBnk_ItemButton_OnLeave(self, motion);
       </OnLeave>
     </Scripts>
   </Button>
@@ -165,31 +165,31 @@
       </Layer>
     </Layers>
     <Scripts>
-      <OnClick>
-        TBnk_SlotTargetButton_OnClick(arg1);
+      <OnClick> 
+        TBnk_SlotTargetButton_OnClick(self, button, down);
       </OnClick>
       <OnDragStart>
-        TBnk_SlotTargetButton_OnClick("LeftButton", 1);
+        TBnk_SlotTargetButton_OnClick(self, button);
       </OnDragStart>
       <OnReceiveDrag>
-        TBnk_SlotTargetButton_OnClick("LeftButton", 1);
+        TBnk_SlotTargetButton_OnClick(self, "LeftButton");
       </OnReceiveDrag>
       <OnLoad>
-        this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
-        this:RegisterForDrag("LeftButton");
-	ContainerFrameItemButton_OnLoad();	
-	this.UpdateTooltip = TBnk_SlotTargetButton_OnEnter;
+        self:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+        self:RegisterForDrag("LeftButton");
+	ContainerFrameItemButton_OnLoad(self);	
+	self.UpdateTooltip = TBnk_SlotTargetButton_OnEnter;
       </OnLoad>
       <OnHide>
-        if ( this.hasStackSplit and (this.hasStackSplit == 1) ) then
+        if ( self.hasStackSplit and (self.hasStackSplit == 1) ) then
           StackSplitFrame:Hide();
         end
       </OnHide>
       <OnEnter>
-        TBnk_SlotTargetButton_OnEnter(self);
+        TBnk_SlotTargetButton_OnEnter(self, motion);
       </OnEnter>
       <OnLeave>
-        TBnk_SlotTargetButton_OnLeave();
+        TBnk_SlotTargetButton_OnLeave(self, motion);
       </OnLeave>
     </Scripts>
   </Button>
@@ -198,24 +198,24 @@
     <Size><AbsDimension x="40" y="40"/></Size>
 		<Scripts>
 			<OnLoad>
-				BankFrameBagButton_OnLoad();
-				this.UpdateTooltip = TBnk_BankBagButton_OnEnter;
+				BankFrameBagButton_OnLoad(self);
+				self.UpdateTooltip = TBnk_BankBagButton_OnEnter;
 			</OnLoad>
 			<OnClick>
 				if ( IsModifiedClick("PICKUPACTION") ) then
 					BankFrameItemButtonBag_Pickup();
 				else
-					BankFrameItemButtonBag_OnClick(arg1);
+					BankFrameItemButtonBag_OnClick(button);
 				end
 			</OnClick>
 	        <OnDragStart>
 	            BankFrameItemButtonBag_Pickup();
 	        </OnDragStart>
 	        <OnReceiveDrag>
-	            BankFrameItemButtonBag_OnClick();
+	            BankFrameItemButtonBag_OnClick(button);
 	        </OnReceiveDrag>
       <OnEnter>
-        TBnk_BankBagButton_OnEnter(self);
+        TBnk_BankBagButton_OnEnter(self, motion);
       </OnEnter>
 		</Scripts>
 		<Frames>
@@ -360,7 +360,7 @@
         </Anchors>
         <Scripts>
           <OnClick>
-            TBnk_Button_MoveLockToggle_OnClick();
+            TBnk_Button_MoveLockToggle_OnClick(self, button, down);
           </OnClick>
           <OnEnter>
             if (TBnkCfg["moveLock"] == 0) then
@@ -388,7 +388,7 @@
         </Anchors>
         <Scripts>
           <OnShow>
-            TBnk_UserDropdown_OnLoad();
+            TBnk_UserDropdown_OnLoad(self);
           </OnShow>
         </Scripts>
       </Frame>
@@ -408,7 +408,7 @@
         </Anchors>
         <Scripts>
           <OnClick>
-            TBnk_Button_HighlightToggle_OnClick();
+            TBnk_Button_HighlightToggle_OnClick(self, button, down);
           </OnClick>
           <OnEnter>
             if (TBag_SrchText) then
@@ -440,7 +440,7 @@
         </Anchors>
         <Scripts>
           <OnClick>
-            TBnk_Button_ChangeEditMode_OnClick();
+            TBnk_Button_ChangeEditMode_OnClick(self, button, down);
           </OnClick>
           <OnEnter>
 		  GameTooltip_AddNewbieTip(TBAG_LOCALE["Toggle Edit Mode"], 1.0, 1.0, 1.0, TBAG_LOCALE["Select this option to move classes of items into different 'bars' (the red numbers)."]);
@@ -466,7 +466,7 @@
         </Anchors>
         <Scripts>
           <OnClick>
-            TBnk_Button_ShowPurchase_OnClick();
+            TBnk_Button_ShowPurchase_OnClick(self, button, down);
           </OnClick>
           <OnEnter>
 		  GameTooltip_AddNewbieTip(TBAG_LOCALE["Toggle Purchase Info"], 1.0, 1.0, 1.0, TBAG_LOCALE["Displays the purchase button and cost to buy a new bank slot.  This is disabled in read-only views and edit mode."]);
@@ -492,7 +492,7 @@
         </Anchors>
         <Scripts>
           <OnClick>
-            TBnk_Button_Reload_OnClick();
+            TBnk_Button_Reload_OnClick(self, button, down);
           </OnClick>
           <OnEnter>
 		  GameTooltip_AddNewbieTip(TBAG_LOCALE["Reload and Sort"], 1.0, 1.0, 1.0, TBAG_LOCALE["Reloads your items and sorts them."]);
@@ -573,7 +573,7 @@
             ResetCursor();
           </OnLeave>
           <OnClick>
-            TBnkFrameBagBank_OnClick();
+            TBnkFrameBagBank_OnClick(self, button, down);
           </OnClick>
         </Scripts>
         <CheckedTexture alphaMode="ADD" file="Interface\Buttons\CheckButtonHilight"/>
@@ -882,10 +882,10 @@
       <Frame name="$parent_RightClickMenu" inherits="UIDropDownMenuTemplate" id="1" hidden="true">
         <Scripts>
           <OnLoad>
-            this:RegisterEvent("VARIABLES_LOADED");
+            self:RegisterEvent("VARIABLES_LOADED");
           </OnLoad>
           <OnEvent>
-            TBnkFrame_RightClickMenu_OnLoad();
+            TBnkFrame_RightClickMenu_OnLoad(self);
           </OnEvent>
         </Scripts>
       </Frame>
@@ -893,36 +893,36 @@
 
     <Scripts>
       <OnLoad> 
-        this:RegisterEvent("VARIABLES_LOADED"); 
-	tinsert(UISpecialFrames,this:GetName());
+        self:RegisterEvent("VARIABLES_LOADED"); 
+	tinsert(UISpecialFrames,self:GetName());
       </OnLoad> 
       <OnEvent> 
         if (event == "VARIABLES_LOADED") then 
           TBnk_init(0);
-          this:RegisterEvent("BANKFRAME_OPENED");
-          this:RegisterEvent("BANKFRAME_CLOSED");
+          self:RegisterEvent("BANKFRAME_OPENED");
+	  self:RegisterEvent("BANKFRAME_CLOSED");
 
-          this:RegisterEvent("BAG_UPDATE");
-          this:RegisterEvent("BAG_UPDATE_COOLDOWN");
-          this:RegisterEvent("ITEM_LOCK_CHANGED");
+	  self:RegisterEvent("BAG_UPDATE");
+          self:RegisterEvent("BAG_UPDATE_COOLDOWN");
+          self:RegisterEvent("ITEM_LOCK_CHANGED");
 
-          this:RegisterEvent("PLAYERBANKSLOTS_CHANGED");
-          this:RegisterEvent("PLAYERBANKBAGSLOTS_CHANGED");
+          self:RegisterEvent("PLAYERBANKSLOTS_CHANGED");
+          self:RegisterEvent("PLAYERBANKBAGSLOTS_CHANGED");
         else
-          TBnk_OnEvent(event);
+          TBnk_OnEvent(self, event, ...);
         end
       </OnEvent> 
       <OnMouseDown>
-        TBnk_OnMouseDown(arg1, this);
+        TBnk_OnMouseDown(self, button);
       </OnMouseDown>
       <OnMouseUp>
-        TBnk_StopMoving(this);
+        TBnk_StopMoving(self);
       </OnMouseUp>
       <OnDragStart>
-        TBnk_StartMoving(this);
+        TBnk_StartMoving(self);
       </OnDragStart>
       <OnDragStop>
-        TBnk_StopMoving(this);
+        TBnk_StopMoving(self);
       </OnDragStop>
       <OnShow>
         PlaySound("igBackPackOpen");
@@ -931,11 +931,11 @@
       </OnShow>
       <OnHide>
         PlaySound("igBackPackClose");
-        TBnk_StopMoving(this);
+        TBnk_StopMoving(self);
         TBnk_Close();
     </OnHide>
     <OnUpdate>
-      TBag_OnUpdate();
+      TBag_OnUpdate(self, elapsed);
     </OnUpdate>
     </Scripts>
 
