@@ -1,7 +1,7 @@
 -- $Id$
 
 -- Localization Support
-local L = TBAG_LOCALE;
+local L = TBag.LOCALE;
 
 local TBnk_CfgOpt = {};
 
@@ -35,10 +35,10 @@ end
 function TBnkOpt_SwapSearchItems(unused_value, key1, key2)
   local tmp;
 
-  if ( (TBnkCfg["item_search_list"][key1] ~= nil) and (TBnkCfg["item_search_list"][key2] ~= nil) ) then
-    tmp = TBnkCfg["item_search_list"][key1];
-    TBnkCfg["item_search_list"][key1] = TBnkCfg["item_search_list"][key2];
-    TBnkCfg["item_search_list"][key2] = tmp;
+  if ( (TBnkFrame.cfg["item_search_list"][key1] ~= nil) and (TBnkFrame.cfg["item_search_list"][key2] ~= nil) ) then
+    tmp = TBnkFrame.cfg["item_search_list"][key1];
+    TBnkFrame.cfg["item_search_list"][key1] = TBnkFrame.cfg["item_search_list"][key2];
+    TBnkFrame.cfg["item_search_list"][key2] = tmp;
 
     if (key1 > key2) then
       TBnk_Opts_CurrentPosition = TBnk_Opts_CurrentPosition - 1;
@@ -52,14 +52,14 @@ end
 
 function TBnkOpt_ResizeUpdate()
   if (TBnkCfg) then
-    TBnk_CalcButtonSize(TBnkCfg["frameButtonSize"], TBnkCfg["framePad"]);
-    TBnk_UpdateWindow(TBAG_REQ_MUST);
+    TBnkFrame:CalcButtonSize(TBnkFrame.cfg["frameButtonSize"], TBnkFrame.cfg["framePad"]);
+    TBnkFrame:UpdateWindow(TBag.REQ_MUST);
   end
 end
 
 function TBnkOpt_ForceUpdate()
-  if (TBnkCfg) then
-    TBnk_UpdateWindow(TBAG_REQ_MUST);
+  if (TBnkFrame.cfg) then
+    TBnkFrame:UpdateWindow(TBag.REQ_MUST);
   end
 end
 
@@ -68,13 +68,13 @@ function TBnkOpt_CreateCfgOpt()
 
   TBnk_CfgOpt = {};
 
-  TBagOpt_CreateCfgOpt(TBnk_CfgOpt, TBnkCfg, TBnk_Bags, TBnk_UpdateWindow, 
+  TBag:CreateCfgOpt(TBnk_CfgOpt, TBnkFrame.cfg, TBnkFrame.bags, function () TBnkFrame:UpdateWindow() end, 
     TBnkOpt_ResizeUpdate, TBnkOpt_ForceUpdate);
 
-  TBagOpt_CreateNewOpt(TBnk_CfgOpt, TBnkCfg, TBnk_UpdateWindow);
+    TBag:CreateNewOpt(TBnk_CfgOpt, TBnkFrame.cfg, function () TBnkFrame:UpdateWindow() end);
 
-  TBagOpt_MakeItemSearchHeader(TBnk_CfgOpt);
-  TBagOpt_MakeItemSearch(TBnk_CfgOpt, TBnkCfg, TBnkOpt_SwapSearchItems);
+  TBag:MakeItemSearchHeader(TBnk_CfgOpt);
+  TBag:MakeItemSearch(TBnk_CfgOpt, TBnkFrame.cfg, TBnkOpt_SwapSearchItems);
 end
 
 
@@ -83,7 +83,7 @@ function TBnk_Options_InitWindow()
 
 	TBnk_Config_MaxScroll = math.max( 1, (table.getn(TBnk_CfgOpt)-TBnk_OptS_SCROLL_LINES)+2 );
 
-	TBag_PositionFrame( TBnk_OptsFrame_ScrollBar:GetName(), "TOPRIGHT",
+	TBag:PositionFrame( TBnk_OptsFrame_ScrollBar:GetName(), "TOPRIGHT",
 		TBnk_OptsFrame:GetName(), "TOPRIGHT",
 		0-(TBnk_Options_FRAME_BORDER),
 		0-(TBnk_Options_FRAME_BORDER+TBnk_OptS_SCROLLBARBUTTONHEIGHT),
@@ -101,16 +101,16 @@ function TBnk_Options_InitWindow()
 
 	TBnk_OptsFrame:SetBackdropColor(
 --	  TBag_GetColor(TBnkCfg, "bkgr_"..TBAG_MAIN_BAR)
-		TBagCfg["bar_colors_"..TBAG_MAIN_BAR.."_background_r"],
-		TBagCfg["bar_colors_"..TBAG_MAIN_BAR.."_background_g"],
-		TBagCfg["bar_colors_"..TBAG_MAIN_BAR.."_background_b"],
-		TBagCfg["bar_colors_"..TBAG_MAIN_BAR.."_background_a"] );
+		TBnkFrame.cfg["bar_colors_"..TBag.MAIN_BAR.."_background_r"],
+		TBnkFrame.cfg["bar_colors_"..TBag.MAIN_BAR.."_background_g"],
+		TBnkFrame.cfg["bar_colors_"..TBag.MAIN_BAR.."_background_b"],
+		TBnkFrame.cfg["bar_colors_"..TBag.MAIN_BAR.."_background_a"] );
 	TBnk_OptsFrame:SetBackdropBorderColor(
 --	  TBag_GetColor(TBnkCfg, "brdr_"..TBAG_MAIN_BAR)
-		TBagCfg["bar_colors_"..TBAG_MAIN_BAR.."_border_r"],
-		TBagCfg["bar_colors_"..TBAG_MAIN_BAR.."_border_g"],
-		TBagCfg["bar_colors_"..TBAG_MAIN_BAR.."_border_b"],
-		TBagCfg["bar_colors_"..TBAG_MAIN_BAR.."_border_a"] );
+		TBnkFrame.cfg["bar_colors_"..TBag.MAIN_BAR.."_border_r"],
+		TBnkFrame.cfg["bar_colors_"..TBag.MAIN_BAR.."_border_g"],
+		TBnkFrame.cfg["bar_colors_"..TBag.MAIN_BAR.."_border_b"],
+		TBnkFrame.cfg["bar_colors_"..TBag.MAIN_BAR.."_border_a"] );
 
 	TBnk_Options_UpdateWindow();
 end
@@ -141,7 +141,7 @@ function TBnk_Options_UpdateWindow()
 		else
 			use_fade = 1;
 		end
-		y = TBagOpt_EnableLine(
+		y = TBag:EnableLine(
 		getglobal("TBnk_OptsFrame_Line_"..(i+1)), "TBnk_OptsFrame", 
           TBnk_Options_FRAME_LINE_HEIGHT, TBnk_OptS_CONTROL_SLIDER_HEIGHT,
           TBnk_CfgOpt[i+current_Opt], y, x_start, x_width, use_fade );
@@ -157,7 +157,7 @@ end
 
 function TBnkOpts_AddCat()
   -- Add a blank entry
-  table.insert(TBnkCfg["item_search_list"], {L["UNKNOWN"], "", "", "", ""});
+  table.insert(TBnkFrame.cfg["item_search_list"], {L["UNKNOWN"], "", "", "", ""});
 
   -- Refresh the window, scrolling down to last entry
   TBnkOpt_CreateCfgOpt();

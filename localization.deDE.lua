@@ -9,7 +9,7 @@
 
 if GetLocale() ~= "deDE" then return end
 
-TBAG_LOCALE = setmetatable({
+TBag.LOCALE = setmetatable({
   [""] = "",  -- Needed to preserve nil returns
 
 -----------------------------------------------------------------------
@@ -38,6 +38,7 @@ TBAG_LOCALE = setmetatable({
 -- Other skills
   ["Lockpicking"] = "Schlo\195\159knacken",
   ["Poisons"] = "Gifte",
+  ["Runeforging"] = "Runeforging",
 
 -----------------------------------------------------------------------
 -- SKILLS REVERSE deDE -> enUS
@@ -65,6 +66,7 @@ TBAG_LOCALE = setmetatable({
 -- Other skills
   ["Schlo\195\159knacken"] = "Lockpicking",
   ["Gifte"] = "Poisons",
+  ["Runeforging"] = "Runeforging",
 
 
 -----------------------------------------------------------------------
@@ -219,6 +221,7 @@ TBAG_LOCALE = setmetatable({
   ["FIRST_AID"] = "ERSTE_HILFE",
   ["COOKING"] = "KOCHEN",
   ["FISHING"] = "ANGELN",
+  ["RUNEFORGING"] = "RUNEFORGING",
   ["TRADE_TOOL"] = "HANDELSWERKZEUG",
 
   -- Item slot categories
@@ -255,6 +258,7 @@ TBAG_LOCALE = setmetatable({
   ["SHAMAN"] = "SCHAMANE",
   ["WARRIOR"] = "KRIEGER",
   ["HUNTER"] = "J\195\132GER",
+  ["DEATHKNIGHT"] = "DEATHKNIGHT",
   ["CLASS_TOOL"] = "KLASSENWERKZEUG",
   ["CLASS_REAGENT"] = "KLASSENREAGENZ",
   
@@ -574,8 +578,10 @@ TBAG_LOCALE = setmetatable({
   ["Spirit Shard"] = "Geistsplitter",
   ["Use: Permanently"] = "Benutzen: .*dauerhaft",
   ["Hearthstone"] = "Ruhestein",
+  ["Scourgestone"] = "Scourgestone",
   ["Right Click to summon and dismiss"] = "Mit Rechtsklick .* beschw\195\182ren und freigeben%.", 
-  ["Summons or dismisses a Spirit of Summer"] = "Beschw\195\182rt einen Geist des Sommers oder gibt ihn frei",
+  ["Summons or dismisses a Spirit of"] = "Beschw\195\182rt einen Geist des Sommers oder gibt ihn frei",
+  ["Use: Teaches you how to summon this companion."] = "Use: Teaches you how to summon this companion.",
   ["Requires Riding %("] = "Ben\195\182tigt Reiten %(",
   ["%a+ Scarab"] = "%a+skarab\195\164us",
   ["%a+ Idol"] = "%a+g\195\182tze",
@@ -757,6 +763,7 @@ TBAG_LOCALE = setmetatable({
   ["Thieves' Tools"] = "Diebeswerkzeug",
   [" Totem"] = "totem",
   ["Soul Shard"] = "Seelensplitter",
+  ["Corpse Dust"] = "Corpse Dust",
   ["Target Dummy"] = "Zielattrappe",
   ["Elemental %a+"] = "Elementar%s?%a+",
   ["Essence of %a+"] = "Essenz de[sr] %a+",
@@ -782,4 +789,4 @@ TBAG_LOCALE = setmetatable({
   ["Greater %a+ Essence"] = "Gro\195\159e .*[Ee]ssenz",
   ["Small %a+ Shard"] = "Kleiner .*[Ss]plitter",
   ["Large %a+ Shard"] = "Gro\195\159er .*[Ss]plitter",
-}, { __index = TBAG_LOCALE }); 
+}, { __index = TBag.LOCALE }); 

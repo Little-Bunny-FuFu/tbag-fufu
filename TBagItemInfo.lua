@@ -9,10 +9,11 @@
 --- WILL BE OVERWRITTEN ON THE NEXT RELEASE OF THE ADDON!         ---
 ---------------------------------------------------------------------
 
+local TBag = _G.TBag
 
-local TBag_TradeCreations = {
-		[TBAG_S_UPDATE] = "1211753828",
-		[TBAG_S_VERSION] = 1,
+local TradeCreations = {
+		[TBag.S_UPDATE] = "1211753828",
+		[TBag.S_VERSION] = 1,
 		["Alchemy"] = {
 			["118"] = 1,
 			["858"] = 1,
@@ -1800,9 +1801,9 @@ local TBag_TradeCreations = {
 };
 
 
-local TBag_SecondCreations = {
-		[TBAG_S_UPDATE] = "1211753828",
-		[TBAG_S_VERSION] = 1,
+local SecondCreations = {
+		[TBag.S_UPDATE] = "1211753828",
+		[TBag.S_VERSION] = 1,
 		["Cooking"] = {
 			["724"] = 1,
 			["733"] = 1,
@@ -1941,9 +1942,9 @@ local TBag_SecondCreations = {
 };
 
 
-local TBag_SkillCreations = {
-		[TBAG_S_UPDATE] = "1211753828",
-		[TBAG_S_VERSION] = 1,
+local SkillCreations = {
+		[TBag.S_UPDATE] = "1211753828",
+		[TBag.S_VERSION] = 1,
 		["Mining"] = {
 			["2840"] = 1,
 			["2841"] = 1,
@@ -1997,9 +1998,9 @@ local TBag_SkillCreations = {
 };
 
 
-local TBag_Reagents = {
-		[TBAG_S_UPDATE] = "1211753828",
-		[TBAG_S_VERSION] = 1,
+local Reagents = {
+		[TBag.S_UPDATE] = "1211753828",
+		[TBag.S_VERSION] = 1,
 		["118"] = {
 			["Alchemy"] = {
 				["858"] =1,
@@ -11100,7 +11101,7 @@ local TBag_Reagents = {
 
 
 
-function TBag_MergeCreations(TBagCfg,tradetype,new)
+function TBag:MergeCreations(TBagCfg,tradetype,new)
   if TBagCfg[tradetype] == nil then
     TBagCfg[tradetype] = {};
   end
@@ -11118,55 +11119,55 @@ function TBag_MergeCreations(TBagCfg,tradetype,new)
   end
 end
 
-function TBag_RefreshCreations(TBagCfg)
-  if (TBagCfg[TBAG_S_TRADES] == nil or TBagCfg[TBAG_S_TRADES][TBAG_S_VERSION] ~= 1) then
-    TBagCfg[TBAG_S_TRADES] = TBag_TradeCreations;
-  elseif (TBagCfg[TBAG_S_TRADES][TBAG_S_UPDATE] == nil or
-          TBagCfg[TBAG_S_TRADES][TBAG_S_UPDATE] < TBag_TradeCreations[TBAG_S_UPDATE]) then
-    TBag_MergeCreations(TBagCfg,TBAG_S_TRADES,TBag_TradeCreations);
+function TBag:RefreshCreations(TBagCfg)
+  if (TBagCfg[self.S_TRADES] == nil or TBagCfg[self.S_TRADES][self.S_VERSION] ~= 1) then
+    TBagCfg[self.S_TRADES] = TradeCreations;
+  elseif (TBagCfg[self.S_TRADES][self.S_UPDATE] == nil or
+          TBagCfg[self.S_TRADES][self.S_UPDATE] < TradeCreations[self.S_UPDATE]) then
+    self:MergeCreations(TBagCfg,self.S_TRADES,TradeCreations);
   end
-  if (TBagCfg[TBAG_S_SECOND] == nil or TBagCfg[TBAG_S_SECOND][TBAG_S_VERSION] ~= 1) then
-    TBagCfg[TBAG_S_SECOND] = TBag_SecondCreations;
-  elseif (TBagCfg[TBAG_S_SECOND][TBAG_S_UPDATE] == nil or
-          TBagCfg[TBAG_S_SECOND][TBAG_S_UPDATE] < TBag_TradeCreations[TBAG_S_UPDATE]) then
-    TBag_MergeCreations(TBagCfg,TBAG_S_SECOND,TBag_SecondCreations);
+  if (TBagCfg[self.S_SECOND] == nil or TBagCfg[self.S_SECOND][self.S_VERSION] ~= 1) then
+    TBagCfg[self.S_SECOND] = SecondCreations;
+  elseif (TBagCfg[self.S_SECOND][self.S_UPDATE] == nil or
+          TBagCfg[self.S_SECOND][self.S_UPDATE] < TradeCreations[self.S_UPDATE]) then
+    self:MergeCreations(TBagCfg,self.S_SECOND,SecondCreations);
   end
-  if (TBagCfg[TBAG_S_SKILLS] == nil or TBagCfg[TBAG_S_SKILLS][TBAG_S_VERSION] ~= 1) then
-    TBagCfg[TBAG_S_SKILLS] = TBag_SkillCreations;
-  elseif (TBagCfg[TBAG_S_SKILLS][TBAG_S_UPDATE] == nil or
-          TBagCfg[TBAG_S_SKILLS][TBAG_S_UPDATE] < TBag_SkillCreations[TBAG_S_UPDATE]) then
-    TBag_MergeCreations(TBagCfg,TBAG_S_SKILLS,TBag_SkillCreations);
+  if (TBagCfg[self.S_SKILLS] == nil or TBagCfg[self.S_SKILLS][self.S_VERSION] ~= 1) then
+    TBagCfg[self.S_SKILLS] = SkillCreations;
+  elseif (TBagCfg[self.S_SKILLS][self.S_UPDATE] == nil or
+          TBagCfg[self.S_SKILLS][self.S_UPDATE] < SkillCreations[self.S_UPDATE]) then
+    self:MergeCreations(TBagCfg,self.S_SKILLS,SkillCreations);
   end
 end
 
-function TBag_MergeReagents(TBagCfg,new)
-  if TBagCfg[TBAG_S_REAGENT] == nil then
-    TBagCfg[TBAG_S_REAGENT] = {};
+function TBag:MergeReagents(TBagCfg,new)
+  if TBagCfg[self.S_REAGENT] == nil then
+    TBagCfg[self.S_REAGENT] = {};
   end
   for reagent,reagent_value in pairs(new) do
-    if (TBagCfg[TBAG_S_REAGENT][reagent] == nil) then
-      TBagCfg[TBAG_S_REAGENT][reagent] = {};
+    if (TBagCfg[self.S_REAGENT][reagent] == nil) then
+      TBagCfg[self.S_REAGENT][reagent] = {};
     end
     if (type(new[reagent]) == "table") then
       for trade,_ in pairs(new[reagent]) do
-        if (TBagCfg[TBAG_S_REAGENT][reagent][trade] == nil) then
-          TBagCfg[TBAG_S_REAGENT][reagent][trade] = {};
+        if (TBagCfg[self.S_REAGENT][reagent][trade] == nil) then
+          TBagCfg[self.S_REAGENT][reagent][trade] = {};
         end
         for itemid in pairs(new[reagent][trade]) do
-          TBagCfg[TBAG_S_REAGENT][reagent][trade][itemid] = 1;
+          TBagCfg[self.S_REAGENT][reagent][trade][itemid] = 1;
         end
       end
     else
-      TBagCfg[TBAG_S_REAGENT][reagent] = reagent_value;
+      TBagCfg[self.S_REAGENT][reagent] = reagent_value;
     end
   end
 end
 
-function TBag_RefreshReagents(TBagCfg)
-  if (TBagCfg[TBAG_S_REAGENT] == nil or TBagCfg[TBAG_S_REAGENT][TBAG_S_VERSION] ~= 1) then
-    TBagCfg[TBAG_S_REAGENT] = TBag_Reagents;
-  elseif (TBagCfg[TBAG_S_REAGENT][TBAG_S_UPDATE] == nil or
-          TBagCfg[TBAG_S_REAGENT][TBAG_S_UPDATE] < TBag_Reagents[TBAG_S_UPDATE]) then
-    TBag_MergeReagents(TBagCfg,TBag_Reagents);
+function TBag:RefreshReagents(TBagCfg)
+  if (TBagCfg[self.S_REAGENT] == nil or TBagCfg[self.S_REAGENT][self.S_VERSION] ~= 1) then
+    TBagCfg[self.S_REAGENT] = Reagents;
+  elseif (TBagCfg[self.S_REAGENT][self.S_UPDATE] == nil or
+          TBagCfg[self.S_REAGENT][self.S_UPDATE] < Reagents[self.S_UPDATE]) then
+    MergeReagents(TBagCfg,Reagents);
   end
 end

@@ -1,13 +1,15 @@
 -- $Id $
 
 -- Test harness don't bother to load if this isn't a dev version.
-if (not string.match(TBAG_VERSION,"-Alpha") and
-    not string.match(TBAG_VERSION,"-Beta")) then
+if (not string.match(TBag.VERSION,"-Alpha") and
+    not string.match(TBag.VERSION,"-Beta")) then
   return
 end
 
+local TBag = TBag
+
 -- Localization Support
-local L = TBAG_LOCALE;
+local L = TBag.LOCALE;
 
 -- Config table we'll use.
 local cfg = { }
@@ -41,6 +43,7 @@ local tests = {
 
   -- Hearthstones
   [6948] = L["HEARTH"],
+  [40582] = L["HEARTH"], -- New one for Deathknights
 
   -- Minipets
   [4401] = L["MINIPET"],  
@@ -406,11 +409,11 @@ local tests = {
 }
 
 local function build_itm(id,itm)
-  itm[TBAG_I_ITEMLINK] = "item:"..id..":0:0:0:0:0:0:0";
-  itm[TBAG_I_BAG] = 1;
-  itm[TBAG_I_SLOT] = 1;
-  itm[TBAG_I_NAME], itm[TBAG_I_TYPE], itm[TBAG_I_SUBTYPE], itm[TBAG_I_RARITY]
-    = TBag_GetItemInfo(itm[TBAG_I_ITEMLINK]);
+  itm[TBag.I_ITEMLINK] = "item:"..id..":0:0:0:0:0:0:0";
+  itm[TBag.I_BAG] = 1;
+  itm[TBag.I_SLOT] = 1;
+  itm[TBag.I_NAME], itm[TBag.I_TYPE], itm[TBag.I_SUBTYPE], itm[TBag.I_RARITY]
+    = TBag:GetItemInfo(itm[TBag.I_ITEMLINK]);
 end
 
 -- Executes a single test 
@@ -420,47 +423,47 @@ local function test(id,cat)
   local itm = { };
 
   build_itm(id,itm);
-  TBag_PickBar(cfg, "TBAGTEST|TBAGTEST", itm, "", "");
+  TBag:PickBar(cfg, "TBAGTEST|TBAGTEST", itm, "", "");
   
-  return (cat == itm[TBAG_I_CAT]), itm;
+  return (cat == itm[TBag.I_CAT]), itm;
 end
 
 
 
-function TBag_RunTests()
+function TBag:RunTests()
   local fail = false;
   -- Initialize the cfg with default values
-  TBag_InitDefVals(cfg, TInv_Bags, 0, 1);  
+  self:InitDefVals(cfg, self.Inv_Bags, 0, 1);  
 
-  TBag_Print(L["TEST RUN STARTING"]);
+  self:Print(L["TEST RUN STARTING"]);
   
   -- Run through all the test ids to get them cached.
   for id in pairs (tests) do
     local start = time();
     local itemlink = "item:"..id;
     repeat 
-      local tooltip = TBag_MakeToolTipStr(nil,itemlink)
+      local tooltip = self:MakeToolTipStr(nil,itemlink)
     until (tooltip ~= L[" Retrieving item information"] or time() - start >= 2)
   end
   
   for id,cat in pairs(tests) do
     local result, itm = test(id,cat)
-    local link = TBag_MakeHyperlink(itm[TBAG_I_ITEMLINK],itm[TBAG_I_NAME],
-                                    itm[TBAG_I_RARITY]);
+    local link = self:MakeHyperlink(itm[self.I_ITEMLINK],itm[self.I_NAME],
+                                    itm[self.I_RARITY]);
     link = tostring(link); 
     
     if (result == true) then
       local output = string.format(L["SUCCESS: %s"], link);
-      TBag_Print(output,0,1,0);
+      self:Print(output,0,1,0);
     else
       fail = true;
       local output = string.format(L["FAIL: %s (%s) expected %q but got %q"], link,
-                                   tostring(id),tostring(cat),tostring(itm[TBAG_I_CAT]));
-      TBag_Print(output,1,0,0);
+                                   tostring(id),tostring(cat),tostring(itm[self.I_CAT]));
+      self:Print(output,1,0,0);
     end
   end
 
   if (fail == false) then
-    TBag_Print(L["ALL TESTS SUCCESSFUL"]);
+    self:Print(L["ALL TESTS SUCCESSFUL"]);
   end
 end

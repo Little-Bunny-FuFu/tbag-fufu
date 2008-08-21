@@ -1,9 +1,9 @@
 <!-- $Id$ -->
 <Bindings>
   <Binding name="TINV_TOGGLE" header="TBag">
-    TInv_Toggle();
+    TInvFrame:Toggle();
   </Binding>
   <Binding name="TBNK_TOGGLE">
-    TBnk_Toggle();
+    TBnkFrame:Toggle();
   </Binding>
 </Bindings>

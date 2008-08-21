@@ -1,331 +1,8 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/"   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"   xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
   <Script file="TBnk.lua"/>
-  <Script file="TBnkHooks.lua"/>
 
-  <Button name="TBnk_BankItemButtonTemplate" inherits="BankItemButtonGenericTemplate" hidden="true" virtual="true">
-    <Size>
-      <AbsDimension x="40" y="40"/>
-    </Size>
-    <Anchors>
-      <Anchor point="CENTER">
-        <Offset>
-          <AbsDimension x="0" y="0"/>
-        </Offset>
-      </Anchor>
-    </Anchors>
+  <Frame name="TBnkFrame" inherits="TBag_MainTemplate"> 
     <Frames>
-      <Button name="$parent_EditButton" hidden="true">
-        <Size>
-          <AbsDimension x="40" y="40"/>
-        </Size>
-        <Anchors>
-          <Anchor point="CENTER">
-            <Offset>
-              <AbsDimension x="0" y="0"/>
-            </Offset>
-          </Anchor>
-        </Anchors>
-        <Scripts>
-          <OnLoad>
-            self:RegisterForClicks("LeftButtonUp", "RightButtonUp");
-          </OnLoad>
-          <OnClick>
-            TBnk_ItemButton_OnClick(self, button, down);
-          </OnClick>
-          <OnEnter>
-            TBnk_ItemButton_OnEnter(self, motion);
-          </OnEnter>
-          <OnLeave>
-            TBnk_ItemButton_OnLeave(self, motion);
-          </OnLeave>
-        </Scripts>
-      </Button>
-      <Cooldown name="$parent_Cooldown" inherits="CooldownFrameTemplate"/>
-      <Frame name="$parentHighlightFrame" setAllPoints="true">
-        <Layers>
-          <Layer>
-            <Texture name="$parentTexture" alphaMode="ADD" file="Interface\Buttons\CheckButtonHilight" setAllPoints="true" hidden="true"/>                  
-          </Layer>
-        </Layers>
-      </Frame>
-    </Frames>
-    <Layers>
-      <Layer frameStrata="BORDER">
-        <Texture name="$parent_bkgr" inherits="TBag_ButtonBkgrTemplate"/>
-      </Layer>
-    </Layers>
-    <Scripts>
-      <OnLoad>
-        self:RegisterEvent("MODIFIER_STATE_CHANGED");
-        self:RegisterForClicks("LeftButtonUp", "RightButtonUp");	   
-        BankFrameItemButton_OnLoad(self);
-	self.UpdateTooltip = TBnk_ItemButton_OnEnter;
-      </OnLoad>
-      <OnEnter>
-        TBnk_ItemButton_OnEnter(self, motion);
-      </OnEnter>
-      <OnLeave>
-        TBnk_ItemButton_OnLeave(self, motion);
-      </OnLeave>
-    </Scripts>
-  </Button>
-
-  <Button name="TBnk_ItemButtonTemplate" inherits="ContainerFrameItemButtonTemplate" hidden="true" virtual="true">
-    <Size>
-      <AbsDimension x="40" y="40"/>
-    </Size>
-    <Anchors>
-      <Anchor point="CENTER">
-        <Offset>
-          <AbsDimension x="0" y="0"/>
-        </Offset>
-      </Anchor>
-    </Anchors>
-    <Frames>
-      <Button name="$parent_EditButton" hidden="true">
-        <Size>
-          <AbsDimension x="40" y="40"/>
-        </Size>
-        <Anchors>
-          <Anchor point="CENTER">
-            <Offset>
-              <AbsDimension x="0" y="0"/>
-            </Offset>
-          </Anchor>
-        </Anchors>
-        <Scripts>
-          <OnLoad>
-            self:RegisterForClicks("LeftButtonUp", "RightButtonUp");
-          </OnLoad>
-          <OnClick>
-            TBnk_ItemButton_OnClick(self, button, down);
-          </OnClick>
-          <OnEnter>
-            TBnk_ItemButton_OnEnter(self, motion);
-          </OnEnter>
-          <OnLeave>
-            TBnk_ItemButton_OnLeave(self, motion);
-          </OnLeave>
-        </Scripts>
-      </Button>
-      <Cooldown name="$parent_Cooldown" inherits="CooldownFrameTemplate"/>
-      <Frame name="$parentHighlightFrame" setAllPoints="true">
-        <Layers>
-          <Layer>
-            <Texture name="$parentTexture" alphaMode="ADD" file="Interface\Buttons\CheckButtonHilight" setAllPoints="true" hidden="true"/>                  
-          </Layer>
-        </Layers>
-      </Frame>
-    </Frames>
-    <Layers>
-      <Layer frameStrata="BORDER">
-        <Texture name="$parent_bkgr" inherits="TBag_ButtonBkgrTemplate"/>
-      </Layer>
-    </Layers>
-    <Scripts>
-      <OnLoad>
-        ContainerFrameItemButton_OnLoad(self);
-        self.UpdateTooltip = TBnk_ItemButton_OnEnter;
-      </OnLoad>
-      <OnEnter>
-        TBnk_ItemButton_OnEnter(self, motion);
-      </OnEnter>
-      <OnLeave>
-        TBnk_ItemButton_OnLeave(self, motion);
-      </OnLeave>
-    </Scripts>
-  </Button>
-
-  <Button name="TBnk_SlotTargetTemplate" inherits="ItemButtonTemplate" hidden="true" virtual="true">
-    <Size>
-      <AbsDimension x="40" y="40"/>
-    </Size>
-    <Anchors>
-      <Anchor point="BOTTOMRIGHT">
-        <Offset>
-          <AbsDimension x="0" y="0"/>
-        </Offset>
-      </Anchor>
-    </Anchors>
-    <Layers>
-      <Layer level="OVERLAY">
-        <FontString name="$parent_BigText" inherits="TBag_BigFont" justifyH="CENTER">
-          <Anchors>
-            <Anchor point="LEFT" relativePoint="LEFT">
-              <Offset><AbsDimension x="-2" y="0"/></Offset>
-            </Anchor>
-            <Anchor point="RIGHT" relativePoint="RIGHT">
-              <Offset><AbsDimension x="2" y="0"/></Offset>
-            </Anchor>
-          </Anchors>
-        </FontString>
-      </Layer>
-      <Layer frameStrata="BORDER">
-        <Texture name="$parent_bkgr" inherits="TBag_ButtonBkgrTemplate"/>
-      </Layer>
-    </Layers>
-    <Scripts>
-      <OnClick> 
-        TBnk_SlotTargetButton_OnClick(self, button, down);
-      </OnClick>
-      <OnDragStart>
-        TBnk_SlotTargetButton_OnClick(self, button);
-      </OnDragStart>
-      <OnReceiveDrag>
-        TBnk_SlotTargetButton_OnClick(self, "LeftButton");
-      </OnReceiveDrag>
-      <OnLoad>
-        self:RegisterForClicks("LeftButtonUp", "RightButtonUp");
-        self:RegisterForDrag("LeftButton");
-	ContainerFrameItemButton_OnLoad(self);	
-	self.UpdateTooltip = TBnk_SlotTargetButton_OnEnter;
-      </OnLoad>
-      <OnHide>
-        if ( self.hasStackSplit and (self.hasStackSplit == 1) ) then
-          StackSplitFrame:Hide();
-        end
-      </OnHide>
-      <OnEnter>
-        TBnk_SlotTargetButton_OnEnter(self, motion);
-      </OnEnter>
-      <OnLeave>
-        TBnk_SlotTargetButton_OnLeave(self, motion);
-      </OnLeave>
-    </Scripts>
-  </Button>
-
-  <CheckButton name="TBnk_BankBagTemplate" inherits="BankItemButtonGenericTemplate" virtual="true">
-    <Size><AbsDimension x="40" y="40"/></Size>
-		<Scripts>
-			<OnLoad>
-				BankFrameBagButton_OnLoad(self);
-				self.UpdateTooltip = TBnk_BankBagButton_OnEnter;
-			</OnLoad>
-			<OnClick>
-				if ( IsModifiedClick("PICKUPACTION") ) then
-					BankFrameItemButtonBag_Pickup();
-				else
-					BankFrameItemButtonBag_OnClick(button);
-				end
-			</OnClick>
-	        <OnDragStart>
-	            BankFrameItemButtonBag_Pickup();
-	        </OnDragStart>
-	        <OnReceiveDrag>
-	            BankFrameItemButtonBag_OnClick(button);
-	        </OnReceiveDrag>
-      <OnEnter>
-        TBnk_BankBagButton_OnEnter(self, motion);
-      </OnEnter>
-		</Scripts>
-		<Frames>
-			<Frame name="$parentHighlightFrame" setAllPoints="true">
-				<Layers>
-					<Layer>
-						<Texture name="$parentTexture" alphaMode="ADD" file="Interface\Buttons\CheckButtonHilight" setAllPoints="true" hidden="true"/>									
-					</Layer>
-				</Layers>
-			</Frame>
-      <Frame name="$parentSpotlight" setAllPoints="true">
-        <Layers>
-          <Layer>
-            <Texture name="$parentTexture" alphaMode="ADD" file="Interface\Buttons\CheckButtonHilight" setAllPoints="true" hidden="true"/>                  
-          </Layer>
-        </Layers>
-      </Frame>
-		</Frames>
-        <CheckedTexture alphaMode="ADD" file="Interface\Buttons\CheckButtonHilight"/>
-  </CheckButton>
-
-  <Frame name="TBnkFrame" toplevel="true" frameStrata="MEDIUM" movable="true" enableMouse="true" hidden="true" parent="UIParent"> 
-    <Size><AbsDimension x="500" y="500"/></Size>
-    <Anchors>
-      <Anchor point="CENTER">
-        <Offset>
-          <AbsDimension x="0" y="0"/>
-        </Offset>
-      </Anchor>
-    </Anchors>
-    <Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
-      <EdgeSize>
-        <AbsValue val="4"/>
-      </EdgeSize>
-      <TileSize>
-        <AbsValue val="4"/>
-      </TileSize>
-      <BackgroundInsets>
-        <AbsInset left="2" right="2" top="2" bottom="2"/>
-      </BackgroundInsets>
-    </Backdrop>
-
-    <Frames>
-      <Button name="TBnk_Button_ColumnsAdd" visible="true" inherits="GameMenuButtonTemplate" text="++">
-        <Size><AbsDimension x="45" y="22"/></Size>
-        <Anchors>
-          <Anchor point="CENTER" relativePoint="CENTER">
-            <OffSet>
-              <AbsDimension x="24" y="0"/>
-            </OffSet>
-          </Anchor>
-          <Anchor point="BOTTOM" relativePoint="BOTTOM">
-            <Offset>
-              <AbsDimension x="0" y="5"/>
-            </Offset>
-          </Anchor>
-        </Anchors>
-        <Scripts>
-          <OnClick>
-            PlaySound("igMainMenuOptionCheckBoxOn");
-            TBnk_IncreaseColumns();
-          </OnClick>
-          <OnEnter>
-            GameTooltip_AddNewbieTip(
-              TBAG_LOCALE["Increase Window Size"],
-              1.0, 1.0, 1.0,
-              TBAG_LOCALE["Increase the number of columns displayed"] );
-          </OnEnter>
-          <OnLeave>
-            GameTooltip:Hide();
-            ResetCursor();
-          </OnLeave>
-        </Scripts>
-      </Button>
-
-      <Button name="TBnk_Button_ColumnsDel" visible="true" inherits="GameMenuButtonTemplate" text="--">
-        <Size><AbsDimension x="45" y="22"/></Size>
-        <Anchors>
-          <Anchor point="CENTER" relativePoint="CENTER">
-            <OffSet>
-              <AbsDimension x="-24" y="0"/>
-            </OffSet>
-          </Anchor>
-          <Anchor point="BOTTOM" relativePoint="BOTTOM">
-            <Offset>
-              <AbsDimension x="0" y="5"/>
-            </Offset>
-          </Anchor>
-        </Anchors>
-        <Scripts>
-
-          <OnClick>
-            PlaySound("igMainMenuOptionCheckBoxOn");
-            TBnk_DecreaseColumns();
-          </OnClick>
-
-          <OnEnter>
-            GameTooltip_AddNewbieTip(
-              TBAG_LOCALE["Decrease Window Size"],
-              1.0, 1.0, 1.0,
-	      TBAG_LOCALE["Decrease the number of columns displayed"] );
-          </OnEnter>
-          <OnLeave>
-            GameTooltip:Hide();
-            ResetCursor();
-          </OnLeave>
-        </Scripts>
-      </Button>
-
-
       <Button name="TBnk_Button_Close">
         <Size><AbsDimension x="34" y="34"/></Size>
         <NormalTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Up" />
@@ -340,7 +17,7 @@
         </Anchors>
         <Scripts>
           <OnClick>
-            TBnk_Close();
+            TBnkFrame:Hide();
           </OnClick>
         </Scripts>
       </Button>
@@ -360,15 +37,15 @@
         </Anchors>
         <Scripts>
           <OnClick>
-            TBnk_Button_MoveLockToggle_OnClick(self, button, down);
+            TBnkFrame.Button_MoveLockToggle_OnClick(self, button, down);
           </OnClick>
           <OnEnter>
-            if (TBnkCfg["moveLock"] == 0) then
-              GameTooltip_AddNewbieTip(TBAG_LOCALE["Unlock Window"], 1.0, 1.0, 1.0,
-                                       TBAG_LOCALE["Allow window to be moved by dragging it."]);
+            if (TBnkFrame.cfg["moveLock"] == 0) then
+              TBag:AddNewbieTip(self, TBag.LOCALE["Unlock Window"], 1.0, 1.0, 1.0,
+                                       TBag.LOCALE["Allow window to be moved by dragging it."]);
             else
-              GameTooltip_AddNewbieTip(TBAG_LOCALE["Lock Window"], 1.0, 1.0, 1.0,
-                                       TBAG_LOCALE["Prevent window from being moved by dragging it."]);
+              TBag:AddNewbieTip(self, TBag.LOCALE["Lock Window"], 1.0, 1.0, 1.0,
+                                       TBag.LOCALE["Prevent window from being moved by dragging it."]);
             end
           </OnEnter>
           <OnLeave>
@@ -388,7 +65,7 @@
         </Anchors>
         <Scripts>
           <OnShow>
-            TBnk_UserDropdown_OnLoad(self);
+            TBnkFrame.UserDropdown_OnLoad(self);
           </OnShow>
         </Scripts>
       </Frame>
@@ -408,15 +85,15 @@
         </Anchors>
         <Scripts>
           <OnClick>
-            TBnk_Button_HighlightToggle_OnClick(self, button, down);
+            TBnkFrame.Button_HighlightToggle_OnClick(self, button, down);
           </OnClick>
           <OnEnter>
-            if (TBag_SrchText) then
-            GameTooltip_AddNewbieTip(TBAG_LOCALE["Clear Search"], 1.0, 1.0, 1.0, TBAG_LOCALE["Stop highlighting search results."]);
-            elseif (TBnk_hilight_new == 0) then
-	    GameTooltip_AddNewbieTip(TBAG_LOCALE["Highlight New"], 1.0, 1.0, 1.0, TBAG_LOCALE["Highlight items marked as new."]);
+            if (TBag.SrchText) then
+            TBag:AddNewbieTip(self, TBag.LOCALE["Clear Search"], 1.0, 1.0, 1.0, TBag.LOCALE["Stop highlighting search results."]);
+            elseif (TBnkFrame.hilight_new == 0) then
+	    TBag:AddNewbieTip(self, TBag.LOCALE["Highlight New"], 1.0, 1.0, 1.0, TBag.LOCALE["Highlight items marked as new."]);
             else
-	    GameTooltip_AddNewbieTip(TBAG_LOCALE["Normal"], 1.0, 1.0, 1.0, TBAG_LOCALE["Stop highlighting new items."]);
+	    TBag:AddNewbieTip(self, TBag.LOCALE["Normal"], 1.0, 1.0, 1.0, TBag.LOCALE["Stop highlighting new items."]);
             end
           </OnEnter>
           <OnLeave>
@@ -440,10 +117,10 @@
         </Anchors>
         <Scripts>
           <OnClick>
-            TBnk_Button_ChangeEditMode_OnClick(self, button, down);
+            TBnkFrame.Button_ChangeEditMode_OnClick(self, button, down);
           </OnClick>
           <OnEnter>
-		  GameTooltip_AddNewbieTip(TBAG_LOCALE["Toggle Edit Mode"], 1.0, 1.0, 1.0, TBAG_LOCALE["Select this option to move classes of items into different 'bars' (the red numbers)."]);
+		  TBag:AddNewbieTip(self, TBag.LOCALE["Toggle Edit Mode"], 1.0, 1.0, 1.0, TBag.LOCALE["Select this option to move classes of items into different 'bars' (the red numbers)."]);
           </OnEnter>
           <OnLeave>
             GameTooltip:Hide();
@@ -466,10 +143,10 @@
         </Anchors>
         <Scripts>
           <OnClick>
-            TBnk_Button_ShowPurchase_OnClick(self, button, down);
+            TBnkFrame.Button_ShowPurchase_OnClick(self, button, down);
           </OnClick>
           <OnEnter>
-		  GameTooltip_AddNewbieTip(TBAG_LOCALE["Toggle Purchase Info"], 1.0, 1.0, 1.0, TBAG_LOCALE["Displays the purchase button and cost to buy a new bank slot.  This is disabled in read-only views and edit mode."]);
+		  TBag:AddNewbieTip(self, TBag.LOCALE["Toggle Purchase Info"], 1.0, 1.0, 1.0, TBag.LOCALE["Displays the purchase button and cost to buy a new bank slot.  This is disabled in read-only views and edit mode."]);
           </OnEnter>
           <OnLeave>
             GameTooltip:Hide();
@@ -492,10 +169,10 @@
         </Anchors>
         <Scripts>
           <OnClick>
-            TBnk_Button_Reload_OnClick(self, button, down);
+            TBnkFrame.Button_Reload_OnClick(self, button, down);
           </OnClick>
           <OnEnter>
-		  GameTooltip_AddNewbieTip(TBAG_LOCALE["Reload and Sort"], 1.0, 1.0, 1.0, TBAG_LOCALE["Reloads your items and sorts them."]);
+		  TBag:AddNewbieTip(self, TBag.LOCALE["Reload and Sort"], 1.0, 1.0, 1.0, TBag.LOCALE["Reloads your items and sorts them."]);
           </OnEnter>
           <OnLeave>
             GameTooltip:Hide();
@@ -504,82 +181,22 @@
         </Scripts>
       </Button>
 
-    <Frame name="TBnkNumTotal" parent="TBnkFrame">
-        <Size>
-            <AbsDimension x="28" y="28"/>
-        </Size>
-       <Anchors>
-          <Anchor point="BOTTOMLEFT">
-            <Offset>
-              <AbsDimension x="3" y="4"/>
-            </Offset>
-          </Anchor>
-        </Anchors>
-     <Layers>
-      <Layer level="ARTWORK">
-        <FontString name="$parentText" inherits="TBag_BigFont">
-          <Anchors>
-            <Anchor point="CENTER"/>
-          </Anchors>
-        </FontString>
-      </Layer>
-    </Layers>
-  </Frame>
-
-      <CheckButton name="TBnkFrameBagBank" inherits="ItemButtonTemplate" hidden="false" id="-1">
+      <CheckButton name="TBnkFrameBagBank" inherits="TBag_BagButtonTemplate" id="-1">
         <Anchors>
-          <Anchor point="BOTTOMLEFT" relativeTo="TBnkNumTotal" relativePoint="BOTTOMRIGHT">
+          <Anchor point="BOTTOMLEFT" relativeTo="$parent_Total" relativePoint="BOTTOMRIGHT">
             <Offset>
               <AbsDimension x="3" y="2"/>
             </Offset>
           </Anchor>
         </Anchors>
-     <Frames>
-      <Frame name="$parentSpotlight" setAllPoints="true">
-        <Layers>
-          <Layer>
-            <Texture name="$parentTexture" alphaMode="ADD" file="Interface\Buttons\CheckButtonHilight" setAllPoints="true" hidden="true"/>                  
-          </Layer>
-        </Layers>
-      </Frame>
-      <Frame name="$parentHighlightFrame" setAllPoints="true">
-        <Layers>
-          <Layer>
-            <Texture name="$parentTexture" alphaMode="ADD" file="Interface\Buttons\CheckButtonHilight" setAllPoints="true" hidden="true"/>                  
-          </Layer>
-        </Layers>
-      </Frame>
-     </Frames>
-                <Layers>
-                    <Layer>
-                      <Texture name="$parent_bkgr" file="Interface\Icons\INV_Box_03" hidden="false">
-                        <Anchor point="CENTER" relativeTo="$parent" relativePoint="CENTER">
-              <Offset>
-                <AbsDimension x="0" y="0"/>
-              </Offset>
-              </Anchor>
-                        </Texture>
-                    </Layer>
-                </Layers>
         <Scripts>
-          <OnEnter>
-            GameTooltip:SetOwner(self, "ANCHOR_LEFT");
-            GameTooltip:ClearLines();
-            GameTooltip:AddLine(self.tooltip);
-            GameTooltip:Show();
-          </OnEnter>
-          <OnLeave>
-            GameTooltip:Hide();
-            ResetCursor();
-          </OnLeave>
-          <OnClick>
-            TBnkFrameBagBank_OnClick(self, button, down);
-          </OnClick>
+          <OnLoad>
+            TBag.BagButton.OnLoad(self)
+            self:SetID(BANK_CONTAINER)
+          </OnLoad>
         </Scripts>
-        <CheckedTexture alphaMode="ADD" file="Interface\Buttons\CheckButtonHilight"/>
-      </CheckButton>
-
-      <CheckButton name="TBnkFrameBag1" inherits="TBnk_BankBagTemplate" id="5">
+      </CheckButton> 
+      <CheckButton name="TBnkFrameBag1" inherits="TBag_BagButtonTemplate" id="5">
         <Anchors>
           <Anchor point="LEFT" relativeTo="TBnkFrameBagBank" relativePoint="RIGHT">
             <Offset>
@@ -588,7 +205,7 @@
           </Anchor>
         </Anchors>
       </CheckButton>
-      <CheckButton name="TBnkFrameBag2" inherits="TBnk_BankBagTemplate" id="6">
+      <CheckButton name="TBnkFrameBag2" inherits="TBag_BagButtonTemplate" id="6">
         <Anchors>
           <Anchor point="BOTTOMLEFT" relativeTo="TBnkFrameBag1" relativePoint="BOTTOMRIGHT">
             <Offset>
@@ -597,7 +214,7 @@
           </Anchor>
         </Anchors>
       </CheckButton>
-      <CheckButton name="TBnkFrameBag3" inherits="TBnk_BankBagTemplate" id="7">
+      <CheckButton name="TBnkFrameBag3" inherits="TBag_BagButtonTemplate" id="7">
         <Anchors>
           <Anchor point="BOTTOMLEFT" relativeTo="TBnkFrameBag2" relativePoint="BOTTOMRIGHT">
             <Offset>
@@ -606,7 +223,7 @@
           </Anchor>
         </Anchors>
       </CheckButton>
-      <CheckButton name="TBnkFrameBag4" inherits="TBnk_BankBagTemplate" id="8">
+      <CheckButton name="TBnkFrameBag4" inherits="TBag_BagButtonTemplate" id="8">
         <Anchors>
           <Anchor point="BOTTOMLEFT" relativeTo="TBnkFrameBag3" relativePoint="BOTTOMRIGHT">
             <Offset>
@@ -615,7 +232,7 @@
           </Anchor>
         </Anchors>
       </CheckButton>
-      <CheckButton name="TBnkFrameBag5" inherits="TBnk_BankBagTemplate" id="9">
+      <CheckButton name="TBnkFrameBag5" inherits="TBag_BagButtonTemplate" id="9">
         <Anchors>
           <Anchor point="BOTTOMLEFT" relativeTo="TBnkFrameBag4" relativePoint="BOTTOMRIGHT">
             <Offset>
@@ -624,7 +241,7 @@
           </Anchor>
         </Anchors>
       </CheckButton>
-      <CheckButton name="TBnkFrameBag6" inherits="TBnk_BankBagTemplate" id="10">
+      <CheckButton name="TBnkFrameBag6" inherits="TBag_BagButtonTemplate" id="10">
         <Anchors>
           <Anchor point="BOTTOMLEFT" relativeTo="TBnkFrameBag5" relativePoint="BOTTOMRIGHT">
             <Offset>
@@ -633,7 +250,7 @@
           </Anchor>
         </Anchors>
       </CheckButton>
-      <CheckButton name="TBnkFrameBag7" inherits="TBnk_BankBagTemplate" id="11">
+      <CheckButton name="TBnkFrameBag7" inherits="TBag_BagButtonTemplate" id="11">
         <Anchors>
           <Anchor point="BOTTOMLEFT" relativeTo="TBnkFrameBag6" relativePoint="BOTTOMRIGHT">
             <Offset>
@@ -642,187 +259,6 @@
           </Anchor>
         </Anchors>
       </CheckButton>
-
-  <Frame name="TBnkNumBank" visible="true" parent="TBnkFrameBagBank">
-        <Size>
-            <AbsDimension x="40" y="30"/>
-        </Size>
-        <Anchors>
-            <Anchor point="CENTER"/>
-        </Anchors>
-    <Layers>
-      <Layer level="ARTWORK">
-        <FontString name="$parentText" inherits="NumberFontNormal" justifyH="CENTER">
-          <Anchors>
-          <Anchor point="CENTER">
-            <Offset><AbsDimension x="1" y="0"/></Offset>
-          </Anchor>
-          </Anchors>
-        </FontString>
-      </Layer>
-    </Layers>
-  </Frame>
-  <Frame name="TBnkNum5" visible="true" parent="TBnkFrameBag1">
-        <Size>
-            <AbsDimension x="40" y="30"/>
-        </Size>
-        <Anchors>
-            <Anchor point="CENTER"/>
-        </Anchors>
-    <Layers>
-      <Layer level="ARTWORK">
-        <FontString name="$parentText" inherits="NumberFontNormal" justifyH="CENTER">
-          <Anchors>
-          <Anchor point="CENTER">
-            <Offset><AbsDimension x="1" y="0"/></Offset>
-          </Anchor>
-          </Anchors>
-        </FontString>
-      </Layer>
-    </Layers>
-  </Frame>
-  <Frame name="TBnkNum6" visible="true" parent="TBnkFrameBag2">
-        <Size>
-            <AbsDimension x="40" y="30"/>
-        </Size>
-        <Anchors>
-            <Anchor point="CENTER"/>
-        </Anchors>
-    <Layers>
-      <Layer level="ARTWORK">
-        <FontString name="$parentText" inherits="NumberFontNormal" justifyH="CENTER">
-          <Anchors>
-          <Anchor point="CENTER">
-            <Offset><AbsDimension x="1" y="0"/></Offset>
-          </Anchor>
-          </Anchors>
-        </FontString>
-      </Layer>
-    </Layers>
-  </Frame>
-  <Frame name="TBnkNum7" visible="true" parent="TBnkFrameBag3">
-        <Size>
-            <AbsDimension x="40" y="30"/>
-        </Size>
-        <Anchors>
-            <Anchor point="CENTER"/>
-        </Anchors>
-    <Layers>
-      <Layer level="ARTWORK">
-        <FontString name="$parentText" inherits="NumberFontNormal" justifyH="CENTER">
-          <Anchors>
-          <Anchor point="CENTER">
-            <Offset><AbsDimension x="1" y="0"/></Offset>
-          </Anchor>
-          </Anchors>
-        </FontString>
-      </Layer>
-    </Layers>
-  </Frame>
-  <Frame name="TBnkNum8" visible="true" parent="TBnkFrameBag4">
-        <Size>
-            <AbsDimension x="40" y="30"/>
-        </Size>
-        <Anchors>
-            <Anchor point="CENTER"/>
-        </Anchors>
-    <Layers>
-      <Layer level="ARTWORK">
-        <FontString name="$parentText" inherits="NumberFontNormal" justifyH="CENTER">
-          <Anchors>
-          <Anchor point="CENTER">
-            <Offset><AbsDimension x="1" y="0"/></Offset>
-          </Anchor>
-          </Anchors>
-        </FontString>
-      </Layer>
-    </Layers>
-  </Frame>
-  <Frame name="TBnkNum9" visible="true" parent="TBnkFrameBag5">
-        <Size>
-            <AbsDimension x="40" y="30"/>
-        </Size>
-        <Anchors>
-            <Anchor point="CENTER"/>
-        </Anchors>
-    <Layers>
-      <Layer level="ARTWORK">
-        <FontString name="$parentText" inherits="NumberFontNormal" justifyH="CENTER">
-          <Anchors>
-          <Anchor point="CENTER">
-            <Offset><AbsDimension x="1" y="0"/></Offset>
-          </Anchor>
-          </Anchors>
-        </FontString>
-      </Layer>
-    </Layers>
-  </Frame>
-  <Frame name="TBnkNum10" visible="true" parent="TBnkFrameBag6">
-        <Size>
-            <AbsDimension x="40" y="30"/>
-        </Size>
-        <Anchors>
-          <Anchor point="CENTER"/>
-        </Anchors>
-    <Layers>
-      <Layer level="ARTWORK">
-        <FontString name="$parentText" inherits="NumberFontNormal" justifyH="CENTER">
-          <Anchors>
-          <Anchor point="CENTER">
-            <Offset><AbsDimension x="1" y="0"/></Offset>
-          </Anchor>
-          </Anchors>
-        </FontString>
-      </Layer>
-    </Layers>
-  </Frame>
-  <Frame name="TBnkNum11" visible="true" parent="TBnkFrameBag7">
-        <Size>
-            <AbsDimension x="40" y="30"/>
-        </Size>
-        <Anchors>
-          <Anchor point="CENTER"/>
-        </Anchors>
-    <Layers>
-      <Layer level="ARTWORK">
-        <FontString name="$parentText" inherits="NumberFontNormal" justifyH="CENTER">
-          <Anchors>
-          <Anchor point="CENTER">
-            <Offset><AbsDimension x="1" y="0"/></Offset>
-          </Anchor>
-          </Anchors>
-        </FontString>
-      </Layer>
-    </Layers>
-  </Frame>
-
-      <Frame name="TBnk_MoneyFrame" inherits="SmallMoneyFrameTemplate" hidden="false">
-      <Size><AbsDimension x="22" y="25"/></Size>
-        <Anchors>
-          <Anchor point="BOTTOMRIGHT">
-            <Offset>
-              <AbsDimension x="5" y="5"/>
-            </Offset>
-          </Anchor>
-        </Anchors>
-      </Frame>
-
-      <Frame name="TBnk_MoneyViewFrame" inherits="SmallMoneyFrameTemplate" hidden="true">
-      <Size><AbsDimension x="22" y="25"/></Size>
-        <Anchors>
-          <Anchor point="BOTTOMRIGHT">
-            <Offset>
-              <AbsDimension x="5" y="5"/>
-            </Offset>
-          </Anchor>
-        </Anchors>
-        <Scripts>
-          <OnLoad>
-            SmallMoneyFrame_OnLoad();
-            MoneyFrame_SetType("STATIC");
-          </OnLoad>
-        </Scripts>
-      </Frame>
 
       <Frame name="TBnk_SlotCostFrame" inherits="SmallMoneyFrameTemplate" hidden="false">
       <Size><AbsDimension x="10" y="25"/></Size>
@@ -835,8 +271,12 @@
         </Anchors>
         <Scripts>
           <OnLoad>
-            SmallMoneyFrame_OnLoad();
-            MoneyFrame_SetType("STATIC");
+	    SmallMoneyFrame_OnLoad(self)
+	    if TBag.WoTLK then
+	      MoneyFrame_SetType(self, "STATIC")
+	    else
+	      MoneyFrame_SetType("STATIC")
+	    end
           </OnLoad>
         </Scripts>
       </Frame>
@@ -865,12 +305,12 @@
           <OnClick>
             PlaySound("igMainMenuOption");
             PurchaseSlot();
-            TBnk_UpdateBagGfx();
+	    TBnkFrame:UpdateBagGfx();
           </OnClick>
         </Scripts>
       </Button>
 
-  <Frame name="TBnkFrame" inherits="TBagainerFrameTemplate" id="0"/>
+  <Frame name="TBnkainerFrame4" inherits="TBagainerFrameTemplate" id="0"/>
   <Frame name="TBnkainerFrame5" inherits="TBagainerFrameTemplate" id="5"/>
   <Frame name="TBnkainerFrame6" inherits="TBagainerFrameTemplate" id="6"/>
   <Frame name="TBnkainerFrame7" inherits="TBagainerFrameTemplate" id="7"/>
@@ -885,7 +325,7 @@
             self:RegisterEvent("VARIABLES_LOADED");
           </OnLoad>
           <OnEvent>
-            TBnkFrame_RightClickMenu_OnLoad(self);
+            TBag.Bank.RightClickMenu_OnLoad(self);
           </OnEvent>
         </Scripts>
       </Frame>
@@ -898,7 +338,7 @@
       </OnLoad> 
       <OnEvent> 
         if (event == "VARIABLES_LOADED") then 
-          TBnk_init(0);
+          TBag.Bank:init(0);
           self:RegisterEvent("BANKFRAME_OPENED");
 	  self:RegisterEvent("BANKFRAME_CLOSED");
 
@@ -909,33 +349,11 @@
           self:RegisterEvent("PLAYERBANKSLOTS_CHANGED");
           self:RegisterEvent("PLAYERBANKBAGSLOTS_CHANGED");
         else
-          TBnk_OnEvent(self, event, ...);
+          self:OnEvent(event, ...);
         end
       </OnEvent> 
-      <OnMouseDown>
-        TBnk_OnMouseDown(self, button);
-      </OnMouseDown>
-      <OnMouseUp>
-        TBnk_StopMoving(self);
-      </OnMouseUp>
-      <OnDragStart>
-        TBnk_StartMoving(self);
-      </OnDragStart>
-      <OnDragStop>
-        TBnk_StopMoving(self);
-      </OnDragStop>
-      <OnShow>
-        PlaySound("igBackPackOpen");
-        TBnk_Open();
-        TBnk_UpdateWindow(TBAG_REQ_PART);
-      </OnShow>
-      <OnHide>
-        PlaySound("igBackPackClose");
-        TBnk_StopMoving(self);
-        TBnk_Close();
-    </OnHide>
     <OnUpdate>
-      TBag_OnUpdate(self, elapsed);
+      TBag.OnUpdate(self, elapsed);
     </OnUpdate>
     </Scripts>
 

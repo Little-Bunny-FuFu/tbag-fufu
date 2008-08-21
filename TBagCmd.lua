@@ -1,8 +1,10 @@
 -- $Id$
 
--- Localization support
-local L = TBAG_LOCALE;
+local _G = _G
+local TBag = _G.TBag
 
+-- Localization support
+local L = TBag.LOCALE;
 
 local TBNK_HELP = {
     L["TBnk Commands:"],
@@ -33,95 +35,95 @@ local TINV_HELP = {
 };
 
 
-function TBag_ShowHelp(arr)
+function TBag:ShowHelp(arr)
   for _, line in ipairs(arr) do
-    TBag_Print(line);
+    self:Print(line);
   end
 end
 
 function TBnk_cmd(msg)
-  local cmd, params = TBag_SplitStr(msg," ");
+  local cmd, params = TBag:SplitStr(msg," ");
   
   cmd = string.lower(cmd);
 
   if (cmd == L["hide"]) then
-    TBnk_Close();
+    TBnkFrame:Hide();
   elseif (cmd == L["show"]) then
-    TBnk_Open();
+    TBnkFrame:Show();
   elseif (cmd == L["update"]) then
-    TBnk_UpdateWindow(TBAG_REQ_MUST);
+    TBnkFrame:UpdateWindow(TBag.REQ_MUST);
   elseif (cmd == L["debug"]) then
-    if (TBnk_DEBUGMESSAGES == 0) then
-      TBnk_DEBUGMESSAGES = 1;
-      TBag_Print("TBnk: Debugging messages on.");
+    if (TBag.DEBUGMESSAGES == 0) then
+      TBag.DEBUGMESSAGES = 1;
+      TBag:Print("TBnk: Debugging messages on.");
     else
-      TBnk_DEBUGMESSAGES = 0;
-      TBag_Print("TBnk: Debugging messages off.");
+      TBag.DEBUGMESSAGES = 0;
+      TBag:Print("TBnk: Debugging messages off.");
     end
   elseif (cmd == L["reset"]) then
     TBagCfg["Bnk"] = {};
-    TBnk_init(1);
+    TBnkFrame:init(1);
     TBnkOpt_ResizeUpdate();
   elseif (cmd == L["resetsorts"]) then
-    TBag_ResetSorts(TBnkCfg);
-    TBnk_UpdateWindow(TBAG_REQ_MUST);
+    TBag:ResetSorts(TBnkFrame.cfg);
+    TBnkFrame:UpdateWindow(TBag.REQ_MUST);
   elseif (cmd == L["resetpos"]) then
-    TBnk_SetDefPos(TBnkCfg,1);
-    TBnk_UpdateWindow(TBAG_REQ_MUST);
+    TBnkFrame:SetDefPos(TBnkFrame.cfg,1);
+    TBnkFrame:UpdateWindow(TBag.REQ_MUST);
   elseif (cmd == L["printchars"]) then
-    TBag_PrintCachedCharacters();
+    TBag:PrintCachedCharacters();
   elseif (cmd == L["deletechar"]) then
-    local char, realm = TBag_SplitStr(params," ");
-    TBag_DeleteCachedCharacter(char,realm); 
+    local char, realm = TBag:SplitStr(params," ");
+    TBag:DeleteCachedCharacter(char,realm); 
   elseif (cmd == L["config"]) then
     TBnk_OptsFrame:Show();
-  elseif (cmd == L["tests"] and TBag_RunTests and type(TBag_RunTests) == "function") then
-    TBag_RunTests();
+  elseif (cmd == L["tests"] and TBag.RunTests and type(TBag.RunTests) == "function") then
+    TBag:RunTests();
   else
-    TBag_ShowHelp(TBNK_HELP);
+    TBag:ShowHelp(TBNK_HELP);
   end
 end
 
 
 function TInv_cmd(msg)
-  local cmd, params = TBag_SplitStr(msg," ");
+  local cmd, params = TBag:SplitStr(msg," ");
   
   cmd = string.lower(cmd);
 
   if (cmd == L["hide"]) then
-    TInv_Close();
+    TInvFrame:Hide();
   elseif (cmd == L["show"]) then
-    TInv_Open();
+    TInvFrame:Show();
   elseif (cmd == L["update"]) then
-    TInv_UpdateWindow(TBAG_REQ_MUST);
+    TInvFrame:UpdateWindow(TBag.REQ_MUST);
   elseif (cmd == L["debug"]) then
-    if (TINV_DEBUGMESSAGES == 0) then
-      TINV_DEBUGMESSAGES = 1;
-      TBag_Print("TInv: Debugging messages on.");
+    if (TBag.DEBUGMESSAGES == 0) then
+      TBag.DEBUGMESSAGES = 1;
+      TBag:Print("TInv: Debugging messages on.");
     else
-      TINV_DEBUGMESSAGES = 0;
-      TBag_Print("TInv: Debugging messages off.");
+      TBag.DEBUGMESSAGES = 0;
+      TBag:Print("TInv: Debugging messages off.");
     end
   elseif (cmd == L["reset"]) then
     TBagCfg["Inv"] = {};
-    TInv_init(1);
+    TInvFrame:init(1);
     TInvOpt_ResizeUpdate();
   elseif (cmd == L["resetsorts"]) then
-    TBag_ResetSorts(TInvCfg);
-    TInv_UpdateWindow(TBAG_REQ_MUST);
+    TBag:ResetSorts(TInvFrame.cfg);
+    TInvFrame:UpdateWindow(TBag.REQ_MUST);
   elseif (cmd == L["resetpos"]) then
-    TInv_SetDefPos(TInvCfg,1);
-    TInv_UpdateWindow(TBAG_REQ_MUST);
+    TInvFrame:SetDefPos(TInvFrame.cfg,1);
+    TInvFrame:UpdateWindow(TBag.REQ_MUST);
   elseif (cmd == L["printchars"]) then
-    TBag_PrintCachedCharacters();
+    TBag:PrintCachedCharacters();
   elseif (cmd == L["deletechar"]) then
-    local char, realm = TBag_SplitStr(params," ");
-    TBag_DeleteCachedCharacter(char,realm); 
+    local char, realm = TBag:SplitStr(params," ");
+    TBag:DeleteCachedCharacter(char,realm); 
   elseif (cmd == L["config"]) then
     TInv_OptsFrame:Show();
-  elseif (cmd == L["tests"] and TBag_RunTests and type(TBag_RunTests) == "function") then
-    TBag_RunTests();
+  elseif (cmd == L["tests"] and TBag.RunTests and type(TBag.RunTests) == "function") then
+    TBag:RunTests();
   else
-    TBag_ShowHelp(TINV_HELP);
+    TBag:ShowHelp(TINV_HELP);
   end
 end

@@ -1,255 +1,9 @@
 <!-- $Id$ -->
 <Ui xmlns="http://www.blizzard.com/wow/ui/"   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"   xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
   <Script file="TInv.lua"/> 
-  <Script file="TInvHooks.lua"/>
 
-  <Button name="TInv_ItemButtonTemplate" inherits="ContainerFrameItemButtonTemplate" hidden="true" virtual="true">
-    <Size>
-      <AbsDimension x="40" y="40"/>
-    </Size>
-    <Anchors>
-      <Anchor point="CENTER">
-        <Offset>
-          <AbsDimension x="0" y="0"/>
-        </Offset>
-      </Anchor>
-    </Anchors>
+  <Frame name="TInvFrame" inherits="TBag_MainTemplate"> 
     <Frames>
-      <Button name="$parent_EditButton" hidden="true">
-        <Size>
-          <AbsDimension x="40" y="40"/>
-	</Size>
-	<Anchors>
-	  <Anchor point="CENTER">
-	    <Offset>
-              <AbsDimension x="0" y="0"/>
-	    </Offset>
-	  </Anchor>
-	</Anchors>
-	<Scripts>
-  	  <OnLoad>
-	    self:RegisterForClicks("LeftButtonUp", "RightButtonUp");
-          </OnLoad>
-  	  <OnClick>
-            TInv_ItemButton_OnClick(self, button, down);
-          </OnClick>
-          <OnEnter>
-            TInv_ItemButton_OnEnter(self, motion);
-          </OnEnter>
-          <OnLeave>
-            TInv_ItemButton_OnLeave(self, motion);
-          </OnLeave>
-        </Scripts>
-      </Button>
-      <Cooldown name="$parent_Cooldown" inherits="CooldownFrameTemplate"/>
-      <Frame name="$parentHighlightFrame" setAllPoints="true">
-        <Layers>
-          <Layer>
-            <Texture name="$parentTexture" alphaMode="ADD" file="Interface\Buttons\CheckButtonHilight" setAllPoints="true" hidden="true"/>
-          </Layer>
-        </Layers>
-      </Frame>
-    </Frames>
-    <Layers>
-      <Layer frameStrata="BORDER">
-        <Texture name="$parent_bkgr" inherits="TBag_ButtonBkgrTemplate"/>
-      </Layer>
-    </Layers>
-    <Scripts>
-      <OnLoad>
-        ContainerFrameItemButton_OnLoad(self);
-        self.UpdateTooltip = TInv_ItemButton_OnEnter;
-      </OnLoad>
-      <OnEnter>
-        TInv_ItemButton_OnEnter(self, motion);
-      </OnEnter>
-      <OnLeave>
-        TInv_ItemButton_OnLeave(self, motion);
-      </OnLeave>
-    </Scripts>
-  </Button>
-
-  <Button name="TInv_SlotTargetTemplate" inherits="ItemButtonTemplate" hidden="true" virtual="true">
-    <Size>
-      <AbsDimension x="40" y="40"/>
-    </Size>
-    <Anchors>
-      <Anchor point="BOTTOMRIGHT">
-        <Offset>
-          <AbsDimension x="0" y="0"/>
-        </Offset>
-      </Anchor>
-    </Anchors>
-    <Layers>
-      <Layer level="OVERLAY">
-        <FontString name="$parent_BigText" inherits="TBag_BigFont">
-          <Anchors>
-            <Anchor point="LEFT" relativePoint="LEFT">
-              <Offset><AbsDimension x="-2" y="0"/></Offset>
-            </Anchor>
-            <Anchor point="RIGHT" relativePoint="RIGHT">
-              <Offset><AbsDimension x="2" y="0"/></Offset>
-            </Anchor>
-          </Anchors>
-        </FontString>
-      </Layer>
-      <Layer frameStrata="BORDER">
-        <Texture name="$parent_bkgr" inherits="TBag_ButtonBkgrTemplate"/>
-      </Layer>
-    </Layers>
-    <Scripts>
-      <OnClick>
-        TInv_SlotTargetButton_OnClick(self, button, down);
-      </OnClick>
-      <OnDragStart>
-        TInv_SlotTargetButton_OnClick(self, button);
-      </OnDragStart>
-      <OnReceiveDrag>
-        TInv_SlotTargetButton_OnClick(self, "LeftButton");
-      </OnReceiveDrag>
-      <OnLoad>
-        self:RegisterForClicks("LeftButtonUp", "RightButtonUp");
-        self:RegisterForDrag("LeftButton");
-      </OnLoad>
-      <OnHide>
-        if ( self.hasStackSplit and (self.hasStackSplit == 1) ) then
-          StackSplitFrame:Hide();
-        end
-      </OnHide>
-      <OnEnter>
-        TInv_SlotTargetButton_OnEnter(self, motion);
-      </OnEnter>
-      <OnLeave>
-        TInv_SlotTargetButton_OnLeave(self, motion);
-      </OnLeave>
-    </Scripts>
-  </Button>
-
-  <CheckButton name="TInv_BagSlotButtonTemplate" inherits="BagSlotButtonTemplate" virtual="true">
-    <Size>
-      <AbsDimension x="40" y="40"/>
-    </Size>
-    <Frames>
-      <Frame name="$parentSpotlight" setAllPoints="true">
-        <Layers>
-          <Layer>
-            <Texture name="$parentTexture" alphaMode="ADD" file="Interface\Buttons\CheckButtonHilight" setAllPoints="true" hidden="true"/>                  
-          </Layer>
-        </Layers>
-      </Frame>
-      <Frame name="$parentHighlightFrame" setAllPoints="true">
-        <Layers>
-          <Layer>
-            <Texture name="$parentTexture" alphaMode="ADD" file="Interface\Buttons\CheckButtonHilight" setAllPoints="true" hidden="true"/>                  
-          </Layer>
-        </Layers>
-      </Frame>
-    </Frames>
-    <Scripts>
-      <OnLoad>
-        PaperDollItemSlotButton_OnLoad(self);
-        self:RegisterEvent("BAG_UPDATE");
-        self.isBag = 1;	
-        self.UpdateTooltip = TInv_BagSlotButton_OnEnter;
-      </OnLoad>
-      <OnEnter>
-        TInv_BagSlotButton_OnEnter(self, motion);
-      </OnEnter>
-    </Scripts>
-  </CheckButton>
-
-  <Frame name="TInvFrame" toplevel="true" frameStrata="MEDIUM" movable="true" enableMouse="true" hidden="true" parent="UIParent"> 
-    <Size><AbsDimension x="400" y="500"/></Size>
-    <Anchors>
-      <Anchor point="RIGHT">
-        <Offset>
-          <AbsDimension x="0" y="0"/>
-        </Offset>
-      </Anchor>
-    </Anchors>
-
-    <Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
-      <EdgeSize>
-        <AbsValue val="4"/>
-      </EdgeSize>
-      <TileSize>
-        <AbsValue val="4"/>
-      </TileSize>
-      <BackgroundInsets>
-        <AbsInset left="2" right="2" top="2" bottom="2"/>
-      </BackgroundInsets>
-    </Backdrop>
-
-    <Frames>
-      <Button name="TInv_Button_ColumnsAdd" inherits="GameMenuButtonTemplate" text="++">
-        <Size><AbsDimension x="45" y="22"/></Size>
-        <Anchors>
-          <Anchor point="CENTER" relativePoint="CENTER">
-            <OffSet>
-              <AbsDimension x="24" y="0"/>
-            </OffSet>
-          </Anchor>
-          <Anchor point="BOTTOM" relativePoint="BOTTOM">
-            <Offset>
-              <AbsDimension x="0" y="5"/>
-            </Offset>
-          </Anchor>
-        </Anchors>
-        <Scripts>
-
-          <OnClick>
-            PlaySound("igMainMenuOptionCheckBoxOn");
-            TInv_IncreaseColumns();
-          </OnClick>
-
-          <OnEnter>
-            GameTooltip_AddNewbieTip(
-	      TBAG_LOCALE["Increase Window Size"],
-              1.0, 1.0, 1.0,
-	      TBAG_LOCALE["Increase the number of columns displayed"] );
-          </OnEnter>
-          <OnLeave>
-            GameTooltip:Hide();
-            ResetCursor();
-          </OnLeave>
-        </Scripts>
-      </Button>
-
-      <Button name="TInv_Button_ColumnsDel" inherits="GameMenuButtonTemplate" text="--">
-        <Size><AbsDimension x="45" y="22"/></Size>
-        <Anchors>
-          <Anchor point="CENTER" relativePoint="CENTER">
-            <OffSet>
-              <AbsDimension x="-24" y="0"/>
-            </OffSet>
-          </Anchor>
-          <Anchor point="BOTTOM" relativePoint="BOTTOM">
-            <Offset>
-              <AbsDimension x="0" y="5"/>
-            </Offset>
-          </Anchor>
-        </Anchors>
-        <Scripts>
-
-          <OnClick>
-            PlaySound("igMainMenuOptionCheckBoxOn");
-            TInv_DecreaseColumns();
-          </OnClick>
-
-          <OnEnter>
-            GameTooltip_AddNewbieTip(
-	      TBAG_LOCALE["Decrease Window Size"],
-              1.0, 1.0, 1.0,
-	      TBAG_LOCALE["Decrease the number of columns displayed"] );
-          </OnEnter>
-          <OnLeave>
-            GameTooltip:Hide();
-            ResetCursor();
-          </OnLeave>
-        </Scripts>
-      </Button>
-
-
       <Button name="TInv_Button_Close">
         <Size><AbsDimension x="34" y="34"/></Size>
         <NormalTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Up" />
@@ -264,7 +18,7 @@
         </Anchors>
         <Scripts>
           <OnClick>
-            CloseBackpack();
+            TInvFrame:Hide() 
           </OnClick>
         </Scripts>
       </Button>
@@ -283,15 +37,15 @@
         </Anchors>
         <Scripts>
           <OnClick>
-            TInv_Button_MoveLockToggle_OnClick(self, button);
+            TInvFrame.Button_MoveLockToggle_OnClick(self, button);
           </OnClick>
           <OnEnter>
-            if (TInvCfg["moveLock"] == 0) then
-	      GameTooltip_AddNewbieTip(TBAG_LOCALE["Unlock Window"], 1.0, 1.0, 1.0,
-                                       TBAG_LOCALE["Allow window to be moved by dragging it."]);
+            if (TInvFrame.cfg["moveLock"] == 0) then
+	      TBag:AddNewbieTip(self, TBag.LOCALE["Unlock Window"], 1.0, 1.0, 1.0,
+                                       TBag.LOCALE["Allow window to be moved by dragging it."]);
             else
-	      GameTooltip_AddNewbieTip(TBAG_LOCALE["Lock Window"], 1.0, 1.0, 1.0,
-                                       TBAG_LOCALE["Prevent window from being moved by dragging it."]);
+	      TBag:AddNewbieTip(self, TBag.LOCALE["Lock Window"], 1.0, 1.0, 1.0,
+                                       TBag.LOCALE["Prevent window from being moved by dragging it."]);
             end
           </OnEnter>
           <OnLeave>
@@ -311,7 +65,7 @@
         </Anchors>
         <Scripts>
           <OnShow>
-            TInv_UserDropdown_OnLoad(self);
+            TInvFrame.UserDropdown_OnLoad(self);
           </OnShow>
         </Scripts>
       </Frame>
@@ -331,15 +85,15 @@
         </Anchors>
         <Scripts>
           <OnClick>
-            TInv_Button_HighlightToggle_OnClick(self, button, down);
+            TInvFrame.Button_HighlightToggle_OnClick(self, button, down);
           </OnClick>
           <OnEnter>
-            if (TBag_SrchText) then
-	    GameTooltip_AddNewbieTip(TBAG_LOCALE["Clear Search"], 1.0, 1.0, 1.0, TBAG_LOCALE["Stop highlighting search results."]);
-            elseif (TInv_hilight_new == 0) then
-	    GameTooltip_AddNewbieTip(TBAG_LOCALE["Highlight New"], 1.0, 1.0, 1.0, TBAG_LOCALE["Highlight items marked as new."]);
+            if (TBag.SrchText) then
+	    TBag:AddNewbieTip(self, TBag.LOCALE["Clear Search"], 1.0, 1.0, 1.0, TBag.LOCALE["Stop highlighting search results."]);
+            elseif (TInvFrame.hilight_new == 0) then
+	    TBag:AddNewbieTip(self, TBag.LOCALE["Highlight New"], 1.0, 1.0, 1.0, TBag.LOCALE["Highlight items marked as new."]);
             else
-	    GameTooltip_AddNewbieTip(TBAG_LOCALE["Normal"], 1.0, 1.0, 1.0, TBAG_LOCALE["Stop highlighting new items."]);
+	    TBag:AddNewbieTip(self, TBag.LOCALE["Normal"], 1.0, 1.0, 1.0, TBag.LOCALE["Stop highlighting new items."]);
             end
           </OnEnter>
           <OnLeave>
@@ -363,10 +117,10 @@
         </Anchors>
         <Scripts>
           <OnClick>
-            TInv_Button_ChangeEditMode_OnClick(self, button, down);
+            TInvFrame.Button_ChangeEditMode_OnClick(self, button, down);
           </OnClick>
           <OnEnter>
-		  GameTooltip_AddNewbieTip(TBAG_LOCALE["Toggle Edit Mode"], 1.0, 1.0, 1.0, TBAG_LOCALE["Select this option to move classes of items into different 'bars' (the red numbers)."]);
+		  TBag:AddNewbieTip(self, TBag.LOCALE["Toggle Edit Mode"], 1.0, 1.0, 1.0, TBag.LOCALE["Select this option to move classes of items into different 'bars' (the red numbers)."]);
           </OnEnter>
           <OnLeave>
             GameTooltip:Hide();
@@ -390,10 +144,10 @@
         </Anchors>
         <Scripts>
           <OnClick>
-            TInv_Button_ShowBank_OnClick(self, button, down);
+            TInvFrame.Button_ShowBank_OnClick(self, button, down);
           </OnClick>
           <OnEnter>
-		  GameTooltip_AddNewbieTip(TBAG_LOCALE["Toggle Bank"], 1.0, 1.0, 1.0, TBAG_LOCALE["Displays bank contents in a view-only mode.  You may select another player's bank to view from the dropdown."]);
+		  TBag:AddNewbieTip(self, TBag.LOCALE["Toggle Bank"], 1.0, 1.0, 1.0, TBag.LOCALE["Displays bank contents in a view-only mode.  You may select another player's bank to view from the dropdown."]);
           </OnEnter>
           <OnLeave>
             GameTooltip:Hide();
@@ -416,10 +170,10 @@
         </Anchors>
         <Scripts>
           <OnClick>
-            TInv_Button_Reload_OnClick(self, button, down);
+            TInvFrame.Button_Reload_OnClick(self, button, down);
           </OnClick>
           <OnEnter>
-		  GameTooltip_AddNewbieTip(TBAG_LOCALE["Reload and Sort"], 1.0, 1.0, 1.0, TBAG_LOCALE["Reloads your items and sorts them."]);
+		  TBag:AddNewbieTip(self, TBag.LOCALE["Reload and Sort"], 1.0, 1.0, 1.0, TBag.LOCALE["Reloads your items and sorts them."]);
           </OnEnter>
           <OnLeave>
             GameTooltip:Hide();
@@ -438,66 +192,16 @@
         </Anchors>
     </EditBox>
 
-      <Frame name="TInv_MoneyFrame" inherits="SmallMoneyFrameTemplate" hidden="false">
-        <Size><AbsDimension x="22" y="25"/></Size>
+      <CheckButton name="TInvacterBag3Slot" inherits="TBag_BagButtonTemplate" id="4">
         <Anchors>
-          <Anchor point="BOTTOMRIGHT">
-            <Offset>
-              <AbsDimension x="5" y="5"/>
-            </Offset>
-          </Anchor>
-        </Anchors>
-      </Frame>
-
-      <Frame name="TInv_MoneyViewFrame" inherits="SmallMoneyFrameTemplate" hidden="true">
-      <Size><AbsDimension x="22" y="25"/></Size>
-        <Anchors>
-          <Anchor point="BOTTOMRIGHT">
-            <Offset>
-              <AbsDimension x="5" y="5"/>
-            </Offset>
-          </Anchor>
-        </Anchors>
-        <Scripts>
-          <OnLoad>
-            SmallMoneyFrame_OnLoad();
-            MoneyFrame_SetType("STATIC");
-          </OnLoad>
-        </Scripts>
-      </Frame>
-
-    <Frame name="TInvNumTotal" visible="true">
-        <Size>
-            <AbsDimension x="28" y="28"/>
-        </Size>
-       <Anchors>
-         <Anchor point="BOTTOMLEFT" relativeTo="TInv_SearchBox" relativePoint="TOPLEFT">
-            <Offset>
-              <AbsDimension x="0" y="4"/>
-            </Offset>
-          </Anchor>
-        </Anchors>
-     <Layers>
-      <Layer level="ARTWORK">
-        <FontString name="$parentText" inherits="TBag_BigFont">
-          <Anchors>
-            <Anchor point="CENTER"/>
-          </Anchors>
-        </FontString>
-      </Layer>
-    </Layers>
-  </Frame>
-
-      <CheckButton name="TInvacterBag3Slot" inherits="TInv_BagSlotButtonTemplate" id="23">
-        <Anchors>
-          <Anchor point="BOTTOMLEFT" relativeTo="TInvNumTotal" relativePoint="BOTTOMRIGHT">
+          <Anchor point="BOTTOMLEFT" relativeTo="$parent_Total" relativePoint="BOTTOMRIGHT">
             <Offset>
               <AbsDimension x="3" y="-1" />
             </Offset>
           </Anchor>
         </Anchors>
       </CheckButton>
-      <CheckButton name="TInvacterBag2Slot" inherits="TInv_BagSlotButtonTemplate" id="22">
+      <CheckButton name="TInvacterBag2Slot" inherits="TBag_BagButtonTemplate" id="3">
         <Anchors>
           <Anchor point="BOTTOMLEFT" relativeTo="TInvacterBag3Slot" relativePoint="BOTTOMRIGHT">
             <Offset>
@@ -506,7 +210,7 @@
           </Anchor>
         </Anchors>
       </CheckButton>
-      <CheckButton name="TInvacterBag1Slot" inherits="TInv_BagSlotButtonTemplate" id="21">
+      <CheckButton name="TInvacterBag1Slot" inherits="TBag_BagButtonTemplate" id="2">
         <Anchors>
           <Anchor point="BOTTOMLEFT" relativeTo="TInvacterBag2Slot" relativePoint="BOTTOMRIGHT">
             <Offset>
@@ -515,7 +219,7 @@
           </Anchor>
         </Anchors>
       </CheckButton>
-      <CheckButton name="TInvacterBag0Slot" inherits="TInv_BagSlotButtonTemplate" id="20">
+      <CheckButton name="TInvacterBag0Slot" inherits="TBag_BagButtonTemplate" id="1">
         <Anchors>
           <Anchor point="BOTTOMLEFT" relativeTo="TInvacterBag1Slot" relativePoint="BOTTOMRIGHT">
             <Offset>
@@ -526,7 +230,7 @@
       </CheckButton>
       
 
-      <CheckButton name="TInvMenuBarBackpackButton" inherits="ItemButtonTemplate" id="0">
+      <CheckButton name="TInvMenuBarBackpackButton" inherits="TBag_BagButtonTemplate" id="0">
         <Anchors>
           <Anchor point="LEFT" relativeTo="TInvacterBag0Slot" relativePoint="RIGHT">
             <Offset>
@@ -534,231 +238,23 @@
             </Offset>
           </Anchor>
         </Anchors>
-        <Frames>
-          <Model name="$parentItemAnim" inherits="ItemAnimTemplate"/>
-      <Frame name="$parentSpotlight" setAllPoints="true">
-        <Layers>
-          <Layer>
-            <Texture name="$parentTexture" alphaMode="ADD" file="Interface\Buttons\CheckButtonHilight" setAllPoints="true" hidden="true"/>                  
-          </Layer>
-        </Layers>
-      </Frame>
-      <Frame name="$parentHighlightFrame" setAllPoints="true">
-        <Layers>
-          <Layer>
-            <Texture name="$parentTexture" alphaMode="ADD" file="Interface\Buttons\CheckButtonHilight" setAllPoints="true" hidden="true"/>                  
-          </Layer>
-        </Layers>
-      </Frame>
-        </Frames>
-        <Scripts>
-          <OnLoad>
-            self:RegisterForClicks("LeftButtonUp", "RightButtonUp");
-            TInvMenuBarBackpackButtonIconTexture:SetTexture("Interface\\Buttons\\Button-Backpack-Up");
-          </OnLoad>
-	  <OnClick>
-	    if ( IsModifiedClick() ) then
-              BackpackButton_OnModifiedClick(self, button, down);
-	    else
-	      BackpackButton_OnClick(self, button, down);
-	    end
-          </OnClick>
-          <OnReceiveDrag>
-            BackpackButton_OnClick();
-          </OnReceiveDrag>
-          <OnEnter>
-            GameTooltip:SetOwner(self, "ANCHOR_LEFT");
-            GameTooltip:SetText(TEXT(BACKPACK_TOOLTIP), 1.0, 1.0, 1.0);
-            local keyBinding = GetBindingKey("TOGGLEBACKPACK");
-            if ( keyBinding ) then
-              GameTooltip:AppendText(" "..NORMAL_FONT_COLOR_CODE.."("..keyBinding..")"..FONT_COLOR_CODE_CLOSE);
-            end
-          </OnEnter>
-          <OnLeave>
-            GameTooltip:Hide();
-          </OnLeave>
-        </Scripts>
-        <CheckedTexture alphaMode="ADD" file="Interface\Buttons\CheckButtonHilight"/>
-      </CheckButton>
+      </CheckButton> 
 
-  <CheckButton name="TInvingButton">
-    <Size x="18" y="39"/>
-    <Anchors>
+      <CheckButton name="TInvingButton" hidden="false" inherits="TBag_BagButtonTemplate">
+        <Anchors>
           <Anchor point="BOTTOMLEFT" relativeTo="TInvMenuBarBackpackButton" relativePoint="BOTTOMRIGHT">
             <Offset>
-              <AbsDimension x="2" y="-1" />
-            </Offset>
-          </Anchor>
-    </Anchors>
-    <Frames>
-      <Model name="$parentItemAnim" inherits="ItemAnimTemplate">
-        <Anchors>
-          <Anchor point="BOTTOMRIGHT">
-            <Offset>
-              <AbsDimension x="0" y="0"/>
+              <AbsDimension x="4" y="0" />
             </Offset>
           </Anchor>
         </Anchors>
-      </Model>
-      <Frame name="$parentHighlightFrame" setAllPoints="true">
-        <Layers>
-          <Layer>
-            <Texture name="$parentTexture" alphaMode="ADD" file="Interface\Buttons\CheckButtonHilight" setAllPoints="true" hidden="true"/>                  
-          </Layer>
-        </Layers>
-      </Frame>
-    </Frames>
-    <Scripts>
-      <OnLoad>
-        self:SetID(KEYRING_CONTAINER);
-	self:RegisterForClicks("LeftButtonUp", "RightButtonUp");
-      </OnLoad>
-      <OnClick>
-        if (CursorHasItem()) then
-          PutKeyInKeyRing();
-        else
-          ToggleKeyRing();
-        end
-      </OnClick>
-      <OnReceiveDrag>
-        if (CursorHasItem()) then
-          PutKeyInKeyRing();
-        end
-      </OnReceiveDrag>
-      <OnEnter>
-        GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-	GameTooltip:SetText(TBAG_LOCALE["Keyring"], HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
-        GameTooltip:AddLine();
-      </OnEnter>
-      <OnLeave>
-        GameTooltip:Hide();
-      </OnLeave>
-    </Scripts>
-    <NormalTexture file="Interface\Buttons\UI-Button-KeyRing">
-      <TexCoords left="0" right="0.5625" top="0" bottom="0.609375"/>
-    </NormalTexture>
-    <HighlightTexture file="Interface\Buttons\UI-Button-KeyRing-Highlight" alphaMode="ADD">
-      <TexCoords left="0" right="0.5625" top="0" bottom="0.609375"/>
-    </HighlightTexture>
-    <PushedTexture file="Interface\Buttons\UI-Button-KeyRing-Down">
-      <TexCoords left="0" right="0.5625" top="0" bottom="0.609375"/>
-    </PushedTexture>
-  </CheckButton>
-
-     <Frame name="TInvNum0" visible="true" parent="TInvMenuBarBackpackButton">
-        <Size>
-            <AbsDimension x="40" y="30"/>
-        </Size>
-        <Anchors>
-            <Anchor point="CENTER"/>
-        </Anchors>
-    <Layers>
-      <Layer level="ARTWORK">
-        <FontString name="$parentText" inherits="NumberFontNormal" justifyH="CENTER">
-          <Anchors>
-          <Anchor point="CENTER">
-            <Offset><AbsDimension x="0" y="0"/></Offset>
-          </Anchor>
-          </Anchors>
-        </FontString>
-      </Layer>
-    </Layers>
-  </Frame>
-     <Frame name="TInvNum1" visible="true" parent="TInvacterBag0Slot">
-        <Size>
-            <AbsDimension x="40" y="30"/>
-        </Size>
-        <Anchors>
-            <Anchor point="CENTER"/>
-        </Anchors>
-    <Layers>
-      <Layer level="ARTWORK">
-        <FontString name="$parentText" inherits="NumberFontNormal" justifyH="CENTER">
-          <Anchors>
-          <Anchor point="CENTER">
-            <Offset><AbsDimension x="0" y="0"/></Offset>
-          </Anchor>
-          </Anchors>
-        </FontString>
-      </Layer>
-    </Layers>
-  </Frame>
-  <Frame name="TInvNum2" visible="true" parent="TInvacterBag1Slot">
-        <Size>
-            <AbsDimension x="40" y="30"/>
-        </Size>
-        <Anchors>
-            <Anchor point="CENTER"/>
-        </Anchors>
-    <Layers>
-      <Layer level="ARTWORK">
-        <FontString name="$parentText" inherits="NumberFontNormal" justifyH="CENTER">
-          <Anchors>
-          <Anchor point="CENTER">
-            <Offset><AbsDimension x="0" y="0"/></Offset>
-          </Anchor>
-          </Anchors>
-        </FontString>
-      </Layer>
-    </Layers>
-  </Frame>
-  <Frame name="TInvNum3" visible="true" parent="TInvacterBag2Slot">
-        <Size>
-            <AbsDimension x="40" y="30"/>
-        </Size>
-        <Anchors>
-            <Anchor point="CENTER"/>
-        </Anchors>
-    <Layers>
-      <Layer level="ARTWORK">
-        <FontString name="$parentText" inherits="NumberFontNormal" justifyH="CENTER">
-          <Anchors>
-          <Anchor point="CENTER">
-            <Offset><AbsDimension x="0" y="0"/></Offset>
-          </Anchor>
-          </Anchors>
-        </FontString>
-      </Layer>
-    </Layers>
-  </Frame>
-  <Frame name="TInvNum4" visible="true" parent="TInvacterBag3Slot">
-        <Size>
-            <AbsDimension x="40" y="30"/>
-        </Size>
-        <Anchors>
-            <Anchor point="CENTER"/>
-        </Anchors>
-    <Layers>
-      <Layer level="ARTWORK">
-        <FontString name="$parentText" inherits="NumberFontNormal" justifyH="CENTER">
-          <Anchors>
-          <Anchor point="CENTER">
-            <Offset><AbsDimension x="0" y="0"/></Offset>
-          </Anchor>
-          </Anchors>
-        </FontString>
-      </Layer>
-    </Layers>
-  </Frame>
-  <Frame name="TInvNumKeyRing" visible="true" parent="TInvingButton">
-        <Size>
-            <AbsDimension x="10" y="30"/>
-        </Size>
-        <Anchors>
-            <Anchor point="CENTER"/>
-        </Anchors>
-    <Layers>
-      <Layer level="ARTWORK">
-        <FontString name="$parentText" inherits="NumberFontNormal">
-          <Anchors>
-          <Anchor point="CENTER">
-            <Offset><AbsDimension x="1" y="0"/></Offset>
-          </Anchor>
-          </Anchors>
-        </FontString>
-      </Layer>
-    </Layers>
-  </Frame>
+        <Scripts>
+          <OnLoad>
+            TBag.BagButton.OnLoad(self)
+            self:SetID(KEYRING_CONTAINER)
+          </OnLoad>
+        </Scripts>
+      </CheckButton>
 
   <Frame name="TInvainerFrame12" inherits="TBagainerFrameTemplate" id="0"/>
   <Frame name="TInvainerFrame13" inherits="TBagainerFrameTemplate" id="-2"/>
@@ -773,7 +269,7 @@
             self:RegisterEvent("VARIABLES_LOADED");
           </OnLoad>
           <OnEvent>
-            TInvFrame_RightClickMenu_OnLoad(self);
+            TBag.Inv.RightClickMenu_OnLoad(self);
           </OnEvent>
         </Scripts>
       </Frame>
@@ -786,7 +282,7 @@
       </OnLoad> 
       <OnEvent>
         if (event == "VARIABLES_LOADED") then 
-          TInv_init(0);
+          TBag.Inv:init(0);
           self:RegisterEvent("BAG_UPDATE");
           self:RegisterEvent("BAG_UPDATE_COOLDOWN");
           self:RegisterEvent("ITEM_LOCK_CHANGED");
@@ -808,32 +304,12 @@
 --          self:RegisterEvent("TRADE_SHOW");
 --          self:RegisterEvent("TRADE_CLOSED");
         else
-          TInv_OnEvent(self, event, ...);
+          self:OnEvent(event, ...);
         end
       </OnEvent> 
-      <OnMouseDown>
-        TInv_OnMouseDown(self, button);
-      </OnMouseDown>
-      <OnMouseUp>
-        TInv_StopMoving(self);
-      </OnMouseUp>
-      <OnDragStart>
-        TInv_StartMoving(self);
-      </OnDragStart>
-      <OnDragStop>
-        TInv_StopMoving(self);
-      </OnDragStop>
-      <OnShow>
-        PlaySound("igBackPackOpen");
-	TInv_UpdateWindow(TBAG_REQ_PART);
-      </OnShow>
       <OnUpdate>
-        TBag_OnUpdate(self, elapsed);
+        TBag.OnUpdate(self, elapsed);
       </OnUpdate>
-      <OnHide>
-        PlaySound("igBackPackClose");
-        TInv_StopMoving(self);
-      </OnHide>
     </Scripts>
   </Frame> 
 </Ui>

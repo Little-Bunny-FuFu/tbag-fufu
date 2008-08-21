@@ -2,24 +2,11 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/"   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"   xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
   <Script file="TBag.lua"/>
   <Script file="TBagCmd.lua"/>
-  <Script file="TBagHook.lua"/>
+  <Script file="Hooks.lua"/>
   <Script file="TBagOpt.lua"/>
   <Script file="TBagTrade.lua"/>
   <Script file="TBagItemInfo.lua"/>
   <Script file="TBagTest.lua"/>
-
-  <FontString name="TBag_BigFont"  font="Interface\AddOns\TBag\DAB_CooldownFont.ttf" virtual="true" justifyH="CENTER">
-    <Shadow>
-      <Offset>
-        <AbsDimension x="1" y="-1"/>
-      </Offset>
-      <Color r="0" g="0" b="0"/>
-    </Shadow>
-    <FontHeight>
-      <AbsValue val="16"/>
-    </FontHeight>
-    <Color r="1" g="0" b="0.25"/>
-  </FontString>
 
   <Texture name="TBag_ButtonBkgrTemplate" alphaMode="ADD" file="Interface\AddOns\TBag\images\ButtonBkgr" setAllPoints="true" virtual="true">
     <Size>
@@ -70,10 +57,10 @@
   </Frame>
 
   <EditBox name="TBag_SearchBoxTemplate" inherits="InputBoxTemplate" hidden="false" virtual="true" autoFocus="false">
-    <Size><AbsDimension x="190" y="30"/></Size>
+    <Size><AbsDimension x="198" y="30"/></Size>
     <Scripts>
       <OnShow>
-        TBag_ClearSearch();
+        TBag:ClearSearch();
       </OnShow>
       <OnTabPressed>
         self:ClearFocus();
@@ -83,14 +70,14 @@
       </OnEscapePressed>
       <OnEnterPressed>
         if (self:GetText() ~= "") then    
-	  TBag_DoSearch(self:GetText());
+	  TBag:DoSearch(self:GetText());
 	end
         self:ClearFocus();
       </OnEnterPressed>
       <OnEditFocusLost>
         self:HighlightText(0, 0);
         if ( self:GetText() == "" ) then
-          TBag_ClearSearch();
+          TBag:ClearSearch();
         end
       </OnEditFocusLost>
       <OnEditFocusGained>

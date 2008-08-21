@@ -1,3 +1,48 @@
+* 20080821-rxxx-Alpha-Shefki
+  - This is an Alpha version with major portions of TBag
+    rewritten but others still using old code.  There may
+    very well be errors.
+  - General forwards compatability to Wrath code changes.
+  - Show Blizzard Bag Frames is obsolete and ignored now.
+    Clicking on a bag frame that is hidden in TBag now
+    expands the window and displays those items until 
+    the window is closed or the bag is clicked again.
+    Most people will see this mostly with the keychain.
+  - Updates to the sort list to support changes in Wrath:
+    DeathKnights, Minipets, Tokens
+  - Catch the Spirit of Competition in the default sorts.
+  - Support the Scourgestone "hearthstone" that Deathknights use
+    for showing the hearth location.
+  - Allow dragging items onto the bag icon for the default bank
+    slots just like the other bags in the bank.
+  - A large amount of code duplication between the bank and
+    the inventory window has been merged.
+  - Significant effort has been made to decrease the amount
+    of global variables used.
+  - Significantly fewer hooks are used.
+  - Numerous unnecessary frames were removed.
+  - Removed the font that shipped with the addon.  Now simply
+    use an included font with the game.  Font usage is now
+    more consistent across the addon.
+
+  Current Known Issues:
+  - Redraws due to Cache updates are not happening when they
+    should.  This is a side effect of the new event code not
+    being in since it is unfinished while the new window update
+    code is in.  In particular it will be most noticeable when
+    you open the bank for the first time on a character and
+    it appears blank even though you know items are in it.
+    Simply close the bank and open again.  It may also cause
+    some settings to not take effect immediately.
+  - deDE translation is out of sync.
+  - Inscription still needs to be handled.
+
+  Wrath Beta players please do not report the following:
+  - Internal Bag Error.  If you see this it's a Blizzard problem.
+    Happens even without TBag loaded.
+  - Slow movement of items particularly selling.  Again Blizzard
+    beta server issue.
+
 * 20080611-r163-Shefki
   - Fix an error when opening the Hunter Training window.
 

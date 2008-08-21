@@ -1,7 +1,7 @@
 -- $Id$
 
 -- Localization Support
-local L = TBAG_LOCALE;
+local L = TBag.LOCALE;
 
 local TInv_CfgOpt = {};
 
@@ -37,10 +37,10 @@ end
 function TInvOpt_SwapSearchItems(unused_value, key1, key2)
   local tmp;
 
-  if ( (TInvCfg["item_search_list"][key1] ~= nil) and (TInvCfg["item_search_list"][key2] ~= nil) ) then
-    tmp = TInvCfg["item_search_list"][key1];
-    TInvCfg["item_search_list"][key1] = TInvCfg["item_search_list"][key2];
-    TInvCfg["item_search_list"][key2] = tmp;
+  if ( (TInvFrame.cfg["item_search_list"][key1] ~= nil) and (TInvFrame.cfg["item_search_list"][key2] ~= nil) ) then
+    tmp = TInvFrame.cfg["item_search_list"][key1];
+    TInvFrame.cfg["item_search_list"][key1] = TInvFrame.cfg["item_search_list"][key2];
+    TInvFrame.cfg["item_search_list"][key2] = tmp;
 
     if (key1 > key2) then
       TInv_Opts_CurrentPosition = TInv_Opts_CurrentPosition - 1;
@@ -53,15 +53,15 @@ function TInvOpt_SwapSearchItems(unused_value, key1, key2)
 end
 
 function TInvOpt_ResizeUpdate()
-  if (TInvCfg) then
-    TInv_CalcButtonSize(TInvCfg["frameButtonSize"], TInvCfg["framePad"]);
-    TInv_UpdateWindow(TBAG_REQ_MUST);
+  if (TInvFrame.cfg) then
+    TInvFrame:CalcButtonSize(TInvFrame.cfg["frameButtonSize"], TInvFrame.cfg["framePad"]);
+    TInvFrame:UpdateWindow(TBag.REQ_MUST);
   end
 end
 
 function TInvOpt_ForceUpdate()
-  if (TInvCfg) then
-    TInv_UpdateWindow(TBAG_REQ_MUST);
+  if (TInvFrame.cfg) then
+    TInvFrame:UpdateWindow(TBag.REQ_MUST);
   end
 end
 
@@ -70,24 +70,25 @@ function TInvOpt_CreateCfgOpt()
 
   TInv_CfgOpt = {};
 
-  TBagOpt_CreateCfgOpt(TInv_CfgOpt, TInvCfg, TInv_Bags, TInv_UpdateWindow, 
+  TBag:CreateCfgOpt(TInv_CfgOpt, TInvFrame.cfg, TInvFrame.bags, function ()
+    TInvFrame:UpdateWindow() end, 
     TInvOpt_ResizeUpdate, TInvOpt_ForceUpdate);
 
-  TBagOpt_MakeCheck(TInv_CfgOpt, L["Alt Key Auto-Pickup:"],
-    TInvCfg, "alt_pickup", TInvOpt_ResizeUpdate);
-  TBagOpt_MakeCheck(TInv_CfgOpt, L["Alt Key Auto-Panel:"],
-    TInvCfg, "alt_panel", TInvOpt_ResizeUpdate);
+  TBag:MakeCheck(TInv_CfgOpt, L["Alt Key Auto-Pickup:"],
+    TInvFrame.cfg, "alt_pickup", TInvOpt_ResizeUpdate);
+  TBag:MakeCheck(TInv_CfgOpt, L["Alt Key Auto-Panel:"],
+    TInvFrame.cfg, "alt_panel", TInvOpt_ResizeUpdate);
 
-  TBagOpt_MakeCheck(TInv_CfgOpt, L["Show Keyring Empty Slots (Enable Show above):"],
-    TInvCfg, "show_keyring_empty_slots", TInvOpt_ResizeUpdate);
+  TBag:MakeCheck(TInv_CfgOpt, L["Show Keyring Empty Slots (Enable Show above):"],
+    TInvFrame.cfg, "show_keyring_empty_slots", TInvOpt_ResizeUpdate);
 
-  TBagOpt_MakeCheck(TInv_CfgOpt, L["Show Soul Shard Count On Soul Bags:"],
-    TInvCfg, "show_soulshard_count", TInvOpt_ResizeUpdate);
+  TBag:MakeCheck(TInv_CfgOpt, L["Show Soul Shard Count On Soul Bags:"],
+    TInvFrame.cfg, "show_soulshard_count", TInvOpt_ResizeUpdate);
     
-  TBagOpt_CreateNewOpt(TInv_CfgOpt, TInvCfg, TInv_UpdateWindow);
+    TBag:CreateNewOpt(TInv_CfgOpt, TInvFrame.cfg, function () TInvFrame:UpdateWindow() end);
 
-  TBagOpt_MakeItemSearchHeader(TInv_CfgOpt);
-  TBagOpt_MakeItemSearch(TInv_CfgOpt, TInvCfg, TInvOpt_SwapSearchItems);
+  TBag:MakeItemSearchHeader(TInv_CfgOpt);
+  TBag:MakeItemSearch(TInv_CfgOpt, TInvFrame.cfg, TInvOpt_SwapSearchItems);
 end
 
 function TInv_Options_InitWindow()
@@ -95,7 +96,7 @@ function TInv_Options_InitWindow()
 
 	TInv_Config_MaxScroll = math.max( 1, (table.getn(TInv_CfgOpt)-TINV_OPTS_SCROLL_LINES)+2 );
 
-	TBag_PositionFrame( TInv_OptsFrame_ScrollBar:GetName(), "TOPRIGHT",
+	TBag:PositionFrame( TInv_OptsFrame_ScrollBar:GetName(), "TOPRIGHT",
 		TInv_OptsFrame:GetName(), "TOPRIGHT",
 		0-(TINVOPT_FRAME_BORDER),
 		0-(TINVOPT_FRAME_BORDER+TINV_OPTS_SCROLLBARBUTTONHEIGHT),
@@ -112,10 +113,10 @@ function TInv_Options_InitWindow()
 	TInv_OptsFrame:SetHeight( TINVOPT_FRAME_HEIGHT );
 
 	TInv_OptsFrame:SetBackdropColor(
-	  TBag_GetColor(TInvCfg, "bkgr_"..TBAG_MAIN_BAR)
+	  TBag:GetColor(TInvFrame.cfg, "bkgr_"..TBag.MAIN_BAR)
 	);
 	TInv_OptsFrame:SetBackdropBorderColor(
-	  TBag_GetColor(TInvCfg, "brdr_"..TBAG_MAIN_BAR)
+	  TBag:GetColor(TInvFrame.cfg, "brdr_"..TBag.MAIN_BAR)
 	);
 
 	TInv_Options_UpdateWindow();
@@ -147,7 +148,7 @@ function TInv_Options_UpdateWindow()
 		else
 			use_fade = 1;
 		end
-		y = TBagOpt_EnableLine(
+		y = TBag:EnableLine(
 		getglobal("TInv_OptsFrame_Line_"..(i+1)), "TInv_OptsFrame", 
           TINVOPT_FRAME_LINE_HEIGHT, TINV_OPTS_CONTROL_SLIDER_HEIGHT, 
           TInv_CfgOpt[i+current_opt], y, x_start, x_width, use_fade );
@@ -162,7 +163,7 @@ end
 
 function TInvOpts_AddCat()
   -- Add a blank entry
-  table.insert(TInvCfg["item_search_list"], {L["UNKNOWN"], "", "", "", ""});
+  table.insert(TInvFrame.cfg["item_search_list"], {L["UNKNOWN"], "", "", "", ""});
 
   -- Refresh the window, scrolling down to last entry
   TInvOpt_CreateCfgOpt();

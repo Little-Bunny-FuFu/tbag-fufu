@@ -14,10 +14,13 @@
 ## X-Localizations: enUS, deDE
 ## X-CompatibleLocales: enUS, deDE
 ## 
+stub.lua
 localization.enUS.lua
 localization.deDE.lua
 defaults.lua
 TBag.xml
+Buttons.xml
+MainFrame.xml
 TInv.xml
 TInvOpts.xml
 TBnk.xml

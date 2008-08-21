@@ -181,7 +181,7 @@
         </Anchors>
         <Scripts>
           <OnLoad>
-            this:SetText(TBAG_LOCALE["Reset"]);
+            this:SetText(TBag.LOCALE["Reset"]);
 	  </OnLoad>
           <OnClick>
             TBagCfg["Inv"] = {};
@@ -202,7 +202,7 @@
         </Anchors>
         <Scripts>
           <OnLoad>
-            this:SetText(TBAG_LOCALE["Close"]);
+            this:SetText(TBag.LOCALE["Close"]);
 	  </OnLoad>
           <OnClick>
             TInv_OptsFrame:Hide();
@@ -220,7 +220,7 @@
         </Anchors>
         <Scripts>
           <OnLoad>
-            this:SetText(TBAG_LOCALE["Add New Cat"]);
+            this:SetText(TBag.LOCALE["Add New Cat"]);
 	  </OnLoad>
           <OnClick>
             TInvOpts_AddCat();
@@ -238,7 +238,7 @@
         </Anchors>
         <Scripts>
           <OnLoad>
-            this:SetText(TBAG_LOCALE["Assign Cats"]);
+            this:SetText(TBag.LOCALE["Assign Cats"]);
 	  </OnLoad>
           <OnClick>
             TBag_AssignCats(TInvCfg, 1);

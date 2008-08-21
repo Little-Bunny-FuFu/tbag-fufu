@@ -1,0 +1,286 @@
+-- $Id$
+
+local TBag = _G.TBag
+TBag.Hooks = {}
+local Hooks = TBag.Hooks
+
+local WoTLK = TBag.WoTLK 
+
+Hooks.UNREGISTER = 0
+Hooks.REGISTER = 1
+Hooks.CHECK = 2
+
+Hooks.funcs = {
+  "OpenBag",
+  "CloseBag",
+  "ToggleBag",
+  "OpenBackpack",
+  "CloseBackpack",
+  "ToggleBackpack",
+  "ToggleKeyRing",
+  "OpenAllBags",
+  "ContainerFrameItemButton_OnModifiedClick",
+}
+
+Hooks.savedfuncs = {}
+
+function Hooks.Register(reg)
+  local funcs = Hooks.funcs
+  local savedfuncs = Hooks.savedfuncs
+  
+  if (reg == Hooks.REGISTER) then
+    for _,funcname in ipairs(funcs) do
+      local ourfunc = Hooks[funcname]
+
+      if ourfunc then
+        savedfuncs[funcname] = getglobal(funcname)
+        setglobal(funcname, ourfunc)
+        TBag:PrintDEBUG("Hook function for '"..funcname.." installed.")
+      else
+        TBag:PrintDEBUG("** Hook function for '"..funcname.." SKIPPED **")
+      end
+    end
+  elseif (reg == Hooks.UNREGISTER) then
+    -- unregister hooks
+    for _,funcname in ipairs(funcs) do
+      local ourfunc = Hooks[funcname]
+
+      if ourfunc and savedfuncs[funcname] then
+        setglobal(funcname, savedfuncs[funcname])
+        savedfuncs[funcname] = nil
+	TBag:PrintDEBUG("Hook function for '"..funcname.." removed.")
+      end
+    end
+  elseif (reg == Hooks.CHECK) then
+    -- check if hooks are registered
+    TBag:Print( "Hooks:" ,1,1,0.2 )
+    for _,funcname in ipairs(funcs) do
+      local ourfunc = Hooks[funcname]
+      local curfunc = getglobal(funcname)
+
+      if ourfunc == curfunc then
+        TBag:Print("  "..funcname.." is hooked properly.", 0, 1, 0.25)
+      else
+        TBag:Print("  "..funcname.." is NOT hooked.", 1, 0.2, 0.2)
+      end
+    end
+  end
+end
+
+local function CloseAllWindows()
+  TBag:PrintDEBUG("event: CloseAllWindows()")
+
+  TInvFrame:Hide()
+  TBnkFrame:Hide()
+end
+hooksecurefunc('CloseAllWindows', CloseAllWindows)
+
+function Hooks.OpenBag(bag)
+  TBag:PrintDEBUG("event: OpenBag("..bag..")")
+  local mainFrame
+  if TBag:Member(TInvFrame.bags,bag) then 
+    mainFrame = TInvFrame
+  else
+    mainFrame = TBnkFrame
+  end
+  
+  if mainFrame.cfg["show_Bag"..bag] ~= 1 then
+    TBag:GetBagFrame(bag):SetChecked(true)
+  end
+  mainFrame:Show()
+  TBag:UpdateButtonHighlights()
+end
+
+function Hooks.CloseBag(bag)
+  TBag:PrintDEBUG("event: CloseBag("..bag..")")
+  if TBag:Member(TInvFrame.bags,bag) then
+    TInvFrame:Hide()
+  else
+    TBnkFrame:Hide()
+  end
+end
+
+function Hooks.ToggleBag(bag)
+  TBag:PrintDEBUG("event: ToggleBag("..bag..")")
+  local mainFrame
+  if TBag:Member(TInvFrame.bags,bag) then
+    mainFrame = TInvFrame
+  else
+    mainFrame = TBnkFrame
+  end
+  local isBagShown = mainFrame.cfg["show_Bag"..bag] == 1
+  local isVisible = mainFrame:IsVisible()
+  
+  -- If the frame is already visible and the bag is set to
+  -- always be shown just hide the frame.
+  if isVisible and isBagShown then
+    mainFrame:Hide()
+    return
+  end
+  
+  -- Toggle the checked state of the bag frame if the
+  -- bag isn't  permanetly set to be shown, this will
+  -- toggle the shown state of the Bag.
+  if not isBagShown then
+    local bagFrame = TBag:GetBagFrame(bag)
+    bagFrame:SetChecked(not bagFrame:GetChecked())
+  end
+  
+  -- If the frame was already visible when we started
+  -- force an update, otherwise show it which will
+  -- force an update for us.
+  if isVisible then
+    TInvFrame:UpdateWindow(TBag.REQ_MUST)
+  else
+    TInvFrame:Show()
+  end
+  TBag:UpdateButtonHighlights()
+end
+
+function Hooks.OpenBackpack()
+  TBag:PrintDEBUG("event: OpenBackpack()")
+  Hooks.OpenBag(BACKPACK_CONTAINER)
+end
+
+function Hooks.CloseBackpack()
+  TBag:PrintDEBUG("event: CloseBackpack()")
+  TInvFrame:Hide()
+end
+
+function Hooks.ToggleBackpack()
+  TBag:PrintDEBUG("event: ToggleBackpack()")
+  Hooks.ToggleBag(BACKPACK_CONTAINER)
+end
+
+function Hooks.ToggleKeyRing()
+  TBag:PrintDEBUG("event: ToggleKeyRing()")
+  Hooks.ToggleBag(KEYRING_CONTAINER)
+end
+
+function Hooks.OpenAllBags()
+  TBag:PrintDEBUG("event: OpenAllBags()")
+  local inv_update = false
+  local bnk_update = false
+
+  for _,bag in ipairs(TInvFrame.bags) do
+    if TInvFrame.cfg["show_Bag"..bag] ~= 1 then
+      TBag:GetBagFrame(bag):SetChecked(true)
+      inv_update = true
+    end
+  end 
+
+  -- Open the faux bank as well
+  if (TBnkFrame:IsVisible() and TBnkFrame.atbank==1) then
+    for _, bag in ipairs(TBnkFrame.bags) do 
+      if TBnkFrame.cfg["show_Bag"..bag] ~= 1 then
+        TBag:GetBagFrame(bag):SetChecked(true)
+	inv_update = true
+      end
+    end
+  end
+
+  if not TInvFrame:IsVisible() then
+    TInvFrame:Show()
+  elseif inv_update then
+    TInvFrame:UpdateWindow(TBag.REQ_MUST)
+  end
+  
+  if bnk_update then
+    TBnkFrame:UpdateWindow(TBag.REQ_MSUT)
+  end
+  TBag:UpdateButtonHighlights()
+end
+
+-- Comptability wrapper for WoTLK changes
+local function ClickOnTab(func, tab)
+  if WoTLK then
+    func(nil, tab)
+  else
+    func(tab)
+  end
+end
+
+function Hooks.ContainerFrameItemButton_OnModifiedClick(...)
+  -- Support for implicit and explicit args allowing comptability
+  -- with 3.0.x and 2.4.x
+  local n = select('#', ...)
+  local self, button
+  if n == 1 then
+    self = this
+    button = ...
+  else
+    self, button = ...
+  end
+  
+  TBag:PrintDEBUG("event: ItemButton_OnModifiedClick self="..self:GetName())
+ 
+  -- Original func
+  local func = Hooks.savedfuncs["ContainerFrameItemButton_OnModifiedClick"]
+  
+  -- Get the itm and ultimately know if it's one of our buttons
+  local itm = TBag:GetItmFromFrame(TBag.BUTTONS, self)
+  if not itm then return func(...) end
+  local mainFrame = self:GetParent():GetParent()
+
+  if TBag:IsLive(mainFrame) then
+    -- Manage Alt+Click Auto Trade/Auction
+    if IsAltKeyDown() then
+      local alt_pickup = TInvFrame.cfg.alt_pickup == 1
+      local alt_panel = TInvFrame.cfg.alt_panel == 1
+
+      if TradeFrame and TradeFrame:IsShown() then
+        if alt_pickup  then
+          local tradeslot = TradeFrame_GetAvailableSlot()
+	  if tradeslot then
+            PickupContainerItem(itm[TBag.I_BAG], itm[TBag.I_SLOT])
+	    ClickTradeButton(tradeslot)
+            ClearCursor()
+	    return
+	  end
+        end
+      elseif AuctionFrame and AuctionFrame:IsShown() then
+        if alt_panel then
+          ClickOnTab(AuctionFrameTab_OnClick,3)
+        end
+        -- If we have auctioneer do not auto pickup let auctioneer do it.
+        if not AuctionFramePost then
+          if alt_pickup and PanelTemplates_GetSelectedTab(AuctionFrame) == 3 then
+            PickupContainerItem(itm[TBag.I_BAG], itm[TBag.I_SLOT])
+            ClickAuctionSellItemButton()
+            ClearCursor()
+            return
+          end
+        end
+      elseif MailFrame and MailFrame:IsShown() then
+        if alt_panel then
+          ClickOnTab(MailFrameTab_OnClick,2)
+        end
+        if alt_pickup and PanelTemplates_GetSelectedTab(MailFrame) == 2 then
+          PickupContainerItem(itm[TBag.I_BAG], itm[TBag.I_SLOT])
+	  ClickSendMailItemButton()
+	  ClearCursor()
+	  return
+        end
+      end
+    end
+  else
+    -- not a live frame
+    if itm[TBag.I_ITEMLINK] then
+      if IsModifiedClick("CHATLINK") then
+        local hl = TBag:MakeHyperlink(itm[TBag.I_ITEMLINK], itm[TBag.I_NAME],
+	                              itm[TBag.I_RARITY])
+        ChatEdit_InsertLink(hl)
+	return
+      elseif IsModifiedClick("DRESSUP") then
+        DressUpItemLink(itm[TBag.I_ITEMLINK])
+	return
+      elseif IsModifiedClick("SPLITSTACK") then
+        -- Can't split something in a non live frame
+        return
+      end
+    end
+  end
+
+  -- Fall through to the original code
+  return func(...)
+end

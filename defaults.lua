@@ -1,15 +1,15 @@
 -- $Id$
 
 -- Localization Support
-local L = TBAG_LOCALE;
+local L = TBag.LOCALE;
 
-TBAG_S_RARITY  = "R_";  -- Do not touch this  ;-)
+TBag.S_RARITY  = "R_";  -- Do not touch this  ;-)
 
-TBag_DefaultItemOverrides = {
+TBag.DefaultItemOverrides = {
 };
 
 -- Category, Keywords, Tooltip Search, ItemType, ItemSubType
-TBag_DefaultSearchList = {
+TBag.DefaultSearchList = {
 -- Quest items and Collectibles
   { L["ACT_ON"], L[""], L["This Item Begins a Quest"], L[""], L[""] },
   { L["ACT_OPEN"], L[""], L["<Right Click to Open>"], L[""], L[""] },
@@ -25,9 +25,11 @@ TBag_DefaultSearchList = {
   { L["ENCHANTS"], L[""], L["Use: Permanently"], L["Quest"], L[""] },
   { L["ENCHANTS"], L[""], L["Use: Permanently"], L["Miscellaneous"], L[""] },
   { L["HEARTH"], L[""], L["Hearthstone"], L["Miscellaneous"], L[""] },
+  { L["HEARTH"], L[""], L["Scourgestone"], L["Miscellaneous"], L[""] },
 
   { L["MINIPET"], L[""], L["Right Click to summon and dismiss"], L[""], L[""] },
-  { L["MINIPET"], L[""], L["Summons or dismisses a Spirit of Summer"], L[""], L[""] },
+  { L["MINIPET"], L[""], L["Summons or dismisses a Spirit of"], L[""], L[""] },
+  { L["MINIPET"], L[""], L["Use: Teaches you how to summon this companion."], L[""], L[""] },
   { L["MOUNT"], L[""], L["Requires Riding %("], L[""], L[""] },
   
   { L["AHN_QIRAJ"], L[""], L["%a+ Scarab"], L["Quest"], L[""] },
@@ -112,7 +114,7 @@ TBag_DefaultSearchList = {
   { L["ALDOR"], L[""], L["Fel Armament"], L["Quest"], L[""]},
   { L["ALDOR"], L[""], L["Holy Dust"], L["Consumable"], L[""]},
   { L["ALDOR"], L[""], L["Mark of the Illidari"], L["Miscellaneous"], L[""]},
-  { L["SHA'TAR"], L[""], L["Badge of Justice"], L["Miscellaneous"], L[""]},
+  { L["SHA'TAR"], L[""], L["Badge of Justice"], L[""], L[""]},
   { L["LOWER_CITY"], L[""], L["Arakkoa Feather"], L["Quest"], L[""]},
 
   { string.format(L["EQUIPPED_%s"],L["TRINKET"]), L["EQUIPPED"],
@@ -124,7 +126,7 @@ TBag_DefaultSearchList = {
   { L["QUEST"], L[""], L[""], L["Quest"], L[""] },
   { L["QUEST"], L[""], L["Quest Item"], L[""], L[""] },
   { L["QUEST"], L[""], L["Morbent"], L["Armor"], L[""] },
-  { L["GRAY_ITEMS"], TBAG_S_RARITY.."0",  L[""], L[""], L[""] },
+  { L["GRAY_ITEMS"], TBag.S_RARITY.."0",  L[""], L[""], L[""] },
 
 -- Containers
   { L["BAG"], L[""], L[""], L["Container"], L[""] },
@@ -331,6 +333,7 @@ TBag_DefaultSearchList = {
   { string.format(L["%s_REAGENT"],L["SHAMAN"]), L[""], L["Ankh"], L["Reagent"], L["Reagent"] },
   { string.format(L["%s_REAGENT"],L["SHAMAN"]), L[""], L["Fish Oil"], L[""], L[""] },
   { string.format(L["%s_REAGENT"],L["SHAMAN"]), L[""], L["Shiny Fish Scales"], L[""], L[""] },
+  { string.format(L["%s_REAGENT"],L["DEATHKNIGHT"]), L[""], L["Corpse Dust"], L[""], L[""] },
 
   { string.format(L["%s_TOOL"],L["ROGUE"]), L[""], L["Thieves' Tools"], L[""], L[""] },
   { string.format(L["%s_TOOL"],L["SHAMAN"]), L[""],
