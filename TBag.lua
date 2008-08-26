@@ -2393,6 +2393,8 @@ function TBag:UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, comparr,
             end
             if (string.find(tooltip, L["Soulbound"])) then
               itm[self.I_SOULBOUND] = 1;
+	    else
+              itm[self.I_SOULBOUND] = 0 
             end
             itm[self.I_CHARGES] = self:GetItmCharges(tooltip);
           else
