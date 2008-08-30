@@ -299,6 +299,7 @@ local tests = {
   [34780] = L["COMBO"],
   [3448] = L["COMBO"],
   [28112] = L["COMBO"],
+  [21153] = L["COMBO"],
   [13893] = L["FOOD"],
   [35285] = L["FOOD"],
   [28111] = L["FOOD"],

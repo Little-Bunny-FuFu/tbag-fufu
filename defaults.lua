@@ -265,6 +265,7 @@ TBag.DefaultSearchList = {
   { L["FOOD_BUFF"], L[""], L[" well fed "], L["Consumable"], L[""] },
   { L["FOOD_BUFF"], L[""], L["Restores %d+ health.* increases your "], L["Consumable"], L[""] },
   { L["COMBO"], L[""], L["Restores %d+ health and %d+ mana over %d+ sec"], L["Consumable"], L[""] },
+  { L["COMBO"], L[""], L["Restores %d+ health and %d+ mana over %d+ sec"], L["Trade Goods"], L[""] },
   { L["COMBO"], L[""], L["Restores .* health and mana .* %d+ sec"], L["Consumable"], L[""] },
   { L["DRINK"], L[""], L["Restores %d+ mana over %d+ sec"], L["Consumable"], L[""] },
   { L["DRINK"], L[""], L["Must remain seated while drinking%."], L["Consumable"], L[""] },
