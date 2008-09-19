@@ -277,39 +277,8 @@
 
     <Scripts>
       <OnLoad>
-        self:RegisterEvent("VARIABLES_LOADED");
 	tinsert(UISpecialFrames,self:GetName());
       </OnLoad> 
-      <OnEvent>
-        if (event == "VARIABLES_LOADED") then 
-          TBag.Inv:init(0);
-          self:RegisterEvent("BAG_UPDATE");
-          self:RegisterEvent("BAG_UPDATE_COOLDOWN");
-          self:RegisterEvent("ITEM_LOCK_CHANGED");
-	  self:RegisterEvent("UNIT_INVENTORY_CHANGED");
-	  self:RegisterEvent("UPDATE_INVENTORY_ALERTS");
-          self:RegisterEvent("PLAYER_LEAVING_WORLD");
-          self:RegisterEvent("CRAFT_SHOW");
-          self:RegisterEvent("TRADE_SKILL_SHOW");
-
-	  self:RegisterEvent("AUCTION_HOUSE_SHOW");
---          self:RegisterEvent("AUCTION_HOUSE_CLOSED");
---          self:RegisterEvent("BANKFRAME_OPENED");
---          self:RegisterEvent("BANKFRAME_CLOSED");
-          self:RegisterEvent("MAIL_SHOW");
-          self:RegisterEvent("MAIL_INBOX_UPDATE");
---          self:RegisterEvent("MAIL_CLOSED");
-          self:RegisterEvent("MERCHANT_SHOW");
---          self:RegisterEvent("MERCHANT_CLOSED");
---          self:RegisterEvent("TRADE_SHOW");
---          self:RegisterEvent("TRADE_CLOSED");
-        else
-          self:OnEvent(event, ...);
-        end
-      </OnEvent> 
-      <OnUpdate>
-        TBag.OnUpdate(self, elapsed);
-      </OnUpdate>
     </Scripts>
   </Frame> 
 </Ui>

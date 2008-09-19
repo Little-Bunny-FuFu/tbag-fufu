@@ -290,86 +290,6 @@ function Inv:UpdateBagGfx()
   TBag:SetFreeStr(getglobal("TInvFrame_TotalText"), totalfree, totalsize, cfg["show_bag_sizes"]);
 end
 
-function Inv:OnEvent(event, ...)
-  -- TBag:Print("TInv_Event: '"..event.."'");
-
-  if ( self:IsVisible() ) then
-    if ( event == "BAG_UPDATE" ) then
-      -- Only process events related to the inventory window
-      local bag = ...
-      if (bag and TBag:Member(self.bags, bag)) then
-        -- Stack the bags if we are in a state to
-        if (CursorHasItem() == nil and CursorHasMoney() == nil and CursorHasSpell() == nil and TBag:IsStacking(TBag.STACK_INV) == nil) then
-          -- Stack the bags if configured to
-          if (self.cfg["stack_auto"] == 1) then
-            if (self.playerid == TBag.PLAYERID) then
-              -- Send a message to restack
-              self.cfg["stack_once"] = 1;
-            end
-          end
-        end
-        self:UpdateWindow();
-      end
-    elseif ( event == "BAG_UPDATE_COOLDOWN" ) then
-      -- If we're given an argument check if it's a inventory bag and ignore the event
-      -- if it isn't.  If not argument is passed we have to update the window 
-      -- regardless.  /sigh
-      local bag = ...
-      if (not bag or TBag:Member(self.bags, bag)) then
-        self:UpdateWindow();
-      end
-    elseif ( event == "ITEM_LOCK_CHANGED" ) then
-      local bag,slot = ... 
-      if (bag and slot and type(slot) == "number" and TBag:Member(self.bags, bag)) then
---        TBag:UpdateLockedItem(self.playerid,getglobal(TBag:GetBagItemButtonName(bag,slot)));
-        TBag.ItemButton.UpdateLock(getglobal(TBag:GetBagItemButtonName(bag,slot)))
-      end
---    elseif ( event == "AUCTION_HOUSE_CLOSED" ) then
---      Inv.Close();
---    elseif ( event == "BANKFRAME_CLOSED" ) then
---      Inv.Close();
---    elseif ( event == "MERCHANT_CLOSED" ) then
---      Inv.Close();
---  elseif ( event == "TRADE_CLOSED" ) then
---    Inv.Close();
-    else
-      TBag:PrintDEBUG("TInv_Event: Visible dropthru.");
-    end
-  else
-    if ( event == "AUCTION_HOUSE_SHOW" ) then
-      TInvFrame:Show();
---    elseif ( event == "BANKFRAME_OPENED" ) then
---      Inv.Open();
-    elseif ( event == "MAIL_SHOW" ) then
-      TInvFrame:Show();
-    elseif ( event == "MERCHANT_SHOW" ) then
-      TInvFrame:Show();
---    elseif ( event == "TRADE_SHOW" ) then
---      Inv.Open();
-    else
-      TBag:PrintDEBUG("TInv_Event: Hidden dropthru.");
-    end
-  end
-
-  -- Handle these irrespective of window state
-  if ( event == "CRAFT_SHOW" ) then
-    TBag:Craft();
-  elseif ( event == "TRADE_SKILL_SHOW" ) then
-    TBag:Trade();
-  elseif ( event == "UPDATE_INVENTORY_ALERTS" ) then
-    TBag:ScanEquipped();
-  elseif ( event == "UNIT_INVENTORY_CHANGED" ) then
-    TBag:ScanEquipped();
-  elseif ( event == "MAIL_INBOX_UPDATE" ) then
-    TBag:ScanMail();
-  elseif ( event == "PLAYER_LEAVING_WORLD" ) then
-    TBagInfo[TBag.PLAYERID][TBag.G_BASIC][TBag.S_HEARTH] = GetBindLocation();
-  end
-
-  TBag:PrintDEBUG("TInv_Event: Finished "..event);
-end
-
-
 function Inv.Button_HighlightToggle_OnClick(self)
   PlaySound("igMainMenuOptionCheckBoxOn");
   if (TBag.SrchText) then
@@ -1403,10 +1323,11 @@ function Inv:UpdateWindow(resort_req)
   -- Consume a message for bag stacking
   if (self.cfg["stack_once"] == 1) then
     if (self.playerid == TBag.PLAYERID) then
-      TBag:Stack(TBag.STACK_INV, TInvItm[self.playerid], stackarr, comparr);
+      if TBag:Stack(TBag.STACK_INV, TInvItm[self.playerid], stackarr, comparr) then
+        self.cfg["stack_once"] = nil
+      end
     end
   end
-  self.cfg["stack_once"] = nil;
 
   if (resort_req >= TBag.REQ_MUST) then
     self.CACHE_REQ = TBag.REQ_NONE 

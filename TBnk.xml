@@ -333,28 +333,8 @@
 
     <Scripts>
       <OnLoad> 
-        self:RegisterEvent("VARIABLES_LOADED"); 
 	tinsert(UISpecialFrames,self:GetName());
       </OnLoad> 
-      <OnEvent> 
-        if (event == "VARIABLES_LOADED") then 
-          TBag.Bank:init(0);
-          self:RegisterEvent("BANKFRAME_OPENED");
-	  self:RegisterEvent("BANKFRAME_CLOSED");
-
-	  self:RegisterEvent("BAG_UPDATE");
-          self:RegisterEvent("BAG_UPDATE_COOLDOWN");
-          self:RegisterEvent("ITEM_LOCK_CHANGED");
-
-          self:RegisterEvent("PLAYERBANKSLOTS_CHANGED");
-          self:RegisterEvent("PLAYERBANKBAGSLOTS_CHANGED");
-        else
-          self:OnEvent(event, ...);
-        end
-      </OnEvent> 
-    <OnUpdate>
-      TBag.OnUpdate(self, elapsed);
-    </OnUpdate>
     </Scripts>
 
   </Frame>

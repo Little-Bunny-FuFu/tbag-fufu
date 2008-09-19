@@ -308,67 +308,6 @@ function Bank:InitBagGfx()
 end
 
 
-function Bank:OnEvent(event, ...)
-  -- TBag:Print("Bank:OnEvent: '"..event.."'");
-
-  if (event == "BANKFRAME_OPENED") then
-    self.atbank = 1;
-    TBnkFrame:Show()
-  elseif (event == "BANKFRAME_CLOSED") then
-    TBnkFrame:Hide()
-    self.atbank = 0;
-  elseif (event == "PLAYERBANKSLOTS_CHANGED") then
-    self:UpdateWindow();
-    local contid = IsBagOpen(BANK_CONTAINER);
-    -- Make our spoofed Bank bag actually update.
-    if contid then
-      ContainerFrame_Update(getglobal("ContainerFrame"..contid))
-    end
-  elseif (event == "PLAYERBANKBAGSLOTS_CHANGED") then
-    self:UpdateWindow(TBag.REQ_MUST);
-  end
-
-  if ( self:IsVisible() ) then
-    if ( event == "BAG_UPDATE" ) then
-      -- Only process for events that are related to the bank.
-      local bag = ...
-      if (bag and TBag:Member(self.bags, bag)) then
-        -- Stack the bags if we are in a state to
-        if (CursorHasItem() == nil and CursorHasMoney() == nil and CursorHasSpell() == nil and TBag:IsStacking(TBag.STACK_BNK) == nil) then
-          -- Stack the bags if configured to
-          if (self.cfg["stack_auto"] == 1) then
-            if (self.playerid == TBag.PLAYERID) then
-              -- Send a message to restack
-              self.cfg["stack_once"] = 1;
-            end
-          end
-        end
-        self:UpdateWindow();
-      end
-    elseif ( event == "BAG_UPDATE_COOLDOWN" ) then
-      -- If we're given an argument check if it's a bank bag and ignore the event
-      -- if it isn't.  If not argument is passed we have to update the window 
-      -- regardless.  /sigh
-      local bag = ... 
-      if (not bag or TBag:Member(self.bags, bag)) then	
-        self:UpdateWindow();
-      end
-    elseif ( event == "ITEM_LOCK_CHANGED" ) then
-      local bag,slot = ... 
-      if (bag and slot and type(slot) == "number" and TBag:Member(self.bags, bag)) then
---        TBag:UpdateLockedItem(self.playerid,getglobal(TBag:GetBagItemButtonName(bag,slot)));
-        TBag.ItemButton.UpdateLock(getglobal(TBag:GetBagItemButtonName(bag,slot)))
-      end 
-    else
-      TBag:PrintDEBUG("OnEvent: No event handler found.");
-    end
-  else
-    TBag:PrintDEBUG("Event ignored.");
-  end
-
-  TBag:PrintDEBUG("OnEvent: Finished "..event);
-end
-
 function Bank.Button_HighlightToggle_OnClick(self)
   PlaySound("igMainMenuOptionCheckBoxOn");
   if (TBag.SrchText) then
@@ -1468,10 +1407,11 @@ function Bank:UpdateWindow(resort_req)
   -- Consume a message for bag stacking
   if (self.cfg["stack_once"] == 1) then
     if (self.playerid == TBag.PLAYERID) then
-      TBag:Stack(TBag.STACK_BNK,TBnkItm[self.playerid], stackarr, comparr);
+      if TBag:Stack(TBag.STACK_BNK,TBnkItm[self.playerid], stackarr, comparr) then
+        self.cfg["stack_once"] = 0;
+      end
     end
   end
-  self.cfg["stack_once"] = 0;
 
   if (resort_req >= TBag.REQ_MUST) then
     self.BARITM = TBag:SortItmCache(self.cfg,
