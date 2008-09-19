@@ -2750,12 +2750,6 @@ end
 function TBag:ScanMail()
   local itemLink, idx;
 
-  -- Only scan if the number cached is different than the in our inbox
-  if (GetInboxNumItems() == table.getn(TMailItm[self.PLAYERID])) then
---    self:PrintDEBUG( "Aborting Mail Scan");
-    return;
-  end
-
 --  self:Print( "Scanning Mail: ");
 
   -- Arrange by player (for TMail)
