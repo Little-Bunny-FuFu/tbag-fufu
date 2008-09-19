@@ -84,13 +84,6 @@
         </Layers>
       </Frame>
       <Model name="$parentItemAnim" inherits="ItemAnimTemplate" setAllPoints="true">
-        <Anchors>
-          <Anchor point="BOTTOMRIGHT">
-            <Offset>
-              <AbsDimension x="0" y="0"/>
-            </Offset>
-          </Anchor>
-        </Anchors>
         <Scripts>
           <OnEvent>
 	    TBag.BagButton.ItemAnimOnEvent(self,event,...) 
