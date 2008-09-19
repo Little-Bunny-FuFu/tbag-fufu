@@ -5,9 +5,9 @@ function TBag:VARIABLES_LOADED()
   self:RegisterEvent("BAG_UPDATE_COOLDOWN")
   self:RegisterEvent("ITEM_LOCK_CHANGED")
   self:RegisterEvent("UNIT_INVENTORY_CHANGED")
-  self:RegisterEvent("UPDATE_INVENTORY_ALERTS")
   self:RegisterEvent("PLAYER_LEAVING_WORLD")
   self:RegisterEvent("CRAFT_SHOW")
+  self:RegisterEvent("MAIL_INBOX_UPDATE")
   self:RegisterEvent("TRADE_SKILL_SHOW")
   self:RegisterEvent("AUCTION_HOUSE_SHOW")
   self:RegisterEvent("MAIL_SHOW")
@@ -16,6 +16,9 @@ function TBag:VARIABLES_LOADED()
   self:RegisterEvent("BANKFRAME_CLOSED")
   self:RegisterEvent("PLAYERBANKSLOTS_CHANGED")
   self:RegisterEvent("PLAYERBANKBAGSLOTS_CHANGED")
+
+  -- Scan equipment on login.
+  TBag:ScanEquipped()
 end
 
 function TBag:BAG_UPDATE(event, bag)
@@ -97,7 +100,7 @@ local events = {
   ["MERCHANT_SHOW"] = TBag.UIFRAME_SHOW,
   ["CRAFT_SHOW"] = TBag.Craft,
   ["TRADE_SKILL_SHOW"] = TBag.Trade,
-  ["UPDATE_INVENTORY_CHANGED"] = TBag.ScanEquipped,
+  ["UNIT_INVENTORY_CHANGED"] = TBag.ScanEquipped,
   ["MAIL_INBOX_UPDATE"] = TBag.ScanMail,
   ["PLAYER_LEAVING_WORLD"] = TBag.PLAYER_LEAVING_WORLD,
   ["BANKFRAME_OPENED"] = TBag.BANKFRAME_OPENED,
@@ -107,7 +110,7 @@ local events = {
 }
 
 function TBag:OnEvent(event, ...)
-  --TBag:Print("OnEvent: "..event)
+--  TBag:Print("OnEvent: "..event)
   if events[event] then
     events[event](TBag,event, ...)
   end

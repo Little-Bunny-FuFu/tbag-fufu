@@ -3,10 +3,10 @@
   <Script file="TBag.lua"/>
   <Script file="TBagCmd.lua"/>
   <Script file="Hooks.lua"/>
-  <Script file="Events.lua"/>
   <Script file="TBagOpt.lua"/>
   <Script file="TBagTrade.lua"/>
   <Script file="TBagItemInfo.lua"/>
+  <Script file="Events.lua"/>
   <Script file="TBagTest.lua"/>
 
   <Texture name="TBag_ButtonBkgrTemplate" alphaMode="ADD" file="Interface\AddOns\TBag\images\ButtonBkgr" setAllPoints="true" virtual="true">
