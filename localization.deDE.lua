@@ -38,7 +38,7 @@ TBag.LOCALE = setmetatable({
 -- Other skills
   ["Lockpicking"] = "Schlo\195\159knacken",
   ["Poisons"] = "Gifte",
-  ["Runeforging"] = "Runeforging",
+  ["Runeforging"] = "Runen schmieden",
 
 -----------------------------------------------------------------------
 -- SKILLS REVERSE deDE -> enUS
@@ -66,7 +66,7 @@ TBag.LOCALE = setmetatable({
 -- Other skills
   ["Schlo\195\159knacken"] = "Lockpicking",
   ["Gifte"] = "Poisons",
-  ["Runeforging"] = "Runeforging",
+  ["Runen schmieden"] = "Runeforging",
 
 
 -----------------------------------------------------------------------
@@ -221,7 +221,7 @@ TBag.LOCALE = setmetatable({
   ["FIRST_AID"] = "ERSTE_HILFE",
   ["COOKING"] = "KOCHEN",
   ["FISHING"] = "ANGELN",
-  ["RUNEFORGING"] = "RUNEFORGING",
+  ["RUNEFORGING"] = "RUNEN_SCHMIEDEN",
   ["TRADE_TOOL"] = "HANDELSWERKZEUG",
 
   -- Item slot categories
@@ -258,7 +258,7 @@ TBag.LOCALE = setmetatable({
   ["SHAMAN"] = "SCHAMANE",
   ["WARRIOR"] = "KRIEGER",
   ["HUNTER"] = "J\195\132GER",
-  ["DEATHKNIGHT"] = "DEATHKNIGHT",
+  ["DEATHKNIGHT"] = "TODESRITTER",
   ["CLASS_TOOL"] = "KLASSENWERKZEUG",
   ["CLASS_REAGENT"] = "KLASSENREAGENZ",
   
@@ -551,8 +551,8 @@ TBag.LOCALE = setmetatable({
   ["Decreased Tag Text:"] = "Verkleinerter Markierungstext:",
   ["New Tag Timeout (minutes):"] = "Neu Markierungs Timeout (Minuten):",
   ["Recent Tag Timeout (minutes):"] = "K\195\188rzlich Markierungs Timeout (Minuten):",
-  ["Alt Key Auto-Pickup:"] = "Altanative Auto-Pickup Taste:",
-  ["Alt Key Auto-Panel:"] = "Altanative Auto-Panel Taste:",
+  ["Alt Key Auto-Pickup:"] = "Alternative Auto-Pickup Taste:",
+  ["Alt Key Auto-Panel:"] = "Alternative Auto-Panel Taste:",
   ["Show Keyring Empty Slots (Enable Show above):"] = "Zeige leere Pl\195\164tze im Schl\195\188sselbund (Anzeige oben Aktivieren):",
   ["Show Soul Shard Count On Soul Bags:"] = "Zeige Seelensplitter Anzahl auf Seelentaschen:",
 
@@ -580,8 +580,8 @@ TBag.LOCALE = setmetatable({
   ["Hearthstone"] = "Ruhestein",
   ["Scourgestone"] = "Scourgestone",
   ["Right Click to summon and dismiss"] = "Mit Rechtsklick .* beschw\195\182ren und freigeben%.", 
-  ["Summons or dismisses a Spirit of"] = "Beschw\195\182rt einen Geist des Sommers oder gibt ihn frei",
-  ["Use: Teaches you how to summon this companion."] = "Use: Teaches you how to summon this companion.",
+  ["Summons or dismisses a Spirit of"] = "Beschw\195\182rt einen .*[gG]eist",
+  ["Use: Teaches you how to summon this companion."] = "Benutzen: Lehrt euch, wie man dieses Haustier beschw\195\182rt.",
   ["Requires Riding %("] = "Ben\195\182tigt Reiten %(",
   ["%a+ Scarab"] = "%a+skarab\195\164us",
   ["%a+ Idol"] = "%a+g\195\182tze",
@@ -763,7 +763,7 @@ TBag.LOCALE = setmetatable({
   ["Thieves' Tools"] = "Diebeswerkzeug",
   [" Totem"] = "totem",
   ["Soul Shard"] = "Seelensplitter",
-  ["Corpse Dust"] = "Corpse Dust",
+  ["Corpse Dust"] = "Leichenstaub",
   ["Target Dummy"] = "Zielattrappe",
   ["Elemental %a+"] = "Elementar%s?%a+",
   ["Essence of %a+"] = "Essenz de[sr] %a+",
