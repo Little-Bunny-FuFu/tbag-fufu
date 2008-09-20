@@ -3139,9 +3139,8 @@ function TBag:Stack(where, itmcache, sa, ca)
 --  TBag:PrintDEBUG('Stack Start Memory = '..tostring(GetAddOnMemoryUsage("TBag")));
 
   -- Defer the stack if the cursor has an item on it.
-  if GetCursorInfo() then return end
+  if GetCursorInfo() then return false end
 
-  local hasstacked;
   
   -- Set the mutex
   TBag.ISSTACKING[where] = 1;
@@ -3206,7 +3205,6 @@ function TBag:Stack(where, itmcache, sa, ca)
         if (destitm[self.I_NEED] == 0) then
           dest = dest + 1;
         end
-        hasstacked = 1;
       end
     end
   end
@@ -3264,7 +3262,7 @@ function TBag:Stack(where, itmcache, sa, ca)
 
 --  UpdateAddOnMemoryUsage();
 --  TBag:PrintDEBUG('Stack End Memory = '..tostring(GetAddOnMemoryUsage("TBag")));
-  return hasstacked;
+  return true 
 end
 
 TBag.STACKSKIP = {};
