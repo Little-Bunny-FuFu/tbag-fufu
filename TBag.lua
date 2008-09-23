@@ -5,12 +5,16 @@ local TBag = _G.TBag
 local WoTLK = TBag.WoTLK
 local self = TBag
 
-local rev = '$Rev$'
-local date = '$Date$'
-local dev = '-Alpha';
-local short_date = string.gsub(string.sub(date, string.find(date, '%d+-%d+-%d+')),'-','');
-TBag.VERSION = short_date..'-r'..string.sub(rev, string.find(rev, '%d+'))..dev..
-    '-Shefki';
+
+TBag.VERSION = '@project-version@'
+if TBag.VERSION  == "\64project-version\64" then 
+  local rev = '$Rev$'
+  local date = '$Date$'
+  local dev = '-Alpha'
+  local short_date = string.gsub(string.sub(date, string.find(date, '%d+-%d+-%d+')),'-','')
+  TBag.VERSION = short_date..'-r'..string.sub(rev, string.find(rev, '%d+'))..dev..'-Shefki'
+end
+
     
 
 BINDING_HEADER_TBag = "TBag";

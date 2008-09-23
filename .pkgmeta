@@ -1,0 +1,5 @@
+package-as: TBag
+
+ignore:
+  - dist.sh
+  - scrape-wowhead.perl
