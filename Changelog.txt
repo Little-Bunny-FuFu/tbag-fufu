@@ -1,4 +1,4 @@
-* 20080821-r174-Alpha-Shefki
+* 20080923-r186-Alpha-Shefki
   - This is an Alpha version with major portions of TBag
     rewritten but others still using old code.  There may
     very well be errors.
@@ -11,6 +11,10 @@
   - Updates to the sort list to support changes in Wrath:
     DeathKnights, Minipets, Tokens
   - Catch the Spirit of Competition in the default sorts.
+  - Fix a bug that caused BOE items to be treated as if they 
+    were Soulbound sometimes.
+  - Catch food that restores health and mana that is marked
+    as a Trade Good (e.g. Raw Greater Sagefish)
   - Support the Scourgestone "hearthstone" that Deathknights use
     for showing the hearth location.
   - Allow dragging items onto the bag icon for the default bank
@@ -21,20 +25,18 @@
     of global variables used.
   - Significantly fewer hooks are used.
   - Numerous unnecessary frames were removed.
+  - New event handlers which are more efficient.
+  - Stacking should always happen the next time you open the window
+    if needed now.  In the past sometimes it wouldn't happen if you
+    didn't have the window open when you received the item requiring
+    stacking.
+  - More reliable caching of mailbox contents.
   - Removed the font that shipped with the addon.  Now simply
     use an included font with the game.  Font usage is now
     more consistent across the addon.
+  - Packaged by curseforge now. :)
 
   Current Known Issues:
-  - Redraws due to Cache updates are not happening when they
-    should.  This is a side effect of the new event code not
-    being in since it is unfinished while the new window update
-    code is in.  In particular it will be most noticeable when
-    you open the bank for the first time on a character and
-    it appears blank even though you know items are in it.
-    Simply close the bank and open again.  It may also cause
-    some settings to not take effect immediately.
-  - deDE translation is out of sync.
   - Inscription still needs to be handled.
 
   Wrath Beta players please do not report the following:
