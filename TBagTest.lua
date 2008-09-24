@@ -409,6 +409,12 @@ local tests = {
 
 }
 
+-- Remove the few that are irrelevent for Live clients
+-- XXX: Remove this code once Wrath goes live
+if not TBag.WoTLK then
+  tests[40582] = nil
+end
+
 local function build_itm(id,itm)
   itm[TBag.I_ITEMLINK] = "item:"..id..":0:0:0:0:0:0:0";
   itm[TBag.I_BAG] = 1;
@@ -431,7 +437,7 @@ end
 
 
 
-function TBag:RunTests()
+function TBag:RunTests(verbose)
   local fail = false;
   -- Initialize the cfg with default values
   self:InitDefVals(cfg, self.Inv_Bags, 0, 1);  
@@ -454,8 +460,10 @@ function TBag:RunTests()
     link = tostring(link); 
     
     if (result == true) then
-      local output = string.format(L["SUCCESS: %s"], link);
-      self:Print(output,0,1,0);
+      if (verbose) then
+        local output = string.format(L["SUCCESS: %s"], link);
+        self:Print(output,0,1,0);
+      end
     else
       fail = true;
       local output = string.format(L["FAIL: %s (%s) expected %q but got %q"], link,

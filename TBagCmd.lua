@@ -78,7 +78,7 @@ function TBnk_cmd(msg)
   elseif (cmd == L["config"]) then
     TBnk_OptsFrame:Show();
   elseif (cmd == L["tests"] and TBag.RunTests and type(TBag.RunTests) == "function") then
-    TBag:RunTests();
+    TBag:RunTests(params == "verbose");
   else
     TBag:ShowHelp(TBNK_HELP);
   end
@@ -122,7 +122,7 @@ function TInv_cmd(msg)
   elseif (cmd == L["config"]) then
     TInv_OptsFrame:Show();
   elseif (cmd == L["tests"] and TBag.RunTests and type(TBag.RunTests) == "function") then
-    TBag:RunTests();
+    TBag:RunTests(params == "verbose");
   else
     TBag:ShowHelp(TINV_HELP);
   end
