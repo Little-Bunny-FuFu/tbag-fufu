@@ -516,9 +516,11 @@ function TBag:CleanConfig()
   TBagCfg["Body"] = nil;
   TBagCfg["TInv_RegisterHooks"] = nil;
   TBagCfg["Inv"]["show_top_gfx"] = nil;
+  TBagCfg["Inv"]["show_blizzard_frames"] = nil;
   TBagCfg["Inv"]["show_top_graphics"] = nil;
   TBagCfg["Bnk"]["show_top_gfx"] = nil;
   TBagCfg["Bnk"]["show_top_graphics"] = nil;
+  TBagCfg["Bnk"]["show_blizzard_frames"] = nil;
   for player,_ in pairs(TBagInfo) do
     TBagInfo[player]["spell"] = nil;
     TBagInfo[player]["combat"] = nil;
@@ -1157,7 +1159,6 @@ function TBag:InitDefVals(cfg, bagarr, row1offset, reset)
   self:SetDef(cfg, "show_bag_icons", 0, reset, self.NumFunc, 0, 1);
   self:SetDef(cfg, "spotlight_open", 1, reset, self.NumFunc, 0, 1);
   self:SetDef(cfg, "spotlight_hover", 1, reset, self.NumFunc, 0, 1);
-  self:SetDef(cfg, "show_blizzard_frames", 0, reset, self.NumFunc, 0, 1);
   self:SetDef(cfg, "show_rarity_color", 1, reset, self.NumFunc, 0, 1);
 
   self:SetDef(cfg, "stack_auto", 1, reset, self.NumFunc, 0, 1);

@@ -543,7 +543,6 @@ TBag.LOCALE = setmetatable({
   ["General Display Preferences"] = "Allgemeine Anzeigeeigenschaften",
   ["Show Size on Bag Count:"] = "Zeige Gr\195\182\195\159e auf Taschenzahl:",
   ["Show Bag Icons on Empty Slots:"] = "Zeige Taschensymbol auf leeren Pl\195\164tzen:",
-  ["Show Blizzard Bag Frames:"] = "Zeige Blizzard Taschen Frames:",
   ["Spotlight Open or Selected Bags:"] = "Hebe Offene oder Ausgew\195\164hlte Taschen hervor:",
   ["Spotlight Mouseover:"] = "Mouseover Hervorhebung:",
   ["Show Item Rarity Color:"] = "Zeige Item Seltenheitsfarbe:",

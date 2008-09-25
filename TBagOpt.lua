@@ -252,8 +252,6 @@ function TBag:CreateCfgOpt(cfgopt, cfg, bagarr, updatefunc, resizefunc, forcefun
     cfg, "show_bag_sizes", updatefunc);
   self:MakeCheck(cfgopt, L["Show Bag Icons on Empty Slots:"],
     cfg, "show_bag_icons", forcefunc);
-  self:MakeCheck(cfgopt, L["Show Blizzard Bag Frames:"],
-    cfg, "show_blizzard_frames", updatefunc);
   self:MakeCheck(cfgopt, L["Spotlight Open or Selected Bags:"],
     cfg, "spotlight_open", updatefunc);
   self:MakeCheck(cfgopt, L["Spotlight Mouseover:"],

@@ -538,7 +538,6 @@ TBag.LOCALE = setmetatable({
   ["General Display Preferences"] = "General Display Preferences",
   ["Show Size on Bag Count:"] = "Show Size on Bag Count:",
   ["Show Bag Icons on Empty Slots:"] = "Show Bag Icons on Empty Slots:",
-  ["Show Blizzard Bag Frames:"] = "Show Blizzard Bag Frames:",
   ["Spotlight Open or Selected Bags:"] = "Spotlight Open or Selected Bags:",
   ["Spotlight Mouseover:"] = "Spotlight Mouseover:",
   ["Show Item Rarity Color:"] = "Show Item Rarity Color:",
