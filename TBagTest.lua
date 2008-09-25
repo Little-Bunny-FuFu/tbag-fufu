@@ -53,7 +53,114 @@ local tests = {
   [4401] = L["MINIPET"],  
   [8492] = L["MINIPET"],  
   [23083] = L["MINIPET"],  
-  
+  [35223] = L["MINIPET"],
+  [22200] = L["MINIPET"],
+  [37431] = L["MINIPET"],
+  [37460] = L["MINIPET"],
+  [43626] = L["MINIPET"],
+ 
+  -- Combat Pets
+  [23767] = L["COMBATPETS"],
+  [31666] = L["COMBATPETS"],
+  [22728] = L["COMBATPETS"],
+  [22729] = L["SCHEMATIC"], -- Patern for the Steam Tonk Controller
+  [15778] = L["COMBATPETS"],
+  [21277] = L["MINIPET"], -- Similar name but should be a MINIPET.
+  [12928] = L["QUEST"], -- Similar name but should be a QUEST item.
+  [3456] = L["COMBATPETS"],
+  [23379] = L["COMBATPETS"],
+  [13508] = L["COMBATPETS"],
+  [21325] = L["COMBATPETS"],
+  [15778] = L["COMBATPETS"],
+  [1187] = L["COMBATPETS"],
+  [4391] = L["COMBATPETS"],
+  [4395] = L["COMBATPETS"],
+  [10725] = L["COMBATPETS"],
+  [17067] = L["13_OFFHAND"],
+  [13353] = L["13_OFFHAND"],
+
+  -- Costumes
+  [35275] = L["COSTUMES"],
+  [31337] = L["COSTUMES"],
+  [17712] = L["COSTUMES"],
+  [20410] = L["COSTUMES"],
+  [20409] = L["COSTUMES"],
+  [20399] = L["COSTUMES"],
+  [20398] = L["COSTUMES"],
+  [20397] = L["COSTUMES"],
+  [20413] = L["COSTUMES"],
+  [20411] = L["COSTUMES"],
+  [20414] = L["COSTUMES"],
+  [33079] = L["COSTUMES"],
+  [34068] = L["COSTUMES"],
+  [18258] = L["COSTUMES"],
+  [37816] = L["COSTUMES"],
+  [21213] = L["COSTUMES"],
+
+  -- Fireworks
+  [21570] = L["FIREWORKS"],
+  [21569] = L["FIREWORKS"],
+  [21571] = L["FIREWORKS"],
+  [21574] = L["FIREWORKS"],
+  [21716] = L["FIREWORKS"],
+  [21718] = L["FIREWORKS"],
+  [21744] = L["FIREWORKS"],
+  [21576] = L["FIREWORKS"],
+  [21562] = L["FIREWORKS"],
+  [21561] = L["FIREWORKS"],
+  [21557] = L["FIREWORKS"],
+  [21559] = L["FIREWORKS"],
+  [21558] = L["FIREWORKS"],
+  [21558] = L["FIREWORKS"],
+  [21589] = L["FIREWORKS"],
+  [21590] = L["FIREWORKS"],
+  [21592] = L["FIREWORKS"],
+  [9312] = L["FIREWORKS"],
+  [21713] = L["FIREWORKS"],
+  [9313] = L["FIREWORKS"],
+  [34258] = L["FIREWORKS"],
+  [9318] = L["FIREWORKS"],
+  [9314] = L["FIREWORKS"],
+  [9317] = L["FIREWORKS"],
+  [19026] = L["FIREWORKS"],
+  [9315] = L["FIREWORKS"],
+  [23714] = L["TRINKET"],
+
+  -- Items that create an object people can click on to get an consumeable
+  -- but that aren't already in the consumeable category, e.g. Pony keg
+  [33927] = L["CONSUMABLE"],
+  [33219] = L["CONSUMABLE"],
+
+  -- Toys, various non-equipable items that have no real purpose
+  [34686] = L["TOYS"],
+  [37863] = L["TOYS"],
+  [35227] = L["TOYS"],
+  [32566] = L["TOYS"],
+  [34480] = L["TOYS"],
+  [19035] = L["MISC"].."|"..L["ACT_OPEN"], -- Similar name, ACT_OPEN or MISC 
+  [38301] = L["TOYS"],
+  [32542] = L["TOYS"],
+  [35557] = L["TOYS"],
+  [17202] = L["TOYS"],
+  [33081] = L["TOYS"],
+  [18662] = L["TOYS"],
+  [18640] = L["TOYS"],
+  [38308] = L["TOYS"],
+  [38308] = L["TOYS"],
+  [34497] = L["TOYS"],
+  [38266] = L["TOYS"],
+  [34494] = L["TOYS"],
+  [33223] = L["TOYS"],
+  [34499] = L["TOYS"],
+  [21540] = L["TOYS"],
+  [21536] = L["TOYS"],
+  [22218] = L["TOYS"],
+  [34191] = L["TOYS"],
+  [34684] = L["TOYS"],
+  [22206] = L["13_OFFHAND"], -- Similar effect but equipable.
+  [38233] = L["TOYS"],
+  [34498] = L["TOYS"],
+
   -- Mounts
   [33977] = L["MOUNT"],
   [32861] = L["MOUNT"],
@@ -350,6 +457,7 @@ local tests = {
   [23529] = L["BUFF"],
   [28421] = L["BUFF"],
   [21519] = L["BUFF"],
+  [21267] = L["BUFF"],
   [22788] = L["BUFF"],
   [24421] = L["BUFF"],
   [3823] = L["BUFF"],
@@ -413,10 +521,28 @@ local tests = {
 
 }
 
--- Remove the few that are irrelevent for Live clients
--- XXX: Remove this code once Wrath goes live
 if not TBag.WoTLK then
+  -- Remove the few that are irrelevent for Live clients
+  -- XXX: Remove this code once Wrath goes live
   tests[40582] = nil
+  tests[34494] = nil
+  tests[38266] = nil
+  tests[37431] = nil
+  tests[37460] = nil
+  tests[43626] = nil
+  tests[34498] = nil
+else
+  -- Tests that need to be removed for WoTLK
+  -- XXX: Adjust the tests for Wrath when it goes live.
+  tests[20558] = nil
+  tests[20559] = nil
+  tests[20560] = nil
+  tests[29024] = nil
+  tests[5140] = nil
+
+  -- Known items not working on beta/PTR realms
+  tests[38266] = nil  -- Found from wowhead but apparently not seen on any of the realms
+  tests[22218] = nil  -- Apparently the valentine's day stuff isn't seen
 end
 
 local function build_itm(id,itm)

@@ -883,6 +883,7 @@ function TBag:SetDefLayout(cfg, bagarr, row1offset, reset)
   self:SetCatBar(cfg, L["MISC"], 31, reset);
   self:SetCatBar(cfg, L["UNKNOWN"], 31, reset);
 
+  self:SetCatBar(cfg, L["FIREWORKS"], 30, reset);
   self:SetCatBar(cfg, L["CONSUMABLE"], 30, reset);
 
   self:SetCatBar(cfg, L["ACT_ON"], 29, reset);
@@ -1018,6 +1019,9 @@ function TBag:SetDefLayout(cfg, bagarr, row1offset, reset)
 
 -- Third default line - Swappables
   self:SetCatBar(cfg, L["MINIPET"], 12, reset);
+  self:SetCatBar(cfg, L["COMBATPETS"], 12, reset);
+  self:SetCatBar(cfg, L["COSTUMES"], 12, reset);
+  self:SetCatBar(cfg, L["TOYS"], 12, reset);
   self:SetCatBar(cfg, L["MOUNT"], 12, reset);
 
   self:SetCatBar(cfg, L["FISHING"], 11, reset);
