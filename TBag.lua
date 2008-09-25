@@ -136,6 +136,7 @@ TBag.S_EQUIPPED  = "equip";
 TBag.G_BASIC     = "basic";
 TBag.S_CLASS     = "class";
 TBag.S_HEARTH    = "hearth";
+TBag.S_LEVEL     = "level";
 
 -- Localization Support
 local L = TBag.LOCALE;
@@ -616,12 +617,13 @@ function TBag:PlacePrep(playername,place)
   end
 end
 
-function TBag:AddSearchResult(itm, playername, place)
+function TBag:AddSearchResult(itm, playername, place, playerid)
   -- Strip the unique id
   local itemstring = string.gsub(itm[self.I_ITEMLINK],
     "(item:%d+:%d+:%d+:%d+:%d+:%d+:%-?%d+):%-?%d+","%1:0",1);
   local count = itm[self.I_COUNT];
-  local itemlink = self:MakeHyperlink(itemstring,itm[self.I_NAME],itm[self.I_RARITY]);
+  local itemlink = self:MakeHyperlink(itemstring,itm[self.I_NAME],itm[self.I_RARITY],
+                           TBag:GetPlayerInfo(playerid,TBag.G_BASIC)[TBag.S_LEVEL]);
 
   if (itemlink) then
     self:PrintDEBUG("TBag:AddSearchResult "..count.." "..itemlink
@@ -657,7 +659,7 @@ function TBag:GatherSearchResults(itmcache, place)
           if (itm[self.I_ITEMLINK]) and (itm[self.I_NAME]) then
             -- Do case insensitive searches
             if (string.find(string.lower(itm[self.I_NAME]), self.SrchText)) then
-              self:AddSearchResult(itm, playername, place);
+              self:AddSearchResult(itm, playername, place, playerid);
             end
           end
         end
@@ -1652,7 +1654,7 @@ function TBag:GetBagNumFrame(bag)
 end
 
 
-function TBag:MakeHyperlink(itemstring,name,quality)
+function TBag:MakeHyperlink(itemstring,name,quality,level)
   local itemlink;
   -- First try to generate the itemlink off TBag's cached data.
   -- If we don't have the info to do it then fall back on GetItemInfo().
@@ -1660,6 +1662,15 @@ function TBag:MakeHyperlink(itemstring,name,quality)
   if (name) and (itemstring) and (quality) then
     quality = tonumber(quality);
     local _,_,_,color = GetItemQualityColor(quality);
+    if TBag.WoTLK then
+      -- item links now include the level of the linker in Wrath.
+      if level then
+        itemstring = itemstring..":"..level
+      else
+        -- failsave in case level isn't passed through.
+        itemstring = itemstring..":"..UnitLevel("player")
+      end
+    end
     itemlink = color.."|H"..itemstring.."|h["..name.."]|h|r";
   elseif (itemstring) then
     _,itemlink = GetItemInfo(itemstring);
@@ -2125,11 +2136,21 @@ function TBag:SetInventoryItem(tt, playerid, itemlink, bag, slot)
       end
     else
       -- otherwise, just set a link.  Not as good, but safe
+      if TBag.WoTLK and itemlink and itemlink ~= "" then
+        local level = TBag:GetPlayerInfo(playerid,TBag.G_BASIC)[TBag.S_LEVEL] or
+                    UnitLevel("player")
+        itemlink = itemlink..":"..level
+      end
       tt:SetHyperlink(itemlink);
       self:UpdateHearth(tt, itemlink, playerid);
     end
   else
     -- Always just set links for other players
+    if TBag.WoTLK and itemlink and itemlink ~= "" then
+      local level = TBag:GetPlayerInfo(playerid,TBag.G_BASIC)[TBag.S_LEVEL] or
+                    UnitLevel("player")
+      itemlink = itemlink..":"..level
+    end
     tt:SetHyperlink(itemlink);
     self:UpdateHearth(tt, itemlink, playerid);
   end
@@ -2164,6 +2185,11 @@ function TBag:MakeToolTipStr(playerid, itemlink, bag, slot, mailitem, attach)
   elseif (itemlink) and (mailitem) and (attach) then
     tt:SetInboxItem(mailitem, attach);
   elseif (itemlink) then
+    if TBag.WoTLK then 
+      local level = TBag:GetPlayerInfo(playerid,TBag.G_BASIC)[TBag.S_LEVEL] or
+                    UnitLevel("player")
+      itemlink = itemlink..":"..level
+    end
     tt:SetHyperlink(itemlink);
   end
 

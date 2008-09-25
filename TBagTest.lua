@@ -574,7 +574,7 @@ function TBag:GetCategory(id)
 
  local _, itm = test(id,"TEST")
  local link = self:MakeHyperlink(itm[self.I_ITEMLINK],itm[self.I_NAME],
-                                 itm[self.I_RARITY]);
+                                 itm[self.I_RARITY],80);
  link = tostring(link); 
  TBag:Print(string.format("%s (%s) = %s",link,tostring(id),tostring(itm[self.I_CAT])))
 end
@@ -589,7 +589,7 @@ function TBag:RunTests(verbose)
   for id,cat in pairs(tests) do
     local result, itm = test(id,cat)
     local link = self:MakeHyperlink(itm[self.I_ITEMLINK],itm[self.I_NAME],
-                                    itm[self.I_RARITY]);
+                                    itm[self.I_RARITY],80);
     link = tostring(link); 
     
     if (result == true) then

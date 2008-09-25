@@ -16,9 +16,11 @@ function TBag:VARIABLES_LOADED()
   self:RegisterEvent("BANKFRAME_CLOSED")
   self:RegisterEvent("PLAYERBANKSLOTS_CHANGED")
   self:RegisterEvent("PLAYERBANKBAGSLOTS_CHANGED")
+  self:RegisterEvent("PLAYER_LEVEL_UP")
 
   -- Scan equipment on login.
   TBag:ScanEquipped()
+  TBagInfo[TBag.PLAYERID][TBag.G_BASIC][TBag.S_LEVEL] = UnitLevel("player")
 end
 
 function TBag:BAG_UPDATE(event, bag)
@@ -68,8 +70,9 @@ function TBag:UIFRAME_SHOW()
   TInvFrame:Show()
 end
 
-function TBag:PlAYER_LEAVING_WORLD()
-  TBagInfo[TBag.PLAYERID][TBAg.G_BASIC][TBag.S_HEARTH] = GetBindLocation()
+function TBag:PLAYER_LEAVING_WORLD()
+  TBagInfo[TBag.PLAYERID][TBag.G_BASIC][TBag.S_HEARTH] = GetBindLocation()
+  TBagInfo[TBag.PLAYERID][TBag.G_BASIC][TBag.S_LEVEL] = UnitLevel("player")
 end
 
 function TBag:BANKFRAME_OPENED()
@@ -90,6 +93,10 @@ function TBag:PLAYERBANKBAGSLOTS_CHANGED()
   TBnkFrame:UpdateWindow(TBag.REQ_MUST)
 end
 
+function TBag:PLAYER_LEVEL_UP(level)
+  TBagInfo[TBag.PLAYERID][TBag.G_BASIC][TBag.S_LEVEL] = level 
+end
+
 local events = {
   ["VARIABLES_LOADED"] = TBag.VARIABLES_LOADED,
   ["BAG_UPDATE"] = TBag.BAG_UPDATE,
@@ -107,6 +114,7 @@ local events = {
   ["BANKFRAME_CLOSED"] = TBag.BANKFRAME_CLOSED,
   ["PLAYERBANKSLOTS_CHANGED"] = TBag.PLAYERBANKSLOTS_CHANGED,
   ["PLAYERBANKBAGSLOTS_CHANGED"] = TBag.PLAYERBANKBAGSLOTS_CHANGED,
+  ["PLAYER_LEVEL_UP"] = TBag.PLAYER_LEVEL_UP,
 }
 
 function TBag:OnEvent(event, ...)

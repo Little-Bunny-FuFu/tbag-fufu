@@ -424,6 +424,11 @@ function BagButton:OnEnter()
     return
   else
     local itemlink = TBag:GetPlayerBagCfg(mainFrame.playerid, bag, TBag.I_ITEMLINK)
+    if TBag.WoTLK and itemlink and itemlink ~= "" then
+      local level = TBag:GetPlayerInfo(mainFrame.playerid,TBag.G_BASIC)[TBag.S_LEVEL] or
+                    UnitLevel("player")
+      itemlink = itemlink..":"..level
+    end
     if (itemlink and itemlink ~= "") then
       GameTooltip:SetHyperlink(itemlink)
       GameTooltip:Show()
@@ -482,7 +487,8 @@ function BagButton:OnClick(button,down,drag)
   -- Handle linking of the bags
   if IsModifiedClick("CHATLINK") then
     local hyperlink = TBag:MakeHyperlink(itm[TBag.I_ITEMLINK], itm[TBag.I_NAME],
-                                         itm[TBag.I_RARITY])
+                                         itm[TBag.I_RARITY],
+					 TBag:GetPlayerInfo(mainFrame.playerid,TBag.G_BASIC)[TBag.S_LEVEL] or UnitLevel("player"))
     if hyperlink and ChatEdit_InsertLink(hyperlink) then
       self:SetChecked(not self:GetChecked())
       return
