@@ -77,6 +77,8 @@ function TBnk_cmd(msg)
     TBag:DeleteCachedCharacter(char,realm); 
   elseif (cmd == L["config"]) then
     TBnk_OptsFrame:Show();
+  elseif (cmd == L["getcat"] and TBag.GetCategory and type(TBag.GetCategory) == "function") then
+    TBag:GetCategory(params);
   elseif (cmd == L["tests"] and TBag.RunTests and type(TBag.RunTests) == "function") then
     TBag:RunTests(params == "verbose");
   else
@@ -121,6 +123,8 @@ function TInv_cmd(msg)
     TBag:DeleteCachedCharacter(char,realm); 
   elseif (cmd == L["config"]) then
     TInv_OptsFrame:Show();
+  elseif (cmd == L["getcat"] and TBag.GetCategory and type(TBag.GetCategory) == "function") then
+    TBag:GetCategory(params);
   elseif (cmd == L["tests"] and TBag.RunTests and type(TBag.RunTests) == "function") then
     TBag:RunTests(params == "verbose");
   else

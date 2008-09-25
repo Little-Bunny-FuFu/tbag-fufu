@@ -2142,9 +2142,9 @@ function TBag:MakeToolTipStr(playerid, itemlink, bag, slot, mailitem, attach)
   if (not tt) then
     tt = CreateFrame("GameTooltip","TBag_tt");
     -- Allow tooltip set methods to dynamically add new lines based on these
-    TBag_tt:AddFontStrings(
-      TBag_tt:CreateFontString("$parentTextLeft1", nil, "GameTooltipText"),
-      TBag_tt:CreateFontString("$parentTextRight1", nil, "GameTooltipText")
+    tt:AddFontStrings(
+      tt:CreateFontString("$parentTextLeft1", nil, "GameTooltipText"),
+      tt:CreateFontString("$parentTextRight1", nil, "GameTooltipText")
     );
   end
   tt:SetOwner(UIParent, "ANCHOR_NONE");  -- this makes sure that tooltip.valid = true

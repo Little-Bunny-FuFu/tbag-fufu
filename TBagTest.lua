@@ -16,6 +16,10 @@ local cfg = { }
 
 -- Table of tests to execute.
 -- Key is an itemid and the value is the expected category.
+-- Multiple possible category matches can be separated with a | (pipe) character.
+-- This is needed for some items like items that can be opened, the tooltip
+-- string for opening the item only shows if you actually have the item in your
+-- inventory.
 local tests = {
   [1357] = L["ACT_ON"],
   -- Note we can't test the Right click to open rule because it's
@@ -428,14 +432,27 @@ end
 --   output: result (boolean), itm (table produced) 
 local function test(id,cat)
   local itm = { };
+  local result = false
 
   build_itm(id,itm);
   TBag:PickBar(cfg, "TBAGTEST|TBAGTEST", itm, "", "");
-  
-  return (cat == itm[TBag.I_CAT]), itm;
+  for c in cat:gmatch("[^|]+") do 
+    if c == itm[TBag.I_CAT] then
+      result = true
+    end
+  end
+  return result, itm;
 end
 
+function TBag:GetCategory(id)
+ self:InitDefVals(cfg, self.Inv_Bags, 0, 1)
 
+ local _, itm = test(id,"TEST")
+ local link = self:MakeHyperlink(itm[self.I_ITEMLINK],itm[self.I_NAME],
+                                 itm[self.I_RARITY]);
+ link = tostring(link); 
+ TBag:Print(string.format("%s (%s) = %s",link,tostring(id),tostring(itm[self.I_CAT])))
+end
 
 function TBag:RunTests(verbose)
   local fail = false;
@@ -443,15 +460,6 @@ function TBag:RunTests(verbose)
   self:InitDefVals(cfg, self.Inv_Bags, 0, 1);  
 
   self:Print(L["TEST RUN STARTING"]);
-  
-  -- Run through all the test ids to get them cached.
-  for id in pairs (tests) do
-    local start = time();
-    local itemlink = "item:"..id;
-    repeat 
-      local tooltip = self:MakeToolTipStr(nil,itemlink)
-    until (tooltip ~= L[" Retrieving item information"] or time() - start >= 2)
-  end
   
   for id,cat in pairs(tests) do
     local result, itm = test(id,cat)
