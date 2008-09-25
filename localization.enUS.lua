@@ -579,7 +579,6 @@ TBag.LOCALE = setmetatable({
   ["Spirit Shard"] = "Spirit Shard",
   ["Use: Permanently"] = "Use: Permanently",
   ["Hearthstone"] = "Hearthstone",
-  ["Scourgestone"] = "Scourgestone",
   ["Right Click to summon and dismiss"] = "Right Click to summon and dismiss",
   ["Summons or dismisses a Spirit of"] = "Summons or dismisses a Spirit of",
   ["Use: Teaches you how to summon this companion."] = "Use: Teaches you how to summon this companion.",

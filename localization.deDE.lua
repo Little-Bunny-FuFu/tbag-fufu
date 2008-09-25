@@ -584,7 +584,6 @@ TBag.LOCALE = setmetatable({
   ["Spirit Shard"] = "Geistsplitter",
   ["Use: Permanently"] = "Benutzen: .*dauerhaft",
   ["Hearthstone"] = "Ruhestein",
-  ["Scourgestone"] = "Scourgestone",
   ["Right Click to summon and dismiss"] = "Mit Rechtsklick .* beschw\195\182ren und freigeben%.", 
   ["Summons or dismisses a Spirit of"] = "Beschw\195\182rt einen .*[gG]eist",
   ["Use: Teaches you how to summon this companion."] = "Benutzen: Lehrt euch, wie man dieses Haustier beschw\195\182rt.",

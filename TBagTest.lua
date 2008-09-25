@@ -47,7 +47,6 @@ local tests = {
 
   -- Hearthstones
   [6948] = L["HEARTH"],
-  [40582] = L["HEARTH"], -- New one for Deathknights
 
   -- Minipets
   [4401] = L["MINIPET"],  

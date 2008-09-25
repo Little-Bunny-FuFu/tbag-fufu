@@ -2086,8 +2086,7 @@ function TBag:UpdateHearth(tt, itemlink, playerid)
   -- as well.
   if (playerid ~= self.PLAYERID and
       (string.match(itemlink,"item:6948:") or
-      string.match(itemlink,"item:28585:") or
-      string.match(itemlink,"item:40582:"))) then
+      string.match(itemlink,"item:28585:"))) then
     local hearth;
     if (TBagInfo[playerid] and TBagInfo[playerid][self.G_BASIC]) then
       hearth = TBagInfo[playerid][self.G_BASIC][self.S_HEARTH];

@@ -15,8 +15,6 @@
     were Soulbound sometimes.
   - Catch food that restores health and mana that is marked
     as a Trade Good (e.g. Raw Greater Sagefish)
-  - Support the Scourgestone "hearthstone" that Deathknights use
-    for showing the hearth location.
   - Allow dragging items onto the bag icon for the default bank
     slots just like the other bags in the bank.
   - A large amount of code duplication between the bank and
