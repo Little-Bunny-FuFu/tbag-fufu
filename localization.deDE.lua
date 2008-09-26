@@ -833,5 +833,5 @@ TBag.LOCALE = setmetatable({
   ["Fetch Ball"] = "Apportierball",
   ["Happy Pet Snack"] = "Leckerli f\195\188r gl\195\188ckliche Haustiere",
   ["Paper Zeppelin Kit"] = "Papierzeppelinset",
-  ["Titanium Seal of Dalaran"] = "Titanium Seal of Dalaran",
+  ["Titanium Seal of Dalaran"] = "Titansiegel von Dalaran",
 }, { __index = TBag.LOCALE }); 
