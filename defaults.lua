@@ -326,8 +326,6 @@ TBag.DefaultSearchList = {
   { L["HEALTH_RESTORE"], L[""], L["Healing Potion"], L["Consumable"], L[""] },
   { L["HEALTH_RESTORE"], L[""], L["[Rr]estores %d+ to %d+ health"], L[""], L[""] },
   { L["HEALTH_RESTORE"], L[""], L["Place a %a+ stone statue"], L["Consumable"], L[""] },
-  { L["CONSUMABLE"], L[""], L["Goblin Gumbo Kettle"], L[""], L[""] },
-  { L["CONSUMABLE"], L[""], L["Brewfest Pony Keg"], L[""], L[""] },
 
 -- Combat buffs
   { L["CURE"], L[""], L[" [Cc]ure.* poison"], L[""], L[""] },

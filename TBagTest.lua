@@ -125,8 +125,7 @@ local tests = {
   [9315] = L["FIREWORKS"],
   [23714] = L["TRINKET"],
 
-  -- Items that create an object people can click on to get an consumeable
-  -- but that aren't already in the consumeable category, e.g. Pony keg
+  -- Consumables
   [33927] = L["CONSUMABLE"],
   [33219] = L["CONSUMABLE"],
 
