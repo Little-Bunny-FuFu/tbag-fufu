@@ -158,6 +158,7 @@ local tests = {
   [22206] = L["13_OFFHAND"], -- Similar effect but equipable.
   [38233] = L["TOYS"],
   [34498] = L["TOYS"],
+  [44430] = L["TOYS"],
 
   -- Mounts
   [33977] = L["MOUNT"],
@@ -529,6 +530,7 @@ if not TBag.WoTLK then
   tests[37460] = nil
   tests[43626] = nil
   tests[34498] = nil
+  tests[44430] = nil
 else
   -- Tests that need to be removed for WoTLK
   -- XXX: Adjust the tests for Wrath when it goes live.
