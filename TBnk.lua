@@ -642,6 +642,11 @@ function Bank:SetBottomRightButton_Anchors()
     y = y + 30;
   end
   TBnkFrame_MoneyFrame:SetPoint("BOTTOMRIGHT",TBnkFrame,"BOTTOMRIGHT",5,y);
+  if TBag.WoTLK then
+    TBnkFrame_TokenFrame:SetPoint("BOTTOMRIGHT",TBnkFrame_MoneyFrame,"TOPRIGHT",0,-5);
+  else
+    TBnkFrame:Hide()
+  end
 end
 
 function Bank:SetButton_Anchors()

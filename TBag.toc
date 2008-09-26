@@ -20,6 +20,7 @@ localization.deDE.lua
 defaults.lua
 TBag.xml
 Buttons.xml
+Tokens.xml
 MainFrame.xml
 TInv.xml
 TInvOpts.xml

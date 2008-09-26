@@ -1,0 +1,37 @@
+<!-- $Id: $ -->
+<Ui xmlns="http://www.blizzard.com/wow/ui/"   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"   xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
+  <Script file="Tokens.lua"/>
+  <Frame name="TBag_TokenFrameTemplate" virtual="true">
+    <Size>
+      <AbsDimension x="183" y="32"/>
+    </Size>
+    <Frames>
+      <Frame name="$parentToken1" inherits="BackpackTokenTemplate" id="1">
+        <Anchors>
+          <Anchor point="RIGHT">
+            <Offset x="-13" y="0"/>
+          </Anchor>
+        </Anchors>
+      </Frame> 
+      <Frame name="$parentToken2" inherits="BackpackTokenTemplate" id="2">
+        <Anchors>
+          <Anchor point="RIGHT" relativeTo="$parentToken1" relativePoint="LEFT">
+            <Offset x="-2" y="0"/>
+          </Anchor>
+        </Anchors>
+      </Frame> 
+      <Frame name="$parentToken3" inherits="BackpackTokenTemplate" id="3">
+        <Anchors>
+          <Anchor point="RIGHT" relativeTo="$parentToken2" relativePoint="LEFT">
+            <Offset x="-2" y="0"/>
+          </Anchor>
+        </Anchors>
+      </Frame> 
+    </Frames>
+    <Scripts>
+      <OnShow>
+        TBag.Tokens.Update(self)
+      </OnShow>
+    </Scripts>
+  </Frame>
+</Ui>

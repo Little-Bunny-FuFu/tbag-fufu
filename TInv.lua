@@ -504,6 +504,11 @@ function Inv:SetBottomRightButton_Anchors()
     y = y + 30;
   end
   TInvFrame_MoneyFrame:SetPoint("BOTTOMRIGHT",TInvFrame,"BOTTOMRIGHT",5,y);
+  if TBag.WoTLK then
+    TInvFrame_TokenFrame:SetPoint("BOTTOMRIGHT",TInvFrame_MoneyFrame,"TOPRIGHT",0,-5);
+  else
+    TInvFrame_TokenFrame:Hide()
+  end
 end
 
 function Inv:SetButton_Anchors()
