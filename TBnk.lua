@@ -1301,6 +1301,7 @@ function Bank.RightClickMenu_populate(...)
           info = {
             ["text"] = L["Hide Player Dropdown"];
             ["func"] = TBnkFrame.Toggle_UserDropdown;
+            ["keepShownOnClick"] = 1;
             };
           if (TBnkFrame.cfg["show_userdropdown"] == 0) then
             info["checked"] = 1;
@@ -1309,6 +1310,7 @@ function Bank.RightClickMenu_populate(...)
           info = {
             ["text"] = L["Hide Highlight Button"];
             ["func"] = TBnkFrame.Toggle_HighlightButton;
+            ["keepShownOnClick"] = 1;
             };
           if (TBnkFrame.cfg["show_hilightbutton"] == 0) then
             info["checked"] = 1;
@@ -1317,6 +1319,7 @@ function Bank.RightClickMenu_populate(...)
           info = {
             ["text"] = L["Hide Edit Button"];
             ["func"] = TBnkFrame.Toggle_EditButton;
+            ["keepShownOnClick"] = 1;
            };
           if (TBnkFrame.cfg["show_editbutton"] == 0) then
             info["checked"] = 1;
@@ -1325,6 +1328,7 @@ function Bank.RightClickMenu_populate(...)
           info = {
             ["text"] = L["Hide Show Purchase Button"];
             ["func"] = TBnkFrame.Toggle_Purchase;
+            ["keepShownOnClick"] = 1;
             };
           if (TBnkFrame.cfg["show_purchasetoggle"] == 0) then
             info["checked"] = 1;
@@ -1333,6 +1337,7 @@ function Bank.RightClickMenu_populate(...)
           info = {
             ["text"] = L["Hide Re-sort Button"];
             ["func"] = TBnkFrame.Toggle_ReloadButton;
+            ["keepShownOnClick"] = 1;
             };
           if (TBnkFrame.cfg["show_reloadbutton"] == 0) then
             info["checked"] = 1;
@@ -1341,6 +1346,7 @@ function Bank.RightClickMenu_populate(...)
           info = {
             ["text"] = L["Hide Lock Button"];
             ["func"] = TBnkFrame.Toggle_LockButton;
+            ["keepShownOnClick"] = 1;
             };
           if (TBnkFrame.cfg["show_lockbutton"] == 0) then
             info["checked"] = 1;
@@ -1349,6 +1355,7 @@ function Bank.RightClickMenu_populate(...)
           info = {
             ["text"] = L["Hide Close Button"];
             ["func"] = TBnkFrame.Toggle_CloseButton;
+            ["keepShownOnClick"] = 1;
             };
           if (TBnkFrame.cfg["show_closebutton"] == 0) then
             info["checked"] = 1;
@@ -1357,6 +1364,7 @@ function Bank.RightClickMenu_populate(...)
           info = {
             ["text"] = L["Hide Total"];
             ["func"] = TBnkFrame.Toggle_Total;
+            ["keepShownOnClick"] = 1;
             };
           if (TBnkFrame.cfg["show_total"] == 0) then
             info["checked"] = 1;
@@ -1365,6 +1373,7 @@ function Bank.RightClickMenu_populate(...)
           info = {
             ["text"] = L["Hide Bag Buttons"];
             ["func"] = TBnkFrame.Toggle_BagSlotButtons;
+            ["keepShownOnClick"] = 1;
             };
           if (TBnkFrame.cfg["show_bagbuttons"] == 0) then
             info["checked"] = 1;
@@ -1374,6 +1383,7 @@ function Bank.RightClickMenu_populate(...)
             info = {
               ["text"] = L["Hide Tokens"];
               ["func"] = TBnkFrame.Toggle_Token;
+              ["keepShownOnClick"] = 1;
               };
             if (TBnkFrame.cfg["show_tokens"] == 0) then
               info["checked"] = 1;
@@ -1383,6 +1393,7 @@ function Bank.RightClickMenu_populate(...)
           info = {
             ["text"] = L["Hide Money"];
             ["func"] = TBnkFrame.Toggle_Money;
+            ["keepShownOnClick"] = 1;
             };
           if (TBnkFrame.cfg["show_money"] == 0) then
             info["checked"] = 1;
