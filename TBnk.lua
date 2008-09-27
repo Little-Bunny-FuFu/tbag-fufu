@@ -204,6 +204,9 @@ function Bank:init(reset)
   if (cfg["show_money"] == 0) then
     TBnkFrame_MoneyFrame:Hide();
   end
+  if (cfg["show_tokens"] == 0) then
+    TBnkFrame_TokenFrame:Hide();
+  end
 
   TBag:BuildBarClassList(self.BC_LIST, cfg);
 
@@ -580,7 +583,7 @@ function Bank:SetBottomLeftButton_Anchors()
   if (TBnkFrame_Total:IsVisible()) then
     bags_row = bags_row + 1;
   end
-  if TBnkFrame_MoneyFrame:IsVisible() then
+  if TBnkFrame_MoneyFrame:IsVisible() or TBnkFrame_TokenFrame:IsVisible() then
     bags_row = bags_row + 3;
   end
 
@@ -602,7 +605,7 @@ function Bank:SetBottomLeftButton_Anchors()
   if (TBnkFrame_Total:IsVisible()) then
     slotpurchase_row = slotpurchase_row + 1;
   end
-  if TBnkFrame_MoneyFrame:IsVisible() then
+  if TBnkFrame_MoneyFrame:IsVisible() or TBnkFrame_TokenFrame:IsVisible() then
     slotpurchase_row = slotpurchase_row + 4;
   end
 
@@ -637,16 +640,35 @@ function Bank:SetBottomLeftButton_Anchors()
 end
 
 function Bank:SetBottomRightButton_Anchors()
-  local y = 5;
-  if (self.edit_mode == 1) then
-    y = y + 30;
+  local buttons = {
+    "TBnkFrame_MoneyFrame",
+    "TBnkFrame_TokenFrame",
+  } 
+  local button_right = nil
+
+  -- Not used for pre wrath clients
+  if not TBag.WoTLK then
+    TBnkFrame_TokenFrame:Hide()
   end
-  TBnkFrame_MoneyFrame:SetPoint("BOTTOMRIGHT",TBnkFrame,"BOTTOMRIGHT",5,y);
-  if TBag.WoTLK then
-    TBnkFrame_TokenFrame:SetPoint("BOTTOMRIGHT",TBnkFrame_MoneyFrame,"TOPRIGHT",0,-5);
-  else
-    TBnkFrame:Hide()
-  end
+
+  for _, button_name in ipairs(buttons) do
+    button = getglobal(button_name)
+    if button then
+      button:ClearAllPoints()
+      if button_right then
+        button:SetPoint("BOTTOMRIGHT",button_right,"TOPRIGHT",0,-5);
+      else
+        local y = 5
+        if self.edit_mode == 1 then
+          y = y + 30
+        end
+        button:SetPoint("BOTTOMRIGHT",TBnkFrame,"BOTTOMRIGHT",5,y)
+      end
+      if button:IsVisible() then
+        button_right = button
+      end
+    end
+  end 
 end
 
 function Bank:SetButton_Anchors()
@@ -738,6 +760,18 @@ function Bank.Toggle_Money()
   else
     TBnkFrame.cfg["show_money"] = 1;
     TBnkFrame_MoneyFrame:Show();
+    TBnkFrame:SetButton_Anchors();
+  end
+end
+
+function Bank.Toggle_Token()
+  if (TBnkFrame.cfg["show_tokens"] == 1) then
+    TBnkFrame.cfg["show_tokens"] = 0;
+    TBnkFrame_TokenFrame:Hide();
+    TBnkFrame:SetButton_Anchors();
+  else
+    TBnkFrame.cfg["show_tokens"] = 1;
+    TBnkFrame_TokenFrame:Show();
     TBnkFrame:SetButton_Anchors();
   end
 end
@@ -1336,6 +1370,16 @@ function Bank.RightClickMenu_populate(...)
             info["checked"] = 1;
           end
           UIDropDownMenu_AddButton(info, level);
+	  if TBag.WoTLK then
+            info = {
+              ["text"] = L["Hide Tokens"];
+              ["func"] = TBnkFrame.Toggle_Token;
+              };
+            if (TBnkFrame.cfg["show_tokens"] == 0) then
+              info["checked"] = 1;
+            end
+            UIDropDownMenu_AddButton(info, level);
+	  end
           info = {
             ["text"] = L["Hide Money"];
             ["func"] = TBnkFrame.Toggle_Money;

@@ -502,6 +502,7 @@ TBag.LOCALE = setmetatable({
   ["Hide Total"] = "Hide Total",
   ["Hide Bag Buttons"] = "Hide Bag Buttons",
   ["Hide Money"] = "Hide Money",
+  ["Hide Tokens"] = "Hide Tokens",
   ["The Bank"] = "The Bank",
   ["|c%sLeft click to move category |r|c%s%s|r|c%s to bar |r|c%s%s|r"] = "|c%sLeft click to move category |r|c%s%s|r|c%s to bar |r|c%s%s|r",
   ["|c%sBar |r|c%s%s|r"] = "|c%sBar |r|c%s%s|r",

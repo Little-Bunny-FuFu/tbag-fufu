@@ -507,6 +507,7 @@ TBag.LOCALE = setmetatable({
   ["Hide Total"] = "Verstecke Gesamt",
   ["Hide Bag Buttons"] = "Verstecke Taschenkn\195\182pfe",
   ["Hide Money"] = "Verstecke Geld",
+  ["Hide Tokens"] = "Hide Tokens",
   ["The Bank"] = "Die Bank",
   ["|c%sLeft click to move category |r|c%s%s|r|c%s to bar |r|c%s%s|r"] = "|c%sLinksklick um Kategorie |r|c%s%s|r|c%s zu Felder zu verschieben |r|c%s%s|r",
   ["|c%sBar |r|c%s%s|r"] = "|c%sFeld |r|c%s%s|r",

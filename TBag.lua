@@ -1200,6 +1200,7 @@ function TBag:InitDefVals(cfg, bagarr, row1offset, reset)
   self:SetDef(cfg, "show_total", 1, reset, self.NumFunc, 0, 1);
   self:SetDef(cfg, "show_bagbuttons", 1, reset, self.NumFunc, 0, 1);
   self:SetDef(cfg, "show_money", 1, reset, self.NumFunc, 0, 1);
+  self:SetDef(cfg, "show_tokens", 1, reset, self.NumFunc, 0, 1);
 
   -- Do the layout
   self:SetDefLayout(cfg, bagarr, row1offset, reset);
@@ -2976,8 +2977,9 @@ function TBag:LayoutWindow(frame)
       PAD_BOTTOM = PAD_BOTTOM + self.PAD_BOTTOM_EDIT;
     end
      -- If we need the extra row...  add it in.
-    if (TInv_SearchBox:IsVisible()
-        and (TInvFrame_Total:IsVisible() or TInvacterBag3Slot:IsVisible())) then
+    if ((TInv_SearchBox:IsVisible()
+        and (TInvFrame_Total:IsVisible() or TInvacterBag3Slot:IsVisible())) or
+        TInvFrame_MoneyFrame:IsVisible() and TInvFrame_TokenFrame:IsVisible()) then
       PAD_BOTTOM = PAD_BOTTOM + self.PAD_BOTTOM_SEARCH;
     end
     if (PAD_BOTTOM > 0) then
@@ -2993,7 +2995,8 @@ function TBag:LayoutWindow(frame)
  else
     -- TBnkFrame
     if (TBnkFrame_Total:IsVisible() or TBnkFrameBagBank:IsVisible() or
-        TBnkFrame_MoneyFrame:IsVisible() or TBnk_SlotCostFrame:IsVisible()) then
+        TBnkFrame_MoneyFrame:IsVisible() or TBnk_SlotCostFrame:IsVisible() or
+        TBnkFrame_TokenFrame:IsVisible()) then
       PAD_BOTTOM = PAD_BOTTOM + self.PAD_BOTTOM_NORM;
     end
     if (edit_mode == 1) then
@@ -3008,7 +3011,7 @@ function TBag:LayoutWindow(frame)
     if (TBnkFrame_Total:IsVisible()) then
       bags_row = bags_row + 1;
     end
-    if TBnkFrame_MoneyFrame:IsVisible() then
+    if TBnkFrame_MoneyFrame:IsVisible() or TBnkFrame_TokenFrame:IsVisible() then
       bags_row = bags_row + 4;
     end
     local slotpurchase_row = 0;
@@ -3018,11 +3021,12 @@ function TBag:LayoutWindow(frame)
     if (TBnkFrame_Total:IsVisible()) then
       slotpurchase_row = slotpurchase_row + 1;
     end
-    if TBnkFrame_MoneyFrame:IsVisible() then
+    if TBnkFrame_MoneyFrame:IsVisible() or TBnkFrame_TokenFrame:IsVisible() then
       slotpurchase_row = slotpurchase_row + 4;
     end
     if (cfg["maxColumns"] <= bags_row or 
-       (cfg["maxColumns"] <= slotpurchase_row and TBnk_SlotCostFrame:IsVisible())) then
+       (cfg["maxColumns"] <= slotpurchase_row and TBnk_SlotCostFrame:IsVisible()) or
+       (TBnkFrame_MoneyFrame:IsVisible() and TBnkFrame_TokenFrame:IsVisible())) then
       PAD_BOTTOM = PAD_BOTTOM + self.PAD_BOTTOM_NORM;
     end
 

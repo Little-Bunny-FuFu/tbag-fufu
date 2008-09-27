@@ -231,6 +231,9 @@ function Inv:init(reset)
   if (cfg["show_money"] == 0) then
     TInvFrame_MoneyFrame:Hide();
   end
+  if (cfg["show_tokens"] == 0) then
+    TInvFrame_TokenFrame:Hide();
+  end
 
   TBag:BuildBarClassList(self.BC_LIST, cfg);
 
@@ -499,15 +502,34 @@ function Inv:SetBottomLeftButton_Anchors()
 end
 
 function Inv:SetBottomRightButton_Anchors()
-  local y = 5;
-  if (TInvFrame.edit_mode == 1) then
-    y = y + 30;
-  end
-  TInvFrame_MoneyFrame:SetPoint("BOTTOMRIGHT",TInvFrame,"BOTTOMRIGHT",5,y);
-  if TBag.WoTLK then
-    TInvFrame_TokenFrame:SetPoint("BOTTOMRIGHT",TInvFrame_MoneyFrame,"TOPRIGHT",0,-5);
-  else
+  local buttons = {
+    "TInvFrame_MoneyFrame",
+    "TInvFrame_TokenFrame",
+  }
+  local button_right = nil
+
+  -- Not used for pre wrath clients
+  if not TBag.WoTLK then
     TInvFrame_TokenFrame:Hide()
+  end
+
+  for _, button_name in ipairs(buttons) do
+    button = getglobal(button_name)
+    if button then
+      button:ClearAllPoints()
+      if button_right then
+        button:SetPoint("BOTTOMRIGHT",button_right,"TOPRIGHT",0,-5);
+      else
+        local y = 5
+        if TInvFrame.edit_mode == 1 then
+          y = y + 30
+        end
+        button:SetPoint("BOTTOMRIGHT",TInvFrame,"BOTTOMRIGHT",5,y)
+      end
+      if button:IsVisible() then
+        button_right = button
+      end
+    end
   end
 end
 
@@ -623,6 +645,18 @@ function Inv.Toggle_Money()
   else
     TInvFrame.cfg["show_money"] = 1;
     TInvFrame_MoneyFrame:Show();
+    TInvFrame:SetButton_Anchors();
+  end
+end
+
+function Inv.Toggle_Token()
+  if (TInvFrame.cfg["show_tokens"] == 1) then
+    TInvFrame.cfg["show_tokens"] = 0;
+    TInvFrame_TokenFrame:Hide();
+    TInvFrame:SetButton_Anchors();
+  else
+    TInvFrame.cfg["show_tokens"] = 1;
+    TInvFrame_TokenFrame:Show();
     TInvFrame:SetButton_Anchors();
   end
 end
@@ -1257,6 +1291,17 @@ function Inv.RightClickMenu_populate(...)
             info["checked"] = 1;
           end
           UIDropDownMenu_AddButton(info, level);
+	  if TBag.WoTLK then
+            info = {
+              ["text"] = L["Hide Tokens"];
+              ["func"] = TInvFrame.Toggle_Token;
+  	      ["keepShownOnClick"] = 1;
+              };
+            if (TInvFrame.cfg["show_tokens"] == 0) then
+              info["checked"] = 1;
+            end
+            UIDropDownMenu_AddButton(info, level);
+	  end
           info = {
             ["text"] = L["Hide Money"];
             ["func"] = TInvFrame.Toggle_Money;
