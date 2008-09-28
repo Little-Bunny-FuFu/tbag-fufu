@@ -88,6 +88,7 @@ TBag.LOCALE = setmetatable({
   ["Weapon"] = "Waffe",
   ["Key"] = "Schl\195\188ssel",
   ["Elemental"] = "Elementar",
+  ["Glyph"] = "Glyph",
 
   -- Sub types
   ["Junk"] = "Plunder",
@@ -155,6 +156,7 @@ TBag.LOCALE = setmetatable({
   ["KEY_QUEST"] = "SCHL\195\156SSEL_QUEST",
   ["KEY_OPEN"] = "SCHL\195\156SSEL_\195\150FFNEN",
   ["ENCHANTS"] = "VERZAUBERUNG",
+  ["GLYPHS"] = "GLYPHS",
   ["BOOK"] = "BUCH",
   ["DESIGN"] = "VORLAGE",
   ["FORMULA"] = "FORMEL",

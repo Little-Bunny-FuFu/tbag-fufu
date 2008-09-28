@@ -117,6 +117,7 @@ TBag.LOCALE = setmetatable({
   ["Weapon"] = "Weapon",
   ["Key"] = "Key",
   ["Elemental"] = "Elemental",
+  ["Glyph"] = "Glyph",
 
   -- Sub types
   ["Junk"] = "Junk",
@@ -185,6 +186,7 @@ TBag.LOCALE = setmetatable({
   ["KEY_QUEST"] = "KEY_QUEST",
   ["KEY_OPEN"] = "KEY_OPEN",
   ["ENCHANTS"] = "ENCHANTS",
+  ["GLYPHS"] = "GLYPHS",
   ["BOOK"] = "BOOK",
   ["DESIGN"] = "DESIGN",
   ["FORMULA"] = "FORMULA",

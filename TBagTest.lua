@@ -46,6 +46,10 @@ local tests = {
   [29533] = L["ENCHANTS"],
   [38896] = L["ENCHANTS"],
 
+  -- Glyphs
+  [43673] = L["GLYPHS"],
+  [40912] = L["GLYPHS"],
+
   -- Hearthstones
   [6948] = L["HEARTH"],
 
@@ -667,6 +671,8 @@ if not TBag.WoTLK then
   tests[39341] = nil
   tests[39340] = nil
   tests[39505] = nil
+  tests[43673] = nil 
+  tests[40912] = nil 
 else
   -- Tests that need to be removed for WoTLK
   -- XXX: Adjust the tests for Wrath when it goes live.
