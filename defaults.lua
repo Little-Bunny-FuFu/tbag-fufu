@@ -202,6 +202,7 @@ TBag.DefaultSearchList = {
   { L["TRADE_TOOL"], L[""], L["Finkle's Skinner"], L[""], L[""] },
   { L["TRADE_TOOL"], L[""], L["Blood Scythe"], L[""], L[""] },
   { L["TRADE_TOOL"], L[""], L["Herbalist's Gloves"], L[""], L[""] },
+  { L["TRADE_TOOL"], L[""], L["Virtuoso Inking Set"], L[""], L[""] },
   { string.format(L["EQUIPPED_%s"],L["WEAPON"]), L["EQUIPPED"],
     L[""], L["Dwarven Fishing Pole"], L[""] },
   { string.format(L["SOULBOUND_%s"],L["WEAPON"]), L["SOULBOUND"],
@@ -402,6 +403,10 @@ TBag.DefaultSearchList = {
   { L["REAGENT"], L[""], L["Nether Vortex"], L["Trade Goods"], L[""]},
   { L["REAGENT"], L[""], L["Heart of Darkness"], L["Trade Goods"], L[""]},
   { L["REAGENT"], L[""], L["Sunmote"], L["Trade Goods"], L[""]},
+  { L["REAGENT"], L[""], L["Frozen Orb"], L["Trade Goods"], L[""]},
+  { L["REAGENT"], L[""], L["Crystallized %a+"], L["Trade Goods"], L["Elemental"]},
+  { L["REAGENT"], L[""], L["Eternal %a+"], L["Trade Goods"], L["Elemental"]},
+
 
 -- Trades (fishing done above before equipment)
   { L["ALCHEMY"], L[""], L[" Vial"], L["Trade Goods"], L[""] },
@@ -434,6 +439,10 @@ TBag.DefaultSearchList = {
   { L["LEATHERWORKING"], L["LEATHERWORKING"], L[""], L[""], L[""]},
   { L["MINING"], L["MINING"], L[""], L[""], L[""] },
   { L["TAILORING"], L["TAILORING"], L[""], L[""], L[""]},
+  { L["INSCRIPTION"], L[""], L["Ink"], L["Trade Goods"], L["Parts"]},
+  { L["INSCRIPTION"], L[""], L[" Parchment"], L["Trade Goods"], L[""]},
+  { L["INSCRIPTION"], L[""], L[" Pigment"], L["Trade Goods"], L[""]},
+  { L["INSCRIPTION"], L["INSCRIPTION"], L[""], L[""], L[""]},
 
   { L["REAGENT"], L[""], L[""], L["Reagent"], L[""] },
   { L["TRADE_GOODS"], L[""], L[""], L["Trade Goods"], L[""] },

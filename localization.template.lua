@@ -59,6 +59,7 @@ TBag.LOCALE = setmetatable({
   ["Jewelcrafting"] = "Jewelcrafting",
   ["Leatherworking"] = "Leatherworking",
   ["Tailoring"] = "Tailoring",
+  ["Inscription"] = "Inscription",
 
 -- Gathering
   ["Skinning"] = "Skinning",
@@ -87,6 +88,7 @@ TBag.LOCALE = setmetatable({
   ["Juwelenschleifen"] = "Jewelcrafting",
   ["Lederverarbeitung"] = "Leatherworking",
   ["Schneiderei"] = "Tailoring",
+  ["Inscription deDE"] = "Inscription",
 
 -- Gathering
   ["K\195\188rschnerei"] = "Skinning",
@@ -120,6 +122,7 @@ TBag.LOCALE = setmetatable({
   ["Junk"] = "Junk",
   ["Explosives"] = "Explosives",
   ["Devices"] = "Devices",
+  ["Parts"] = "Parts",
   ["Ammo Pouch"] = "Ammo Pouch",
   ["Soul Bag"] = "Soul Bag",
   ["Engineering Bag"] = "Engineering Bag",
@@ -252,6 +255,7 @@ TBag.LOCALE = setmetatable({
   ["MINING"] = "MINING",
   ["POISONS"] = "POISONS",
   ["TAILORING"] = "TAILORING",
+  ["INSCRIPTION"] = "INSCRIPTION",
   ["FIRST_AID"] = "FIRST_AID",
   ["COOKING"] = "COOKING",
   ["FISHING"] = "FISHING",
@@ -864,4 +868,11 @@ TBag.LOCALE = setmetatable({
   ["Happy Pet Snack"] = "Happy Pet Snack",
   ["Paper Zeppelin Kit"] = "Paper Zeppelin Kit",
   ["Titanium Seal of Dalaran"] = "Titanium Seal of Dalaran",
+  ["Frozen Orb"] = "Frozen Orb",
+  ["Crystallized %a+"] = "Crystallized %a+",
+  ["Eternal %a+"] = "Eternal %a+",
+  ["Virtuoso Inking Set"] = "Virtuoso Inking Set",
+  ["Ink"] = "Ink",
+  [" Parchment"] = "Parchment",
+  [" Pigment"] = "Pigment",
 }, { __index = TBag.LOCALE }); 

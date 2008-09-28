@@ -44,6 +44,7 @@ local tests = {
   [29486] = L["ENCHANTS"],
   [19789] = L["ENCHANTS"],
   [29533] = L["ENCHANTS"],
+  [38896] = L["ENCHANTS"],
 
   -- Hearthstones
   [6948] = L["HEARTH"],
@@ -368,10 +369,65 @@ local tests = {
   [12709] = L["TRADE_TOOL"],
   [19727] = L["TRADE_TOOL"],
   [7349] = L["TRADE_TOOL"],
+  [39505] = L["TRADE_TOOL"],
   [3567] = L["WEAPON"], -- Avoid matching fishing pole
   [4598] = L["EXPLOSIVES"], -- ditto
   [19970] = L["FISHING"],
-  
+ 
+  -- Inscription
+  [43125] = L["INSCRIPTION"],
+  [43117] = L["INSCRIPTION"],
+  [43121] = L["INSCRIPTION"],
+  [43115] = L["INSCRIPTION"],
+  [43123] = L["INSCRIPTION"],
+  [43123] = L["INSCRIPTION"],
+  [31519] = L["11_LEGS"], -- Has ink in the name but not inscription item
+  [43119] = L["INSCRIPTION"],
+  [43127] = L["INSCRIPTION"],
+  [34645] = L["INSCRIPTION"],
+  [10647] = L["ENGINEERING"], -- Engineer's Ink
+  [43124] = L["INSCRIPTION"],
+  [43126] = L["INSCRIPTION"],
+  [37101] = L["INSCRIPTION"],
+  [43118] = L["INSCRIPTION"],
+  [43116] = L["INSCRIPTION"],
+  [39774] = L["INSCRIPTION"],
+  [39469] = L["INSCRIPTION"],
+  [43122] = L["INSCRIPTION"],
+  [37100] = L["INSCRIPTION"],
+  [37100] = L["INSCRIPTION"],
+  [6929] = L["QUEST"], -- Bath'rah's Parchment
+  [10648] = L["INSCRIPTION"],
+  [11105] = L["QUEST"], -- Curled Map Parchment 
+  [3706] = L["ACT_ON"], -- Enscorcelled Parchment
+  [9553] = L["QUEST"], -- Etched Parchment 
+  [9323] = L["QUEST"], -- Gadrin's Parchment 
+  [39501] = L["INSCRIPTION"],
+  [39354] = L["INSCRIPTION"],
+  [39502] = L["INSCRIPTION"],
+  [34647] = L["INSCRIPTION"],
+  [12635] = L["QUEST"], -- Simple Parchment 
+  [5348] = L["QUEST"], -- Worn Parchment 
+  [3767] = L["GRAY_ITEMS"], -- Fine Parchment 
+  [40737] = L["08_WRIST"], -- Pigmented Clan Bindings 
+  [44061] = L["05_CHEST"], -- Pigmented Clan Bindings 
+  [43104] = L["INSCRIPTION"],
+  [43108] = L["INSCRIPTION"],
+  [43109] = L["INSCRIPTION"],
+  [43105] = L["INSCRIPTION"],
+  [43106] = L["INSCRIPTION"],
+  [43106] = L["INSCRIPTION"],
+  [43107] = L["INSCRIPTION"],
+  [43103] = L["INSCRIPTION"],
+  [39151] = L["INSCRIPTION"],
+  [39343] = L["INSCRIPTION"],
+  [39334] = L["INSCRIPTION"],
+  [39339] = L["INSCRIPTION"],
+  [39338] = L["INSCRIPTION"],
+  [39342] = L["INSCRIPTION"],
+  [39341] = L["INSCRIPTION"],
+  [39340] = L["INSCRIPTION"],
+
   -- Various equipment items
   [33508] = L["RELIC"],
   [28757] = L["RING"],
@@ -501,6 +557,19 @@ local tests = {
   [30183] = L["REAGENT"],
   [32428] = L["REAGENT"],
   [34664] = L["REAGENT"],
+  [43102] = L["REAGENT"],
+  [37700] = L["REAGENT"],
+  [37701] = L["REAGENT"],
+  [37702] = L["REAGENT"],
+  [37703] = L["REAGENT"],
+  [37704] = L["REAGENT"],
+  [37705] = L["REAGENT"],
+  [35622] = L["REAGENT"],
+  [35623] = L["REAGENT"],
+  [35624] = L["REAGENT"],
+  [35625] = L["REAGENT"],
+  [35627] = L["REAGENT"],
+  [36860] = L["REAGENT"],
 
   -- Trades
   [8925] = L["ALCHEMY"],
@@ -531,6 +600,73 @@ if not TBag.WoTLK then
   tests[43626] = nil
   tests[34498] = nil
   tests[44430] = nil
+  tests[43102] = nil
+  tests[37700] = nil
+  tests[37701] = nil
+  tests[37702] = nil
+  tests[37703] = nil
+  tests[37704] = nil
+  tests[37705] = nil
+  tests[35622] = nil
+  tests[35623] = nil
+  tests[35624] = nil
+  tests[35625] = nil
+  tests[35627] = nil
+  tests[36860] = nil
+  tests[38896] = nil
+  tests[43125] = nil
+  tests[43117] = nil
+  tests[43121] = nil
+  tests[43115] = nil
+  tests[43123] = nil
+  tests[43123] = nil
+  tests[31519] = nil
+  tests[43119] = nil
+  tests[43127] = nil
+  tests[34645] = nil
+  tests[10647] = nil
+  tests[43124] = nil
+  tests[43126] = nil
+  tests[37101] = nil
+  tests[43118] = nil
+  tests[43116] = nil
+  tests[39774] = nil
+  tests[39469] = nil
+  tests[43122] = nil
+  tests[37100] = nil
+  tests[37100] = nil
+  tests[6929] = nil
+  tests[10648] = nil
+  tests[11105] = nil
+  tests[3706] = nil
+  tests[9553] = nil
+  tests[9323] = nil
+  tests[39501] = nil
+  tests[39354] = nil
+  tests[39502] = nil
+  tests[34647] = nil
+  tests[12635] = nil
+  tests[5348] = nil
+  tests[3767] = nil
+  tests[40737] = nil
+  tests[44061] = nil
+  tests[43104] = nil
+  tests[43108] = nil
+  tests[43109] = nil
+  tests[43105] = nil
+  tests[43106] = nil
+  tests[43106] = nil
+  tests[43107] = nil
+  tests[43103] = nil
+  tests[39151] = nil
+  tests[39343] = nil
+  tests[39334] = nil
+  tests[39339] = nil
+  tests[39338] = nil
+  tests[39342] = nil
+  tests[39341] = nil
+  tests[39340] = nil
+  tests[39505] = nil
 else
   -- Tests that need to be removed for WoTLK
   -- XXX: Adjust the tests for Wrath when it goes live.
@@ -541,7 +677,11 @@ else
   tests[5140] = nil
 
   -- Known items not working on beta/PTR realms
-  tests[38266] = nil  -- Found from wowhead but apparently not seen on any of the realms
+  -- Found from wowhead but apparently not seen on any of the realms
+  tests[38266] = nil  
+  tests[34645] = nil
+  tests[34647] = nil 
+
   tests[22218] = nil  -- Apparently the valentine's day stuff isn't seen
 end
 
