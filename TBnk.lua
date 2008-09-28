@@ -74,6 +74,13 @@ function Bank:SetPlayer(playerid)
   if self.playerid ~= playerid then
     self.CACHE_REQ = TBag.REQ_MUST
   end
+  if self.cfg.show_tokens then
+    if playerid ~= TBag.PLAYERID then
+      TBnkFrame_TokenFrame:Hide()
+    else
+      TBnkFrame_TokenFrame:Show()
+    end
+  end
   self.playerid = playerid;
 end
 

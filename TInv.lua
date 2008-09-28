@@ -91,6 +91,13 @@ function Inv:SetPlayer(playerid)
        getglobal(TBag:GetDummyBagFrameName(bag)):SetID(bag);
      end
    end
+   if self.cfg.show_tokens then
+     if playerid ~= TBag.PLAYERID then
+       TInvFrame_TokenFrame:Hide()
+     else
+       TInvFrame_TokenFrame:Show()
+     end
+   end
    if self.playerid ~=  playerid then
      self.CACHE_REQ = TBag.REQ_MUST
    end
