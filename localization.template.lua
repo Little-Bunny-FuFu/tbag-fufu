@@ -877,4 +877,7 @@ TBag.LOCALE = setmetatable({
   ["Ink"] = "Ink",
   [" Parchment"] = "Parchment",
   [" Pigment"] = "Pigment",
+  ["Grindgear Toy Gorilla"] = "Grindgear Toy Gorilla",
+  ["Trusty Copper Racer"] = "Trusty Copper Racer",
+  ["Toy Train Set"] = "Toy Train Set",
 }, { __index = TBag.LOCALE }); 

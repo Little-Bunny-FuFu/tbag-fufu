@@ -842,6 +842,9 @@ TBag.LOCALE = setmetatable({
   ["Ink"] = "Ink",
   [" Parchment"] = "Parchment",
   [" Pigment"] = "Pigment",
+  ["Grindgear Toy Gorilla"] = "Grindgear Toy Gorilla",
+  ["Trusty Copper Racer"] = "Trusty Copper Racer",
+  ["Toy Train Set"] = "Toy Train Set",
 }, {__index = function(self,key)
     if debug then DEFAULT_CHAT_FRAME:AddMessage(string.format("Please localize: %q",tostring(key))) end
     rawset(self, key, key);

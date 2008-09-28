@@ -73,6 +73,9 @@ TBag.DefaultSearchList = {
   { L["TOYS"], L[""], L["Shower a nearby target with a cascade of"], L["Miscellaneous"], L[""] },
   { L["TOYS"], L[""], L["Path of Illidan"], L[""], L[""] },
   { L["TOYS"], L[""], L["Titanium Seal of Dalaran"], L[""], L[""] },
+  { L["TOYS"], L[""], L["Grindgear Toy Gorilla"], L[""], L[""] },
+  { L["TOYS"], L[""], L["Trusty Copper Racer"], L[""], L[""] },
+  { L["TOYS"], L[""], L["Toy Train Set"], L[""], L[""] },
 
   
   { L["AHN_QIRAJ"], L[""], L["%a+ Scarab"], L["Quest"], L[""] },

@@ -164,6 +164,9 @@ local tests = {
   [38233] = L["TOYS"],
   [34498] = L["TOYS"],
   [44430] = L["TOYS"],
+  [44606] = L["TOYS"],
+  [44482] = L["TOYS"],
+  [44481] = L["TOYS"],
 
   -- Mounts
   [33977] = L["MOUNT"],
@@ -673,6 +676,9 @@ if not TBag.WoTLK then
   tests[39505] = nil
   tests[43673] = nil 
   tests[40912] = nil 
+  tests[44606] = nil
+  tests[44482] = nil
+  tests[44481] = nil
 else
   -- Tests that need to be removed for WoTLK
   -- XXX: Adjust the tests for Wrath when it goes live.
