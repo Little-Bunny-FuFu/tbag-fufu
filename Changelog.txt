@@ -9,7 +9,8 @@
     the window is closed or the bag is clicked again.
     Most people will see this mostly with the keychain.
   - Updates to the sort list to support changes in Wrath:
-    DeathKnights, Minipets, Tokens
+    DeathKnights, Minipets, Tokens, Glyphs and Inscription.
+  - Support for Token tracking for Wrath.
   - Catch the Spirit of Competition in the default sorts.
   - Fix a bug that caused BOE items to be treated as if they 
     were Soulbound sometimes.
@@ -33,9 +34,6 @@
     use an included font with the game.  Font usage is now
     more consistent across the addon.
   - Packaged by curseforge now. :)
-
-  Current Known Issues:
-  - Inscription still needs to be handled.
 
   Wrath Beta players please do not report the following:
   - Internal Bag Error.  If you see this it's a Blizzard problem.

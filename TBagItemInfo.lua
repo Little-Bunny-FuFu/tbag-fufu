@@ -1,3 +1,4 @@
+-- $Id$
 ---------------------------------------------------------------------
 --- Item data used for categorization and inventory compression.  ---
 --- The trade and skill based data is only a default, it will be  ---

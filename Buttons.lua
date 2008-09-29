@@ -1,3 +1,4 @@
+-- $Id$
 -- Implementation of the base templates for various buttons.
 
 local _G = _G
