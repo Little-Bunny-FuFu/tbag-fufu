@@ -534,7 +534,7 @@ local tests = {
   [22147] = string.format(L["%s_REAGENT"],L["DRUID"]),
   [17037] = string.format(L["%s_REAGENT"],L["DRUID"]),
   [22148] = string.format(L["%s_REAGENT"],L["DRUID"]),
-  [44615] = string.format(L["%s_REAGENT"],L["DRUID"]),
+  [44614] = string.format(L["%s_REAGENT"],L["DRUID"]),
   [44605] = string.format(L["%s_REAGENT"],L["DRUID"]),
   [17020] = string.format(L["%s_REAGENT"],L["MAGE"]),
   [17031] = string.format(L["%s_REAGENT"],L["MAGE"]),
@@ -546,6 +546,7 @@ local tests = {
   [17030] = string.format(L["%s_REAGENT"],L["SHAMAN"]),
   [17058] = string.format(L["%s_REAGENT"],L["SHAMAN"]),
   [17057] = string.format(L["%s_REAGENT"],L["SHAMAN"]),
+  [37201] = string.format(L["%s_REAGENT"],L["DEATHKNIGHT"]),
   [5060] = string.format(L["%s_TOOL"],L["ROGUE"]),
   [5178] = string.format(L["%s_TOOL"],L["SHAMAN"]),
   [5175] = string.format(L["%s_TOOL"],L["SHAMAN"]),
@@ -682,6 +683,10 @@ if not TBag.WoTLK then
   tests[44606] = nil
   tests[44482] = nil
   tests[44481] = nil
+  tests[44614] = nil
+  tests[44605] = nil
+  tests[44615] = nil
+  tests[37201] = nil
 else
   -- Tests that need to be removed for WoTLK
   -- XXX: Adjust the tests for Wrath when it goes live.

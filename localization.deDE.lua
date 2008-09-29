@@ -94,6 +94,7 @@ TBag.LOCALE = setmetatable({
   ["Junk"] = "Plunder",
   ["Explosives"] = "Sprengstoff",
   ["Devices"] = "Ger\195\164te",
+  ["Parts"] = "Teile",
   ["Ammo Pouch"] = "K\195\182cher",
   ["Soul Bag"] = "Seelentasche",
   ["Engineering Bag"] = "Ingenieurstasche",
@@ -102,7 +103,6 @@ TBag.LOCALE = setmetatable({
   ["Mining Bag"] = "Bergbautasche",
   ["Enchanting Bag"] = "Verzauberertasche",
   ["Leatherworking Bag"] = "Lederertasche",
-  ["Parts"] = "Teile",
 
   -- Slots
   ["Finger"] = INVTYPE_FINGER,
@@ -851,4 +851,5 @@ TBag.LOCALE = setmetatable({
   ["Grindgear Toy Gorilla"] = "Schleifritzelspielzeuggorilla",
   ["Trusty Copper Racer"] = "Zuverl\195\164ssiger Kupferflitzer",
   ["Toy Train Set"] = "Toy Train Set", -- TODO: unlocalized on beta
+  ["Engineer's Ink"] = "Ingenieurstinte",
 }, { __index = TBag.LOCALE }); 

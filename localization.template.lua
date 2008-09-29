@@ -132,7 +132,6 @@ TBag.LOCALE = setmetatable({
   ["Mining Bag"] = "Mining Bag",
   ["Enchanting Bag"] = "Enchanting Bag",
   ["Leatherworking Bag"] = "Leatherworking Bag",
-  ["Parts"] = "Teile",
 
   -- Slots
   ["Finger"] = INVTYPE_FINGER,
@@ -881,4 +880,5 @@ TBag.LOCALE = setmetatable({
   ["Grindgear Toy Gorilla"] = "Grindgear Toy Gorilla",
   ["Trusty Copper Racer"] = "Trusty Copper Racer",
   ["Toy Train Set"] = "Toy Train Set",
+  ["Engineer's Ink"] = "Engineer's Ink",
 }, { __index = TBag.LOCALE }); 
