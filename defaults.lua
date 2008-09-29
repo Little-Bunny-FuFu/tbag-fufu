@@ -436,6 +436,7 @@ TBag.DefaultSearchList = {
   { L["ENCHANTING"], L[""], L["Small %a+ Shard"], L["Trade Goods"], L["Enchanting"] },
   { L["ENCHANTING"], L[""], L["Large %a+ Shard"], L["Trade Goods"], L["Enchanting"] },
   { L["BLACKSMITHING"], L["BLACKSMITHING"], L[""], L[""], L[""] },
+  { L["ENGINEERING"], L[""], L["Engineer's Ink"], L[""], L[""]},
   { L["INSCRIPTION"], L[""], L["Ink"], L["Trade Goods"], L["Parts"]},
   { L["INSCRIPTION"], L[""], L[" Parchment"], L["Trade Goods"], L[""]},
   { L["INSCRIPTION"], L[""], L[" Pigment"], L["Trade Goods"], L[""]},
