@@ -81,6 +81,13 @@ TBag.I_NEED      = "sn";
 TBag.I_SOULBOUND = "sb";
 TBag.I_CHARGES         = "ch";
 
+-- Tokens
+TBag.I_HEADER = "hd";
+TBag.I_EXPAND = "ex";
+TBag.I_UNUSED = "un";
+TBag.I_WATCH  = "wa";
+
+
 -- Used in the item compression routines
 TBag.COMP_EMPTY = "e";
 TBag.COMP_ITEM = "i";
@@ -225,6 +232,9 @@ function TBag:Init()
     TMailItm = {};
     TMailItm[self.S_VERSION] = 1;
   end
+  if (TTknItm == nil) then
+    TTknItm = {};
+  end
 
   -- Set up the main player arrays
   self.PLAYERID = UnitName("player").."|"..self.REALM;
@@ -253,6 +263,9 @@ function TBag:Init()
   end
   if (TMailItm[self.PLAYERID] == nil) then
     TMailItm[self.PLAYERID] = {};
+  end
+  if (TTknItm[self.PLAYERID] == nil) then
+    TTknItm[self.PLAYERID] = {};
   end
 
   -- Force the KEYRING_CONTAINER frame's id to the proper value.
@@ -725,6 +738,7 @@ function TBag:DoSearch(srch)
     self:GatherSearchResults(TContItm, L["container"]);
     self:GatherSearchResults(TBodyItm, L["body"]);
     self:GatherSearchResults(TMailItm, L["mail"]);
+    self:GatherSearchResults(TTknItm, L["tokens"]);
 
     -- Sort it alphabetically
     table.sort(SrchResults);
@@ -1325,6 +1339,7 @@ function TBag:DeleteCachedCharacter(char,realm)
   TContItm[playerid] = nil;
   TBodyItm[playerid] = nil;
   TMailItm[playerid] = nil;
+  TTknItm[playerid] = nil;
   TBagInfo[playerid] = nil;
   if (found == 1 and TInvItm[playerid] == nil) then
     DEFAULT_CHAT_FRAME:AddMessage(self.SCP..

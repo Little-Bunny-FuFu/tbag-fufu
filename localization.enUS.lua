@@ -324,6 +324,7 @@ TBag.LOCALE = setmetatable({
   ["container"] = "container",
   ["body"] = "body",
   ["mail"] = "mail",
+  ["tokens"] = "tokens",
   [" in %s's %s"] = " in %s's %s", -- Used when an item is found in a characters bag or bank
   [" on %s's %s"] = " on %s's %s", -- Used when an item is found on a characters body
   [" as %s's %s"] = " as %s's %s", -- Used when an item is used as a container for a character

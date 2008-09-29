@@ -4,10 +4,166 @@ local TBag = _G.TBag
 TBag.Tokens = {}
 local Tokens = TBag.Tokens
 
+function Tokens.GetItemStringFromCurrencyIndex(index)
+  local ttname = "TBag_tt"
+  local tt = TBag_tt
+
+  if (not tt) then
+    tt = CreateFrame("GameTooltip","TBag_tt")
+    -- Allow tooltip set methods to dynamically add new lines based on these
+    tt:AddFontStrings(
+      tt:CreateFontString("$parentTextLeft1", nil, "GameTooltipText"),
+      tt:CreateFontString("$parentTextRight1", nil, "GameTooltipText")
+    )
+  end
+  tt:SetOwner(UIParent, "ANCHOR_NONE")  -- this makes sure that tooltip.valid = true
+  tt:ClearLines()
+
+  tt:SetCurrencyToken(index)
+  local _,itemlink = tt:GetItem()
+  local _,itemstring = TBag:GetItemID(itemlink)
+  return itemstring
+end
+
+function Tokens.SetItmFromCurrencyIndex(index,itm)
+  local name, isHeader, isExpand, isUnused, isWatched, count, extraType
+  name, isHeader, isExpand, isUnused, isWatched, count, extraType = GetCurrencyListInfo(index)
+
+  if not name then
+    return false
+  end
+
+  itm[TBag.I_NAME] = name
+  itm[TBag.I_HEADER] = isHeader
+  itm[TBag.I_EXPAND] = isExpand
+  itm[TBag.I_UNUSED] = isUnused
+  itm[TBag.I_WATCH] = isWatched
+  itm[TBag.I_COUNT] = count
+  itm[TBag.I_TYPE] = extraType
+  if not isHeader and extraType == 0 then
+    itm[TBag.I_ITEMLINK] = Tokens.GetItemStringFromCurrencyIndex(index)	
+  end
+  return true
+end
+
+local scanning = false
+function Tokens.Scan()
+  if scanning then return end
+  scanning = true
+  
+  local n = 0
+  if not TTknItm[TBag.PLAYERID] then
+    TTknItm[TBag.PLAYERID] = {}
+  end
+  if not TTknItm[TBag.PLAYERID][TBag.D_BAG] then
+    TTknItm[TBag.PLAYERID][TBag.D_BAG] = {}
+  end
+  local dbag = TTknItm[TBag.PLAYERID][TBag.D_BAG]
+  table.wipe(dbag)
+
+  for i = 1, GetCurrencyListSize() do
+    n = n + 1
+    dbag[n] = {}
+    if not Tokens.SetItmFromCurrencyIndex(i,dbag[n]) then
+      scanning = false
+      return
+    end
+    if dbag[n][TBag.I_HEADER] and not dbag[n][TBag.I_EXPAND] then
+      local size = GetCurrencyListSize()
+      ExpandCurrencyList(i,1)
+      size = GetCurrencyListSize() - size
+      for j = i+1, i+size do
+        n = n + 1
+        dbag[n] = {}
+        if not Tokens.SetItmFromCurrencyIndex(j,dbag[n]) then
+          scanning = false
+          return
+        end
+      end
+      ExpandCurrencyList(i,0)
+    end
+  end
+  scanning = false
+end
+
+function Tokens.UpdateTokenButtonFromItm(button, itm)
+  -- Update watched tokens
+  if itm[TBag.I_NAME] then
+    button.extraCurrencyType = itm[TBag.I_TYPE] 
+    button.itemstring = itm[TBag.I_ITEMLINK]
+    if itm[TBag.I_TYPE]  == 1 then --Arena points
+      button.icon:SetTexture("Interface\\PVPFrame\\PVP-ArenaPoints-Icon")
+      button.icon:SetTexCoord(0, 1, 0, 1)
+    elseif itm[TBag.I_TYPE]  == 2 then -- Honor Points
+      local factionGroup = UnitFactionGroup("player")
+      if factionGroup then
+        button.icon:SetTexture("Interface\\TargetingFrame\\UI-PVP-"..factionGroup)
+        button.icon:SetTexCoord( 0.03125, 0.59375, 0.03125, 0.59375)
+      else
+        button.icon:SetTexCoord(0, 1, 0, 1)
+      end
+    else
+      button.icon:SetTexture(GetItemIcon(itm[TBag.I_ITEMLINK]))
+      button.icon:SetTexCoord(0, 1, 0, 1)
+    end
+    if itm[TBag.I_COUNT] <= 99999 then
+      button.count:SetText(itm[TBag.I_COUNT])
+    else
+      button.count:SetText("*")
+    end
+    button:Show()
+  end
+end
+
+function Tokens.Update(frame)
+  if not TBag.WoTLK then return end
+  local framename = frame:GetName()
+  local mainFrame = frame:GetParent()
+  local i = 1
+  for _,itm in pairs(TTknItm[mainFrame.playerid][TBag.D_BAG]) do
+    if itm[TBag.I_WATCH] then
+      local watchButton = getglobal(framename.."Token"..i)
+      Tokens.UpdateTokenButtonFromItm(watchButton,itm)
+      frame.shouldShow = 1
+      frame.numWatchedTokens = i
+      i = i + 1
+    end
+    if i > MAX_WATCHED_TOKENS then return end
+  end 
+  for n = i, MAX_WATCHED_TOKENS do
+    getglobal(framename.."Token"..n):Hide()
+    if n == 1 then
+      frame.shouldShow = nil
+    end
+  end
+end
+
+function Tokens.Button_OnEnter(self)
+  GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+  if ( self.extraCurrencyType == 1 ) then
+    GameTooltip:SetText(ARENA_POINTS,
+                        HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b)
+    GameTooltip:AddLine(TOOLTIP_ARENA_POINTS, nil, nil, nil, 1)
+    GameTooltip:Show()
+  elseif ( self.extraCurrencyType == 2 ) then
+    GameTooltip:SetText(HONOR_POINTS,
+                        HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b)
+    GameTooltip:AddLine(TOOLTIP_HONOR_POINTS, nil, nil, nil, 1)
+    GameTooltip:Show()
+  else
+      local mainFrame = self:GetParent():GetParent()
+      local level = TBag:GetPlayerInfo(mainFrame.playerid,TBag.G_BASIC)[TBag.S_LEVEL] or
+                    UnitLevel("player")
+      local itemstring = self.itemstring..":"..level
+      GameTooltip:SetHyperlink(itemstring)
+  end
+end
+
 -- I really hate having to hook to do this but it would be a real mess
 -- to do it otherwise since the TokenUI doesn't generate an event when
 -- the tracked tokens change.
 function Tokens.Hook()
+  Tokens.Scan()
   Tokens.Update(TInvFrame_TokenFrame)
   Tokens.Update(TBnkFrame_TokenFrame)
 end
@@ -15,44 +171,4 @@ if TBag.WoTLK then
   hooksecurefunc("BackpackTokenFrame_Update",Tokens.Hook)
 end
 
-function Tokens.Update(frame)
-  if not TBag.WoTLK then return end
-  local framename = frame:GetName()
-  for i=1, MAX_WATCHED_TOKENS do
-    local watchButton
-    local name, count, extraCurrencyType, icon = GetBackpackCurrencyInfo(i)
-    -- Update watched tokens
-    if name then
-      watchButton = getglobal(framename.."Token"..i)
-      watchButton.extraCurrencyType = extraCurrencyType
-      if extraCurrencyType == 1 then --Arena points
-        watchButton.icon:SetTexture("Interface\\PVPFrame\\PVP-ArenaPoints-Icon")
-        watchButton.icon:SetTexCoord(0, 1, 0, 1)
-      elseif extraCurrencyType == 2 then -- Honor Points
-        local factionGroup = UnitFactionGroup("player")
-        if factionGroup then
-          watchButton.icon:SetTexture("Interface\\TargetingFrame\\UI-PVP-"..factionGroup)
-          watchButton.icon:SetTexCoord( 0.03125, 0.59375, 0.03125, 0.59375)
-        else
-          watchButton.icon:SetTexCoord(0, 1, 0, 1)
-        end
-      else
-        watchButton.icon:SetTexture(icon)
-        watchButton.icon:SetTexCoord(0, 1, 0, 1)
-      end
-      if count <= 99999 then
-        watchButton.count:SetText(count)
-      else
-        watchButton.count:SetText("*")
-      end
-      watchButton:Show()
-      frame.shouldShow = 1
-      frame.numWatchedTokens = i
-    else
-      getglobal(framename.."Token"..i):Hide()
-      if i == 1 then
-        frame.shouldShow = nil
-      end
-    end
-  end
-end
+

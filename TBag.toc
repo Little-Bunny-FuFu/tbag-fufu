@@ -9,7 +9,7 @@
 ## X-Feedback: http://wow.curseforge.com/projects/tbag-shefki/tickets/ 
 ## RequiredDeps: 
 ## OptionalDeps: Auctioneer
-## SavedVariables: TBagCfg, TBagInfo, TBnkItm, TInvItm, TContItm, TBodyItm, TMailItm
+## SavedVariables: TBagCfg, TBagInfo, TBnkItm, TInvItm, TContItm, TBodyItm, TMailItm, TTknItm
 ## Dependencies: 
 ## X-Localizations: enUS, deDE
 ## X-CompatibleLocales: enUS, deDE
@@ -18,9 +18,9 @@ stub.lua
 localization.enUS.lua
 localization.deDE.lua
 defaults.lua
+Tokens.xml
 TBag.xml
 Buttons.xml
-Tokens.xml
 MainFrame.xml
 TInv.xml
 TInvOpts.xml
