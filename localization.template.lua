@@ -132,6 +132,7 @@ TBag.LOCALE = setmetatable({
   ["Mining Bag"] = "Mining Bag",
   ["Enchanting Bag"] = "Enchanting Bag",
   ["Leatherworking Bag"] = "Leatherworking Bag",
+  ["Parts"] = "Teile",
 
   -- Slots
   ["Finger"] = INVTYPE_FINGER,
