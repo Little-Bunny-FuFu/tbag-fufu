@@ -1,3 +1,5 @@
+-- $Id$
+
 -- Implementation of the base class for the main frames i.e. the Inventory
 -- and Bank Windows.
 

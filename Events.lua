@@ -1,3 +1,5 @@
+-- $Id$
+
 function TBag:VARIABLES_LOADED()
   self.Inv:init(0)
   self.Bank:init(0)

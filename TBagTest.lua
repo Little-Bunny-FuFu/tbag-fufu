@@ -1,4 +1,4 @@
--- $Id $
+-- $Id$
 
 -- Test harness don't bother to load if this isn't a dev version.
 if (not string.match(TBag.VERSION,"-Alpha") and
