@@ -119,13 +119,18 @@ function Tokens.Update(frame)
   if not TBag.WoTLK then return end
   local framename = frame:GetName()
   local mainFrame = frame:GetParent()
+  if mainFrame.cfg.show_tokens ~= 1 then return end
+  if not (TTknItm and TTknItm[mainFrame.playerid] and
+          TTknItm[mainFrame.playerid][TBag.D_BAG]) then
+    frame:Hide()
+    return
+  end
   local i = 1
   for _,itm in pairs(TTknItm[mainFrame.playerid][TBag.D_BAG]) do
     if itm[TBag.I_WATCH] then
       local watchButton = getglobal(framename.."Token"..i)
       Tokens.UpdateTokenButtonFromItm(watchButton,itm)
-      frame.shouldShow = 1
-      frame.numWatchedTokens = i
+      frame:Show()
       i = i + 1
     end
     if i > MAX_WATCHED_TOKENS then return end
@@ -133,7 +138,7 @@ function Tokens.Update(frame)
   for n = i, MAX_WATCHED_TOKENS do
     getglobal(framename.."Token"..n):Hide()
     if n == 1 then
-      frame.shouldShow = nil
+      frame:Hide()
     end
   end
 end
