@@ -1,5 +1,5 @@
-* 20080923-r186-Alpha-Shefki
-  - This is an Alpha version with major portions of TBag
+* 20080929-r214-Beta-Shefki
+  - This is an Beta version with major portions of TBag
     rewritten but others still using old code.  There may
     very well be errors.
   - General forwards compatability to Wrath code changes.
