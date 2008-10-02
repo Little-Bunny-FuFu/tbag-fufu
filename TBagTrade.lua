@@ -69,7 +69,7 @@ function TBag:GetTradeType(trade)
     elseif ((trade == "Alchemy") or (trade == "Blacksmithing") 
       or (trade == "Enchanting") or (trade == "Engineering") 
       or (trade == "Leatherworking") or (trade == "Tailoring")
-      or (trade == "Jewelcrafting")) then
+      or (trade == "Jewelcrafting") or (trade == "Inscription")) then
       return self.S_TRADES;
     else
       return self.S_SKILLS;
@@ -99,12 +99,27 @@ end
 
 
 function TBag:GetSkillRank(trade)
+  -- Localize the trade name to search for since we use English names
+  -- for the rest of the trade skill code.
+  trade = L[trade]
   for idx = 1, GetNumSkillLines() do
-    local skillName, isHeader, isExpanded, skillRank, numTempPoints, skillModifier,
-      skillMaxRank, isAbandonable, stepCost, rankCost, minLevel, skillCostType,
-      skillDescription = GetSkillLineInfo(idx)
-    if (isHeader == nil) and (trade == skillName) then
-      return skillRank;
+    local skillName, isHeader, isExpanded, skillRank = GetSkillLineInfo(idx)
+    if isHeader == 1 and not isExpanded then
+      local size = GetNumSkillLines()
+      ExpandSkillHeader(idx)
+      size = GetNumSkillLines() - size
+      for j = idx+1, idx+size do
+        skillName, isHeader, isExpanded, skillRank = GetSkillLineInfo(j)
+        if not isHeader and trade == skillName then
+	  CollapseSkillHeader(idx)
+	  return skillRank 
+	end
+      end
+      CollapseSkillHeader(idx)
+    else
+      if not isHeader and trade == skillName then
+        return skillRank 
+      end
     end
   end
 end
