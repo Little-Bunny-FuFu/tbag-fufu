@@ -530,7 +530,9 @@ TBag.LOCALE = setmetatable({
   ["TOPRIGHT"] = "OBENRECHTS",
   ["BOTTOMLEFT"] = "UNTENLINKS",
   ["BOTTOMRIGHT"] = "UNTENRECHTS",
-    
+  ["Show on TBag"] = "Show on TBag",
+  ["Checking this option will allow you to track this currency type in TBag for this character.\n\nYou can also Shift-click a currency to add or remove it from being tracked in TBag."] = "Checking this option will allow you to track this currency type in TBag for this character.\n\nYou can also Shift-click a currency to add or remove it from being tracked in TBag.",
+
   -- Option Window Strings
   ["Main Sizing Preferences"] = "Allgemeine Gr\195\182\195\159eneinstellungen",
   ["Number of Item Columns:"] = "Anzahl der Itemspalten:",

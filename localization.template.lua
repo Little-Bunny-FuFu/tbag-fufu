@@ -559,6 +559,8 @@ TBag.LOCALE = setmetatable({
   ["TOPRIGHT"] = "TOPRIGHT",
   ["BOTTOMLEFT"] = "BOTTOMLEFT",
   ["BOTTOMRIGHT"] = "BOTTOMRIGHT",
+  ["Show on TBag"] = "Show on TBag",
+  ["Checking this option will allow you to track this currency type in TBag for this character.\n\nYou can also Shift-click a currency to add or remove it from being tracked in TBag."] = "Checking this option will allow you to track this currency type in TBag for this character.\n\nYou can also Shift-click a currency to add or remove it from being tracked in TBag.",
 
   -- Option Window Strings
   ["Main Sizing Preferences"] = "Main Sizing Preferences",

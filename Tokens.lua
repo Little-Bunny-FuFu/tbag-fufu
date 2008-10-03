@@ -1,6 +1,7 @@
 -- $Id$
 local _G = _G
 local TBag = _G.TBag
+local L = TBag.LOCALE
 TBag.Tokens = {}
 local Tokens = TBag.Tokens
 
@@ -176,4 +177,7 @@ if TBag.WoTLK then
   hooksecurefunc("BackpackTokenFrame_Update",Tokens.Hook)
 end
 
-
+if TBag.WoTLK then
+  TokenFramePopupBackpackCheckBoxText:SetText(L["Show on TBag"])
+  TOKEN_SHOW_ON_BACKPACK = L["Checking this option will allow you to track this currency type in TBag for this character.\n\nYou can also Shift-click a currency to add or remove it from being tracked in TBag."]
+end
