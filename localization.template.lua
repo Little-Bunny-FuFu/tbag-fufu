@@ -88,7 +88,7 @@ TBag.LOCALE = setmetatable({
   ["Juwelenschleifen"] = "Jewelcrafting",
   ["Lederverarbeitung"] = "Leatherworking",
   ["Schneiderei"] = "Tailoring",
-  ["Inscription deDE"] = "Inscription",
+  ["Inschriftenkunde"] = "Inscription",
 
 -- Gathering
   ["K\195\188rschnerei"] = "Skinning",
