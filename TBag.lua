@@ -144,6 +144,7 @@ TBag.G_BASIC     = "basic";
 TBag.S_CLASS     = "class";
 TBag.S_HEARTH    = "hearth";
 TBag.S_LEVEL     = "level";
+TBag.S_FACTION   = "faction";
 
 -- Localization Support
 local L = TBag.LOCALE;

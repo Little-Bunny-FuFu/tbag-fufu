@@ -86,7 +86,7 @@ function Tokens.Scan()
   scanning = false
 end
 
-function Tokens.UpdateTokenButtonFromItm(button, itm)
+function Tokens.UpdateTokenButtonFromItm(button, itm, playerid)
   -- Update watched tokens
   if itm[TBag.I_NAME] then
     button.extraCurrencyType = itm[TBag.I_TYPE] 
@@ -95,7 +95,7 @@ function Tokens.UpdateTokenButtonFromItm(button, itm)
       button.icon:SetTexture("Interface\\PVPFrame\\PVP-ArenaPoints-Icon")
       button.icon:SetTexCoord(0, 1, 0, 1)
     elseif itm[TBag.I_TYPE]  == 2 then -- Honor Points
-      local factionGroup = UnitFactionGroup("player")
+      local factionGroup = TBagInfo[playerid][TBag.G_BASIC][TBag.S_FACTION] or 'FFA'
       if factionGroup then
         button.icon:SetTexture("Interface\\TargetingFrame\\UI-PVP-"..factionGroup)
         button.icon:SetTexCoord( 0.03125, 0.59375, 0.03125, 0.59375)
@@ -129,7 +129,7 @@ function Tokens.Update(frame)
   for _,itm in pairs(TTknItm[mainFrame.playerid][TBag.D_BAG]) do
     if itm[TBag.I_WATCH] then
       local watchButton = getglobal(framename.."Token"..i)
-      Tokens.UpdateTokenButtonFromItm(watchButton,itm)
+      Tokens.UpdateTokenButtonFromItm(watchButton,itm, mainFrame.playerid)
       frame:Show()
       i = i + 1
     end

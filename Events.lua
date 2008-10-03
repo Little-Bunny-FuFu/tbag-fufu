@@ -23,6 +23,7 @@ function TBag:VARIABLES_LOADED()
   -- Scan equipment on login.
   TBag:ScanEquipped()
   TBagInfo[TBag.PLAYERID][TBag.G_BASIC][TBag.S_LEVEL] = UnitLevel("player")
+  TBagInfo[TBag.PLAYERID][TBag.G_BASIC][TBag.S_FACTION] = UnitFactionGroup("player")
 end
 
 function TBag:BAG_UPDATE(event, bag)
