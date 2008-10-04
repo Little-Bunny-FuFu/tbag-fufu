@@ -1,4 +1,4 @@
--- $Id$
+﻿-- $Id$
 
 -- This file serves as the template for starting a new
 -- translation.  Just change the locale value below and
@@ -7,6 +7,10 @@
 -- (e.g. localization.deDE.lua).  Then add the file
 -- to the TBag.toc below localization.enUS.lua but
 -- above defaults.lua.
+--
+-- Unlocalized strings are initially set to false as
+-- you translate them change them to the string value
+-- in the language you are translating to.
 --
 -- localization files should be edited with a utf-8 
 -- compatable editor and done so with utf-8 encoding.
@@ -39,849 +43,849 @@ if GetLocale() ~= "deDE" then return end
 -- patterns.  Documentation can be found at:
 -- http://www.wowwiki.com/HOWTO:_Use_Regular_Expressions
 
-TBag.LOCALE = setmetatable({
-  [""] = "",  -- Needed to preserve nil returns
+TBag.LOCALES.deDE = {}
+TBag.LOCALES.current = TBag.LOCALES.deDE
+local L = TBag.LOCALE
+
+L[""] = false  -- Needed to preserve nil returns
 
 -----------------------------------------------------------------------
 -- SKILLS
 -----------------------------------------------------------------------
 
 -- Secondary skills
-  ["Cooking"] = "Cooking",
-  ["Fishing"] = "Fishing",
-  ["First Aid"] = "First Aid",
+L["Cooking"] = false 
+L["Fishing"] = false 
+L["First Aid"] = false 
 
 -- Primary professions
-  ["Alchemy"] = "Alchemy",
-  ["Blacksmithing"] = "Blacksmithing",
-  ["Enchanting"] = "Enchanting",
-  ["Engineering"] = "Engineering",
-  ["Jewelcrafting"] = "Jewelcrafting",
-  ["Leatherworking"] = "Leatherworking",
-  ["Tailoring"] = "Tailoring",
-  ["Inscription"] = "Inscription",
+L["Alchemy"] = false
+L["Blacksmithing"] = false
+L["Enchanting"] = false
+L["Engineering"] = false
+L["Jewelcrafting"] = false
+L["Leatherworking"] = false
+L["Tailoring"] = false
+L["Inscription"] = false
 
 -- Gathering
-  ["Skinning"] = "Skinning",
-  ["Mining"] = "Mining",
-  ["Herbalism"] = "Herbalism",
+L["Skinning"] = false
+L["Mining"] = false
+L["Herbalism"] = false
 
 -- Other skills
-  ["Lockpicking"] = "Lockpicking",
-  ["Poisons"] = "Poisons",
-  ["Runeforging"] = "Runeforging",
+L["Lockpicking"] = false
+L["Poisons"] = false
+L["Runeforging"] = false
 
 -----------------------------------------------------------------------
 -- SKILLS REVERSE locale -> enUS
 -----------------------------------------------------------------------
 
 -- Secondary skills
-  ["Kochen"] = "Cooking",
-  ["Angeln"] = "Fishing",
-  ["Erste Hilfe"] = "First Aid",
+L["Kochen"] = "Cooking"
+L["Angeln"] = "Fishing"
+L["Erste Hilfe"] = "First Aid"
 
 -- Primary professions
-  ["Alchimie"] = "Alchemy",
-  ["Schmiedekunst"] = "Blacksmithing",
-  ["Verzauberkunst"] = "Enchanting",
-  ["Ingenieurskunst"] = "Engineering",
-  ["Juwelenschleifen"] = "Jewelcrafting",
-  ["Lederverarbeitung"] = "Leatherworking",
-  ["Schneiderei"] = "Tailoring",
-  ["Inschriftenkunde"] = "Inscription",
+L["Alchimie"] = "Alchemy"
+L["Schmiedekunst"] = "Blacksmithing"
+L["Verzauberkunst"] = "Enchanting"
+L["Ingenieurskunst"] = "Engineering"
+L["Juwelenschleifen"] = "Jewelcrafting"
+L["Lederverarbeitung"] = "Leatherworking"
+L["Schneiderei"] = "Tailoring"
+L["Inschriftenkunde"] = "Inscription"
 
 -- Gathering
-  ["K\195\188rschnerei"] = "Skinning",
-  ["Bergbau"] = "Mining",
-  ["Kr\195\164uterkunde"] = "Herbalism",
+L["K\195\188rschnerei"] = "Skinning"
+L["Bergbau"] = "Mining"
+L["Kr\195\164uterkunde"] = "Herbalism"
 
 -- Other skills
-  ["Schlo\195\159knacken"] = "Lockpicking",
-  ["Gifte"] = "Poisons",
-  ["Runeforging"] = "Runeforging",
+L["Schlo\195\159knacken"] = "Lockpicking"
+L["Gifte"] = "Poisons"
+L["Runeforging"] = "Runeforging"
 
 -----------------------------------------------------------------------
 -- ITEM TYPES
 -----------------------------------------------------------------------
 
-  ["Armor"] = ARMOR,
-  ["Consumable"] = "Consumable",
-  ["Container"] = "Container",
-  ["Miscellaneous"] = MISCELLANEOUS,
-  ["Projectile"] = "Projectile",
-  ["Quest"] = "Quest",
-  ["Quiver"] = INVTYPE_QUIVER,
-  ["Reagent"] = "Reagent",
-  ["Recipe"] = "Recipe",
-  ["Trade Goods"] = "Trade Goods",
-  ["Weapon"] = "Weapon",
-  ["Key"] = "Key",
-  ["Elemental"] = "Elemental",
-  ["Glyph"] = "Glyph",
+L["Armor"] = ARMOR
+L["Consumable"] = false
+L["Container"] = false
+L["Miscellaneous"] = MISCELLANEOUS
+L["Projectile"] = false
+L["Quest"] = false
+L["Quiver"] = INVTYPE_QUIVER
+L["Reagent"] = false
+L["Recipe"] = false
+L["Trade Goods"] = false
+L["Weapon"] = false
+L["Key"] = false
+L["Elemental"] = false
+L["Glyph"] = false
 
-  -- Sub types
-  ["Junk"] = "Junk",
-  ["Explosives"] = "Explosives",
-  ["Devices"] = "Devices",
-  ["Parts"] = "Parts",
-  ["Ammo Pouch"] = "Ammo Pouch",
-  ["Soul Bag"] = "Soul Bag",
-  ["Engineering Bag"] = "Engineering Bag",
-  ["Gem Bag"] = "Gem Bag",
-  ["Herb Bag"] = "Herb Bag",
-  ["Mining Bag"] = "Mining Bag",
-  ["Enchanting Bag"] = "Enchanting Bag",
-  ["Leatherworking Bag"] = "Leatherworking Bag",
+-- Sub types
+L["Junk"] = false
+L["Explosives"] = false
+L["Devices"] = false
+L["Parts"] = false
+L["Ammo Pouch"] = false
+L["Soul Bag"] = false
+L["Engineering Bag"] = false
+L["Gem Bag"] = false
+L["Herb Bag"] = false
+L["Mining Bag"] = false
+L["Enchanting Bag"] = false
+L["Leatherworking Bag"] = false
 
-  -- Slots
-  ["Finger"] = INVTYPE_FINGER,
-  ["Trinket"] = INVTYPE_TRINKET,
-  ["Relic"] = INVTYPE_RELIC,
+-- Slots
+L["Finger"] = INVTYPE_FINGER
+L["Trinket"] = INVTYPE_TRINKET
+L["Relic"] = INVTYPE_RELIC
 
-  ["Soulbound"] = ITEM_SOULBOUND,
+L["Soulbound"] = ITEM_SOULBOUND
 
 -----------------------------------------------------------------------
 -- BAG DISPLAY NAMES 
 -----------------------------------------------------------------------
 
-  ["Keyring"] = KEYRING,
-  ["Bank"] = "Bank",
-  ["Backpack"] = "Backpack",
-  ["First Bag"] = "First Bag",
-  ["Second Bag"] = "Second Bag",
-  ["Third Bag"] = "Third Bag",
-  ["Fourth Bag"] = "Fourth Bag",
-  ["First Bank Bag"] = "First Bank Bag",
-  ["Second Bank Bag"] = "Second Bank Bag",
-  ["Third Bank Bag"] = "Third Bank Bag",
-  ["Fourth Bank Bag"] = "Fourth Bank Bag",
-  ["Fifth Bank Bag"] = "Fifth Bank Bag",
-  ["Sixth Bank Bag"] = "Sixth Bank Bag",
-  ["Seventh Bank Bag"] = "Seventh Bank Bag",
-  ["Empty Slot"] = "Empty Slot",
+L["Keyring"] = KEYRING
+L["Bank"] = false
+L["Backpack"] = false
+L["First Bag"] = false
+L["Second Bag"] = false
+L["Third Bag"] = false
+L["Fourth Bag"] = false
+L["First Bank Bag"] = false
+L["Second Bank Bag"] = false
+L["Third Bank Bag"] = false
+L["Fourth Bank Bag"] = false
+L["Fifth Bank Bag"] = false
+L["Sixth Bank Bag"] = false
+L["Seventh Bank Bag"] = false
+L["Empty Slot"] = false
 
 -----------------------------------------------------------------------
 -- CATEGORIES
 -----------------------------------------------------------------------
 
-  -- Templates that are used to create a number of categories.
-  ["EMPTY_%s_SLOTS"] = "EMPTY_%s_SLOTS",
-  ["IN_%s_BAG"] = "IN_%s_BAG",
-  ["%s_CREATED"] = "%s_CREATED",
-  ["SOULBOUND_%s"] = "SOULBOUND_%s",
-  ["EQUIPPED_%s"] = "EQUIPPED_%s",
-  ["%s_TOOL"] = "%s_TOOL",
-  ["%s_REAGENT"] = "%s_REAGENT",
+-- Templates that are used to create a number of categories.
+L["EMPTY_%s_SLOTS"] = false
+L["IN_%s_BAG"] = false
+L["%s_CREATED"] = false
+L["SOULBOUND_%s"] = false
+L["EQUIPPED_%s"] = false
+L["%s_TOOL"] = false
+L["%s_REAGENT"] = false
 
-  -- Broad categories for item types
-  ["PROJECTILE"] = "PROJECTILE",
-  ["SOULSHARD"] = "SOULSHARD",
-  ["CONSUMABLE"] = "CONSUMABLE",
-  ["ACT_ON"] = "ACT_ON",
-  ["ACT_OPEN"] = "ACT_OPEN",
-  ["ACT_SELL"] = "ACT_SELL",
-  ["BAG"] = "BAG",
-  ["GRAY_ITEMS"] = "GRAY_ITEMS",
-  ["QUEST"] = "QUEST",
-  ["KEY_QUEST"] = "KEY_QUEST",
-  ["KEY_OPEN"] = "KEY_OPEN",
-  ["ENCHANTS"] = "ENCHANTS",
-  ["GLYPHS"] = "GLYPHS",
-  ["BOOK"] = "BOOK",
-  ["DESIGN"] = "DESIGN",
-  ["FORMULA"] = "FORMULA",
-  ["RECIPE"] = "RECIPE",
-  ["PATTERN"] = "PATTERN",
-  ["PLANS"] = "PLANS",
-  ["SCHEMATIC"] = "SCHEMATIC",
-  ["RECIPE_OTHER"] = "RECIPE_OTHER",
-  ["PVP"] = "PVP",
-  ["REAGENT"] = "REAGENT",
-  ["TRADE_GOODS"] = "TRADE_GOODS",
-  ["CLOTH"] = "CLOTH",
-  ["MINIPET"] = "MINIPET",
-  ["COMBATPETS"] = "COMBATPETS",
-  ["COSTUMES"] = "COSTUMES",
-  ["FIREWORKS"] = "FIREWORKS",
-  ["TOYS"] = "TOYS",
-  ["MOUNT"] = "MOUNT",
-  ["FOOD"] = "FOOD",
-  ["FOOD_BUFF"] = "FOOD_BUFF",
-  ["DRINK"] = "DRINK",
-  ["COMBO"] = "COMBO",
-  ["BUFF"] = "BUFF",
-  ["DUMMY"] = "DUMMY",
-  ["BANDAGE"] = "BANDAGE",
-  ["HEALTH_RESTORE"] = "HEALTH_RESTORE",
-  ["HEALTHSTONE"] = "HEALTHSTONE",
-  ["MANA_RESTORE"] = "MANA_RESTORE",
-  ["COMBO_RESTORE"] = "COMBO_RESTORE",
-  ["RAGE_RESTORE"] = "RAGE_RESTORE",
-  ["ENERGY_RESTORE"] = "ENERGY_RESTORE",
-  ["CURE"] = "CURE",
-  ["EXPLOSIVES"] = "EXPLOSIVES",
-  ["HEARTH"] = "HEARTH",
-  ["MISC"] = "MISC",
-  ["UNKNOWN"] = "UNKNOWN",
+-- Broad categories for item types
+L["PROJECTILE"] = false
+L["SOULSHARD"] = false
+L["CONSUMABLE"] = false
+L["ACT_ON"] = false
+L["ACT_OPEN"] = false
+L["ACT_SELL"] = false
+L["BAG"] = false
+L["GRAY_ITEMS"] = false
+L["QUEST"] = false
+L["KEY_QUEST"] = false
+L["KEY_OPEN"] = false
+L["ENCHANTS"] = false
+L["GLYPHS"] = false
+L["BOOK"] = false
+L["DESIGN"] = false
+L["FORMULA"] = false
+L["RECIPE"] = false
+L["PATTERN"] = false
+L["PLANS"] = false
+L["SCHEMATIC"] = false
+L["RECIPE_OTHER"] = false
+L["PVP"] = false
+L["REAGENT"] = false
+L["TRADE_GOODS"] = false
+L["CLOTH"] = false
+L["MINIPET"] = false
+L["COMBATPETS"] = false
+L["COSTUMES"] = false
+L["FIREWORKS"] = false
+L["TOYS"] = false
+L["MOUNT"] = false
+L["FOOD"] = false
+L["FOOD_BUFF"] = false
+L["DRINK"] = false
+L["COMBO"] = false
+L["BUFF"] = false
+L["DUMMY"] = false
+L["BANDAGE"] = false
+L["HEALTH_RESTORE"] = false
+L["HEALTHSTONE"] = false
+L["MANA_RESTORE"] = false
+L["COMBO_RESTORE"] = false
+L["RAGE_RESTORE"] = false
+L["ENERGY_RESTORE"] = false
+L["CURE"] = false
+L["EXPLOSIVES"] = false
+L["HEARTH"] = false
+L["MISC"] = false
+L["UNKNOWN"] = false
 
-  -- Faction and Collectable Categories.
-  ["THORIUM_BROTHER"] = "THORIUM_BROTHER",
-  ["TIMBERMAW"] = "TIMBERMAW",
-  ["CENARION_EXPEDITION"] = "CENARION_EXPEDITION",
-  ["SPOREGGAR"] = "SPOREGGAR",
-  ["ARGENT_DAWN"] = "ARGENT_DAWN",
-  ["ALDOR"] = "ALDOR",
-  ["SCRYER"] = "SCRYER",
-  ["SHA'TAR"] = "SHA'TAR",
-  ["LOWER_CITY"] = "LOWER_CITY",
-  ["AHN_QIRAJ"] = "AHN_QIRAJ",
-  ["CENARION_CIRCLE"] = "CENARION_CIRCLE",
-  ["NETHERWING"] = "NETHERWING",
-  ["BLACKWING_LAIR"] = "BLACKWING_LAIR",
-  ["DARKMOON_FAIRE"] = "DARKMOON_FAIRE",
-  ["OGRI'LA"] = "OGRI'LA",
-  ["MOLTEN_CORE"] = "MOLTEN_CORE",
-  ["ZUL_GURUB"] = "ZUL_GURUB",
-  ["CONSORTIUM"] = "CONSORTIUM",
-  ["HALAA"] = "HALAA",
+-- Faction and Collectable Categories.
+L["THORIUM_BROTHER"] = false
+L["TIMBERMAW"] = false
+L["CENARION_EXPEDITION"] = false
+L["SPOREGGAR"] = false
+L["ARGENT_DAWN"] = false
+L["ALDOR"] = false
+L["SCRYER"] = false
+L["SHA'TAR"] = false
+L["LOWER_CITY"] = false
+L["AHN_QIRAJ"] = false
+L["CENARION_CIRCLE"] = false
+L["NETHERWING"] = false
+L["BLACKWING_LAIR"] = false
+L["DARKMOON_FAIRE"] = false
+L["OGRI'LA"] = false
+L["MOLTEN_CORE"] = false
+L["ZUL_GURUB"] = false
+L["CONSORTIUM"] = false
+L["HALAA"] = false
 
-  -- Tradeskill categories
-  ["TRADE1"] = "TRADE1",
-  ["TRADE2"] = "TRADE2",
-  ["ALCHEMY"] = "ALCHEMY",
-  ["BLACKSMITHING"] = "BLACKSMITHING",
-  ["ENCHANTING"] = "ENCHANTING",
-  ["ENGINEERING"] = "ENGINEERING",
-  ["JEWELCRAFTING"] = "JEWELCRAFTING",
-  ["LEATHERWORKING"] = "LEATHERWORKING",
-  ["MINING"] = "MINING",
-  ["POISONS"] = "POISONS",
-  ["TAILORING"] = "TAILORING",
-  ["INSCRIPTION"] = "INSCRIPTION",
-  ["FIRST_AID"] = "FIRST_AID",
-  ["COOKING"] = "COOKING",
-  ["FISHING"] = "FISHING",
-  ["RUNEFORGING"] = "RUNEFORGING",
-  ["TRADE_TOOL"] = "TRADE_TOOL",
+-- Tradeskill categories
+L["TRADE1"] = false
+L["TRADE2"] = false
+L["ALCHEMY"] = false
+L["BLACKSMITHING"] = false
+L["ENCHANTING"] = false
+L["ENGINEERING"] = false
+L["JEWELCRAFTING"] = false
+L["LEATHERWORKING"] = false
+L["MINING"] = false
+L["POISONS"] = false
+L["TAILORING"] = false
+L["INSCRIPTION"] = false
+L["FIRST_AID"] = false
+L["COOKING"] = false
+L["FISHING"] = false
+L["RUNEFORGING"] = false
+L["TRADE_TOOL"] = false
 
-  -- Item slot categories
-  -- Note the categories with numbers in them must sort in the same order
-  -- per the standard lua sort.  Numbering like this is probably needed
-  -- for all languages to preserve the sort order.
-  ["01_HEAD"] = "01_HEAD",
-  ["02_NECK"] = "02_NECK",
-  ["03_SHOULDER"] = "03_SHOULDER",
-  ["04_BACK"] = "04_BACK",
-  ["05_CHEST"] = "05_CHEST",
-  ["06_SHIRT"] = "06_SHIRT",
-  ["07_TABARD"] = "07_TABARD",
-  ["08_WRIST"] = "08_WRIST",
-  ["09_HANDS"] = "09_HANDS",
-  ["10_WAIST"] = "10_WAIST",
-  ["11_LEGS"] = "11_LEGS",
-  ["12_FEET"] = "12_FEET",
-  ["13_OFFHAND"] = "13_OFFHAND",
-  ["RELIC"] = "RELIC",
-  ["RING"] = "RING",
-  ["TRINKET"] = "TRINKET",
-  ["ARMOR"] = "ARMOR",
-  ["WEAPON"] = "WEAPON",
-  ["OTHER"] = "OTHER",
+-- Item slot categories
+-- Note the categories with numbers in them must sort in the same order
+-- per the standard lua sort.  Numbering like this is probably needed
+-- for all languages to preserve the sort order.
+L["01_HEAD"] = false
+L["02_NECK"] = false
+L["03_SHOULDER"] = false
+L["04_BACK"] = false
+L["05_CHEST"] = false
+L["06_SHIRT"] = false
+L["07_TABARD"] = false
+L["08_WRIST"] = false
+L["09_HANDS"] = false
+L["10_WAIST"] = false
+L["11_LEGS"] = false
+L["12_FEET"] = false
+L["13_OFFHAND"] = false
+L["RELIC"] = false
+L["RING"] = false
+L["TRINKET"] = false
+L["ARMOR"] = false
+L["WEAPON"] = false
+L["OTHER"] = false
  
-  -- Class Categories
-  ["DRUID"] = "DRUID",
-  ["WARLOCK"] = "WARLOCK",
-  ["ROGUE"] = "ROGUE",
-  ["MAGE"] = "MAGE",
-  ["PALADIN"] = "PALADIN",
-  ["PRIEST"] = "PRIEST",
-  ["SHAMAN"] = "SHAMAN",
-  ["WARRIOR"] = "WARRIOR",
-  ["HUNTER"] = "HUNTER",
-  ["DEATHKNIGHT"] = "DEATHKNIGHT",
-  ["CLASS_TOOL"] = "CLASS_TOOL",
-  ["CLASS_REAGENT"] = "CLASS_REAGENT",
+-- Class Categories
+L["DRUID"] = false
+L["WARLOCK"] = false
+L["ROGUE"] = false
+L["MAGE"] = false
+L["PALADIN"] = false
+L["PRIEST"] = false
+L["SHAMAN"] = false
+L["WARRIOR"] = false
+L["HUNTER"] = false
+L["DEATHKNIGHT"] = false
+L["CLASS_TOOL"] = false
+L["CLASS_REAGENT"] = false
   
-  -- Short bag type names used for EMPTY_%s_SLOTS and IN_%s_BAG categories
-  -- 3-4 characters is about right for these.
-  ["BAG"] = "BAG",
-  ["QUIV"] = "QUIV",
-  ["AMMO"] = "AMMO",
-  ["SOUL"] = "SOUL",
-  ["ENG"] = "ENG",
-  ["GEM"] = "GEM",
-  ["HERB"] = "HERB",
-  ["MINE"] = "MINE",
-  ["ENCH"] = "ENCH",
-  ["LTHR"] = "LTHR",
-  ["PET"] = "PET",
-  ["UNKNOWN"] = "UNKNOWN",
+-- Short bag type names used for EMPTY_%s_SLOTS and IN_%s_BAG categories
+-- 3-4 characters is about right for these.
+L["QUIV"] = false
+L["AMMO"] = false
+L["SOUL"] = false
+L["ENG"] = false
+L["GEM"] = false
+L["HERB"] = false
+L["MINE"] = false
+L["ENCH"] = false
+L["LTHR"] = false
+L["PET"] = false
 
-  -- Bag Position Names, also used for EMPTY_%s_SLOTS and IN_%s_BAG categories
-  ["KEYRING"] = "KEYRING",
-  ["BANK"] = "BANK",
-  ["BACKPACK"] = "BACKPACK",
-  ["BAG1"] = "BAG1",
-  ["BAG2"] = "BAG2",
-  ["BAG3"] = "BAG3",
-  ["BAG4"] = "BAG4",
-  ["BBAG1"] = "BBAG1",
-  ["BBAG2"] = "BBAG2",
-  ["BBAG3"] = "BBAG3",
-  ["BBAG4"] = "BBAG4",
-  ["BBAG5"] = "BBAG5",
-  ["BBAG6"] = "BBAG6",
-  ["BBAG7"] = "BBAG7",
+-- Bag Position Names, also used for EMPTY_%s_SLOTS and IN_%s_BAG categories
+L["KEYRING"] = false
+L["BANK"] = false
+L["BACKPACK"] = false
+L["BAG1"] = false
+L["BAG2"] = false
+L["BAG3"] = false
+L["BAG4"] = false
+L["BBAG1"] = false
+L["BBAG2"] = false
+L["BBAG3"] = false
+L["BBAG4"] = false
+L["BBAG5"] = false
+L["BBAG6"] = false
+L["BBAG7"] = false
   
-  -- Keywords
-  ["SOULBOUND"] = "SOULBOUND",
-  ["EQUIPPED"] = "EQUIPPED",
+-- Keywords
+L["SOULBOUND"] = false
+L["EQUIPPED"] = false
 
 -----------------------------------------------------------------------
 -- CHAT STRINGS
 -----------------------------------------------------------------------
 
-  ["%sSetting keybind to %q"] = "%sSetting keybind to %q",
-  ["Unassigned category %s has been assigned to slot 1"] = 
-      "Unassigned category %s has been assigned to slot 1", 
-  ["Character data cached for:"] = "Character data cached for:",
-  ["Removed cache for %q"] = "Removed cache for %q",
-  ["Couldn't find and remove cache for %q"] = 
-      "Couldn't find and remove cache for %q",       
+L["%sSetting keybind to %q"] = false
+L["Unassigned category %s has been assigned to slot 1"] = 
+      "Unassigned category %s has been assigned to slot 1" 
+L["Character data cached for:"] = false
+L["Removed cache for %q"] = false
+L["Couldn't find and remove cache for %q"] = 
+      "Couldn't find and remove cache for %q"       
 -----------------------------------------------------------------------
 -- SEARCH OUTPUT STRINGS 
 -----------------------------------------------------------------------
-  ["Search results for %q:"] = "Search results for %q:",
-  ["No results|r for %q"] = "No results|r for %q",
-  [" found:"] = " found:",
-  ["bags"] = "bags",
-  ["bank"] = "bank",
-  ["container"] = "container",
-  ["body"] = "body",
-  ["mail"] = "mail",
-  ["tokens"] = "tokens",
-  [" in %s's %s"] = " in %s's %s", -- Used when an item is found in a characters bag or bank
-  [" on %s's %s"] = " on %s's %s", -- Used when an item is found on a characters body
-  [" as %s's %s"] = " as %s's %s", -- Used when an item is used as a container for a character
+L["Search results for %q:"] = false
+L["No results|r for %q"] = false
+L[" found:"] = false
+L["bags"] = false
+L["bank"] = false
+L["container"] = false
+L["body"] = false
+L["mail"] = false
+L["tokens"] = false
+L[" in %s's %s"] = false -- Used when an item is found in a characters bag or bank
+L[" on %s's %s"] = false -- Used when an item is found on a characters body
+L[" as %s's %s"] = false -- Used when an item is used as a container for a character
 
 -----------------------------------------------------------------------
 -- HEARTHSTONE 
 -----------------------------------------------------------------------
-  -- These two strings are used to replace the home location on the tooltip
-  -- for Hearthstones.  The first string should be translated to match the
-  -- text from the Use: up to the actual location and end on the period.
-  -- If you keep it to just 3 captures with the 2nd capture from the
-  -- expression being the location then you probably don't need to change
-  -- the 2nd line.  The 2nd line controls putting the string back together.
-  -- %%1 and %%3 represent the first and third captures from the previous
-  -- expresion.  %s is the location that will be replaced.
-  ["(Use: Returns you to )([^%.]*)(%.)"] = "(Use: Returns you to )([^%.]*)(%.)",
-  ["%%1%s%%3"] = "%%1%s%%3",
+-- These two strings are used to replace the home location on the tooltip
+-- for Hearthstones.  The first string should be translated to match the
+-- text from the Use: up to the actual location and end on the period.
+-- If you keep it to just 3 captures with the 2nd capture from the
+-- expression being the location then you probably don't need to change
+-- the 2nd line.  The 2nd line controls putting the string back together.
+-- %%1 and %%3 represent the first and third captures from the previous
+-- expresion.  %s is the location that will be replaced.
+L["(Use: Returns you to )([^%.]*)(%.)"] = false
+L["%%1%s%%3"] = false
 
-  -- Generic name for the home location if we don't have it cached.
-  -- The tooltip should have something like this where in the text
-  -- where it describes how to change your bind point.  Brackets are
-  -- there to imply it's a placeholder.
-  ["<home location>"] = "<home location>",
+-- Generic name for the home location if we don't have it cached.
+-- The tooltip should have something like this where in the text
+-- where it describes how to change your bind point.  Brackets are
+-- there to imply it's a placeholder.
+L["<home location>"] = false
 
 -----------------------------------------------------------------------
 -- CHARGES 
 -----------------------------------------------------------------------
-  -- Pattern to get the charges from a tooltip
-  -- Probably only need to chage the Charges.
-  -- The ? after the s implies that the s may not be there
-  -- as would be the case in a single Charge.
-  ["(%d+) Charges?"] = "(%d+) Charges?",
-  -- Format string for adding the charges tooltip.
-  -- %d is the number of charges.  |4 specifies this
-  -- is a plural/singular pair.  Up until the : is the
-  -- singular form after is the plural until the ;.
-  ["%d |4Charge:Charges;"] = "%d |4Charge:Charges;",
+-- Pattern to get the charges from a tooltip
+-- Probably only need to chage the Charges.
+-- The ? after the s implies that the s may not be there
+-- as would be the case in a single Charge.
+L["(%d+) Charges?"] = false
+-- Format string for adding the charges tooltip.
+-- %d is the number of charges.  |4 specifies this
+-- is a plural/singular pair.  Up until the : is the
+-- singular form after is the plural until the ;.
+L["%d |4Charge:Charges;"] = false
 
 -----------------------------------------------------------------------
 -- BINDING STRINGS 
 -----------------------------------------------------------------------
-  ["Toggle Bank Window"] = "Toggle Bank Window",
-  ["Toggle Inventory Window"] = "Toggle Inventory Window",
+L["Toggle Bank Window"] = false
+L["Toggle Inventory Window"] = false
   
 -----------------------------------------------------------------------
 -- COMMAND LINE STRINGS 
 -----------------------------------------------------------------------
-  -- commands
-  ["hide"] = "hide",
-  ["show"] = "show",
-  ["update"] = "update",
-  ["debug"] = "debug",
-  ["reset"] = "reset",
-  ["resetpos"] = "resetpos",
-  ["resetsorts"] = "resetsorts",
-  ["printchars"] = "printchars",
-  ["deletechar"] = "deletechar",
-  ["config"] = "config",
-  ["tests"] = "tests",
-  ["getcat"] = "getcat",
+-- commands
+L["hide"] = false
+L["show"] = false
+L["update"] = false
+L["debug"] = false
+L["reset"] = false
+L["resetpos"] = false
+L["resetsorts"] = false
+L["printchars"] = false
+L["deletechar"] = false
+L["config"] = false
+L["tests"] = false
+L["getcat"] = false
 
-  -- /tbnk help text
-  ["TBnk Commands:"] = "TBnk Commands",
-  [" /tbnk show  -- open window"] = " /tbnk show  -- open window",
-  [" /tbnk hide  -- hide window"] = " /tbnk hide  -- hide window",
-  [" /tbnk update  -- refresh the window"] = " /tbnk update  -- refresh the window",
-  [" /tbnk config  -- configuration options"] = " /tbnk config  -- configuration options",
-  [" /tbnk debug  -- turn debug info on/off"] = " /tbnk debug  -- turn debug info on/off",
-  [" /tbnk reset  -- sets everything back to default values"] = " /tbnk reset  -- sets everything back to default values",
-  [" /tbnk resetpos -- put the bank back to its default position"] = " /tbnk resetpos -- put the bank back to its default position",
-  [" /tbnk resetsorts -- clears the item search list"] = " /tbnk resetsorts -- clears the item search list",
-  [" /tbnk printchars -- prints a list of all the chars with cached info"] = " /tbnk printchars -- prints a list of all the chars with cached info",
-  [" /tbnk deletechar CHAR SERVER -- clears all cached info for character "] = " /tbnk deletechar CHAR SERVER -- clears all cached info for character ",
+-- /tbnk help text
+L["TBnk Commands:"] = false
+L[" /tbnk show  -- open window"] = false
+L[" /tbnk hide  -- hide window"] = false
+L[" /tbnk update  -- refresh the window"] = false
+L[" /tbnk config  -- configuration options"] = false
+L[" /tbnk debug  -- turn debug info on/off"] = false
+L[" /tbnk reset  -- sets everything back to default values"] = false
+L[" /tbnk resetpos -- put the bank back to its default position"] = false
+L[" /tbnk resetsorts -- clears the item search list"] = false
+L[" /tbnk printchars -- prints a list of all the chars with cached info"] = false
+L[" /tbnk deletechar CHAR SERVER -- clears all cached info for character "] = false
 
-  -- /tinv help text
-  ["TInv Commands:"] = "TInv Commands:",
-  [" /tinv show  -- open window"] = " /tinv show  -- open window",
-  [" /tinv hide  -- hide window"] = " /tinv hide  -- hide window",
-  [" /tinv update  -- refresh the window"] = " /tinv update  -- refresh the window",
-  [" /tinv config  -- configuration options"] = " /tinv config  -- configuration options",
-  [" /tinv debug  -- turn debug info on/off"] = " /tinv debug  -- turn debug info on/off",
-  [" /tinv reset  -- sets everything back to default values"] = " /tinv reset  -- sets everything back to default values",
-  [" /tinv resetpos -- put the inventory window back to its default position"] = " /tinv resetpos -- put the inventory window back to its default position",
-  [" /tinv resetsorts -- clears the item search list"] = " /tinv resetsorts -- clears the item search list",
-  [" /tinv printchars -- prints a list of all the chars with cached info"] = " /tinv printchars -- prints a list of all the chars with cached info",
-  [" /tinv deletechar CHAR SERVER -- clears all cached info for character "] = " /tinv deletechar CHAR SERVER -- clears all cached info for character ",
+-- /tinv help text
+L["TInv Commands:"] = false
+L[" /tinv show  -- open window"] = false
+L[" /tinv hide  -- hide window"] = false
+L[" /tinv update  -- refresh the window"] = false
+L[" /tinv config  -- configuration options"] = false
+L[" /tinv debug  -- turn debug info on/off"] = false
+L[" /tinv reset  -- sets everything back to default values"] = false
+L[" /tinv resetpos -- put the inventory window back to its default position"] = false
+L[" /tinv resetsorts -- clears the item search list"] = false
+L[" /tinv printchars -- prints a list of all the chars with cached info"] = false
+L[" /tinv deletechar CHAR SERVER -- clears all cached info for character "] = false
 
 -----------------------------------------------------------------------
 -- WINDOW STRINGS
 -----------------------------------------------------------------------
-  ["TBag v%s"] = "TBag v%s",
+L["TBag v%s"] = false
 
-  ["Normal"] = "Normal",
-  ["Stop highlighting new items."] = "Stop highlighting new items.",
-  ["Highlight New"] = "Highlight New",
-  ["Highlight items marked as new."] = "Highlight items marked as new.",
-  ["Clear Search"] = "Clear Search",
-  ["Stop highlighting search results."] = "Stop highlighting search results.",
+L["Normal"] = false
+L["Stop highlighting new items."] = false
+L["Highlight New"] = false
+L["Highlight items marked as new."] = false
+L["Clear Search"] = false
+L["Stop highlighting search results."] = false
 
-  ["Toggle Edit Mode"] = "Toggle Edit Mode",
-  ["Select this option to move classes of items into different 'bars' (the red numbers)."] = "Select this option to move classes of items into different 'bars' (the red numbers).",
+L["Toggle Edit Mode"] = false
+L["Select this option to move classes of items into different 'bars' (the red numbers)."] = false
 
-  ["Reload and Sort"] = "Reload and Sort",
-  ["Reloads your items and sorts them."] = "Reloads your items and sorts them.",
+L["Reload and Sort"] = false
+L["Reloads your items and sorts them."] = false
 
-  ["Toggle Bank"] = "Toggle Bank",
-  ["Displays bank contents in a view-only mode.  You may select another player's bank to view from the dropdown."] = "Displays bank contents in a view-only mode.  You may select another player's bank to view from the dropdown.",
+L["Toggle Bank"] = false
+L["Displays bank contents in a view-only mode.  You may select another player's bank to view from the dropdown."] = false
 
-  ["Toggle Purchase Info"] = "Toggle Purchase Info",
-  ["Displays the purchase button and cost to buy a new bank slot.  This is disabled in read-only views and edit mode."] = "Displays the purchase button and cost to buy a new bank slot.  This is disabled in read-only views and edit mode.",
+L["Toggle Purchase Info"] = false
+L["Displays the purchase button and cost to buy a new bank slot.  This is disabled in read-only views and edit mode."] = false
 
-  ["Unlock Window"] = "Unlock Window",
-  ["Allow window to be moved by dragging it."] = "Allow window to be moved by dragging it.",
-  ["Lock Window"] = "Lock Window",
-  ["Prevent window from being moved by dragging it."] = "Prevent window from being moved by dragging it.",
+L["Unlock Window"] = false
+L["Allow window to be moved by dragging it."] = false
+L["Lock Window"] = false
+L["Prevent window from being moved by dragging it."] = false
   
-  ["<++>"] = "<++>",
-  ["Increase Window Size"] = "Increase Window Size",
-  ["Increase the number of columns displayed"] = "Increase the number of columns displayed",
+L["<++>"] = false
+L["Increase Window Size"] = false
+L["Increase the number of columns displayed"] = false
 
-  [">--<"] = ">--<",
-  ["Decrease Window Size"] = "Decrease Window Size",
-  ["Decrease the number of columns displayed"] = "Decrease the number of columns displayed",
+L[">--<"] = false
+L["Decrease Window Size"] = false
+L["Decrease the number of columns displayed"] = false
 
-  ["Reset"] = "Reset",
-  ["Close"] = "Close",
-  ["Add New Cat"] = "Add New Cat",
-  ["Assign Cats"] = "Assign Cats",
-  ["No"] = "No",
-  ["Yes"] = "Yes",
-  ["Category"] = "Category",
-  ["Keywords"] = "Keywords",
-  ["Tooltip Search"] = "Tooltip Search",
-  ["Type"] = "Type",
-  ["SubType"] = "SubType",
+L["Reset"] = false
+L["Close"] = false
+L["Add New Cat"] = false
+L["Assign Cats"] = false
+L["No"] = false
+L["Yes"] = false
+L["Category"] = false
+L["Keywords"] = false
+L["Tooltip Search"] = false
+L["Type"] = false
+L["SubType"] = false
   
-  -- Menus and Tooltips
-  ["Main Background Color"] = "Main Background Color",
-  ["Main Border Color"] = "Main Border Color",
-  ["Set Bar Colors to Main Colors"] = "Set Bar Colors to Main Colors",
-  ["Spotlight for %s"] = "Spotlight for %s",
-  ["Current Category: %s"] = "Current Category: %s",
-  ["Assign item to category:"] = "Assign item to category:",
-  ["Use default category assignment"] = "Use default category assignment",
-  ["Debug Info: "] = "Debug Info: ",
-  ["Categories within bar %d"] = "Categories within bar %d",
-  ["Move: |c%s%s|r"] = "Move: |c%s%s|r",
-  ["Sort Mode:"] = "Sort Mode:",
-  ["No sort"] = "No sort",
-  ["Sort by name"] = "Sort by name",
-  ["Sort last words first"] = "Sort last words first",
-  ["Highlight new items:"] = "Highlight new items:",
-  ["Don't tag new items"] = "Don't tag new items",
-  ["Tag new items"] = "Tag new items",
-  ["Hide Bar:"] = "Hide Bar:",
-  ["Show items assigned to this bar"] = "Show items assigned to this bar",
-  ["Hide items assigned to this bar"] = "Hide items assigned to this bar",
-  ["Color:"] = "Color:",
-  ["Background Color for Bar %d"] = "Background Color for Bar %d",
-  ["Border Color for Bar %d"] = "Border Color for Bar %d",
-  ["Select Character"] = "Select Character",
-  ["Edit Mode"] = "Edit Mode",
-  ["Lock window"] = "Lock window",
-  ["Show Purchase Info"] = "Show Purchase Info",
-  ["Close Inventory"] = "Close Inventory",
-  ["Highlight New Items"] = "Highlight New Items",
-  ["Reset NEW tag"] = "Reset NEW tag",
-  ["Advanced Configuration"] = "Advanced Configuration",
-  ["Set Size"] = "Set Size",
-  ["Set Colors"] = "Set Colors",
-  ["Hide"] = "Hide",
-  ["Hide Player Dropdown"] = "Hide Player Dropdown",
-  ["Hide Search Box"] = "Hide Search Box",
-  ["Hide Re-sort Button"] = "Hide Re-sort Button",
-  ["Hide Bank Button"] = "Hide Bank Button",
-  ["Hide Show Purchase Button"] = "Hide Show Purchase Button",
-  ["Hide Edit Button"] = "Hide Edit Button",
-  ["Hide Highlight Button"] = "Hide Highlight Button",
-  ["Hide Lock Button"] = "Hide Lock Button",
-  ["Hide Close Button"] = "Hide Close Button",
-  ["Hide Total"] = "Hide Total",
-  ["Hide Bag Buttons"] = "Hide Bag Buttons",
-  ["Hide Money"] = "Hide Money",
-  ["Hide Tokens"] = "Hide Tokens",
-  ["The Bank"] = "The Bank",
-  ["|c%sLeft click to move category |r|c%s%s|r|c%s to bar |r|c%s%s|r"] = "|c%sLeft click to move category |r|c%s%s|r|c%s to bar |r|c%s%s|r",
-  ["|c%sBar |r|c%s%s|r"] = "|c%sBar |r|c%s%s|r",
-  ["|c%s%s|r"] = "|c%s%s|r",
-  ["Right click for options"] = "Right click for options",
-  ["|c%sLeft click to select category to move:|r |c%s%s|r"] = "|c%sLeft click to select category to move:|r |c%s%s|r",
-  ["Right click to assign this item to a different category"] = "Right click to assign this item to a different category",
-  ["You are viewing the selected player's bank."] = "You are viewing the selected player's bank.",
-  ["You are viewing the selected player's inventory."] = "You are viewing the selected player's inventory.",
-  ["Equip Container"] = "Equip Container",
-  ["Anchor"] = "Anchor",
-  ["TOPLEFT"] = "TOPLEFT",
-  ["TOPRIGHT"] = "TOPRIGHT",
-  ["BOTTOMLEFT"] = "BOTTOMLEFT",
-  ["BOTTOMRIGHT"] = "BOTTOMRIGHT",
-  ["Show on TBag"] = "Show on TBag",
-  ["Checking this option will allow you to track this currency type in TBag for this character.\n\nYou can also Shift-click a currency to add or remove it from being tracked in TBag."] = "Checking this option will allow you to track this currency type in TBag for this character.\n\nYou can also Shift-click a currency to add or remove it from being tracked in TBag.",
+-- Menus and Tooltips
+L["Main Background Color"] = false
+L["Main Border Color"] = false
+L["Set Bar Colors to Main Colors"] = false
+L["Spotlight for %s"] = false
+L["Current Category: %s"] = false
+L["Assign item to category:"] = false
+L["Use default category assignment"] = false
+L["Debug Info: "] = false
+L["Categories within bar %d"] = false
+L["Move: |c%s%s|r"] = false
+L["Sort Mode:"] = false
+L["No sort"] = false
+L["Sort by name"] = false
+L["Sort last words first"] = false
+L["Highlight new items:"] = false
+L["Don't tag new items"] = false
+L["Tag new items"] = false
+L["Hide Bar:"] = false
+L["Show items assigned to this bar"] = false
+L["Hide items assigned to this bar"] = false
+L["Color:"] = false
+L["Background Color for Bar %d"] = false
+L["Border Color for Bar %d"] = false
+L["Select Character"] = false
+L["Edit Mode"] = false
+L["Lock window"] = false
+L["Show Purchase Info"] = false
+L["Close Inventory"] = false
+L["Highlight New Items"] = false
+L["Reset NEW tag"] = false
+L["Advanced Configuration"] = false
+L["Set Size"] = false
+L["Set Colors"] = false
+L["Hide"] = false
+L["Hide Player Dropdown"] = false
+L["Hide Search Box"] = false
+L["Hide Re-sort Button"] = false
+L["Hide Bank Button"] = false
+L["Hide Show Purchase Button"] = false
+L["Hide Edit Button"] = false
+L["Hide Highlight Button"] = false
+L["Hide Lock Button"] = false
+L["Hide Close Button"] = false
+L["Hide Total"] = false
+L["Hide Bag Buttons"] = false
+L["Hide Money"] = false
+L["Hide Tokens"] = false
+L["The Bank"] = false
+L["|c%sLeft click to move category |r|c%s%s|r|c%s to bar |r|c%s%s|r"] = false
+L["|c%sBar |r|c%s%s|r"] = false
+L["|c%s%s|r"] = false
+L["Right click for options"] = false
+L["|c%sLeft click to select category to move:|r |c%s%s|r"] = false
+L["Right click to assign this item to a different category"] = false
+L["You are viewing the selected player's bank."] = false
+L["You are viewing the selected player's inventory."] = false
+L["Equip Container"] = false
+L["Anchor"] = false
+L["TOPLEFT"] = false
+L["TOPRIGHT"] = false
+L["BOTTOMLEFT"] = false
+L["BOTTOMRIGHT"] = false
+L["Show on TBag"] = false
+L["Checking this option will allow you to track this currency type in TBag for this character.\n\nYou can also Shift-click a currency to add or remove it from being tracked in TBag."] = false
 
-  -- Option Window Strings
-  ["Main Sizing Preferences"] = "Main Sizing Preferences",
-  ["Number of Item Columns:"] = "Number of Item Columns:",
-  ["Number of Horizontal Bars:"] = "Number of Horizontal Bars:",
-  ["Window Scale:"] = "Window Scale:",
-  ["Item Button Size:"] = "Item Button Size:",
-  ["Item Button Padding:"] = "Item Button Padding:",
-  ["Spacing - X Button:"] = "Spacing - X Button:",
-  ["Spacing - Y Button:"] = "Spacing - Y Button:",
-  ["Spacing - X Pool:"] = "Spacing - X Pool:",
-  ["Spacing - Y Pool:"] = "Spacing - Y Pool:",
-  ["Count Font Size:"] = "Count Font Size:",
-  ["Count Placement - X:"] = "Count Placement - X:",
-  ["Count Placement - Y:"] = "Count Placement - Y:",
-  ["New Tag Font Size:"] = "New Tag Font Size:",
-  ["Bag Contents Show"] = "Bag Contents Show",
-  ["Show %s:"] = "Show %s:",
-  ["General Display Preferences"] = "General Display Preferences",
-  ["Show Size on Bag Count:"] = "Show Size on Bag Count:",
-  ["Show Bag Icons on Empty Slots:"] = "Show Bag Icons on Empty Slots:",
-  ["Spotlight Open or Selected Bags:"] = "Spotlight Open or Selected Bags:",
-  ["Spotlight Mouseover:"] = "Spotlight Mouseover:",
-  ["Show Item Rarity Color:"] = "Show Item Rarity Color:",
-  ["Auto Stack:"] = "Auto Stack:",
-  ["Stack on Re-sort:"] = "Stack on Re-sort:",
-  ["Profession Bags precede Sorting:"] = "Profession Bags precede Sorting:",
-  ["Trade Creation precedes Sorting (Reopen Window):"] = "Trade Creation precedes Sorting (Reopen Window):",
-  ["New Tag Options"] = "New Tag Options",
-  ["New Tag Text:"] = "New Tag Text:",
-  ["Increased Tag Text:"] = "Increased Tag Text:",
-  ["Decreased Tag Text:"] = "Decreased Tag Text:",
-  ["New Tag Timeout (minutes):"] = "New Tag Timeout (minutes):",
-  ["Recent Tag Timeout (minutes):"] = "Recent Tag Timeout (minutes):",
-  ["Alt Key Auto-Pickup:"] = "Alt Key Auto-Pickup:",
-  ["Alt Key Auto-Panel:"] = "Alt Key Auto-Panel:",
-  ["Show Keyring Empty Slots (Enable Show above):"] = "Show Keyring Empty Slots (Enable Show above):",
-  ["Show Soul Shard Count On Soul Bags:"] = "Show Soul Shard Count On Soul Bags:",
+-- Option Window Strings
+L["Main Sizing Preferences"] = false
+L["Number of Item Columns:"] = false
+L["Number of Horizontal Bars:"] = false
+L["Window Scale:"] = false
+L["Item Button Size:"] = false
+L["Item Button Padding:"] = false
+L["Spacing - X Button:"] = false
+L["Spacing - Y Button:"] = false
+L["Spacing - X Pool:"] = false
+L["Spacing - Y Pool:"] = false
+L["Count Font Size:"] = false
+L["Count Placement - X:"] = false
+L["Count Placement - Y:"] = false
+L["New Tag Font Size:"] = false
+L["Bag Contents Show"] = false
+L["Show %s:"] = false
+L["General Display Preferences"] = false
+L["Show Size on Bag Count:"] = false
+L["Show Bag Icons on Empty Slots:"] = false
+L["Spotlight Open or Selected Bags:"] = false
+L["Spotlight Mouseover:"] = false
+L["Show Item Rarity Color:"] = false
+L["Auto Stack:"] = false
+L["Stack on Re-sort:"] = false
+L["Profession Bags precede Sorting:"] = false
+L["Trade Creation precedes Sorting (Reopen Window):"] = false
+L["New Tag Options"] = false
+L["New Tag Text:"] = false
+L["Increased Tag Text:"] = false
+L["Decreased Tag Text:"] = false
+L["New Tag Timeout (minutes):"] = false
+L["Recent Tag Timeout (minutes):"] = false
+L["Alt Key Auto-Pickup:"] = false
+L["Alt Key Auto-Panel:"] = false
+L["Show Keyring Empty Slots (Enable Show above):"] = false
+L["Show Soul Shard Count On Soul Bags:"] = false
 
 -----------------------------------------------------------------------
 -- Unit Tests 
 -----------------------------------------------------------------------
-  ["TEST RUN STARTING"] = "TEST RUN STARTING",
-  [" Retrieving item information"] = " Retrieving item information",
-  ["SUCCESS: %s"] = "SUCCESS: %s",
-  ["FAIL: %s (%s) expected %q but got %q"] = "FAIL: %s (%s) expected %q but got %q",
-  ["ALL TESTS SUCCESSFUL"] = "ALL TESTS SUCCESSFUL",
+L["TEST RUN STARTING"] = false
+L[" Retrieving item information"] = false
+L["SUCCESS: %s"] = false
+L["FAIL: %s (%s) expected %q but got %q"] = false
+L["ALL TESTS SUCCESSFUL"] = false
 
 -----------------------------------------------------------------------
 -- Default Search List Strings 
 -----------------------------------------------------------------------
-  ["This Item Begins a Quest"] = ITEM_STARTS_QUEST,
-  ["<Right Click to Open>"] = ITEM_OPENABLE,
-  [" Lockbox"] = " Lockbox",
-  ["Mark of Honor"] = "Mark of Honor",
-  ["Mark of Honor Hold"] = "Mark of Honor Hold",
-  ["Mark of Thrallmar"] = "Mark of Thrallmar",
-  ["Halaa Battle Token"] = "Halaa Battle Token",
-  ["Spirit Shard"] = "Spirit Shard",
-  ["Use: Permanently"] = "Use: Permanently",
-  ["Hearthstone"] = "Hearthstone",
-  ["Right Click to summon and dismiss"] = "Right Click to summon and dismiss",
-  ["Summons or dismisses a Spirit of"] = "Summons or dismisses a Spirit of",
-  ["Use: Teaches you how to summon this companion."] = "Use: Teaches you how to summon this companion.",
-  ["Requires Riding %("] = "Requires Riding %(",
-  ["%a+ Scarab"] = "%a+ Scarab",
-  ["%a+ Idol"] = "%a+ Idol",
-  ["Qiraji %a+ %a+"] = "Qiraji %a+ %a+",
-  ["Bone Fragments"] = "Bone Fragments",
-  ["Core of Elements"] = "Core of Elements",
-  ["Crypt Fiend Parts"] = "Crypt Fiend Parts",
-  ["Dark Iron Scraps"] = "Dark Iron Scraps",
-  ["Savage Frond"] = "Savage Frond",
-  ["Insignia of the Crusade"] = "Insignia of the Crusade",
-  ["Insignia of the Dawn"] = "Insignia of the Dawn",
-  ["Argent Dawn Valor Token"] = "Argent Dawn Valor Token",
-  ["Mantle of the Dawn"] = "Mantle of the Dawn",
-  ["Vitreous Focuser"] = "Vitreous Focuser",
-  ["Osseous Agitator"] = "Osseous Agitator",
-  ["Somatic Intensifier"] = "Somatic Intensifier",
-  ["Ectoplasmic Resonator"] = "Ectoplasmic Resonator",
-  ["Arcane Quickener"] = "Arcane Quickener",
-  [" Scourgestone"] = " Scourgestone",
-  ["Cenarion %a+ Badge"] = "Cenarion %a+ Badge",
-  ["Twilight Text"] = "Twilight Text",
-  ["Twilight Cultist"] = "Twilight Cultist",
-  ["Abyssal Crest"] = "Abyssal Crest",
-  ["Abyssal Signet"] = "Abyssal Signet",
-  ["Abyssal Scepter"] = "Abyssal Scepter",
-  ["Darkmoon Faire Prize Ticket"] = "Darkmoon Faire Prize Ticket",
-  ["Soft Bushy Tail"] = "Soft Bushy Tail",
-  ["Vibrant Plume"] = "Vibrant Plume",
-  ["Small Furry Paw"] = "Small Furry Paw",
-  ["Evil Bat Eye"] = "Evil Bat Eye",
-  ["Torn Bear Pelt"] = "Torn Bear Pelt",
-  ["Glowing Scorpid Blood"] = "Glowing Scorpid Blood",
-  ["Warlords"] = "Warlords",
-  ["Elementals"] = "Elementals",
-  ["Portals"] = "Portals",
-  ["Beasts"] = "Beasts",
-  ["Blessings"] = "Blessings",
-  ["Furies"] = "Furies",
-  ["Lunacy"] = "Lunacy",
-  ["Storms"] = "Storms",
-  ["Incendosaur Scale"] = "Incendosaur Scale",
-  ["Dark Iron Residue"] = "Dark Iron Residue",
-  ["Deadwood Headdress Feather"] = "Deadwood Headdress Feather",
-  ["Winterfall Spirit Beads"] = "Winterfall Spirit Beads",
-  ["Zandalar Honor Token"] = "Zandalar Honor Token",
-  ["%a+ Coin"] = "%a+ Coin",
-  ["%a+ Bijou"] = "%a+ Bijou",
-  ["Primal Hakkari"] = "Primal Hakkari",
-  ["Apexis Crystal"] = "Apexis Crystal",
-  ["to create a dragonscale cloak"] = "to create a dragonscale cloak",
-  ["Darkrune"] = "Darkrune",
-  ["Netherwing Egg"] = "Netherwing Egg",
-  ["Nethercite Ore"] = "Nethercite Ore",
-  ["Netherdust Pollen"] = "Netherdust Pollen",
-  ["Netherwing Crystal"] = "Netherwing Crystal",
-  ["Nethermine Cargo"] = "Nethermine Cargo",
-  ["Unidentified Plant Parts"] = "Unidentified Plant Parts",
-  ["Coilfang Armaments"] = "Coilfang Armaments",
-  ["Mature Spore Sac"] = "Mature Spore Sac",
-  ["Bog Lord Tendril"] = "Bog Lord Tendril",
-  ["Glowcap"] = "Glowcap",
-  ["Fertile Spores"] = "Fertile Spores",
-  ["Sanguine Hibiscus"] = "Sanguine Hibiscus",
-  ["Obsidian Warbeads"] = "Obsidian Warbeads",
-  ["Oshu'gun Crystal Fragment"] = "Oshu'gun Crystal Fragment",
-  ["Pair of Ivory Tusks"] = "Pair of Ivory Tusks",
-  ["Zaxxis Insignia"] = "Zaxxis Insignia",
-  ["Ethereum Prisoner I%.D%. Tag"] = "Ethereum Prisoner I%.D%. Tag",
-  ["Ethereum Prison Key"] = "Ethereum Prison Key",
-  ["Halaa Research Token"] = "Halaa Research Token",
-  ["Oshu'gun Crystal Powder Sample"] = "Oshu'gun Crystal Powder Sample",
-  ["Dampscale Basilisk Eye"] = "Dampscale Basilisk Eye",
-  ["Firewing Signet"] = "Firewing Signet",
-  ["Sunfury Signet"] = "Sunfury Signet",
-  ["Arcane Tome"] = "Arcane Tome",
-  ["Arcane Rune"] = "Arcane Rune",
-  ["Dreadfang Venom Sac"] = "Dreadfang Venom Sac",
-  ["Mark of Kil'jaeden"] = "Mark of Kil'jaeden",
-  ["Mark of Sargeras"] = "Mark of Sargeras",
-  ["Fel Armament"] = "Fel Armament",
-  ["Holy Dust"] = "Holy Dust",
-  ["Mark of the Illidari"] = "Mark of the Illidari",
-  ["Badge of Justice"] = "Badge of Justice",
-  ["Arakkoa Feather"] = "Arakkoa Feather",
-  ["Quest Item"] = ITEM_BIND_QUEST,
-  ["Morbent"] = "Morbent",
-  ["Codex: "] = "Codex: ",
-  ["Manual: "] = "Manual: ",
-  ["Expert "] = "Expert ",
-  ["Tome of "] = "Tome of ",
-  ["Design: "] = "Design: ",
-  ["Formula: "] = "Formula: ",
-  ["Recipe: "] = "Recipe: ",
-  ["Pattern: "] = "Pattern: ",
-  ["Plans: "] = "Plans: ",
-  ["Schematic: "] = "Schematic: ",
-  ["[Ss]kinning [Kk]nife"] = "[Ss]kinning [Kk]nife",
-  ["[Mm]ining [Pp]ick"] = "[Mm]ining [Pp]ick",
-  ["[Bb]lacksmith [Hh]ammer"] = "[Bb]lacksmith [Hh]ammer",
-  ["Runed %a+ Rod"] = "Runed %a+ Rod",
-  ["Philosopher's Stone"] = "Philosopher's Stone",
-  ["Salt Shaker"] = "Salt Shaker",
-  ["Arclight Spanner"] = "Arclight Spanner",
-  ["Gyromatic Micro%-Adjustor"] = "Gyromatic Micro%-Adjustor",
-  ["Zulian Slicer"] = "Zulian Slicer",
-  ["Finkle's Skinner"] = "Finkle's Skinner",
-  ["Blood Scythe"] = "Blood Scythe",
-  ["Herbalist's Gloves"] = "Herbalist's Gloves",
-  ["Dwarven Fishing Pole"] = "Dwarven Fishing Pole",
-  ["Goblin Fishing Pole"] = "Goblin Fishing Pole",
-  ["Everlasting Underspore Frond"] = "Everlasting Underspore Frond",
-  ["\nHead"] = "\nHead",
-  ["\nNeck"] = "\nNeck",
-  ["\nShoulder"] = "\nShoulder",
-  ["\nBack"] = "\nBack",
-  ["\nChest"] = "\nChest",
-  ["\nShirt"] = "\nShirt",
-  ["\nTabard"] = "\nTabard",
-  ["\nWrist"] = "\nWrist",
-  ["\nHands"] = "\nHands",
-  ["\nWaist"] = "\nWaist",
-  ["\nLegs"] = "\nLegs",
-  ["\nFeet"] = "\nFeet",
-  ["\nHeld In Off%-hand"] = "\nHeld In Off%-hand",
-  [" Bandage"] = " Bandage",
-  ["Instantly restores %d+ life"] = "Instantly restores %d+ life",
-  [" well fed "] = " well fed ",
-  ["Restores %d+ health.* increases your "] = "Restores %d+ health.* increases your ",
-  ["Must remain seated while drinking%."] = "Must remain seated while drinking%.",
-  ["Restores %d+ mana over %d+ sec"] = "Restores %d+ mana over %d+ sec",
-  ["Restores %d+ health and %d+ mana over %d+ sec"] = "Restores %d+ health and %d+ mana over %d+ sec",
-  ["Restores .* health and mana .* %d+ sec"] = "Restores .* health and mana .* %d+ sec",
-  ["Must remain seated while eating%."] = "Must remain seated while eating%.",
-  ["Restores %d+ health over %d+ sec"] = "Restores %d+ health over %d+ sec",
-  ["Thistle Tea"] = "Thistle Tea",
-  ["[Rr]estores %d+ energy"] = "[Rr]estores %d+ energy",
-  ["Rage Potion"] = "Rage Potion",
-  ["[Rr]estores %d+ rage"] = "[Rr]estores %d+ rage",
-  ["Rejuvenation Potion"] = "Rejuvenation Potion",
-  ["Dreamless Sleep"] = "Dreamless Sleep",
-  ["[Rr]estores %d+ to %d+ mana and health"] = "[Rr]estores %d+ to %d+ mana and health",
-  ["Mana Potion"] = "Mana Potion",
-  ["[Rr]estores %d+ to %d+ mana"] = "[Rr]estores %d+ to %d+ mana",
-  ["Healing Potion"] = "Healing Potion",
-  ["[Rr]estores %d+ to %d+ health"] = "[Rr]estores %d+ to %d+ health",
-  ["Place a %a+ stone statue"] = "Place a %a+ stone statue",
-  [" [Cc]ure.* poison"] = " [Cc]ure.* poison",
-  [" [Cc]ure.* disease"] = " [Cc]ure.* disease",
-  [" [Cc]ure.* curse"] = " [Cc]ure.* curse",
-  [" [Cc]ure.* magic"] = " [Cc]ure.* magic",
-  [" [Rr]emoves %d+ .*effect"] = " [Rr]emoves %d+ .*effect",
-  [" Dynamite"] = " Dynamite",
-  [" Bomb"] = " Bomb",
-  [" Mortar"] = " Mortar",
-  ["Scroll"] = "Scroll",
-  ["Use: Increases "] = "Use: Increases ",
-  ["Use: Absorbs "] = "Use: Absorbs ",
-  ["Use: Regenerate "] = "Use: Regenerate ",
-  ["Use: While applied to target weapon"] = "Use: While applied to target weapon",
-  [" Sharpening Stone"] = " Sharpening Stone",
-  [" Weightstone"] = " Weightstone",
-  ["Mistletoe"] = "Mistletoe",
-  ["Flame Cap"] = "Flame Cap",
-  ["[AG][li][lv][oe]w?s the [Ii]mbiber "] = "[AG][li][lv][oe]w?s the [Ii]mbiber ",
-  [" Key"] = " Key",
-  ["Light Feather"] = "Light Feather",
-  ["Infernal Stone"] = "Infernal Stone",
-  ["Demonic Figurine"] = "Demonic Figurine",
-  ["Flash Powder"] = "Flash Powder",
-  [" Seed"] = " Seed",
-  ["Wild "] = "Wild ",
-  ["Arcane Powder"] = "Arcane Powder",
-  ["Rune of "] = "Rune of ",
-  ["Symbol of"] = "Symbol of",
-  [" Candle"] = " Candle",
-  ["Ankh"] = "Ankh",
-  ["Fish Oil"] = "Fish Oil",
-  ["Shiny Fish Scales"] = "Shiny Fish Scales",
-  ["Thieves' Tools"] = "Thieves' Tools",
-  [" Totem"] = " Totem",
-  ["Soul Shard"] = "Soul Shard",
-  ["Corpse Dust"] = "Corpse Dust",
-  ["Target Dummy"] = "Target Dummy",
-  ["Elemental %a+"] = "Elemental %a+",
-  ["Essence of %a+"] = "Essence of %a+",
-  ["Globe of Water"] = "Globe of Water",
-  ["Breath of Wind"] = "Breath of Wind",
-  ["Heart of Fire"] = "Heart of Fire",
-  ["Core of Earth"] = "Core of Earth",
-  ["Mote of %a+"] = "Mote of %a+",
-  ["Primal Nether"] = "Primal Nether",
-  ["Primal %a+"] = "Primal %a+",
-  ["Void Crystal"] = "Void Crystal",
-  ["Nether Vortex"] = "Nether Vortex",
-  ["Sunmote"] = "Sunmote",
-  ["Heart of Darkness"] = "Heart of Darkness",
-  [" Vial"] = " Vial",
-  ["[cC]loth"] = "[cC]loth",
-  ["%a+ Poison [IV]*"] = "%a+ Poison [IV]*",
-  ["Raw "] = "Raw ",
-  ["[Ff]ish"] = "[Ff]ish",
-  [" Meat"] = " Meat",
-  ["%a+ Dust"] = "%a+ Dust",
-  ["Lesser %a+ Essence"] = "Lesser %a+ Essence",
-  ["Greater %a+ Essence"] = "Greater %a+ Essence",
-  ["Small %a+ Shard"] = "Small %a+ Shard",
-  ["Large %a+ Shard"] = "Large %a+ Shard",
-  ["Papa Hummel's Old%-Fashioned Pet Biscuit"] = "Papa Hummel's Old%-Fashioned Pet Biscuit",
-  ["Silver Shafted Arrow"] = "Silver Shafted Arrow",
-  ["Crashin' Thrashin'"] = "Crashin' Thrashin'",
-  ["Tonk Controller"] = "Tonk Controller",
-  ["Mechanical Yeti"] = "Mechanical Yeti",
-  ["Orb of the Sin'dorei"] = "Orb of the Sin'dorei",
-  ["Orb of the Blackwhelp"] = "Orb of the Blackwhelp",
-  ["Winter Veil Disguise Kit"] = "Winter Veil Disguise Kit",
-  ["Hallowed Wand %- "] = "Hallowed Wand %- ",
-  ["Murloc Costume"] = "Murloc Costume",
-  ["Weighted Jack%-o'%-Lantern"] = "Weighted Jack%-o'%-Lantern",
-  ["Gordok Ogre Suit"] = "Gordok Ogre Suit",
-  ["Transforms your mount into something more festive"] = "Transforms your mount into something more festive",
-  ["Shoots a.*firework"] = "Shoots a.*firework",
-  ["Place on the ground to launch .* rockets"] = "Place on the ground to launch .* rockets",
-  ["Throw into a .* launcher"] = "Throw into a .* launcher",
-  ["Brazier of Dancing Flames"] = "Brazier of Dancing Flames",
-  ["Direbrew's Remote"] = "Direbrew's Remote",
-  ["Goblin Weather Machine %- Prototype 01%-B"] = "Goblin Weather Machine %- Prototype 01%-B",
-  ["Use: Right Click to set up a .* picnic."] = "Use: Right Click to set up a .* picnic.",
-  ["D\.I\.S\.C\.O\."] = "D\.I\.S\.C\.O\.",
-  ["Imp in a Ball"] = "Imp in a Ball",
-  ["Snowball"] = "Snowball",
-  ["Paper Flying Machine Kit"] = "Paper Flying Machine Kit",
-  ["If they have free room in their pack they will catch it"] = "If they have free room in their pack they will catch it",
-  ["Fishing Chair"] = "Fishing Chair",
-  ["Elune Stone"] = "Elune Stone",
-  ["Shower a nearby target with a cascade of"] = "Shower a nearby target with a cascade of",
-  ["Path of Illidan"] = "Path of Illidan",
-  ["Goblin Gumbo"] = "Goblin Gumbo",
-  ["Toasting Goblet"] = "Toasting Goblet",
-  ["Summons a .* that will protect you for"] = "Summons a .* that will protect you for",
-  ["Creates a .* that will fight for you"] = "Creates a .* that will fight for you",
-  ["Explosive Sheep"] = "Explosive Sheep",
-  ["Goblin Land Mine"] = "Goblin Land Mine",
-  ["Eye of Arachnida"] = "Eye of Arachnida",
-  ["Rope Pet Leash"] = "Rope Pet Leash",
-  ["Fetch Ball"] = "Fetch Ball",
-  ["Happy Pet Snack"] = "Happy Pet Snack",
-  ["Paper Zeppelin Kit"] = "Paper Zeppelin Kit",
-  ["Titanium Seal of Dalaran"] = "Titanium Seal of Dalaran",
-  ["Frozen Orb"] = "Frozen Orb",
-  ["Crystallized %a+"] = "Crystallized %a+",
-  ["Eternal %a+"] = "Eternal %a+",
-  ["Virtuoso Inking Set"] = "Virtuoso Inking Set",
-  ["Ink"] = "Ink",
-  [" Parchment"] = "Parchment",
-  [" Pigment"] = "Pigment",
-  ["Grindgear Toy Gorilla"] = "Grindgear Toy Gorilla",
-  ["Trusty Copper Racer"] = "Trusty Copper Racer",
-  ["Toy Train Set"] = "Toy Train Set",
-  ["Engineer's Ink"] = "Engineer's Ink",
-}, { __index = TBag.LOCALE }); 
+L["This Item Begins a Quest"] = ITEM_STARTS_QUEST
+L["<Right Click to Open>"] = ITEM_OPENABLE
+L[" Lockbox"] = false
+L["Mark of Honor"] = false
+L["Mark of Honor Hold"] = false
+L["Mark of Thrallmar"] = false
+L["Halaa Battle Token"] = false
+L["Spirit Shard"] = false
+L["Use: Permanently"] = false
+L["Hearthstone"] = false
+L["Right Click to summon and dismiss"] = false
+L["Summons or dismisses a Spirit of"] = false
+L["Use: Teaches you how to summon this companion."] = false
+L["Requires Riding %("] = false
+L["%a+ Scarab"] = false
+L["%a+ Idol"] = false
+L["Qiraji %a+ %a+"] = false
+L["Bone Fragments"] = false
+L["Core of Elements"] = false
+L["Crypt Fiend Parts"] = false
+L["Dark Iron Scraps"] = false
+L["Savage Frond"] = false
+L["Insignia of the Crusade"] = false
+L["Insignia of the Dawn"] = false
+L["Argent Dawn Valor Token"] = false
+L["Mantle of the Dawn"] = false
+L["Vitreous Focuser"] = false
+L["Osseous Agitator"] = false
+L["Somatic Intensifier"] = false
+L["Ectoplasmic Resonator"] = false
+L["Arcane Quickener"] = false
+L[" Scourgestone"] = false
+L["Cenarion %a+ Badge"] = false
+L["Twilight Text"] = false
+L["Twilight Cultist"] = false
+L["Abyssal Crest"] = false
+L["Abyssal Signet"] = false
+L["Abyssal Scepter"] = false
+L["Darkmoon Faire Prize Ticket"] = false
+L["Soft Bushy Tail"] = false
+L["Vibrant Plume"] = false
+L["Small Furry Paw"] = false
+L["Evil Bat Eye"] = false
+L["Torn Bear Pelt"] = false
+L["Glowing Scorpid Blood"] = false
+L["Warlords"] = false
+L["Elementals"] = false
+L["Portals"] = false
+L["Beasts"] = false
+L["Blessings"] = false
+L["Furies"] = false
+L["Lunacy"] = false
+L["Storms"] = false
+L["Incendosaur Scale"] = false
+L["Dark Iron Residue"] = false
+L["Deadwood Headdress Feather"] = false
+L["Winterfall Spirit Beads"] = false
+L["Zandalar Honor Token"] = false
+L["%a+ Coin"] = false
+L["%a+ Bijou"] = false
+L["Primal Hakkari"] = false
+L["Apexis Crystal"] = false
+L["to create a dragonscale cloak"] = false
+L["Darkrune"] = false
+L["Netherwing Egg"] = false
+L["Nethercite Ore"] = false
+L["Netherdust Pollen"] = false
+L["Netherwing Crystal"] = false
+L["Nethermine Cargo"] = false
+L["Unidentified Plant Parts"] = false
+L["Coilfang Armaments"] = false
+L["Mature Spore Sac"] = false
+L["Bog Lord Tendril"] = false
+L["Glowcap"] = false
+L["Fertile Spores"] = false
+L["Sanguine Hibiscus"] = false
+L["Obsidian Warbeads"] = false
+L["Oshu'gun Crystal Fragment"] = false
+L["Pair of Ivory Tusks"] = false
+L["Zaxxis Insignia"] = false
+L["Ethereum Prisoner I%.D%. Tag"] = false
+L["Ethereum Prison Key"] = false
+L["Halaa Research Token"] = false
+L["Oshu'gun Crystal Powder Sample"] = false
+L["Dampscale Basilisk Eye"] = false
+L["Firewing Signet"] = false
+L["Sunfury Signet"] = false
+L["Arcane Tome"] = false
+L["Arcane Rune"] = false
+L["Dreadfang Venom Sac"] = false
+L["Mark of Kil'jaeden"] = false
+L["Mark of Sargeras"] = false
+L["Fel Armament"] = false
+L["Holy Dust"] = false
+L["Mark of the Illidari"] = false
+L["Badge of Justice"] = false
+L["Arakkoa Feather"] = false
+L["Quest Item"] = ITEM_BIND_QUEST
+L["Morbent"] = false
+L["Codex: "] = false
+L["Manual: "] = false
+L["Expert "] = false
+L["Tome of "] = false
+L["Design: "] = false
+L["Formula: "] = false
+L["Recipe: "] = false
+L["Pattern: "] = false
+L["Plans: "] = false
+L["Schematic: "] = false
+L["[Ss]kinning [Kk]nife"] = false
+L["[Mm]ining [Pp]ick"] = false
+L["[Bb]lacksmith [Hh]ammer"] = false
+L["Runed %a+ Rod"] = false
+L["Philosopher's Stone"] = false
+L["Salt Shaker"] = false
+L["Arclight Spanner"] = false
+L["Gyromatic Micro%-Adjustor"] = false
+L["Zulian Slicer"] = false
+L["Finkle's Skinner"] = false
+L["Blood Scythe"] = false
+L["Herbalist's Gloves"] = false
+L["Dwarven Fishing Pole"] = false
+L["Goblin Fishing Pole"] = false
+L["Everlasting Underspore Frond"] = false
+L["\nHead"] = false
+L["\nNeck"] = false
+L["\nShoulder"] = false
+L["\nBack"] = false
+L["\nChest"] = false
+L["\nShirt"] = false
+L["\nTabard"] = false
+L["\nWrist"] = false
+L["\nHands"] = false
+L["\nWaist"] = false
+L["\nLegs"] = false
+L["\nFeet"] = false
+L["\nHeld In Off%-hand"] = false
+L[" Bandage"] = false
+L["Instantly restores %d+ life"] = false
+L[" well fed "] = false
+L["Restores %d+ health.* increases your "] = false
+L["Must remain seated while drinking%."] = false
+L["Restores %d+ mana over %d+ sec"] = false
+L["Restores %d+ health and %d+ mana over %d+ sec"] = false
+L["Restores .* health and mana .* %d+ sec"] = false
+L["Must remain seated while eating%."] = false
+L["Restores %d+ health over %d+ sec"] = false
+L["Thistle Tea"] = false
+L["[Rr]estores %d+ energy"] = false
+L["Rage Potion"] = false
+L["[Rr]estores %d+ rage"] = false
+L["Rejuvenation Potion"] = false
+L["Dreamless Sleep"] = false
+L["[Rr]estores %d+ to %d+ mana and health"] = false
+L["Mana Potion"] = false
+L["[Rr]estores %d+ to %d+ mana"] = false
+L["Healing Potion"] = false
+L["[Rr]estores %d+ to %d+ health"] = false
+L["Place a %a+ stone statue"] = false
+L[" [Cc]ure.* poison"] = false
+L[" [Cc]ure.* disease"] = false
+L[" [Cc]ure.* curse"] = false
+L[" [Cc]ure.* magic"] = false
+L[" [Rr]emoves %d+ .*effect"] = false
+L[" Dynamite"] = false
+L[" Bomb"] = false
+L[" Mortar"] = false
+L["Scroll"] = false
+L["Use: Increases "] = false
+L["Use: Absorbs "] = false
+L["Use: Regenerate "] = false
+L["Use: While applied to target weapon"] = false
+L[" Sharpening Stone"] = false
+L[" Weightstone"] = false
+L["Mistletoe"] = false
+L["Flame Cap"] = false
+L["[AG][li][lv][oe]w?s the [Ii]mbiber "] = false
+L[" Key"] = false
+L["Light Feather"] = false
+L["Infernal Stone"] = false
+L["Demonic Figurine"] = false
+L["Flash Powder"] = false
+L[" Seed"] = false
+L["Wild "] = false
+L["Arcane Powder"] = false
+L["Rune of "] = false
+L["Symbol of"] = false
+L[" Candle"] = false
+L["Ankh"] = false
+L["Fish Oil"] = false
+L["Shiny Fish Scales"] = false
+L["Thieves' Tools"] = false
+L[" Totem"] = false
+L["Soul Shard"] = false
+L["Corpse Dust"] = false
+L["Target Dummy"] = false
+L["Elemental %a+"] = false
+L["Essence of %a+"] = false
+L["Globe of Water"] = false
+L["Breath of Wind"] = false
+L["Heart of Fire"] = false
+L["Core of Earth"] = false
+L["Mote of %a+"] = false
+L["Primal Nether"] = false
+L["Primal %a+"] = false
+L["Void Crystal"] = false
+L["Nether Vortex"] = false
+L["Sunmote"] = false
+L["Heart of Darkness"] = false
+L[" Vial"] = false
+L["[cC]loth"] = false
+L["%a+ Poison [IV]*"] = false
+L["Raw "] = false
+L["[Ff]ish"] = false
+L[" Meat"] = false
+L["%a+ Dust"] = false
+L["Lesser %a+ Essence"] = false
+L["Greater %a+ Essence"] = false
+L["Small %a+ Shard"] = false
+L["Large %a+ Shard"] = false
+L["Papa Hummel's Old%-Fashioned Pet Biscuit"] = false
+L["Silver Shafted Arrow"] = false
+L["Crashin' Thrashin'"] = false
+L["Tonk Controller"] = false
+L["Mechanical Yeti"] = false
+L["Orb of the Sin'dorei"] = false
+L["Orb of the Blackwhelp"] = false
+L["Winter Veil Disguise Kit"] = false
+L["Hallowed Wand %- "] = false
+L["Murloc Costume"] = false
+L["Weighted Jack%-o'%-Lantern"] = false
+L["Gordok Ogre Suit"] = false
+L["Transforms your mount into something more festive"] = false
+L["Shoots a.*firework"] = false
+L["Place on the ground to launch .* rockets"] = false
+L["Throw into a .* launcher"] = false
+L["Brazier of Dancing Flames"] = false
+L["Direbrew's Remote"] = false
+L["Goblin Weather Machine %- Prototype 01%-B"] = false
+L["Use: Right Click to set up a .* picnic."] = false
+L["D\.I\.S\.C\.O\."] = false
+L["Imp in a Ball"] = false
+L["Snowball"] = false
+L["Paper Flying Machine Kit"] = false
+L["If they have free room in their pack they will catch it"] = false
+L["Fishing Chair"] = false
+L["Elune Stone"] = false
+L["Shower a nearby target with a cascade of"] = false
+L["Path of Illidan"] = false
+L["Goblin Gumbo"] = false
+L["Toasting Goblet"] = false
+L["Summons a .* that will protect you for"] = false
+L["Creates a .* that will fight for you"] = false
+L["Explosive Sheep"] = false
+L["Goblin Land Mine"] = false
+L["Eye of Arachnida"] = false
+L["Rope Pet Leash"] = false
+L["Fetch Ball"] = false
+L["Happy Pet Snack"] = false
+L["Paper Zeppelin Kit"] = false
+L["Titanium Seal of Dalaran"] = false
+L["Frozen Orb"] = false
+L["Crystallized %a+"] = false
+L["Eternal %a+"] = false
+L["Virtuoso Inking Set"] = false
+L["Ink"] = false
+L[" Parchment"] = false
+L[" Pigment"] = false
+L["Grindgear Toy Gorilla"] = false
+L["Trusty Copper Racer"] = false
+L["Toy Train Set"] = false
+L["Engineer's Ink"] = false
