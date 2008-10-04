@@ -93,7 +93,7 @@ L["Key"] = "Schl\195\188ssel"
 L["Elemental"] = "Elementar"
 L["Glyph"] = "Glyphe"
 
-  -- Sub types
+-- Sub types
 L["Junk"] = "Plunder"
 L["Explosives"] = "Sprengstoff"
 L["Devices"] = "Ger\195\164te"
@@ -107,7 +107,7 @@ L["Mining Bag"] = "Bergbautasche"
 L["Enchanting Bag"] = "Verzauberertasche"
 L["Leatherworking Bag"] = "Lederertasche"
 
-  -- Slots
+-- Slots
 L["Finger"] = INVTYPE_FINGER
 L["Trinket"] = INVTYPE_TRINKET
 L["Relic"] = INVTYPE_RELIC
@@ -138,7 +138,7 @@ L["Empty Slot"] = "Leerer Platz"
 -- CATEGORIES
 -----------------------------------------------------------------------
 
-  -- Templates that are used to create a number of categories.
+-- Templates that are used to create a number of categories.
 L["EMPTY_%s_SLOTS"] = "LEERE_%s_PL\195\132TZE"
 L["IN_%s_BAG"] = "IN_%s_TASCHE"
 L["%s_CREATED"] = "%s_ERSTELLT"
@@ -147,7 +147,7 @@ L["EQUIPPED_%s"] = "ANGELEGT_%s"
 L["%s_TOOL"] = "%s_WERKZEUG"
 L["%s_REAGENT"] = "%s_REAGENZ"
 
-  -- Broad categories for item types
+-- Broad categories for item types
 L["PROJECTILE"] = "PROJEKTIL"
 L["SOULSHARD"] = "SEELENSPLITTER"
 L["CONSUMABLE"] = "VERBRAUCHBAR"
@@ -198,7 +198,7 @@ L["HEARTH"] = "RUHE"
 L["MISC"] = "VERSCHIEDENES"
 L["UNKNOWN"] = "UNBEKANNT"
 
-  -- Faction and Collectable Categories.
+-- Faction and Collectable Categories.
 L["THORIUM_BROTHER"] = "THORIUM_BRUDERSCHAFT"
 L["TIMBERMAW"] = "HOLZSCHLUNDFESTE"
 L["CENARION_EXPEDITION"] = "EXPEDITION_DES_CENARIUS"
@@ -219,7 +219,7 @@ L["ZUL_GURUB"] = "ZUL_GURUB"
 L["CONSORTIUM"] = "KONSORTIUM"
 L["HALAA"] = "HALAA"
 
-  -- Tradeskill categories
+-- Tradeskill categories
 L["TRADE1"] = "TRADE1"
 L["TRADE2"] = "TRADE2"
 L["ALCHEMY"] = "ALCHIMIE"
@@ -238,10 +238,10 @@ L["FISHING"] = "ANGELN"
 L["RUNEFORGING"] = "RUNEN_SCHMIEDEN"
 L["TRADE_TOOL"] = "HANDELSWERKZEUG"
 
-  -- Item slot categories
-  -- Note the categories with numbers in them must sort in the same order
-  -- per the standard lua sort.  Numbering like this is probably needed
-  -- for all languages to preserve the sort order.
+-- Item slot categories
+-- Note the categories with numbers in them must sort in the same order
+-- per the standard lua sort.  Numbering like this is probably needed
+-- for all languages to preserve the sort order.
 L["01_HEAD"] = "01_KOPF"
 L["02_NECK"] = "02_HALS"
 L["03_SHOULDER"] = "03_SCHULTER"
@@ -262,7 +262,7 @@ L["ARMOR"] = "R\195\156STUNG"
 L["WEAPON"] = "WAFFE"
 L["OTHER"] = "ANDERE"
  
-  -- Class Categories
+-- Class Categories
 L["DRUID"] = "DRUIDE"
 L["WARLOCK"] = "HEXENMEISTER"
 L["ROGUE"] = "SCHURKE"
@@ -276,8 +276,8 @@ L["DEATHKNIGHT"] = "TODESRITTER"
 L["CLASS_TOOL"] = "KLASSENWERKZEUG"
 L["CLASS_REAGENT"] = "KLASSENREAGENZ"
   
-  -- Short bag type names used for EMPTY_%s_SLOTS and IN_%s_BAG categories
-  -- 3-4 characters is about right for these.
+-- Short bag type names used for EMPTY_%s_SLOTS and IN_%s_BAG categories
+-- 3-4 characters is about right for these.
 L["QUIV"] = "K\195\150CH"
 L["AMMO"] = "MUN"
 L["SOUL"] = "SEEL"
@@ -289,7 +289,7 @@ L["ENCH"] = "VERZ"
 L["LTHR"] = "LED"
 L["PET"] = "PET"
 
-  -- Bag Position Names, also used for EMPTY_%s_SLOTS and IN_%s_BAG categories
+-- Bag Position Names, also used for EMPTY_%s_SLOTS and IN_%s_BAG categories
 L["KEYRING"] = "SCHL\195\156SSELBUND"
 L["BANK"] = "BANK"
 L["BACKPACK"] = "RUCKSACK"
@@ -305,7 +305,7 @@ L["BBAG5"] = "BANKTASCHE5"
 L["BBAG6"] = "BANKTASCHE6"
 L["BBAG7"] = "BANKTASCHE7"
   
-  -- Keywords
+-- Keywords
 L["SOULBOUND"] = "SEELENGEBUNDEN"
 L["EQUIPPED"] = "ANGELEGT"
 
@@ -339,35 +339,35 @@ L[" as %s's %s"] = " als %s's %s" -- Used when an item is used as a container fo
 -----------------------------------------------------------------------
 -- HEARTHSTONE 
 -----------------------------------------------------------------------
-  -- These two strings are used to replace the home location on the tooltip
-  -- for Hearthstones.  The first string should be translated to match the
-  -- text from the Use: up to the actual location and end on the period.
-  -- If you keep it to just 3 captures with the 2nd capture from the
-  -- expression being the location then you probably don't need to change
-  -- the 2nd line.  The 2nd line controls putting the string back together.
-  -- %%1 and %%3 represent the first and third captures from the previous
-  -- expresion.  %s is the location that will be replaced.
+-- These two strings are used to replace the home location on the tooltip
+-- for Hearthstones.  The first string should be translated to match the
+-- text from the Use: up to the actual location and end on the period.
+-- If you keep it to just 3 captures with the 2nd capture from the
+-- expression being the location then you probably don't need to change
+-- the 2nd line.  The 2nd line controls putting the string back together.
+-- %%1 and %%3 represent the first and third captures from the previous
+-- expresion.  %s is the location that will be replaced.
 L["(Use: Returns you to )([^%.]*)(%.)"] = "(Benutzen: Bringt euch zur\195\188ck nach )([^%.]*)(%.)"
 L["%%1%s%%3"] = "%%1%s%%3"
 
-  -- Generic name for the home location if we don't have it cached.
-  -- The tooltip should have something like this where in the text
-  -- where it describes how to change your bind point.  Brackets are
-  -- there to imply it's a placeholder.
+-- Generic name for the home location if we don't have it cached.
+-- The tooltip should have something like this where in the text
+-- where it describes how to change your bind point.  Brackets are
+-- there to imply it's a placeholder.
 L["<home location>"] = "<Heimatort>"
 
 -----------------------------------------------------------------------
 -- CHARGES 
 -----------------------------------------------------------------------
-  -- Pattern to get the charges from a tooltip
-  -- Probably only need to chage the Charges.
-  -- The ? after the s implies that the s may not be there
-  -- as would be the case in a single Charge.
+-- Pattern to get the charges from a tooltip
+-- Probably only need to chage the Charges.
+-- The ? after the s implies that the s may not be there
+-- as would be the case in a single Charge.
 L["(%d+) Charges?"] = "(%d+) Aufladung?n?"
-  -- Format string for adding the charges tooltip.
-  -- %d is the number of charges.  |4 specifies this
-  -- is a plural/singular pair.  Up until the : is the
-  -- singular form after is the plural until the ;.
+-- Format string for adding the charges tooltip.
+-- %d is the number of charges.  |4 specifies this
+-- is a plural/singular pair.  Up until the : is the
+-- singular form after is the plural until the ;.
 L["%d |4Charge:Charges;"] = "%d |4Aufladung:Aufladungen;"
 
 -----------------------------------------------------------------------
@@ -379,7 +379,7 @@ L["Toggle Inventory Window"] = "Zeige Inventarfester"
 -----------------------------------------------------------------------
 -- COMMAND LINE STRINGS 
 -----------------------------------------------------------------------
-  -- commands
+-- commands
 L["hide"] = "hide"
 L["show"] = "show"
 L["update"] = "update"
@@ -393,7 +393,7 @@ L["config"] = "config"
 L["tests"] = "tests"
 L["getcat"] = "getcat"
 
-  -- /tbnk help text
+-- /tbnk help text
 L["TBnk Commands:"] = "TBnk Kommandos"
 L[" /tbnk show  -- open window"] = " /tbnk show  -- \195\150ffne Fenster"
 L[" /tbnk hide  -- hide window"] = " /tbnk hide  -- Verstecke Fenster"
@@ -406,7 +406,7 @@ L[" /tbnk resetsorts -- clears the item search list"] = " /tbnk resetsorts -- l\
 L[" /tbnk printchars -- prints a list of all the chars with cached info"] = " /tbnk printchars -- Gibt eine Liste aller Charaktere mit gespeicherten Infos aus"
 L[" /tbnk deletechar CHAR SERVER -- clears all cached info for character "] = " /tbnk deletechar CHAR SERVER -- L\195\182scht die gespeicherten Daten f\195\188r den gew\195\164hlten Charakter "
 
-  -- /tinv help text
+-- /tinv help text
 L["TInv Commands:"] = "TInv Kommandos:"
 L[" /tinv show  -- open window"] = " /tinv show  -- \195\150ffne Fenster"
 L[" /tinv hide  -- hide window"] = " /tinv hide  -- Verstecke Fenster"
@@ -468,7 +468,7 @@ L["Tooltip Search"] = "Tooltip Suche"
 L["Type"] = "Typ"
 L["SubType"] = "SubTyp"
   
-  -- Menus and Tooltips
+-- Menus and Tooltips
 L["Main Background Color"] = "Allgemeine Hintergrundfarbe"
 L["Main Border Color"] = "Allgemeine Randfarbe"
 L["Set Bar Colors to Main Colors"] = "Verwende Feldfarben als allgemeine Farben"
@@ -534,7 +534,7 @@ L["BOTTOMRIGHT"] = "UNTENRECHTS"
 L["Show on TBag"] = false 
 L["Checking this option will allow you to track this currency type in TBag for this character.\n\nYou can also Shift-click a currency to add or remove it from being tracked in TBag."] = false 
 
-  -- Option Window Strings
+-- Option Window Strings
 L["Main Sizing Preferences"] = "Allgemeine Gr\195\182\195\159eneinstellungen"
 L["Number of Item Columns:"] = "Anzahl der Itemspalten:"
 L["Number of Horizontal Bars:"] = "Anzahl der Horizontalen Felder:"
