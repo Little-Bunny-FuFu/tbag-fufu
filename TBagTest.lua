@@ -703,6 +703,7 @@ else
   tests[34647] = nil 
 
   tests[22218] = nil  -- Apparently the valentine's day stuff isn't seen
+  tests[22200] = nil  -- more v'day stuff
 end
 
 local function build_itm(id,itm)
