@@ -1,6 +1,6 @@
 -- $Id$ 
 
-local _G = _G
+local _G = getfenv(0) 
 local TBag = _G.TBag
 local WoTLK = TBag.WoTLK
 TBag.Bank = {}
@@ -139,9 +139,9 @@ function Bank:init(reset)
 --    end
   end
 
-  TBag:CreateFrame("Frame", "TBnkFrame_bar_", getglobal("TBnkFrame"),
+  TBag:CreateFrame("Frame", "TBnkFrame_bar_", TBnkFrame,
     "TBag_BarFrameTemplate", TBag.BAR_MAX, "");
-  TBag:CreateFrame("Button", "TBnkFrame_BarButton_", getglobal("TBnkFrame"),
+  TBag:CreateFrame("Button", "TBnkFrame_BarButton_", TBnkFrame,
     "TBag_BarButtonTemplate", TBag.BAR_MAX, "");
 
   -- change imported from auctioneer team..  what does it do?
@@ -284,21 +284,21 @@ function Bank:UpdateBagGfx()
     totalfree = totalfree + free;
     totalsize = totalsize + size;
   end
-  TBag:SetFreeStr(getglobal("TBnkFrame_TotalText"), totalfree, totalsize, self.cfg["show_bag_sizes"]);
+  TBag:SetFreeStr(TBnkFrame_TotalText, totalfree, totalsize, self.cfg["show_bag_sizes"]);
 end
 
 function Bank:InitBagGfx()
   local numSlots, _ = TBag:GetNumBankSlots(self.playerid);
 
   -- Spoof the bank
-  local button = getglobal("TBnkFrameBagBank");
+  local button = TBnkFrameBagBank;
   SetItemButtonTextureVertexColor(button, 1.0,1.0,1.0, 1.0);
   TBag:GetBagFrameTexture(BANK_CONTAINER):SetTexture( 
         TBag:GetBagTexture(TBnkFrame.playerid, BANK_CONTAINER));
 	
 
   for i=1, NUM_BANKBAGSLOTS do
-    button = getglobal("TBnkFrameBag"..i);
+    button = _G["TBnkFrameBag"..i];
     if ( button ) then
       if ( i <= numSlots ) then
         SetItemButtonTextureVertexColor(button, 1.0,1.0,1.0, 1.0);
@@ -503,7 +503,7 @@ function Bank:SetTopLeftButton_Anchors()
   end
 
   for _,button_name in ipairs(buttons) do
-    button = getglobal(button_name);
+    button = _G[button_name];
     if (button) then
       button:ClearAllPoints();
       if (button_left) then
@@ -533,7 +533,7 @@ function Bank:SetTopRightButton_Anchors()
   local button_right = nil;
 
   for _,button_name in ipairs(buttons) do
-    local button = getglobal(button_name);
+    local button = _G[button_name];
     if (button) then
       if (button_right) then
         button:SetPoint("TOPRIGHT",button_right,"TOPLEFT",10,0);
@@ -555,7 +555,7 @@ function Bank:SetBottomLeftButton_Anchors()
   local button_left = nil;
 
   for _,button_name in ipairs(buttons) do
-    button = getglobal(button_name);
+    button = _G[button_name];
     if (button) then
       button:ClearAllPoints();
       if (button_left) then
@@ -653,7 +653,7 @@ function Bank:SetBottomRightButton_Anchors()
   end
 
   for _, button_name in ipairs(buttons) do
-    button = getglobal(button_name)
+    button = _G[button_name]
     if button then
       button:ClearAllPoints()
       if button_right then
@@ -1417,7 +1417,7 @@ end
 Bank.WindowIsUpdating = 0;
 
 function Bank:UpdateWindow(resort_req)
-  local frame = getglobal("TBnkFrame");
+  local frame = TBnkFrame;
   local barnum;
   local cur_y;
 
@@ -1502,10 +1502,10 @@ function Bank:UpdateWindow(resort_req)
     if (not size) then size = 0; end
     if (self.cfg["show_Bag"..bag] ~= 1) then size = 0; end
     for slot = 1, size do
-      TBag.ItemButton.Update(getglobal(TBag:GetBagItemButtonName(bag, slot)))
+      TBag.ItemButton.Update(_G[TBag:GetBagItemButtonName(bag, slot)])
     end
     for slot = size+1, MAX_CONTAINER_ITEMS do
-      getglobal(TBag:GetBagItemButtonName(bag, slot)):Hide();
+      _G[TBag:GetBagItemButtonName(bag, slot)]:Hide();
     end
   end
 
@@ -1548,7 +1548,7 @@ end
 
 function Bank:SetReplaceBank()
   if BankFrame_Saved == nil then
-    BankFrame_Saved = getglobal("BankFrame");
+    BankFrame_Saved = BankFrame;
   end
   if BankFrame_Saved:IsVisible() then
     BankFrame_Saved:Hide();

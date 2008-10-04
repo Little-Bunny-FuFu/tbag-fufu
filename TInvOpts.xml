@@ -33,7 +33,7 @@
       </OnLeave>
       <OnValueChanged>
         TInv_Opts_ControlValueChanged(arg1);
-        getglobal(this:GetName().."_disp_text"):SetText( this:GetValue() );
+        _G[this:GetName().."_disp_text"]:SetText( this:GetValue() );
       </OnValueChanged>
     </Scripts>
     <ThumbTexture name="$parentThumb" file="Interface\Buttons\UI-SliderBar-Button-Horizontal">

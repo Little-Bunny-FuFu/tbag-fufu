@@ -10,6 +10,7 @@
 --- WILL BE OVERWRITTEN ON THE NEXT RELEASE OF THE ADDON!         ---
 ---------------------------------------------------------------------
 
+local _G = getfenv(0)
 local TBag = _G.TBag
 
 local TradeCreations = {

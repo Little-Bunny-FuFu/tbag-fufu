@@ -1,6 +1,6 @@
 -- $Id$
 
-local _G = _G
+local _G = getfenv(0) 
 local TBag = _G.TBag
 
 -- Localization Support
@@ -306,7 +306,7 @@ function TBag:EnableLine(frame, optsframename, lineheight, sliderheight, element
 			width = e["width"] * available_width;
 
 			tmpframe_name = frame:GetName().."_"..e["type"].."_"..e["ID"];
-			tmpframe = getglobal(tmpframe_name);
+			tmpframe = _G[tmpframe_name];
 
 			tmpframe.change_value_func = e["func"];
 			tmpframe.func_param1 = e["param1"];
@@ -315,7 +315,7 @@ function TBag:EnableLine(frame, optsframename, lineheight, sliderheight, element
 			tmpframe.func_param4 = e["param4"];
 
 			if (e["type"] == "Slider") then
-				tmpframe_text = getglobal( tmpframe:GetName().."_disp_text" );
+				tmpframe_text = _G[tmpframe:GetName().."_disp_text"];
 				tmpframe:SetMinMaxValues(e["minValue"], e["maxValue"]);
 				tmpframe:SetValueStep(e["valueStep"]);
 				tmpframe:SetValue( e["defaultValue"](e["param1"], e["param2"], e["param3"], e["param4"]) );
@@ -397,7 +397,7 @@ function TBag:EnableLine(frame, optsframename, lineheight, sliderheight, element
 
     for _, value in ipairs(TBAGOPT_LIST_FRAMES) do
       if ( used_frames[value] == nil ) then
-			tmpframe = getglobal( frame:GetName().."_"..value );
+			tmpframe = _G[frame:GetName().."_"..value];
 			tmpframe:Hide();
 		end
 	end

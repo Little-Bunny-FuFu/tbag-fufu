@@ -1,6 +1,6 @@
 -- $Id$
 
-local _G = _G
+local _G = getfenv(0) 
 local TBag = _G.TBag
 local WoTLK = TBag.WoTLK
 local self = TBag
@@ -271,8 +271,8 @@ function TBag:Init()
 
   -- Force the KEYRING_CONTAINER frame's id to the proper value.
   -- Can't set frames to negative values from XML. :(
-  getglobal(self:GetDummyBagFrameName(KEYRING_CONTAINER)):SetID(KEYRING_CONTAINER);
-  getglobal(self:GetDummyBagFrameName(BANK_CONTAINER)):SetID(BANK_CONTAINER);
+  _G[self:GetDummyBagFrameName(KEYRING_CONTAINER)]:SetID(KEYRING_CONTAINER);
+  _G[self:GetDummyBagFrameName(BANK_CONTAINER)]:SetID(BANK_CONTAINER);
   
   -- Initialize any player related info
   local group;
@@ -465,14 +465,14 @@ function TBag:ClearItmCache(itmcache, bagarr)
 end
 
 function TBag:CreateDummyBag(bag, template)
-  local dbag = getglobal(self:GetDummyBagFrameName(bag));
+  local dbag = _G[self:GetDummyBagFrameName(bag)];
 
   if (dbag) then
     local buttonname;
 
     for slot = 1, MAX_CONTAINER_ITEMS do
       buttonname = self:GetBagItemButtonName(bag, slot);
-      if not (getglobal(buttonname)) then
+      if not (_G[buttonname]) then
         local button = CreateFrame("Button", buttonname, dbag, template);
         button:SetID(slot);
         button:Hide();
@@ -486,13 +486,13 @@ function TBag:CreateFrame(type, name, parent, template, num, append)
   if (num) then
     for idx = 1, num do
       local full_name = name..idx..append
-      if not (getglobal(full_name)) then
+      if not (_G[full_name]) then
         CreateFrame(type, full_name, parent, template);
       end
-      getglobal(full_name):SetID(idx)
+      _G[full_name]:SetID(idx)
     end
   else
-    if not (getglobal(name)) then
+    if not (_G[name]) then
       CreateFrame(type, name, parent, template);
     end
   end
@@ -1409,7 +1409,7 @@ function TBag:GetCat(cfg, bar)
 end
 
 function TBag:PositionFrame(frameName, childAttachPoint, parentFrameName, parentAttachPoint, xoffset, yoffset, width, height)
-  local frame = getglobal(frameName);
+  local frame = _G[frameName];
 
   if (frame) then
     frame:ClearAllPoints();
@@ -1637,7 +1637,7 @@ end
 
 function TBag:GetBagFrameTexture(bag)
   if (bag >= self.BAGMIN) and (bag <= self.BAGMAX) then
-    return getglobal(self:GetBagFrameName(bag).."IconTexture");
+    return _G[self:GetBagFrameName(bag).."IconTexture"];
   else
     return nil;
   end
@@ -1645,7 +1645,7 @@ end
 
 function TBag:GetBagFrameSpotlight(bag)
   if (bag >= self.BAGMIN) and (bag <= self.BAGMAX) then
-    return getglobal(self:GetBagFrameName(bag).."SpotlightTexture");
+    return _G[self:GetBagFrameName(bag).."SpotlightTexture"];
   else
     return nil;
   end
@@ -1653,7 +1653,7 @@ end
 
 --function TBag:GetBagFrameHighlight(bag)
 --  if (bag >= self.BAGMIN) and (bag <= self.BAGMAX) then
---    return getglobal(self:GetBagFrameName(bag).."HighlightFrameTexture");
+--    return _G[self:GetBagFrameName(bag).."HighlightFrameTexture"];
 --  else
 --    return nil;
 --  end
@@ -1662,14 +1662,14 @@ end
 
 function TBag:GetBagFrame(bag)
   if (bag >= self.BAGMIN) and (bag <= self.BAGMAX) then
-    return getglobal(self:GetBagFrameName(bag));
+    return _G[self:GetBagFrameName(bag)];
   else
     return nil;
   end
 end
 
 function TBag:GetBagNumFrame(bag)
-  return getglobal(self:GetBagNumName(bag));
+  return _G[self:GetBagNumName(bag)];
 end
 
 
@@ -1699,8 +1699,8 @@ end
 
 
 function TBag:SetRarityColor(rarity, name)
-  local bkgr = getglobal(name.."_bkgr");
-  local normal = getglobal(name.."NormalTexture");
+  local bkgr = _G[name.."_bkgr"];
+  local normal = _G[name.."NormalTexture"];
   if (rarity) then
     local r, g, b = GetItemQualityColor(rarity);
 
@@ -2031,7 +2031,7 @@ function TBag:UpdateButtonHighlights()
 
   -- Then cycle through all the buttons
   for buttonname, itm in pairs(self.BUTTONS) do
-    texture = getglobal(buttonname.."HighlightFrameTexture");
+    texture = _G[buttonname.."HighlightFrameTexture"];
     if (texture) and (itm) then
       bag = itm[self.I_BAG];
       texture:SetVertexColor(r[bag], g[bag], b[bag], a[bag]);
@@ -2128,7 +2128,7 @@ function TBag:UpdateHearth(tt, itemlink, playerid)
     local repl = string.format(L["%%1%s%%3"],hearth);    local ttname = tt:GetName();
     
     for i=1, tt:NumLines() do 
-      local ttleft = getglobal(ttname.."TextLeft"..i);
+      local ttleft = _G[ttname.."TextLeft"..i];
       if (ttleft) then        local line = ttleft:GetText();        if (line) then
           local sub,match = string.gsub(line, L["(Use: Returns you to )([^%.]*)(%.)"],repl,1);          if (match == 1) then
             ttleft:SetText(sub);
@@ -2213,7 +2213,7 @@ function TBag:MakeToolTipStr(playerid, itemlink, bag, slot, mailitem, attach)
   end
 
   for i=1, tt:NumLines() do
-    local ttleft = getglobal(ttname.."TextLeft"..i);
+    local ttleft = _G[ttname.."TextLeft"..i];
     if (ttleft) then
       local line = ttleft:GetText();
 
@@ -2921,7 +2921,7 @@ function TBag:AssignButtonsToFrame(mainFrame, barnum, frame, width, height)
       mainFrame.BGF_WIDTH, mainFrame.BGF_HEIGHT)
 
     -- resize frame texture (this is the little border)
-    local frame_normaltexture = getglobal(buttonname.."NormalTexture")
+    local frame_normaltexture = _G[buttonname.."NormalTexture"]
     frame_normaltexture:SetWidth(mainFrame.BGF_WIDTH)
     frame_normaltexture:SetHeight(mainFrame.BGF_HEIGHT)
 
@@ -2947,13 +2947,13 @@ function TBag:AssignButtonsToFrame(mainFrame, barnum, frame, width, height)
       0-mainFrame.BF_X_PAD, mainFrame.BF_Y_PAD,
       mainFrame.BGF_WIDTH, mainFrame.BGF_HEIGHT)
 
-    local frame_normaltexture = getglobal(buttonname.."NormalTexture")
+    local frame_normaltexture = _G[buttonname.."NormalTexture"]
     frame_normaltexture:SetWidth(mainFrame.BGF_WIDTH)
     frame_normaltexture:SetHeight(mainFrame.BGF_HEIGHT)
 
-    local tmpframe = getglobal(buttonname.."Stock")
+    local tmpframe = _G[buttonname.."Stock"]
     tmpframe:SetText(barnum)
-    tmpframe = getglobal(buttonname.."_bkgr")
+    tmpframe = _G[buttonname.."_bkgr"]
     tmpframe:SetVertexColor(1,0,0.25,0.8)
     tmpframe:Show()
   end
@@ -3066,8 +3066,8 @@ function TBag:LayoutWindow(frame)
 
   for barnum = 1, bar_x * bar_y, bar_x do
     for iBar = 0, bar_x - 1 do
-      barframe[iBar] = getglobal(framename.."_bar_"..(barnum+iBar));
-      tmpframe = getglobal(framename.."_BarButton_"..(barnum+iBar));
+      barframe[iBar] = _G[framename.."_bar_"..(barnum+iBar)];
+      tmpframe = _G[framename.."_BarButton_"..(barnum+iBar)];
       if (edit_mode ~= 1) then
         -- we're not in edit mode, make sure the SlotTarget button and texture is hidden
         tmpframe:Hide();
@@ -3132,7 +3132,7 @@ function TBag:LayoutWindow(frame)
 
   -- Hide any "leftover" frames
   for barnum = bar_x * bar_y + 1, self.BAR_MAX do
-    getglobal(framename.."_bar_"..barnum):Hide();
+    _G[framename.."_bar_"..barnum]:Hide();
   end
 
   local new_height;

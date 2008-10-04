@@ -1,5 +1,7 @@
 -- $Id$
 
+local _G = getfenv(0)
+
 function TBag:VARIABLES_LOADED()
   self.Inv:init(0)
   self.Bank:init(0)
@@ -65,7 +67,7 @@ end
 
 function TBag:ITEM_LOCK_CHANGED(event, bag, slot)
   if bag and slot and type(slot) == "number" then
-    TBag.ItemButton.UpdateLock(getglobal(TBag:GetBagItemButtonName(bag,slot)))
+    TBag.ItemButton.UpdateLock(_G[TBag:GetBagItemButtonName(bag,slot)])
   end
 end
 

@@ -1,5 +1,6 @@
 -- $Id$
 
+local _G = getfenv(0)
 local TBag = _G.TBag
 TBag.Hooks = {}
 local Hooks = TBag.Hooks
@@ -33,7 +34,7 @@ function Hooks.Register(reg)
       local ourfunc = Hooks[funcname]
 
       if ourfunc then
-        savedfuncs[funcname] = getglobal(funcname)
+        savedfuncs[funcname] = _G[funcname]
         setglobal(funcname, ourfunc)
         TBag:PrintDEBUG("Hook function for '"..funcname.." installed.")
       else
@@ -56,7 +57,7 @@ function Hooks.Register(reg)
     TBag:Print( "Hooks:" ,1,1,0.2 )
     for _,funcname in ipairs(funcs) do
       local ourfunc = Hooks[funcname]
-      local curfunc = getglobal(funcname)
+      local curfunc = _G[funcname]
 
       if ourfunc == curfunc then
         TBag:Print("  "..funcname.." is hooked properly.", 0, 1, 0.25)

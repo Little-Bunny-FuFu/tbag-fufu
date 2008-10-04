@@ -30,8 +30,8 @@
     <Scripts>
       <OnLoad>
         local name = self:GetName()
-        self.icon = getglobal(name.."Icon")
-        self.count = getglobal(name.."Count")
+        self.icon = _G[name.."Icon"]
+	self.count = _G[name.."Count"]
       </OnLoad>
       <OnEnter>
         TBag.Tokens.Button_OnEnter(self)

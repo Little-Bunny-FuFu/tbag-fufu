@@ -1,6 +1,6 @@
 -- $Id$
 
-local _G = _G
+local _G = getfenv(0) 
 local TBag = _G.TBag
 local WoTLK = TBag.WoTLK
 TBag.Inv = {}
@@ -84,11 +84,11 @@ function Inv:SetPlayer(playerid)
    -- actually doing anything.
    if (playerid ~= TBag.PLAYERID) then
      for _, bag in ipairs(self.bags) do
-       getglobal(TBag:GetDummyBagFrameName(bag)):SetID(100);
+       _G[TBag:GetDummyBagFrameName(bag)]:SetID(100);
      end
    else
      for _, bag in ipairs(self.bags) do
-       getglobal(TBag:GetDummyBagFrameName(bag)):SetID(bag);
+       _G[TBag:GetDummyBagFrameName(bag)]:SetID(bag);
      end
    end
    if self.playerid ~=  playerid then
@@ -154,9 +154,9 @@ function Inv:init(reset)
     TBag:CreateDummyBag(bag, "TBag_ItemButtonTemplate");
   end
 
-  TBag:CreateFrame("Frame", "TInvFrame_bar_", getglobal("TInvFrame"),
+  TBag:CreateFrame("Frame", "TInvFrame_bar_", TInvFrame,
     "TBag_BarFrameTemplate", TBag.BAR_MAX, "");
-  TBag:CreateFrame("Button", "TInvFrame_BarButton_", getglobal("TInvFrame"),
+  TBag:CreateFrame("Button", "TInvFrame_BarButton_", TInvFrame,
     "TBag_BarButtonTemplate", TBag.BAR_MAX, "");
 
   -- change imported from auctioneer team..  what does it do?
@@ -291,7 +291,7 @@ function Inv:UpdateBagGfx()
 
     TBag:UpdateBagColors(bag);
   end
-  TBag:SetFreeStr(getglobal("TInvFrame_TotalText"), totalfree, totalsize, cfg["show_bag_sizes"]);
+  TBag:SetFreeStr(TInvFrame_TotalText, totalfree, totalsize, cfg["show_bag_sizes"]);
 end
 
 function Inv.Button_HighlightToggle_OnClick(self)
@@ -411,7 +411,7 @@ function Inv:SetTopLeftButton_Anchors()
   end
   
   for _,button_name in ipairs(buttons) do
-    button = getglobal(button_name);
+    button = _G[button_name];
     if (button) then 
       button:ClearAllPoints();
       if (button_left) then
@@ -441,7 +441,7 @@ function Inv:SetTopRightButton_Anchors()
   local button_right = nil;
 
   for _,button_name in ipairs(buttons) do
-    local button = getglobal(button_name);
+    local button = _G[button_name];
     if (button) then 
       if (button_right) then
         button:SetPoint("TOPRIGHT",button_right,"TOPLEFT",10,0);
@@ -475,7 +475,7 @@ function Inv:SetBottomLeftButton_Anchors()
   end
 
   for _,button_name in ipairs(buttons) do
-    button = getglobal(button_name);
+    button = _G[button_name];
     if (button) then 
       button:ClearAllPoints();
       if (button_left) then
@@ -515,7 +515,7 @@ function Inv:SetBottomRightButton_Anchors()
   end
 
   for _, button_name in ipairs(buttons) do
-    button = getglobal(button_name)
+    button = _G[button_name]
     if button then
       button:ClearAllPoints()
       if button_right then
@@ -1340,7 +1340,7 @@ end
 Inv.WindowIsUpdating = 0;
 
 function Inv:UpdateWindow(resort_req)
-  local frame = getglobal("TInvFrame");
+  local frame = TInvFrame;
   local barnum;
 
   TBag:PrintDEBUG("TInv_UpdateWindow:  WindowIsUpdating="..Inv.WindowIsUpdating );
@@ -1423,10 +1423,10 @@ function Inv:UpdateWindow(resort_req)
       size = 0;
     end
     for slot = 1, size do
-      TBag.ItemButton.Update(getglobal(TBag:GetBagItemButtonName(bag, slot)))
+      TBag.ItemButton.Update(_G[TBag:GetBagItemButtonName(bag, slot)])
     end
     for slot = size+1, MAX_CONTAINER_ITEMS do
-      getglobal(TBag:GetBagItemButtonName(bag, slot)):Hide();
+      _G[TBag:GetBagItemButtonName(bag, slot)]:Hide();
     end
   end
 

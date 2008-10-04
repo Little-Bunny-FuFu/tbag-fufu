@@ -1,5 +1,7 @@
 -- $Id$
 
+local _G = getfenv(0)
+
 -- Localization Support
 local L = TBag.LOCALE;
 
@@ -149,7 +151,7 @@ function TInv_Options_UpdateWindow()
 			use_fade = 1;
 		end
 		y = TBag:EnableLine(
-		getglobal("TInv_OptsFrame_Line_"..(i+1)), "TInv_OptsFrame", 
+		_G["TInv_OptsFrame_Line_"..i+1], "TInv_OptsFrame", 
           TINVOPT_FRAME_LINE_HEIGHT, TINV_OPTS_CONTROL_SLIDER_HEIGHT, 
           TInv_CfgOpt[i+current_opt], y, x_start, x_width, use_fade );
 	end

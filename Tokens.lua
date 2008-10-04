@@ -1,5 +1,5 @@
 -- $Id$
-local _G = _G
+local _G = getfenv(0) 
 local TBag = _G.TBag
 local L = TBag.LOCALE
 TBag.Tokens = {}
@@ -129,7 +129,7 @@ function Tokens.Update(frame)
   local i = 1
   for _,itm in pairs(TTknItm[mainFrame.playerid][TBag.D_BAG]) do
     if itm[TBag.I_WATCH] then
-      local watchButton = getglobal(framename.."Token"..i)
+      local watchButton = _G[framename.."Token"..i]
       Tokens.UpdateTokenButtonFromItm(watchButton,itm, mainFrame.playerid)
       frame:Show()
       i = i + 1
@@ -137,7 +137,7 @@ function Tokens.Update(frame)
     if i > MAX_WATCHED_TOKENS then return end
   end 
   for n = i, MAX_WATCHED_TOKENS do
-    getglobal(framename.."Token"..n):Hide()
+    _G[framename.."Token"..n]:Hide()
     if n == 1 then
       frame:Hide()
     end

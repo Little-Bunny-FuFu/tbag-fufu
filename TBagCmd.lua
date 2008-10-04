@@ -1,6 +1,6 @@
 -- $Id$
 
-local _G = _G
+local _G = getfenv(0) 
 local TBag = _G.TBag
 
 -- Localization support

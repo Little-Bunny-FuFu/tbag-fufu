@@ -1,5 +1,7 @@
 -- $Id$
 
+local _G = getfenv(0)
+
 -- Localization Support
 local L = TBag.LOCALE;
 
@@ -142,7 +144,7 @@ function TBnk_Options_UpdateWindow()
 			use_fade = 1;
 		end
 		y = TBag:EnableLine(
-		getglobal("TBnk_OptsFrame_Line_"..(i+1)), "TBnk_OptsFrame", 
+		_G["TBnk_OptsFrame_Line_"..i+1], "TBnk_OptsFrame", 
           TBnk_Options_FRAME_LINE_HEIGHT, TBnk_OptS_CONTROL_SLIDER_HEIGHT,
           TBnk_CfgOpt[i+current_Opt], y, x_start, x_width, use_fade );
 	end

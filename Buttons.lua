@@ -1,7 +1,7 @@
 -- $Id$
 -- Implementation of the base templates for various buttons.
 
-local _G = _G
+local _G = getfenv(0) 
 local TBag = _G.TBag
 local WoTLK = TBag.WoTLK
 local L = TBag.LOCALE
@@ -183,7 +183,7 @@ end
 -- which allows it to short circuit getting the frames itm and mainFrame
 -- such as when it is called from ItemButton.Update.
 function ItemButton.UpdateCooldown(self, itm, mainFrame)
-  local cooldownFrame = getglobal(self:GetName().."_Cooldown")
+  local cooldownFrame = _G[self:GetName().."_Cooldown"]
   if not cooldownFrame then return end
   if not itm then itm = TBag:GetItmFromFrame(TBag.BUTTONS, self) end
   if not itm then return end
@@ -208,11 +208,11 @@ function ItemButton.Update(self)
 
   -- Get the various frames.
   local framename = self:GetName()
-  local frame_texture = getglobal(framename.."IconTexture")
-  local frame_font = getglobal(framename.."Count")
-  local frame_bkgr = getglobal(framename.."_bkgr")
-  local frame_stock = getglobal(framename.."Stock")
-  local editFrame = getglobal(framename.."_EditButton")
+  local frame_texture = _G[framename.."IconTexture"]
+  local frame_font = _G[framename.."Count"]
+  local frame_bkgr = _G[framename.."_bkgr"]
+  local frame_stock = _G[framename.."Stock"]
+  local editFrame = _G[framename.."_EditButton"]
   
   -- Hide buttons attached to bars which are marked to be hidden
   -- unless of course it is set to a forced show.
@@ -319,7 +319,7 @@ function BarButton:OnLoad()
 
   -- Stock frame from ItemButtonTemplate is used here for
   -- the bar number.  Adjust it to center the number.
-  local stock = getglobal(self:GetName().."Stock")
+  local stock = _G[self:GetName().."Stock"]
   stock:SetFont("Fonts\\ARIALN.TTF", 18, "OUTLINE")
   stock:SetTextColor(1,0,0.25,1)
   stock:SetJustifyH("CENTER")
@@ -393,7 +393,7 @@ function BagButton:OnLoad()
 
   -- Stock frame from ItemButtonTemplate is used here for
   -- the counts on the bag.  Adjust it to center the numbers.
-  local stock = getglobal(self:GetName().."Stock")
+  local stock = _G[self:GetName().."Stock"]
   stock:SetFont("Fonts\\ARIALN.TTF", 18, "OUTLINE")
   stock:SetJustifyH("CENTER")
   stock:ClearAllPoints()
