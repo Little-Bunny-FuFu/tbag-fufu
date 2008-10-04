@@ -41,15 +41,9 @@ TBag.LOCALE = setmetatable({},
     if value then
       return value
     end
-    if TBag.LOCALES.current ~= TBag.LOCALES.enUS then
-      value = rawget(TBag.LOCALES.enUS,key)
-      if value then
-	rawset(TBag.LOCALES.current, key, key)
-        DEFAULT_CHAT_FRAME:AddMessage(string.format("TBag: Please localize: %q", tostring(key)))
-        return value
-      end
-    end
+    rawset(TBag.LOCALES.current, key, key)
     DEFAULT_CHAT_FRAME:AddMessage(string.format("TBag: Please localize: %q", tostring(key)))
+    return key
    end,
    __newindex = function(self, key, value)
      if not rawget(TBag.LOCALES.current, key) then
