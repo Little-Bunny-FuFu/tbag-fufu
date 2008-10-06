@@ -1511,7 +1511,7 @@ function TBag:GetBagTypeName(bagType)
     return L["GEM"];
   elseif (bagType == 1024) then
     return L["MINE"];
-  elseif (bagType == 2048) then
+  elseif (bagType == 4096) then
     return L["PET"];
   else
     return L["UNKNOWN"];
