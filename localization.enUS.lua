@@ -301,6 +301,7 @@ L["MINE"] = true
 L["ENCH"] = true
 L["LTHR"] = true
 L["PET"] = true
+L["INSC"] = true
 
 -- Bag Position Names, also used for EMPTY_%s_SLOTS and IN_%s_BAG categories
 L["KEYRING"] = true

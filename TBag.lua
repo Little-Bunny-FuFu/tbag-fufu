@@ -1497,6 +1497,8 @@ function TBag:GetBagTypeName(bagType)
     return L["SOUL"];
   elseif (bagType == 8) then
     return L["LTHR"];
+  elseif (bagType == 16) then
+    return L["INSC"];
   elseif (bagType == 32) then
     return L["HERB"];
   elseif (bagType == 64) then
