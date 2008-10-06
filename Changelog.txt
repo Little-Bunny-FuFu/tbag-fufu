@@ -1,4 +1,4 @@
-* 20080929-r214-Beta-Shefki
+* 20081006-r231-Beta-Shefki
   - This is an Beta version with major portions of TBag
     rewritten but others still using old code.  There may
     very well be errors.
@@ -10,6 +10,8 @@
     Most people will see this mostly with the keychain.
   - Updates to the sort list to support changes in Wrath:
     DeathKnights, Minipets, Tokens, Glyphs and Inscription.
+  - Support for Inscription Bags in compressing items to 
+    leave the most free slots.  
   - Support for Token tracking for Wrath.
   - Catch the Spirit of Competition in the default sorts.
   - Fix a bug that caused BOE items to be treated as if they 
@@ -18,6 +20,9 @@
     as a Trade Good (e.g. Raw Greater Sagefish)
   - Allow dragging items onto the bag icon for the default bank
     slots just like the other bags in the bank.
+  - Bug fixes to the profession tracking code so that more
+    professions are tracked properly, especially in non-enUS
+    locales.
   - A large amount of code duplication between the bank and
     the inventory window has been merged.
   - Significant effort has been made to decrease the amount
