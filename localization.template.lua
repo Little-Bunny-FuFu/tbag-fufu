@@ -83,7 +83,7 @@ L["Runeforging"] = false
 -----------------------------------------------------------------------
 
 -- Secondary skills
-L["Kochen"] = "Cooking"
+L["Kochkunst"] = "Cooking"
 L["Angeln"] = "Fishing"
 L["Erste Hilfe"] = "First Aid"
 

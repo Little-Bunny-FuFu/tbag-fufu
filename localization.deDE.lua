@@ -20,7 +20,7 @@ L[""] = ""  -- Needed to preserve nil returns
 -----------------------------------------------------------------------
 
 -- Secondary skills
-L["Cooking"] = "Kochen"
+L["Cooking"] = "Kochkunst"
 L["Fishing"] = "Angeln"
 L["First Aid"] = "Erste Hilfe"
 
@@ -49,7 +49,7 @@ L["Runeforging"] = "Runen schmieden"
 -----------------------------------------------------------------------
   
 -- Secondary skills
-L["Kochen"] = "Cooking"
+L["Kochkunst"] = "Cooking"
 L["Angeln"] = "Fishing"
 L["Erste Hilfe"] = "First Aid"
 
@@ -233,7 +233,7 @@ L["POISONS"] = "GIFTE"
 L["TAILORING"] = "SCHNEIDEREI"
 L["INSCRIPTION"] = "INSCHRIFTENKUNDE"
 L["FIRST_AID"] = "ERSTE_HILFE"
-L["COOKING"] = "KOCHEN"
+L["COOKING"] = "KOCHKUNST"
 L["FISHING"] = "ANGELN"
 L["RUNEFORGING"] = "RUNEN_SCHMIEDEN"
 L["TRADE_TOOL"] = "HANDELSWERKZEUG"
@@ -531,8 +531,8 @@ L["TOPLEFT"] = "OBENLINKS"
 L["TOPRIGHT"] = "OBENRECHTS"
 L["BOTTOMLEFT"] = "UNTENLINKS"
 L["BOTTOMRIGHT"] = "UNTENRECHTS"
-L["Show on TBag"] = false 
-L["Checking this option will allow you to track this currency type in TBag for this character.\n\nYou can also Shift-click a currency to add or remove it from being tracked in TBag."] = false 
+L["Show on TBag"] = "Zeige in TBag"
+L["Checking this option will allow you to track this currency type in TBag for this character.\n\nYou can also Shift-click a currency to add or remove it from being tracked in TBag."] = "Ist diese Option aktiviert wird diese W\195\164hrung in TBag f\195\188r diesen Charakter angezeigt.\n\nDu kannst auch auf eine W\195\164hrung Shift-Rechtsklicken um sie in TBag anzuzeigen oder zu entfernen."
 
 -- Option Window Strings
 L["Main Sizing Preferences"] = "Allgemeine Gr\195\182\195\159eneinstellungen"
@@ -849,7 +849,7 @@ L["Frozen Orb"] = "Gefrorene Kugel"
 L["Crystallized %a+"] = "%a+ Eiskristall"
 L["Eternal %a+"] = "\195\132onen%a+"
 L["Virtuoso Inking Set"] = "Kaiserliches Schreibzeug"
-L["Ink"] = "Tinte "
+L["Ink"] = "%a+tinte"
 L[" Parchment"] = "Pergament"
 L[" Pigment"] = "[Pp]igmente"
 L["Grindgear Toy Gorilla"] = "Schleifritzelspielzeuggorilla"
