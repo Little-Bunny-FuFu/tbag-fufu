@@ -1,4 +1,8 @@
-* 20081014-r235-Beta-Shefki
+* 20081014-r238-Shefki
+  - Fix an issue where the token update events would fire
+    before variables loaded causing an error.
+
+* 20081014-r235-Shefki
   - General forwards compatability to 3.0 code changes.
   - Show Blizzard Bag Frames is obsolete and ignored now.
     Clicking on a bag frame that is hidden in TBag now
