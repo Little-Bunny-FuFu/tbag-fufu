@@ -11170,6 +11170,6 @@ function TBag:RefreshReagents(TBagCfg)
     TBagCfg[self.S_REAGENT] = Reagents;
   elseif (TBagCfg[self.S_REAGENT][self.S_UPDATE] == nil or
           TBagCfg[self.S_REAGENT][self.S_UPDATE] < Reagents[self.S_UPDATE]) then
-    MergeReagents(TBagCfg,Reagents);
+    self:MergeReagents(TBagCfg,Reagents);
   end
 end
