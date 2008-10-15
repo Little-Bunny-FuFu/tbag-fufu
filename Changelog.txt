@@ -1,8 +1,5 @@
-* 20081006-r231-Beta-Shefki
-  - This is an Beta version with major portions of TBag
-    rewritten but others still using old code.  There may
-    very well be errors.
-  - General forwards compatability to Wrath code changes.
+* 20081014-r235-Beta-Shefki
+  - General forwards compatability to 3.0 code changes.
   - Show Blizzard Bag Frames is obsolete and ignored now.
     Clicking on a bag frame that is hidden in TBag now
     expands the window and displays those items until 
@@ -39,12 +36,6 @@
     use an included font with the game.  Font usage is now
     more consistent across the addon.
   - Packaged by curseforge now. :)
-
-  Wrath Beta players please do not report the following:
-  - Internal Bag Error.  If you see this it's a Blizzard problem.
-    Happens even without TBag loaded.
-  - Slow movement of items particularly selling.  Again Blizzard
-    beta server issue.
 
 * 20080611-r163-Shefki
   - Fix an error when opening the Hunter Training window.
