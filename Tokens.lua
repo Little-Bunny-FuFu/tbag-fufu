@@ -173,7 +173,10 @@ function Tokens.Hook()
   Tokens.Update(TInvFrame_TokenFrame)
   Tokens.Update(TBnkFrame_TokenFrame)
 end
-if TBag.WoTLK then
+
+-- Turn on the hook, we have to delay doing this until variables
+-- are loaded to avoid problems.
+function Tokens.Enable()
   hooksecurefunc("BackpackTokenFrame_Update",Tokens.Hook)
 end
 

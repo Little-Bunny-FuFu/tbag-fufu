@@ -182,6 +182,12 @@ function Inv:init(reset)
   TBag.Hooks.Register(TBag.Hooks.UNREGISTER);
   TBag.Hooks.Register(TBag.Hooks.REGISTER);
 
+  -- Setup the token system 
+  if TBag.WoTLK then
+    TBag.Tokens.Enable()
+    TBag.Tokens.Scan()
+  end
+
   if (cfg["moveLock"] == 0) then
     TInvLockNorm:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Locked-Up"); 
     TInvLockPush:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Locked-Down"); 
