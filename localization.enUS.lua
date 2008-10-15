@@ -42,7 +42,10 @@ TBag.LOCALE = setmetatable({},
       return value
     end
     rawset(TBag.LOCALES.current, key, key)
+    -- Only output the warning on unpackaged versions.
+    --@alpha@
     DEFAULT_CHAT_FRAME:AddMessage(string.format("TBag: Please localize: %q", tostring(key)))
+    --@end-alpha@
     return key
    end,
    __newindex = function(self, key, value)
