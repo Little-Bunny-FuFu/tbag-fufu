@@ -1005,6 +1005,7 @@ function TBag:SetDefLayout(cfg, bagarr, row1offset, reset)
   self:SetCatBar(cfg, string.format(L["IN_%s_BAG"],L["HERB"]), 16, reset);
   self:SetCatBar(cfg, string.format(L["IN_%s_BAG"],L["MINE"]), 16, reset);
   self:SetCatBar(cfg, string.format(L["IN_%s_BAG"],L["LTHR"]), 16, reset);
+  self:SetCatBar(cfg, string.format(L["IN_%s_BAG"],L["INSC"]), 16, reset);
   self:SetCatBar(cfg, string.format(L["EMPTY_%s_SLOTS"],L["ENCH"]), 16, reset);
   self:SetCatBar(cfg, string.format(L["EMPTY_%s_SLOTS"],L["ENG"]), 16, reset);
   self:SetCatBar(cfg, string.format(L["EMPTY_%s_SLOTS"],L["GEM"]), 16, reset);
