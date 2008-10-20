@@ -643,8 +643,6 @@ if not TBag.WoTLK then
   tests[39774] = nil
   tests[39469] = nil
   tests[43122] = nil
-  tests[37100] = nil
-  tests[37100] = nil
   tests[6929] = nil
   tests[10648] = nil
   tests[11105] = nil
@@ -704,6 +702,14 @@ else
   tests[22218] = nil  -- Apparently the valentine's day stuff isn't seen
   tests[22200] = nil  -- more v'day stuff
 end
+
+local beta_realms = { 'Northrend', 'Lich King', 'Murmur', 'Coldarra' }
+
+-- Beta realms only
+if (TBag:Member(beta_realms, TBag.REALM) ~= 1) then
+  tests[44430] = nil
+end
+
 
 local function build_itm(id,itm)
   itm[TBag.I_ITEMLINK] = "item:"..id..":0:0:0:0:0:0:0";
