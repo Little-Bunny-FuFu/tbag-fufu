@@ -857,3 +857,4 @@ L["Grindgear Toy Gorilla"] = "Schleifritzelspielzeuggorilla"
 L["Trusty Copper Racer"] = "Zuverl\195\164ssiger Kupferflitzer"
 L["Toy Train Set"] = "Spielzeugzug"
 L["Engineer's Ink"] = "Ingenieurstinte"
+L["Rickety Magic Broom"] = false

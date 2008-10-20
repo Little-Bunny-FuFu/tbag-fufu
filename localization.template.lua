@@ -890,3 +890,4 @@ L["Grindgear Toy Gorilla"] = false
 L["Trusty Copper Racer"] = false
 L["Toy Train Set"] = false
 L["Engineer's Ink"] = false
+L["Rickety Magic Broom"] = false
