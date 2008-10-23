@@ -496,7 +496,7 @@ function BagButton:OnClick(button,down,drag)
     end
   end
 
-  if isBagShown ~= 1 then
+  if not isBagShown then
     mainFrame:UpdateWindow(TBag.REQ_MUST)
   end
   TBag:UpdateButtonHighlights()
