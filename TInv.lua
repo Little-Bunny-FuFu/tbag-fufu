@@ -1473,43 +1473,6 @@ function Inv:UpdateWindow(resort_req)
 
 end
 
-function Inv.Openxxx()
-  if (not TInvFrame:IsVisible()) then
-    -- Always default to the current player
-    if (TInvFrame.playerid ~= TBag.PLAYERID) then
-      TInvFrame:SetPlayer(TBag.PLAYERID)
-      TInvFrame.CACHE_REQ = TBag.REQ_MUST
-    end
-    TInvFrame.edit_mode = 0;
-
-    TInvFrame:Show();
-  end
-end
-
-function Inv.Closexxx()
-  if (TInvFrame:IsVisible()) then
-    TInvFrame:Hide();
-  end
-  
-  -- Unhighlight any bags that are still highlighted.
-  for _, bag in ipairs(TInvFrame.bags) do
-    TBag:GetBagFrame(bag):SetChecked(false);
-  end
-  TBag:UpdateButtonHighlights();
-  
-  -- Always reset to the global player for event processing
-  TInvFrame:SetPlayer(TBag.PLAYERID);
-end
-
-function Inv.Togglexxx()
-  if (TInvFrame:IsVisible()) then
-    Inv.Close();
-  else
-    Inv.Open();
-  end
-end
-
-
 function Inv.UserDropdown_OnLoad(self)
   UIDropDownMenu_Initialize(self, Inv.UserDropdown_Initialize);
   UIDropDownMenu_SetSelectedValue(self, TInvFrame.playerid);
