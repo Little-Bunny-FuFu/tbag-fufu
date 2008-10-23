@@ -287,22 +287,6 @@ function TBag:Init()
   LoadAddOn("Blizzard_BindingUI");
 end
 
-function TBag:ChangeKeybind()
-  if (GetBindingKey("TINV_TOGGLE") == nil) then
-    -- Swipe the key from the backpack
-    local key1, key2 = GetBindingKey("TOGGLEBACKPACK");
-    if (key1) then
-      SetBinding(key1, "TINV_TOGGLE");
-      self:Print(string.format(L['%sSetting keybind to %q'],self.SCP,key1), 1, 1, 1);
-      SaveBindings(GetCurrentBindingSet());
-    elseif (key2) then
-      SetBinding(key2, "TINV_TOGGLE");
-      self:Print(string.format(L['%sSetting keybind to %q'],self.SCP,key2), 1, 1, 1);
-      SaveBindings(GetCurrentBindingSet());
-    end
-  end
-end
-
 -----------------------------------------------------------------------
 -- UTILITY Funcs
 -----------------------------------------------------------------------

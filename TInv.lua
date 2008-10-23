@@ -136,8 +136,6 @@ function Inv:init(reset)
   self.BGF_WIDTH = 38;
   self.BGF_HEIGHT = 38;
 
-  self.KEYBINDCHECK = 1
-
  
   TBag:Init();
   self.cfg = TBagCfg["Inv"];
@@ -1483,12 +1481,6 @@ function Inv.Openxxx()
       TInvFrame.CACHE_REQ = TBag.REQ_MUST
     end
     TInvFrame.edit_mode = 0;
-
-    -- Check the keybinding
-    if (TInvFrame.KEYBINDCHECK) then
-      TBag:ChangeKeybind();
-      TInvFrame.KEYBINDCHECK = nil;
-    end
 
     TInvFrame:Show();
   end

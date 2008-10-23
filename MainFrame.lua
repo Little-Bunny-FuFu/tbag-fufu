@@ -107,12 +107,6 @@ function MainFrame:OnShow()
   self:SetPlayer(TBag.PLAYERID)
   self.edit_mode = 0
 
-  -- Check the keybinding
-  if self.KEYBINDCHECK then
-    TBag:ChangeKeybind()
-    self.KEYBINDCHECK = nil
-  end
-  
   if self == TBnkFrame then
     TInvFrame:Show()
   end
