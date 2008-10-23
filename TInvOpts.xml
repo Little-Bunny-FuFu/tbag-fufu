@@ -241,8 +241,8 @@
             this:SetText(TBag.LOCALE["Assign Cats"]);
 	  </OnLoad>
           <OnClick>
-            TBag_AssignCats(TInvCfg, 1);
-            TBag_BuildBarClassList(TINV_BC_LIST, TInvCfg); 
+            TBag:AssignCats(TInvFrame.cfg, 1);
+            TBag:BuildBarClassList(TInvFrame.BC_LIST, TInvFrame.cfg); 
           </OnClick>
         </Scripts>
       </Button>
