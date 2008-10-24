@@ -220,6 +220,12 @@ function ItemButton.Update(self)
      TBag.Forced_SHOW[TBag:BagSlotToString(bag, slot)] ~= 1 then
     self:Hide()
     return
+
+  -- Hide empty keyring slots unless configured to show them
+  elseif bag == KEYRING_CONTAINER and cfg.show_keyring_empty_slots ~= 1 and
+         (not itm[TBag.I_ITEMLINK] or itm[TBag.I_ITEMLINK] == "") then
+    self:Hide()
+    return
   else
     self:Show()
   end

@@ -1406,13 +1406,9 @@ function Inv:UpdateWindow(resort_req)
   end
 
   -- Relink the button map
-  local position;
-  for barnum = 1, self.cfg["bar_x"] * TBag:GetBarY(self.cfg["bar_x"]) do
-    if (table.getn(self.BARITM[barnum]) > 0) then
-      for position = 1, table.getn(self.BARITM[barnum]) do
-        TBag.BUTTONS[TBag:GetBagItemButtonName(self.BARITM[barnum][position][TBag.I_BAG], self.BARITM[barnum][position][TBag.I_SLOT])] =
-          TInvItm[self.playerid][self.BARITM[barnum][position][TBag.I_BAG]][self.BARITM[barnum][position][TBag.I_SLOT]];
-      end
+  for _,bag in ipairs(self.bags) do
+    for slot = 1, MAX_CONTAINER_ITEMS do
+      TBag.BUTTONS[TBag:GetBagItemButtonName(bag, slot)] = TInvItm[self.playerid][bag][slot]
     end
   end
 
