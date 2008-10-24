@@ -216,8 +216,8 @@ function ItemButton.Update(self)
   
   -- Hide buttons attached to bars which are marked to be hidden
   -- unless of course it is set to a forced show.
-  if TBag:GetGrp(cfg, TBag.G_BAR_HIDE, itm[self.I_BAR]) == 1 and
-     TBag.Forced_SHOW[TBag:BagSlotToString(bag, slot)] ~= 1 then
+  if TBag:GetGrp(cfg, TBag.G_BAR_HIDE, itm[TBag.I_BAR]) == 1 and
+     not TBag.FORCED_SHOW[TBag:BagSlotToString(bag, slot)] then
     self:Hide()
     return
 
