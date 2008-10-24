@@ -156,9 +156,6 @@ function Inv:init(reset)
   TBag:CreateFrame("Button", "TInvFrame_BarButton_", TInvFrame,
     "TBag_BarButtonTemplate", TBag.BAR_MAX, "");
 
-  -- change imported from auctioneer team..  what does it do?
-  UIPanelWindows["TInvFrame"] = { area = "left", pushable = 6 };
-
   -- register slash command
   SlashCmdList["TINV"] = TInv_cmd;
   SLASH_TINV1 = "/tinv";

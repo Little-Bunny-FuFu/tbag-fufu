@@ -143,9 +143,6 @@ function Bank:init(reset)
   TBag:CreateFrame("Button", "TBnkFrame_BarButton_", TBnkFrame,
     "TBag_BarButtonTemplate", TBag.BAR_MAX, "");
 
-  -- change imported from auctioneer team..  what does it do?
-  UIPanelWindows["TBnkFrame"] = { area = "left", pushable = 6 };
-
   -- register slash command
   SlashCmdList["TBnk"] = TBnk_cmd;
   SLASH_TBnk1 = "/tbnk";
