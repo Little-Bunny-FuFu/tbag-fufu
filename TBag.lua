@@ -2538,14 +2538,16 @@ function TBag:SortItmCache(cfg, playerid, itmcache, baritm, bagarr)
       if (size > 0) then
 --        self:PrintDEBUG("Show bag "..bag);
         for slot = 1, size do
-          itmcache[bag][slot] = self:PickBar(cfg, playerid,
-            itmcache[bag][slot], trade1, trade2);
+	  if next(itmcache[bag][slot]) then
+            itmcache[bag][slot] = self:PickBar(cfg, playerid,
+              itmcache[bag][slot], trade1, trade2);
 
-          -- An ugly special case check for Keyring slots
-          if ( (itmcache[bag][slot][self.I_ITEMLINK]) 
-            or (cfg["show_keyring_empty_slots"] ~= 0)
-            or (bag ~= KEYRING_CONTAINER) ) then
-            table.insert( baritm[ itmcache[bag][slot][self.I_BAR] ], itmcache[bag][slot]);
+            -- An ugly special case check for Keyring slots
+            if ( (itmcache[bag][slot][self.I_ITEMLINK]) 
+              or (cfg["show_keyring_empty_slots"] ~= 0)
+              or (bag ~= KEYRING_CONTAINER) ) then
+              table.insert( baritm[ itmcache[bag][slot][self.I_BAR] ], itmcache[bag][slot]);
+            end
           end
         end
       end

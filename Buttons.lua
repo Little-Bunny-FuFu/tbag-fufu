@@ -12,7 +12,7 @@ local ItemButton = TBag.ItemButton
 
 function ItemButton:OnEnter()
   local itm = TBag:GetItmFromFrame(TBag.BUTTONS, self)
-  if not itm then return end
+  if not itm or not next(itm) then return end
   local mainFrame = self:GetParent():GetParent()
   if self:GetName():match('_EditButton') then
     mainFrame = self:GetParent():GetParent():GetParent()
@@ -127,7 +127,7 @@ end
 
 function ItemButton:OnClick(button)
   local itm = TBag:GetItmFromFrame(TBag.BUTTONS, self)
-  if not itm then return end
+  if not itm or not next(itm) then return end
   local mainFrame = self:GetParent():GetParent()
   if self:GetName():match('_EditButton') then
     mainFrame = self:GetParent():GetParent():GetParent()
@@ -169,7 +169,7 @@ end
 -- such as when it is called from ItemButton.Update.
 function ItemButton.UpdateLock(self, itm, mainFrame)
   if not itm then itm = TBag:GetItmFromFrame(TBag.BUTTONS, self) end
-  if not itm then return end
+  if not itm or not next(itm) then return end
   if not mainFrame then mainFrame = self:GetParent():GetParent() end
 
   -- Another player's view never appears locked
@@ -186,7 +186,7 @@ function ItemButton.UpdateCooldown(self, itm, mainFrame)
   local cooldownFrame = _G[self:GetName().."_Cooldown"]
   if not cooldownFrame then return end
   if not itm then itm = TBag:GetItmFromFrame(TBag.BUTTONS, self) end
-  if not itm then return end
+  if not itm or not next(itm) then return end
   if not mainFrame then mainFrame = self:GetParent():GetParent() end
 
   if itm[TBag.I_ITEMLINK] and TBag:IsLive(mainFrame) then
@@ -202,7 +202,7 @@ function ItemButton.Update(self)
   local playerid = mainFrame.playerid
   local hilight_new = mainFrame.hilight_new
   local itm = TBag:GetItmFromFrame(TBag.BUTTONS, self)
-  if not itm then return end
+  if not itm or not next(itm) then return end
   local bag, slot = itm[TBag.I_BAG], itm[TBag.I_SLOT]
   local ic_start, ic_duration, ic_enable, texture
 
