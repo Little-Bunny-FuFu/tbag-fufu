@@ -2020,7 +2020,7 @@ function TBag:UpdateButtonHighlights()
   -- Then cycle through all the buttons
   for buttonname, itm in pairs(self.BUTTONS) do
     texture = _G[buttonname.."HighlightFrameTexture"];
-    if (texture) and (itm) then
+    if (texture) and (itm) and next(itm) then
       bag = itm[self.I_BAG];
       texture:SetVertexColor(r[bag], g[bag], b[bag], a[bag]);
       local cfg = self:GetCfgFromBag(bag);
