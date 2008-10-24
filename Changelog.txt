@@ -1,3 +1,18 @@
+* 20081024-r260-Shefki
+  - Sorting rules updates (/tinv resetsorts and /tbnk resetsorts
+    to replace your config with the default and get the updates)
+  - Handle Inscription Bags properly.
+  - Fix Assign Cats button in Advanced Configuration.
+  - Stop modifying keybindings entirely on first run.  Users existing
+    keybindings can get them started.
+  - Fix button positioning errors when hiding empty keyring slots.
+  - Handle corruption of the cached data more gracefully.
+  - Ensure that bars that do not fit within the number of horizontal
+    bars are correctly hidden.
+  - Correctly hide items on hidden bars.
+  - Possible fix for money type errors.
+  - Minor code cleanups.
+
 * 20081015-r242-Shefki
   - Fix the MergeReagents error.
 
