@@ -3123,6 +3123,11 @@ function TBag:LayoutWindow(frame)
   -- Hide any "leftover" frames
   for barnum = bar_x * bar_y + 1, self.BAR_MAX do
     _G[framename.."_bar_"..barnum]:Hide();
+    _G[framename.."_BarButton_"..barnum]:Hide() 
+    for _,itm in pairs(baritm[barnum]) do
+      local bag, slot = itm[self.I_BAG], itm[self.I_SLOT]
+      _G[self:GetBagItemButtonName(bag,slot)]:Hide()
+    end
   end
 
   local new_height;
