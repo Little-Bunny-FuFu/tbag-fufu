@@ -23,11 +23,7 @@
         <Scripts>
           <OnLoad>
             SmallMoneyFrame_OnLoad(self)
-            if TBag.WoTLK then
-              MoneyFrame_SetType(self, "STATIC")
-            else
-              MoneyFrame_SetType("STATIC")
-            end
+            MoneyFrame_SetType(self, "STATIC")
           </OnLoad>
         </Scripts>
       </Frame>

@@ -3,7 +3,6 @@
 
 local _G = getfenv(0) 
 local TBag = _G.TBag
-local WoTLK = TBag.WoTLK
 local L = TBag.LOCALE
 
 -- Generic itembutton implementation
@@ -431,12 +430,10 @@ function BagButton:OnEnter()
     return
   else
     local itemlink = TBag:GetPlayerBagCfg(mainFrame.playerid, bag, TBag.I_ITEMLINK)
-    if TBag.WoTLK and itemlink and itemlink ~= "" then
+    if (itemlink and itemlink ~= "") then
       local level = TBag:GetPlayerInfo(mainFrame.playerid,TBag.G_BASIC)[TBag.S_LEVEL] or
                     UnitLevel("player")
       itemlink = itemlink..":"..level
-    end
-    if (itemlink and itemlink ~= "") then
       GameTooltip:SetHyperlink(itemlink)
       GameTooltip:Show()
       return
@@ -580,7 +577,7 @@ function ColumnsButton:OnEnter()
   end
   
   GameTooltip:SetOwner(self, "ANCHOR_LEFT")
-  TBag:AddNewbieTip(self, normal, 1.0, 1.0, 1.0, newbie)
+  GameTooltip_AddNewbieTip(self, normal, 1.0, 1.0, 1.0, newbie)
 end
 
 function ColumnsButton:OnLeave()

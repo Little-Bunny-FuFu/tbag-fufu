@@ -2,7 +2,6 @@
 
 local _G = getfenv(0) 
 local TBag = _G.TBag
-local WoTLK = TBag.WoTLK
 local self = TBag
 
 
@@ -1669,14 +1668,12 @@ function TBag:MakeHyperlink(itemstring,name,quality,level)
   if (name) and (itemstring) and (quality) then
     quality = tonumber(quality);
     local _,_,_,color = GetItemQualityColor(quality);
-    if TBag.WoTLK then
-      -- item links now include the level of the linker in Wrath.
-      if level then
-        itemstring = itemstring..":"..level
-      else
-        -- failsave in case level isn't passed through.
-        itemstring = itemstring..":"..UnitLevel("player")
-      end
+    -- item links now include the level of the linker in Wrath.
+    if level then
+      itemstring = itemstring..":"..level
+    else
+      -- failsave in case level isn't passed through.
+      itemstring = itemstring..":"..UnitLevel("player")
     end
     itemlink = color.."|H"..itemstring.."|h["..name.."]|h|r";
   elseif (itemstring) then
@@ -2143,7 +2140,7 @@ function TBag:SetInventoryItem(tt, playerid, itemlink, bag, slot)
       end
     else
       -- otherwise, just set a link.  Not as good, but safe
-      if TBag.WoTLK and itemlink and itemlink ~= "" then
+      if itemlink and itemlink ~= "" then
         local level = TBag:GetPlayerInfo(playerid,TBag.G_BASIC)[TBag.S_LEVEL] or
                     UnitLevel("player")
         itemlink = itemlink..":"..level
@@ -2153,7 +2150,7 @@ function TBag:SetInventoryItem(tt, playerid, itemlink, bag, slot)
     end
   else
     -- Always just set links for other players
-    if TBag.WoTLK and itemlink and itemlink ~= "" then
+    if itemlink and itemlink ~= "" then
       local level = TBag:GetPlayerInfo(playerid,TBag.G_BASIC)[TBag.S_LEVEL] or
                     UnitLevel("player")
       itemlink = itemlink..":"..level
@@ -2192,11 +2189,9 @@ function TBag:MakeToolTipStr(playerid, itemlink, bag, slot, mailitem, attach)
   elseif (itemlink) and (mailitem) and (attach) then
     tt:SetInboxItem(mailitem, attach);
   elseif (itemlink) then
-    if TBag.WoTLK then 
-      local level = TBag:GetPlayerInfo(playerid,TBag.G_BASIC)[TBag.S_LEVEL] or
-                    UnitLevel("player")
-      itemlink = itemlink..":"..level
-    end
+    local level = TBag:GetPlayerInfo(playerid,TBag.G_BASIC)[TBag.S_LEVEL] or
+                  UnitLevel("player")
+    itemlink = itemlink..":"..level
     tt:SetHyperlink(itemlink);
   end
 
@@ -2212,14 +2207,6 @@ function TBag:MakeToolTipStr(playerid, itemlink, bag, slot, mailitem, attach)
   end
 
   return tooltip, hasCooldown, repairCost;
-end
-
-function TBag:AddNewbieTip(frame, normalText, r, g, b, newbieText, noNormalText)
-  if WoTLK then
-    GameTooltip_AddNewbieTip(frame, normalText, r, g, b, newbieText, noNormalText)
-  else
-    GameTooltip_AddNewbieTip(normalText, r, g, b, newbieText, noNormalText)
-  end
 end
 
 -----------------------------------------------------------------------
@@ -2426,7 +2413,7 @@ function TBag:UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, comparr,
 	      end
               itm[self.I_TIMESTAMP] = time();
               itm[self.I_NEWSTR] = self.V_NEWON;
-	      self.FORCED_SHOW[self:BagSlotToString(itm[self.I_BAG],itm[self.I_SLOT])] = 1
+	      self.FORCED_SHOW[self:BagSlotToString(itm[self.I_BAG],itm[self.I_SLOT])] = true 
             end
             if (not tooltip) then
               -- Haven't already made it so make it now.

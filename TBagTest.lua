@@ -27,10 +27,6 @@ local tests = {
   [5759] = L["ACT_OPEN"],
 
   -- PVP Items
-  [20560] = L["PVP"],
-  [20559] = L["PVP"],
-  [29024] = L["PVP"],
-  [20558] = L["PVP"],
   [24579] = L["PVP"],
   [26045] = L["PVP"],
   [28558] = L["PVP"],
@@ -392,7 +388,6 @@ local tests = {
   [31519] = L["11_LEGS"], -- Has ink in the name but not inscription item
   [43119] = L["INSCRIPTION"],
   [43127] = L["INSCRIPTION"],
-  [34645] = L["INSCRIPTION"],
   [10647] = L["ENGINEERING"], -- Engineer's Ink
   [43124] = L["INSCRIPTION"],
   [43126] = L["INSCRIPTION"],
@@ -411,7 +406,6 @@ local tests = {
   [39501] = L["INSCRIPTION"],
   [39354] = L["INSCRIPTION"],
   [39502] = L["INSCRIPTION"],
-  [34647] = L["INSCRIPTION"],
   [12635] = L["QUEST"], -- Simple Parchment 
   [5348] = L["QUEST"], -- Worn Parchment 
   [3767] = L["GRAY_ITEMS"], -- Fine Parchment 
@@ -529,7 +523,6 @@ local tests = {
   [17056] = L["CLASS_REAGENT"],
   [5565] = string.format(L["%s_REAGENT"],L["WARLOCK"]), 
   [16583] = string.format(L["%s_REAGENT"],L["WARLOCK"]),
-  [5140] = string.format(L["%s_REAGENT"],L["ROGUE"]),
   [22147] = string.format(L["%s_REAGENT"],L["DRUID"]),
   [17037] = string.format(L["%s_REAGENT"],L["DRUID"]),
   [22148] = string.format(L["%s_REAGENT"],L["DRUID"]),
@@ -599,109 +592,13 @@ local tests = {
 
 }
 
-if not TBag.WoTLK then
-  -- Remove the few that are irrelevent for Live clients
-  -- XXX: Remove this code once Wrath goes live
-  tests[40582] = nil
-  tests[34494] = nil
-  tests[38266] = nil
-  tests[37431] = nil
-  tests[37460] = nil
-  tests[43626] = nil
-  tests[34498] = nil
-  tests[44430] = nil
-  tests[43102] = nil
-  tests[37700] = nil
-  tests[37701] = nil
-  tests[37702] = nil
-  tests[37703] = nil
-  tests[37704] = nil
-  tests[37705] = nil
-  tests[35622] = nil
-  tests[35623] = nil
-  tests[35624] = nil
-  tests[35625] = nil
-  tests[35627] = nil
-  tests[36860] = nil
-  tests[38896] = nil
-  tests[43125] = nil
-  tests[43117] = nil
-  tests[43121] = nil
-  tests[43115] = nil
-  tests[43123] = nil
-  tests[43123] = nil
-  tests[31519] = nil
-  tests[43119] = nil
-  tests[43127] = nil
-  tests[34645] = nil
-  tests[10647] = nil
-  tests[43124] = nil
-  tests[43126] = nil
-  tests[37101] = nil
-  tests[43118] = nil
-  tests[43116] = nil
-  tests[39774] = nil
-  tests[39469] = nil
-  tests[43122] = nil
-  tests[6929] = nil
-  tests[10648] = nil
-  tests[11105] = nil
-  tests[3706] = nil
-  tests[9553] = nil
-  tests[9323] = nil
-  tests[39501] = nil
-  tests[39354] = nil
-  tests[39502] = nil
-  tests[34647] = nil
-  tests[12635] = nil
-  tests[5348] = nil
-  tests[3767] = nil
-  tests[40737] = nil
-  tests[44061] = nil
-  tests[43104] = nil
-  tests[43108] = nil
-  tests[43109] = nil
-  tests[43105] = nil
-  tests[43106] = nil
-  tests[43106] = nil
-  tests[43107] = nil
-  tests[43103] = nil
-  tests[39151] = nil
-  tests[39343] = nil
-  tests[39334] = nil
-  tests[39339] = nil
-  tests[39338] = nil
-  tests[39342] = nil
-  tests[39341] = nil
-  tests[39340] = nil
-  tests[39505] = nil
-  tests[43673] = nil 
-  tests[40912] = nil 
-  tests[44606] = nil
-  tests[44482] = nil
-  tests[44481] = nil
-  tests[44614] = nil
-  tests[44605] = nil
-  tests[44615] = nil
-  tests[37201] = nil
-else
-  -- Tests that need to be removed for WoTLK
-  -- XXX: Adjust the tests for Wrath when it goes live.
-  tests[20558] = nil
-  tests[20559] = nil
-  tests[20560] = nil
-  tests[29024] = nil
-  tests[5140] = nil
+-- Known items not working on any realm 
+-- Found from wowhead but apparently not seen on any of the realms
+tests[38266] = nil  
 
-  -- Known items not working on beta/PTR realms
-  -- Found from wowhead but apparently not seen on any of the realms
-  tests[38266] = nil  
-  tests[34645] = nil
-  tests[34647] = nil 
-
-  tests[22218] = nil  -- Apparently the valentine's day stuff isn't seen
-  tests[22200] = nil  -- more v'day stuff
-end
+-- For whatever reason valentine's items are missing from the realms
+tests[22200] = nil
+tests[22218] = nil
 
 local beta_realms = { 'Northrend', 'Lich King', 'Murmur', 'Coldarra' }
 

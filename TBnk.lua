@@ -2,7 +2,6 @@
 
 local _G = getfenv(0) 
 local TBag = _G.TBag
-local WoTLK = TBag.WoTLK
 TBag.Bank = {}
 local Bank = TBag.Bank
 
@@ -318,10 +317,10 @@ function Bank.Button_HighlightToggle_OnClick(self)
     TBag:ClearSearch();
     if (GameTooltip:GetOwner() == TBnk_Button_HighlightToggle) then
       if (TBnkFrame.highlight_new == 1) then
-        TBag:AddNewbieTip(self, L["Normal"], 1.0, 1.0, 1.0,
+        GameTooltip_AddNewbieTip(self, L["Normal"], 1.0, 1.0, 1.0,
                                  L["Stop highlighting new items."]);
       else
-        TBag:AddNewbieTip(self, L["Highlight New"], 1.0, 1.0, 1.0,
+        GameTooltip_AddNewbieTip(self, L["Highlight New"], 1.0, 1.0, 1.0,
                                  L["Highlight items marked as new."]);
       end
     end
@@ -329,13 +328,13 @@ function Bank.Button_HighlightToggle_OnClick(self)
   elseif (TBnkFrame.hilight_new == 0) then
     TBnkFrame.hilight_new = 1;
     if (GameTooltip:GetOwner() == TBnk_Button_HighlightToggle) then
-      TBag:AddNewbieTip(self, L["Normal"], 1.0, 1.0, 1.0,
+      GameTooltip_AddNewbieTip(self, L["Normal"], 1.0, 1.0, 1.0,
                                L["Stop highlighting new items."]);
     end
   else
     TBnkFrame.hilight_new = 0;
     if (GameTooltip:GetOwner() == TBnk_Button_HighlightToggle) then
-      TBag:AddNewbieTip(self, L["Highlight New"], 1.0, 1.0, 1.0,
+      GameTooltip_AddNewbieTip(self, L["Highlight New"], 1.0, 1.0, 1.0,
                                L["Highlight items marked as new."]);
     end
   end
@@ -393,7 +392,7 @@ function Bank.Button_MoveLockToggle_OnClick(self)
     TBnkLockNorm:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Unlocked-Up");
     TBnkLockPush:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Unlocked-Down");
     if (GameTooltip:GetOwner() == TBnk_Button_MoveLockToggle) then
-      TBag:AddNewbieTip(self, L["Lock Window"], 1.0, 1.0, 1.0,
+      GameTooltip_AddNewbieTip(self, L["Lock Window"], 1.0, 1.0, 1.0,
                                L["Prevent window from being moved by dragging it."]);
     end
   else
@@ -401,7 +400,7 @@ function Bank.Button_MoveLockToggle_OnClick(self)
     TBnkLockNorm:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Locked-Up");
     TBnkLockPush:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Locked-Down");
     if (GameTooltip:GetOwner() == TBnk_Button_MoveLockToggle) then
-      TBag:AddNewbieTip(self, L["Unlock Window"], 1.0, 1.0, 1.0,
+      GameTooltip_AddNewbieTip(self, L["Unlock Window"], 1.0, 1.0, 1.0,
                                L["Allow window to be moved by dragging it."]);
     end
   end
@@ -646,11 +645,6 @@ function Bank:SetBottomRightButton_Anchors()
     "TBnkFrame_TokenFrame",
   } 
   local button_right = nil
-
-  -- Not used for pre wrath clients
-  if not TBag.WoTLK then
-    TBnkFrame_TokenFrame:Hide()
-  end
 
   for _, button_name in ipairs(buttons) do
     button = _G[button_name]
@@ -1380,17 +1374,15 @@ function Bank.RightClickMenu_populate(...)
             info["checked"] = 1;
           end
           UIDropDownMenu_AddButton(info, level);
-	  if TBag.WoTLK then
-            info = {
-              ["text"] = L["Hide Tokens"];
-              ["func"] = TBnkFrame.Toggle_Token;
-              ["keepShownOnClick"] = 1;
-              };
-            if (TBnkFrame.cfg["show_tokens"] == 0) then
-              info["checked"] = 1;
-            end
-            UIDropDownMenu_AddButton(info, level);
-	  end
+          info = {
+            ["text"] = L["Hide Tokens"];
+            ["func"] = TBnkFrame.Toggle_Token;
+            ["keepShownOnClick"] = 1;
+            };
+          if (TBnkFrame.cfg["show_tokens"] == 0) then
+            info["checked"] = 1;
+          end
+          UIDropDownMenu_AddButton(info, level);
           info = {
             ["text"] = L["Hide Money"];
             ["func"] = TBnkFrame.Toggle_Money;
@@ -1511,11 +1503,7 @@ function Bank:UpdateWindow(resort_req)
     if (self.playerid == TBag.PLAYERID) then
       type = "PLAYER"
     end
-    if WoTLK then
-      MoneyFrame_SetType(TBnkFrame_MoneyFrame,type)	    
-    else
-      MoneyFrame_SetType(type,TBnkFrame_MoneyFrame)
-    end
+    MoneyFrame_SetType(TBnkFrame_MoneyFrame,type)	    
     MoneyFrame_Update("TBnkFrame_MoneyFrame", TBag:GetMoney(self.playerid));
   end
   TBnkFrame:UpdatePurchaseGfx();
@@ -1558,11 +1546,7 @@ function Bank.UserDropdown_OnLoad(self)
   UIDropDownMenu_Initialize(self, Bank.UserDropdown_Initialize);
   UIDropDownMenu_SetSelectedValue(self, TBnkFrame.playerid);
   self.tooltip = L["You are viewing the selected player's bank."];
-  if WoTLK then
-    UIDropDownMenu_SetWidth(self, TBag.USERDD_WIDTH)
-  else
-    UIDropDownMenu_SetWidth(TBag.USERDD_WIDTH, self);
-  end
+  UIDropDownMenu_SetWidth(self, TBag.USERDD_WIDTH)
   -- UIDropDownMenu_SetWidth actually adds 50 to our width, we really only want
   -- 25 to avoid the control running into our buttons on the right.
   self:SetWidth(TBag.USERDD_WIDTH + 25);

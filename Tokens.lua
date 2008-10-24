@@ -117,7 +117,6 @@ function Tokens.UpdateTokenButtonFromItm(button, itm, playerid)
 end
 
 function Tokens.Update(frame)
-  if not TBag.WoTLK then return end
   local framename = frame:GetName()
   local mainFrame = frame:GetParent()
   if mainFrame.cfg.show_tokens ~= 1 then return end
@@ -180,7 +179,5 @@ function Tokens.Enable()
   hooksecurefunc("BackpackTokenFrame_Update",Tokens.Hook)
 end
 
-if TBag.WoTLK then
-  TokenFramePopupBackpackCheckBoxText:SetText(L["Show on TBag"])
-  TOKEN_SHOW_ON_BACKPACK = L["Checking this option will allow you to track this currency type in TBag for this character.\n\nYou can also Shift-click a currency to add or remove it from being tracked in TBag."]
-end
+TokenFramePopupBackpackCheckBoxText:SetText(L["Show on TBag"])
+TOKEN_SHOW_ON_BACKPACK = L["Checking this option will allow you to track this currency type in TBag for this character.\n\nYou can also Shift-click a currency to add or remove it from being tracked in TBag."]

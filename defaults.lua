@@ -14,7 +14,6 @@ TBag.DefaultSearchList = {
   { L["ACT_ON"], L[""], L["This Item Begins a Quest"], L[""], L[""] },
   { L["ACT_OPEN"], L[""], L["<Right Click to Open>"], L[""], L[""] },
   { L["ACT_OPEN"], L[""], L[" Lockbox"], L["Miscellaneous"], L[""] },
-  { L["PVP"], L[""], L["Mark of Honor"], L["Quest"], L[""] },
   { L["PVP"], L[""], L["Mark of Honor Hold"], L["Consumable"], L[""] },
   { L["PVP"], L[""], L["Mark of Thrallmar"], L["Consumable"], L[""] },
   { L["PVP"], L[""], L["Halaa Battle Token"], L["Miscellaneous"], L[""] },
@@ -366,8 +365,6 @@ TBag.DefaultSearchList = {
     L["Infernal Stone"], L["Miscellaneous"], L["Reagent"] },
   { string.format(L["%s_REAGENT"],L["WARLOCK"]), L[""],
     L["Demonic Figurine"], L["Miscellaneous"], L["Reagent"] },
-
-  { string.format(L["%s_REAGENT"],L["ROGUE"]), L[""], L["Flash Powder"], L[""], L[""] },
 
   { string.format(L["%s_REAGENT"],L["DRUID"]), L[""],
     L[" Seed"], L["Miscellaneous"], L["Reagent"] },

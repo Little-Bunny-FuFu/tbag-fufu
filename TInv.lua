@@ -2,7 +2,6 @@
 
 local _G = getfenv(0) 
 local TBag = _G.TBag
-local WoTLK = TBag.WoTLK
 TBag.Inv = {}
 local Inv = TBag.Inv
 
@@ -181,10 +180,8 @@ function Inv:init(reset)
   TBag.Hooks.Register(TBag.Hooks.REGISTER);
 
   -- Setup the token system 
-  if TBag.WoTLK then
-    TBag.Tokens.Enable()
-    TBag.Tokens.Scan()
-  end
+  TBag.Tokens.Enable()
+  TBag.Tokens.Scan()
 
   if (cfg["moveLock"] == 0) then
     TInvLockNorm:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Locked-Up"); 
@@ -304,10 +301,10 @@ function Inv.Button_HighlightToggle_OnClick(self)
     TBag:ClearSearch();
     if (GameTooltip:GetOwner() == TInv_Button_HighlightToggle) then
       if (TInvFrame.highlight_new == 1) then
-        TBag:AddNewbieTip(self, L["Normal"], 1.0, 1.0, 1.0,
+        GameTooltip_AddNewbieTip(self, L["Normal"], 1.0, 1.0, 1.0,
                                  L["Stop highlighting new items."]);
       else
-        TBag:AddNewbieTip(self, L["Highlight New"], 1.0, 1.0, 1.0,
+        GameTooltip_AddNewbieTip(self, L["Highlight New"], 1.0, 1.0, 1.0,
                                  L["Highlight items marked as new."]);
       end
     end
@@ -315,13 +312,13 @@ function Inv.Button_HighlightToggle_OnClick(self)
   elseif (TInvFrame.hilight_new == 0) then
     TInvFrame.hilight_new = 1;
     if (GameTooltip:GetOwner() == TInv_Button_HighlightToggle) then
-      TBag:AddNewbieTip(self, L["Normal"], 1.0, 1.0, 1.0,
+      GameTooltip_AddNewbieTip(self, L["Normal"], 1.0, 1.0, 1.0,
                                L["Stop highlighting new items."]);
     end
   else
     TInvFrame.hilight_new = 0;
     if (GameTooltip:GetOwner() == TInv_Button_HighlightToggle) then
-      TBag:AddNewbieTip(self, L["Highlight New"], 1.0, 1.0, 1.0,
+      GameTooltip_AddNewbieTip(self, L["Highlight New"], 1.0, 1.0, 1.0,
                                L["Highlight items marked as new."]);
     end
   end
@@ -367,7 +364,7 @@ function Inv.Button_MoveLockToggle_OnClick(self)
     TInvLockNorm:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Unlocked-Up"); 
     TInvLockPush:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Unlocked-Down"); 
     if (GameTooltip:GetOwner() == TInv_Button_MoveLockToggle) then
-      TBag:AddNewbieTip(self, L["Lock Window"], 1.0, 1.0, 1.0, 
+      GameTooltip_AddNewbieTip(self, L["Lock Window"], 1.0, 1.0, 1.0, 
                                L["Prevent window from being moved by dragging it."]);
     end
   else
@@ -375,7 +372,7 @@ function Inv.Button_MoveLockToggle_OnClick(self)
     TInvLockNorm:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Locked-Up"); 
     TInvLockPush:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Locked-Down"); 
     if (GameTooltip:GetOwner() == TInv_Button_MoveLockToggle) then
-      TBag:AddNewbieTip(self, L["Unlock Window"], 1.0, 1.0, 1.0,
+      GameTooltip_AddNewbieTip(self, L["Unlock Window"], 1.0, 1.0, 1.0,
                                L["Allow window to be moved by dragging it."]);
     end
   end
@@ -512,11 +509,6 @@ function Inv:SetBottomRightButton_Anchors()
     "TInvFrame_TokenFrame",
   }
   local button_right = nil
-
-  -- Not used for pre wrath clients
-  if not TBag.WoTLK then
-    TInvFrame_TokenFrame:Hide()
-  end
 
   for _, button_name in ipairs(buttons) do
     button = _G[button_name]
@@ -1306,17 +1298,15 @@ function Inv.RightClickMenu_populate(...)
             info["checked"] = 1;
           end
           UIDropDownMenu_AddButton(info, level);
-	  if TBag.WoTLK then
-            info = {
-              ["text"] = L["Hide Tokens"];
-              ["func"] = TInvFrame.Toggle_Token;
-  	      ["keepShownOnClick"] = 1;
-              };
-            if (TInvFrame.cfg["show_tokens"] == 0) then
-              info["checked"] = 1;
-            end
-            UIDropDownMenu_AddButton(info, level);
-	  end
+          info = {
+            ["text"] = L["Hide Tokens"];
+            ["func"] = TInvFrame.Toggle_Token;
+  	    ["keepShownOnClick"] = 1;
+            };
+          if (TInvFrame.cfg["show_tokens"] == 0) then
+            info["checked"] = 1;
+          end
+          UIDropDownMenu_AddButton(info, level);
           info = {
             ["text"] = L["Hide Money"];
             ["func"] = TInvFrame.Toggle_Money;
@@ -1436,11 +1426,7 @@ function Inv:UpdateWindow(resort_req)
     if (self.playerid == TBag.PLAYERID) then
       type = "PLAYER"
     end
-    if WoTLK then
-      MoneyFrame_SetType(TInvFrame_MoneyFrame,type)
-    else
-      MoneyFrame_SetType(type,TInvFrame_MoneyFrame)
-    end
+    MoneyFrame_SetType(TInvFrame_MoneyFrame,type)
     MoneyFrame_Update("TInvFrame_MoneyFrame", TBag:GetMoney(self.playerid));
   end
 
@@ -1473,11 +1459,7 @@ function Inv.UserDropdown_OnLoad(self)
   UIDropDownMenu_Initialize(self, Inv.UserDropdown_Initialize);
   UIDropDownMenu_SetSelectedValue(self, TInvFrame.playerid);
   self.tooltip = L["You are viewing the selected player's inventory."];
-  if WoTLK then
-    UIDropDownMenu_SetWidth(self,TBag.USERDD_WIDTH)
-  else
-    UIDropDownMenu_SetWidth(TBag.USERDD_WIDTH, self)
-  end
+  UIDropDownMenu_SetWidth(self,TBag.USERDD_WIDTH)
   -- UIDropDownMenu_SetWidth actually adds 50 to our width, we really only want
   -- 25 to avoid the control running into our buttons on the right.
   self:SetWidth(TBag.USERDD_WIDTH+25);

@@ -5,7 +5,6 @@ local TBag = _G.TBag
 TBag.Hooks = {}
 local Hooks = TBag.Hooks
 
-local WoTLK = TBag.WoTLK 
 
 Hooks.UNREGISTER = 0
 Hooks.REGISTER = 1
@@ -192,15 +191,6 @@ function Hooks.OpenAllBags()
   TBag:UpdateButtonHighlights()
 end
 
--- Comptability wrapper for WoTLK changes
-local function ClickOnTab(func, tab)
-  if WoTLK then
-    func(nil, tab)
-  else
-    func(tab)
-  end
-end
-
 function Hooks.ContainerFrameItemButton_OnModifiedClick(...)
   -- Support for implicit and explicit args allowing comptability
   -- with 3.0.x and 2.4.x
@@ -241,7 +231,7 @@ function Hooks.ContainerFrameItemButton_OnModifiedClick(...)
         end
       elseif AuctionFrame and AuctionFrame:IsShown() then
         if alt_panel then
-          ClickOnTab(AuctionFrameTab_OnClick,3)
+          AuctionFrameTab_OnClick(nil,3)
         end
         -- If we have auctioneer do not auto pickup let auctioneer do it.
         if not AuctionFramePost then
@@ -254,7 +244,7 @@ function Hooks.ContainerFrameItemButton_OnModifiedClick(...)
         end
       elseif MailFrame and MailFrame:IsShown() then
         if alt_panel then
-          ClickOnTab(MailFrameTab_OnClick,2)
+          MailFrameTab_OnClick(nil,2)
         end
         if alt_pickup and PanelTemplates_GetSelectedTab(MailFrame) == 2 then
           PickupContainerItem(itm[TBag.I_BAG], itm[TBag.I_SLOT])
