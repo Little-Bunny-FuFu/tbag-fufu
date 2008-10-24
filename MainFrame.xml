@@ -19,7 +19,17 @@
       <Button name="$parent_ColumnsDel" inherits="TBag_ColumnsButtonTemplate"/>
       <Frame name="$parent_Total" hidden="false" inherits="TBag_TotalTemplate"/>
       <Frame name="$parent_MoneyFrame" hidden="false" inherits="SmallMoneyFrameTemplate">
-	      <Size><AbsDimension x="22" y="25"/></Size>
+        <Size><AbsDimension x="22" y="25"/></Size>
+        <Scripts>
+          <OnLoad>
+            SmallMoneyFrame_OnLoad(self)
+            if TBag.WoTLK then
+              MoneyFrame_SetType(self, "STATIC")
+            else
+              MoneyFrame_SetType("STATIC")
+            end
+          </OnLoad>
+        </Scripts>
       </Frame>
       <Frame name="$parent_TokenFrame" hidden="false" inherits="TBag_TokenFrameTemplate"/>
     </Frames>
