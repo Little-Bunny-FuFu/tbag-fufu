@@ -421,7 +421,7 @@ TBag.DefaultSearchList = {
     L[""], L[""], L[""] },
   { string.format(L["%s_CREATED"],L["POISONS"]), string.format(L["%s_CREATED"],L["POISONS"]),
     L[""], L[""], L[""] },
-  { string.format(L["%s_CREATED"],L["POISONS"]), L[""], L["%a+ Poison [IV]*"], L[""], L[""] },
+  { string.format(L["%s_CREATED"],L["POISONS"]), L[""], L["Coats a weapon with poison that lasts for"], L[""], L[""] },
   { L["POISONS"], L["POISONS"], L[""], L[""], L[""] },
   { L["ALCHEMY"], L["ALCHEMY"], L[""], L[""], L[""] },
   { L["COOKING"], L["COOKING"], L[""], L[""], L[""] },
