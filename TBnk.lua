@@ -1260,7 +1260,7 @@ function Bank.RightClickMenu_populate(...)
           info = {
             ["text"] = L["TOPRIGHT"];
             ["func"] = function ()
-                         TBag:SetFrameAnchor (TBnkFrame,TBnk.cfg,"TOP","RIGHT")
+                         TBag:SetFrameAnchor (TBnkFrame,TBnkFrame.cfg,"TOP","RIGHT")
                        end;
             };
           if (TBnkFrame.cfg["frameXRelativeTo"] == "RIGHT" and
