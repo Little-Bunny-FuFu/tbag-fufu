@@ -53,7 +53,7 @@ function TBnkOpt_SwapSearchItems(unused_value, key1, key2)
 end
 
 function TBnkOpt_ResizeUpdate()
-  if (TBnkCfg) then
+  if (TBnkFrame.cfg) then
     TBnkFrame:CalcButtonSize(TBnkFrame.cfg["frameButtonSize"], TBnkFrame.cfg["framePad"]);
     TBnkFrame:UpdateWindow(TBag.REQ_MUST);
   end
