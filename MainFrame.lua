@@ -46,6 +46,12 @@ end
   
 function MainFrame:DragStart()
   if not self.isMoving and self.cfg.moveLock == 1 then
+    -- Raise the window and turn off top level while dragging.
+    -- This prevents the game from freezing up from constantly
+    -- recalculating frame level while dragging.
+    self:Raise()
+    self:SetToplevel(false)
+
     self:StartMoving()
     self.isMoving = true
   end
@@ -53,6 +59,10 @@ end
 
 function MainFrame:DragStop()
   if self.isMoving then
+    -- Done moving so set us back to top level and force a raise
+    self:SetToplevel(true)
+    self:Raise()
+
     self:StopMovingOrSizing()
     self.isMoving = false
   
