@@ -187,12 +187,13 @@ function ItemButton.UpdateCooldown(self, itm, mainFrame)
   if not itm then itm = TBag:GetItmFromFrame(TBag.BUTTONS, self) end
   if not itm or not next(itm) then return end
   if not mainFrame then mainFrame = self:GetParent():GetParent() end
+  local start, duration, enable = 0, 0, false
 
   if itm[TBag.I_ITEMLINK] and TBag:IsLive(mainFrame) then
-    CooldownFrame_SetTimer(cooldownFrame,
-                           GetContainerItemCooldown(itm[TBag.I_BAG],itm[TBag.I_SLOT]))
-    cooldownFrame:SetScale(TBag.COOLDOWN_SCALE)
+    start, duration, enable = GetContainerItemCooldown(itm[TBag.I_BAG], itm[TBag.I_SLOT])
   end
+  CooldownFrame_SetTimer(cooldownFrame, start, duration, enable)
+  cooldownFrame:SetScale(TBag.COOLDOWN_SCALE)
 end
 
 function ItemButton.Update(self)
