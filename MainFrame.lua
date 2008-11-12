@@ -97,7 +97,11 @@ function MainFrame:OnHide()
   
   -- Unhighlight any bags that are still highlighted.
   for _, bag in ipairs(self.bags) do
-    TBag:GetBagFrame(bag):SetChecked(false)
+    local bagframe = TBag:GetBagFrame(bag)
+    if bagframe:GetChecked() then
+      self.CACHE_REQ = TBag.REQ_MUST
+      bagframe:SetChecked(false)
+    end
   end
   TBag:UpdateButtonHighlights()
  
