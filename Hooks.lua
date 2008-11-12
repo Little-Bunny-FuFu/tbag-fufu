@@ -159,35 +159,46 @@ end
 
 function Hooks.OpenAllBags()
   TBag:PrintDEBUG("event: OpenAllBags()")
-  local inv_update = false
-  local bnk_update = false
+  local inv_shown = false
 
   for _,bag in ipairs(TInvFrame.bags) do
-    if TInvFrame.cfg["show_Bag"..bag] ~= 1 then
-      TBag:GetBagFrame(bag):SetChecked(true)
-      inv_update = true
+    if bag ~= KEYRING_CONTAINER and TInvFrame.cfg["show_Bag"..bag] ~= 1 then
+      local bagframe = TBag:GetBagFrame(bag)
+      if not bagframe:GetChecked() then
+        bagframe:SetChecked(true)
+        TInvFrame.CACHE_REQ = TBag.REQ_MUST
+      end
     end
   end 
 
-  -- Open the faux bank as well
-  if (TBnkFrame:IsVisible() and TBnkFrame.atbank==1) then
+  if TInvFrame.CACHE_REQ > TBag.REQ_NONE then
+    inv_shown = true
+    TInvFrame:Show()
+    if TInvFrame.CACHE_REQ > TBag.REQ_NONE then
+      TInvFrame:UpdateWindow(TBag.REQ_PART)
+    end
+  else
+    inv_shown = not TInvFrame:Toggle()
+  end
+
+  -- Toggle the normally hidden bank bags based on
+  -- if the inventory is hidden or shown
+  if TBnkFrame:IsVisible() then
     for _, bag in ipairs(TBnkFrame.bags) do 
       if TBnkFrame.cfg["show_Bag"..bag] ~= 1 then
-        TBag:GetBagFrame(bag):SetChecked(true)
-	inv_update = true
+        local bagframe = TBag:GetBagFrame(bag)
+	if bagframe:GetChecked() ~= inv_shown then
+          bagframe:SetChecked(inv_shown)
+          TBnkFrame.CACHE_REQ = TBag.REQ_MUST
+	end
       end
     end
   end
 
-  if not TInvFrame:IsVisible() then
-    TInvFrame:Show()
-  elseif inv_update then
-    TInvFrame:UpdateWindow(TBag.REQ_MUST)
+  if TBnkFrame.CACHE_REQ > TBag.REQ_NONE then
+    TBnkFrame:UpdateWindow(TBag.REQ_PART)
   end
-  
-  if bnk_update then
-    TBnkFrame:UpdateWindow(TBag.REQ_MSUT)
-  end
+
   TBag:UpdateButtonHighlights()
 end
 

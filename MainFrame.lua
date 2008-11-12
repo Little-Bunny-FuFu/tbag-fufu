@@ -132,10 +132,12 @@ function MainFrame:OnShow()
 end
 
 function MainFrame:Toggle()
-  if self:IsVisible() then
+  local isVisible = self:IsVisible()
+  if isVisible then
     self:Hide()
   else
     self:Show()
   end
+  return isVisible
 end
 
