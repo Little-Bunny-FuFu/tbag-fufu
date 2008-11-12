@@ -822,13 +822,7 @@ function Bank.Toggle_Purchase()
 end
 
 
-function Bank.RightClickMenu_populate(...)
-  local self, level = ...
-  if type(self) ~= "table" then
-    -- Pre WoTLK support
-    level = self
-    self = nil
-  end
+function Bank.RightClickMenu_populate(self, level)
   local bar, bag, slot;
   local info, itm, id, barclass, tmp, checked, i;
   local key, value, key2, value2;
@@ -1550,13 +1544,7 @@ function Bank.UserDropdown_OnLoad(self)
 --  OptionsFrame_EnableDropDown(self);
 end
 
-function Bank.UserDropdown_Initialize(...)
-  local self, level = ...
-  if type(self) ~= "table" then
-    -- Pre WoTLK support
-    level = self
-    self = nil
-  end
+function Bank.UserDropdown_Initialize(self, level)
   TBag:UserDropdown_Init(Bank.UserDropdown_OnClick,
     TBnkItm, TBnkFrame.playerid, TBag.REALM, level);
 end

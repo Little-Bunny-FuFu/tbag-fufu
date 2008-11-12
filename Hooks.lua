@@ -191,18 +191,7 @@ function Hooks.OpenAllBags()
   TBag:UpdateButtonHighlights()
 end
 
-function Hooks.ContainerFrameItemButton_OnModifiedClick(...)
-  -- Support for implicit and explicit args allowing comptability
-  -- with 3.0.x and 2.4.x
-  local n = select('#', ...)
-  local self, button
-  if n == 1 then
-    self = this
-    button = ...
-  else
-    self, button = ...
-  end
-  
+function Hooks.ContainerFrameItemButton_OnModifiedClick(self, button, ...)
   TBag:PrintDEBUG("event: ItemButton_OnModifiedClick self="..self:GetName())
  
   -- Original func
@@ -210,7 +199,7 @@ function Hooks.ContainerFrameItemButton_OnModifiedClick(...)
   
   -- Get the itm and ultimately know if it's one of our buttons
   local itm = TBag:GetItmFromFrame(TBag.BUTTONS, self)
-  if not itm then return func(...) end
+  if not itm then return func(self, button, ...) end
   local mainFrame = self:GetParent():GetParent()
 
   if TBag:IsLive(mainFrame) then
@@ -273,5 +262,5 @@ function Hooks.ContainerFrameItemButton_OnModifiedClick(...)
   end
 
   -- Fall through to the original code
-  return func(...)
+  return func(self, button, ...)
 end
