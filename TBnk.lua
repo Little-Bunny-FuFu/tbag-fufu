@@ -1479,7 +1479,9 @@ function Bank:UpdateWindow(resort_req)
   for _, bag in ipairs(self.bags) do
     local size = TBag:GetPlayerBagCfg(self.playerid, bag, TBag.I_BAGSIZE);
     if (not size) then size = 0; end
-    if (self.cfg["show_Bag"..bag] ~= 1) then size = 0; end
+    if (self.cfg["show_Bag"..bag] ~= 1 and not TBag:GetBagFrame(bag):GetChecked()) then
+      size = 0
+    end
     for slot = 1, size do
       TBag.ItemButton.Update(_G[TBag:GetBagItemButtonName(bag, slot)])
     end
