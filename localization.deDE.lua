@@ -113,6 +113,7 @@ L["Trinket"] = INVTYPE_TRINKET
 L["Relic"] = INVTYPE_RELIC
 
 L["Soulbound"] = ITEM_SOULBOUND
+L["Account Bound"] = ITEM_ACCOUNTBOUND
 
 -----------------------------------------------------------------------
 -- BAG DISPLAY NAMES 

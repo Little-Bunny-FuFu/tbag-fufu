@@ -129,6 +129,7 @@ L["Trinket"] = true
 L["Relic"] = true
 
 L["Soulbound"] = true
+L["Account Bound"] = true
 
 -----------------------------------------------------------------------
 -- BAG DISPLAY NAMES 

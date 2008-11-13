@@ -78,6 +78,7 @@ TBag.I_RARITY    = "ir";
 TBag.I_COUNT     = "ic";
 TBag.I_NEED      = "sn";
 TBag.I_SOULBOUND = "sb";
+TBag.I_ACCTBOUND = "ab";
 TBag.I_CHARGES         = "ch";
 
 -- Tokens
@@ -619,8 +620,11 @@ function TBag:AddSearchResult(itm, playername, place, playerid)
   local itemstring = string.gsub(itm[self.I_ITEMLINK],
     "(item:%d+:%d+:%d+:%d+:%d+:%d+:%-?%d+):%-?%d+","%1:0",1);
   local count = itm[self.I_COUNT];
-  local itemlink = self:MakeHyperlink(itemstring,itm[self.I_NAME],itm[self.I_RARITY],
-                           TBag:GetPlayerInfo(playerid,TBag.G_BASIC)[TBag.S_LEVEL]);
+  local level = UnitLevel("player")
+  if itm[self.I_ACCTBOUND] then
+    level = TBag:GetPlayerInfo(playerid,TBag.G_BASIC)[TBag.S_LEVEL]
+  end
+  local itemlink = self:MakeHyperlink(itemstring,itm[self.I_NAME],itm[self.I_RARITY],level);
 
   if (itemlink) then
     self:PrintDEBUG("TBag:AddSearchResult "..count.." "..itemlink
@@ -2424,6 +2428,11 @@ function TBag:UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, comparr,
 	    else
               itm[self.I_SOULBOUND] = 0 
             end
+	    if (string.find(tooltip, L["Account Bound"])) then
+              itm[self.I_ACCTBOUND] = true
+	    else
+              itm[self.I_ACCTBOUND] = false
+	    end
             itm[self.I_CHARGES] = self:GetItmCharges(tooltip);
           else
             -- item has not changed, maybe the count did?
