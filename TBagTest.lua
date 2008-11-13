@@ -590,6 +590,36 @@ local tests = {
   [22202] = L["BLACKSMITHING"], -- Similar to enchanting but shouldn't match
   [22203] = L["BLACKSMITHING"], -- ditto
 
+  -- Rogue Poisons
+  [21835] = string.format(L["%s_CREATED"],L["POISONS"]),
+  [43237] = string.format(L["%s_CREATED"],L["POISONS"]),
+  [3775] = string.format(L["%s_CREATED"],L["POISONS"]),
+  [2892] = string.format(L["%s_CREATED"],L["POISONS"]),
+  [2893] = string.format(L["%s_CREATED"],L["POISONS"]),
+  [8984] = string.format(L["%s_CREATED"],L["POISONS"]),
+  [8985] = string.format(L["%s_CREATED"],L["POISONS"]),
+  [43233] = string.format(L["%s_CREATED"],L["POISONS"]),
+  [20844] = string.format(L["%s_CREATED"],L["POISONS"]),
+  [22053] = string.format(L["%s_CREATED"],L["POISONS"]),
+  [22054] = string.format(L["%s_CREATED"],L["POISONS"]),
+  [43232] = string.format(L["%s_CREATED"],L["POISONS"]),
+  [6947] = string.format(L["%s_CREATED"],L["POISONS"]),
+  [6949] = string.format(L["%s_CREATED"],L["POISONS"]),
+  [6950] = string.format(L["%s_CREATED"],L["POISONS"]),
+  [8926] = string.format(L["%s_CREATED"],L["POISONS"]),
+  [43231] = string.format(L["%s_CREATED"],L["POISONS"]),
+  [8927] = string.format(L["%s_CREATED"],L["POISONS"]),
+  [8928] = string.format(L["%s_CREATED"],L["POISONS"]),
+  [21927] = string.format(L["%s_CREATED"],L["POISONS"]),
+  [43230] = string.format(L["%s_CREATED"],L["POISONS"]),
+  [5237] = string.format(L["%s_CREATED"],L["POISONS"]),
+  [10918] = string.format(L["%s_CREATED"],L["POISONS"]),
+  [10920] = string.format(L["%s_CREATED"],L["POISONS"]),
+  [10921] = string.format(L["%s_CREATED"],L["POISONS"]),
+  [10922] = string.format(L["%s_CREATED"],L["POISONS"]),
+  [22055] = string.format(L["%s_CREATED"],L["POISONS"]),
+  [43234] = string.format(L["%s_CREATED"],L["POISONS"]),
+  [43235] = string.format(L["%s_CREATED"],L["POISONS"]),
 }
 
 -- Known items not working on any realm 
