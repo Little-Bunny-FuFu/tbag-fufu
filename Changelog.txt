@@ -1,3 +1,18 @@
+* 20081112-r276-Shefki
+  - Fixed search splitting items by character level.
+  - Fixed a bug that caused some settings to not immediately take effect
+    for the bank.
+  - Fixed the OpenAllBags hook.
+  - Fix sorting of rogue poisons (/tinv resetsorts /tbnk resetsorts needed)
+  - Fixed cooldown spinners remaining on empty slots.
+  - Fixed bank bags that are hidden not being shown when clicked on.
+  - Fixed items in hidden bags not properly being hidden after the
+    bag was closed.
+  - Workaround a Blizzard bug that causes the game to freeze up when
+    dragging a frame over another frame with a large number of child frames.
+  - Fix a syntax error in the Anchor settings for the bank.
+  - Remove some unnecessary code.
+
 * 20081024-r260-Shefki
   - Sorting rules updates (/tinv resetsorts and /tbnk resetsorts
     to replace your config with the default and get the updates)
