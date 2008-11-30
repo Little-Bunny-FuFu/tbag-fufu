@@ -159,7 +159,9 @@ end
 
 function Hooks.OpenAllBags()
   TBag:PrintDEBUG("event: OpenAllBags()")
+  local inv_bag_toggled  = false
   local inv_shown = false
+  local bnk_bag_toggled = false
 
   for _,bag in ipairs(TInvFrame.bags) do
     if bag ~= KEYRING_CONTAINER and TInvFrame.cfg["show_Bag"..bag] ~= 1 then
@@ -167,11 +169,12 @@ function Hooks.OpenAllBags()
       if not bagframe:GetChecked() then
         bagframe:SetChecked(true)
         TInvFrame.CACHE_REQ = TBag.REQ_MUST
+	inv_bag_toggled = true
       end
     end
   end 
 
-  if TInvFrame.CACHE_REQ > TBag.REQ_NONE then
+  if inv_bag_toggled then 
     inv_shown = true
     TInvFrame:Show()
     if TInvFrame.CACHE_REQ > TBag.REQ_NONE then
@@ -190,12 +193,13 @@ function Hooks.OpenAllBags()
 	if bagframe:GetChecked() ~= inv_shown then
           bagframe:SetChecked(inv_shown)
           TBnkFrame.CACHE_REQ = TBag.REQ_MUST
+	  bnk_bag_toggled = true
 	end
       end
     end
   end
 
-  if TBnkFrame.CACHE_REQ > TBag.REQ_NONE then
+  if bnk_bag_toggled then 
     TBnkFrame:UpdateWindow(TBag.REQ_PART)
   end
 
