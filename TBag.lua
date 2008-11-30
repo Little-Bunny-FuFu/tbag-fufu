@@ -86,6 +86,7 @@ TBag.I_HEADER = "hd";
 TBag.I_EXPAND = "ex";
 TBag.I_UNUSED = "un";
 TBag.I_WATCH  = "wa";
+TBag.I_ICON   = "io";
 
 
 -- Used in the item compression routines

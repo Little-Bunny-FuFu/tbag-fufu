@@ -27,8 +27,8 @@ function Tokens.GetItemStringFromCurrencyIndex(index)
 end
 
 function Tokens.SetItmFromCurrencyIndex(index,itm)
-  local name, isHeader, isExpand, isUnused, isWatched, count, extraType
-  name, isHeader, isExpand, isUnused, isWatched, count, extraType = GetCurrencyListInfo(index)
+  local name, isHeader, isExpand, isUnused, isWatched, count, extraType, icon
+  name, isHeader, isExpand, isUnused, isWatched, count, extraType, icon = GetCurrencyListInfo(index)
 
   if not name then
     return false
@@ -41,7 +41,8 @@ function Tokens.SetItmFromCurrencyIndex(index,itm)
   itm[TBag.I_WATCH] = isWatched
   itm[TBag.I_COUNT] = count
   itm[TBag.I_TYPE] = extraType
-  if not isHeader and extraType == 0 then
+  itm[TBag.I_ICON] = icon
+  if not isHeader and extraType == 0 and count > 0 then
     itm[TBag.I_ITEMLINK] = Tokens.GetItemStringFromCurrencyIndex(index)	
   end
   return true
@@ -92,6 +93,7 @@ function Tokens.UpdateTokenButtonFromItm(button, itm, playerid)
   if itm[TBag.I_NAME] then
     button.extraCurrencyType = itm[TBag.I_TYPE] 
     button.itemstring = itm[TBag.I_ITEMLINK]
+    button.count_val = itm[TBag.I_COUNT]
     if itm[TBag.I_TYPE]  == 1 then --Arena points
       button.icon:SetTexture("Interface\\PVPFrame\\PVP-ArenaPoints-Icon")
       button.icon:SetTexCoord(0, 1, 0, 1)
@@ -104,7 +106,8 @@ function Tokens.UpdateTokenButtonFromItm(button, itm, playerid)
         button.icon:SetTexCoord(0, 1, 0, 1)
       end
     else
-      button.icon:SetTexture(GetItemIcon(itm[TBag.I_ITEMLINK]))
+      local icon = GetItemIcon(itm[TBag.I_ITEMLINK]) or itm[TBag.I_ICON]
+      button.icon:SetTexture(icon)
       button.icon:SetTexCoord(0, 1, 0, 1)
     end
     if itm[TBag.I_COUNT] <= 99999 then
@@ -155,7 +158,7 @@ function Tokens.Button_OnEnter(self)
                         HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b)
     GameTooltip:AddLine(TOOLTIP_HONOR_POINTS, nil, nil, nil, 1)
     GameTooltip:Show()
-  else
+  elseif self.count_val > 0 then
       local mainFrame = self:GetParent():GetParent()
       local level = TBag:GetPlayerInfo(mainFrame.playerid,TBag.G_BASIC)[TBag.S_LEVEL] or
                     UnitLevel("player")
