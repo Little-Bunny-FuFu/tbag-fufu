@@ -78,6 +78,7 @@ TBag.DefaultSearchList = {
   { L["TOYS"], L[""], L["Grindgear Toy Gorilla"], L[""], L[""] },
   { L["TOYS"], L[""], L["Trusty Copper Racer"], L[""], L[""] },
   { L["TOYS"], L[""], L["Toy Train Set"], L[""], L[""] },
+  { L["TOYS"], L[""], L["Rolls a pair of dice"], L[""], L[""] },
 
   
   { L["AHN_QIRAJ"], L[""], L["%a+ Scarab"], L["Quest"], L[""] },
@@ -386,6 +387,7 @@ TBag.DefaultSearchList = {
   { string.format(L["%s_REAGENT"],L["SHAMAN"]), L[""], L["Fish Oil"], L[""], L[""] },
   { string.format(L["%s_REAGENT"],L["SHAMAN"]), L[""], L["Shiny Fish Scales"], L[""], L[""] },
   { string.format(L["%s_REAGENT"],L["DEATHKNIGHT"]), L[""], L["Corpse Dust"], L[""], L[""] },
+  { string.format(L["%s_REAGENT"],L["ROGUE"]), L[""], L["Coats a weapon with poison that lasts for"], L[""], L[""] },
 
   { string.format(L["%s_TOOL"],L["ROGUE"]), L[""], L["Thieves' Tools"], L[""], L[""] },
   { string.format(L["%s_TOOL"],L["SHAMAN"]), L[""],
@@ -423,10 +425,6 @@ TBag.DefaultSearchList = {
     L[""], L[""], L[""] },
   { string.format(L["%s_CREATED"],L["TRADE2"]), string.format(L["%s_CREATED"],L["TRADE2"]),
     L[""], L[""], L[""] },
-  { string.format(L["%s_CREATED"],L["POISONS"]), string.format(L["%s_CREATED"],L["POISONS"]),
-    L[""], L[""], L[""] },
-  { string.format(L["%s_CREATED"],L["POISONS"]), L[""], L["Coats a weapon with poison that lasts for"], L[""], L[""] },
-  { L["POISONS"], L["POISONS"], L[""], L[""], L[""] },
   { L["ALCHEMY"], L["ALCHEMY"], L[""], L[""], L[""] },
   { L["COOKING"], L["COOKING"], L[""], L[""], L[""] },
   { L["COOKING"], L[""], L["Raw "], L["Consumable"], L[""] },
