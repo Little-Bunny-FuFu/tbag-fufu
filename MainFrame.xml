@@ -30,6 +30,9 @@
       <Frame name="$parent_TokenFrame" hidden="false" inherits="TBag_TokenFrameTemplate"/>
     </Frames>
     <Scripts>
+      <OnLoad>
+        table.insert(UISpecialFrames, self:GetName())
+      </OnLoad>
       <OnShow>
         self:OnShow()
       </OnShow>
