@@ -172,6 +172,9 @@ TBag.DefaultSearchList = {
     L["Trinket"], L["Quest"], L[""] },
   { L["TRINKET"], L[""], L["Trinket"], L["Quest"], L[""] },
 
+  { string.format(L["EQUIPPED_%s"],L["02_NECK"]), L["EQUIPPED"], L["Blessed Medallion of Karabor"], L["Quest"], L[""]},
+  { string.format(L["SOULBOUND_%s"],L["02_NECK"]), L["SOULBOUND"], L["Blessed Medallion of Karabor"], L["Quest"], L[""]},
+  { L["02_NECK"], L[""], L["Blessed Medallion of Karabor"], L["Quest"], L[""]},
   { L["QUEST"], L[""], L[""], L["Quest"], L[""] },
   { L["QUEST"], L[""], L["Quest Item"], L[""], L[""] },
   { L["QUEST"], L[""], L["Morbent"], L["Armor"], L[""] },

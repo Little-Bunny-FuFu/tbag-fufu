@@ -338,6 +338,8 @@ local tests = {
   -- Quest
   [11018] = L["QUEST"],
   [7297] = L["QUEST"],
+  [32649] = L["QUEST"],
+  [32757] = L["02_NECK"],
   
   -- Gray items
   [3300] = L["GRAY_ITEMS"],

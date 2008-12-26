@@ -876,3 +876,4 @@ L["Flint and Tinder"] = true
 L["Zapthrottle Mote Extractor"] = true
 L["Wand of Holiday Cheer"] = true
 L["Rolls a pair of dice"] = true
+L["Blessed Medallion of Karabor"] = true
