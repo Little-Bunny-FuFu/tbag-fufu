@@ -1384,7 +1384,7 @@ function Bank.RightClickMenu_populate(self, level)
           end
           UIDropDownMenu_AddButton(info, level);
         elseif (UIDROPDOWNMENU_MENU_VALUE["opt"] == "select_character") then
-          Bank.UserDropdown_Initialize(level);
+          Bank.UserDropdown_Initialize(self, level);
         end
       end
     end

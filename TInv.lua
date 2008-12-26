@@ -1308,7 +1308,7 @@ function Inv.RightClickMenu_populate(self, level)
           end
           UIDropDownMenu_AddButton(info, level);
 	elseif (UIDROPDOWNMENU_MENU_VALUE["opt"] == "select_character") then
-	  TInvFrame.UserDropdown_Initialize(level);
+	  TInvFrame.UserDropdown_Initialize(self, level);
         end
       end
     end
