@@ -96,6 +96,7 @@ local tests = {
   [18258] = L["COSTUMES"],
   [37816] = L["COSTUMES"],
   [21213] = L["COSTUMES"],
+  [43499] = L["COSTUMES"],
 
   -- Fireworks
   [21570] = L["FIREWORKS"],
@@ -163,6 +164,7 @@ local tests = {
   [44606] = L["TOYS"],
   [44482] = L["TOYS"],
   [44481] = L["TOYS"],
+  [21328] = L["TOYS"],
 
   -- Mounts
   [33977] = L["MOUNT"],
@@ -374,6 +376,8 @@ local tests = {
   [19727] = L["TRADE_TOOL"],
   [7349] = L["TRADE_TOOL"],
   [39505] = L["TRADE_TOOL"],
+  [4471] = L["TRADE_TOOL"],
+  [40772] = L["TRADE_TOOL"],
   [3567] = L["WEAPON"], -- Avoid matching fishing pole
   [4598] = L["EXPLOSIVES"], -- ditto
   [19970] = L["FISHING"],
@@ -625,17 +629,6 @@ local tests = {
 -- Known items not working on any realm 
 -- Found from wowhead but apparently not seen on any of the realms
 tests[38266] = nil  
-
--- For whatever reason valentine's items are missing from the realms
-tests[22200] = nil
-tests[22218] = nil
-
-local beta_realms = { 'Northrend', 'Lich King', 'Murmur', 'Coldarra' }
-
--- Beta realms only
-if (TBag:Member(beta_realms, TBag.REALM) ~= 1) then
-  tests[44430] = nil
-end
 
 
 local function build_itm(id,itm)
