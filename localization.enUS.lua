@@ -87,7 +87,6 @@ L["Herbalism"] = true
 
 -- Other skills
 L["Lockpicking"] = true
-L["Poisons"] = true
 L["Runeforging"] = true
 
 -----------------------------------------------------------------------

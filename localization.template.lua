@@ -54,28 +54,27 @@ L[""] = false  -- Needed to preserve nil returns
 -----------------------------------------------------------------------
 
 -- Secondary skills
-L["Cooking"] = false 
-L["Fishing"] = false 
-L["First Aid"] = false 
+L["Cooking"] = GetSpellInfo(2550)
+L["Fishing"] = GetSpellInfo(7620)
+L["First Aid"] = GetSpellInfo(3273)
 
 -- Primary professions
-L["Alchemy"] = false
-L["Blacksmithing"] = false
-L["Enchanting"] = false
-L["Engineering"] = false
-L["Jewelcrafting"] = false
-L["Leatherworking"] = false
-L["Tailoring"] = false
-L["Inscription"] = false
+L["Alchemy"] = GetSpellInfo(2259) 
+L["Blacksmithing"] = GetSpellInfo(2018) 
+L["Enchanting"] = GetSpellInfo(7411) 
+L["Engineering"] = GetSpellInfo(4036) 
+L["Jewelcrafting"] = GetSpellInfo(25229) 
+L["Leatherworking"] = GetSpellInfo(2108) 
+L["Tailoring"] = GetSpellInfo(3908) 
+L["Inscription"] = GetSpellInfo(45357) 
 
 -- Gathering
-L["Skinning"] = false
-L["Mining"] = false
+L["Skinning"] = GetSpellInfo(8613) 
+L["Mining"] = GetSpellInfo(2575) 
 L["Herbalism"] = false
 
 -- Other skills
 L["Lockpicking"] = false
-L["Poisons"] = false
 L["Runeforging"] = false
 
 -----------------------------------------------------------------------
@@ -104,7 +103,6 @@ L["Kr\195\164uterkunde"] = "Herbalism"
 
 -- Other skills
 L["Schlo\195\159knacken"] = "Lockpicking"
-L["Gifte"] = "Poisons"
 L["Runeforging"] = "Runeforging"
 
 -----------------------------------------------------------------------

@@ -20,28 +20,27 @@ L[""] = ""  -- Needed to preserve nil returns
 -----------------------------------------------------------------------
 
 -- Secondary skills
-L["Cooking"] = "Kochkunst"
-L["Fishing"] = "Angeln"
-L["First Aid"] = "Erste Hilfe"
+L["Cooking"] = GetSpellInfo(2550)
+L["Fishing"] = GetSpellInfo(7620)
+L["First Aid"] = GetSpellInfo(3273)
 
 -- Primary professions
-L["Alchemy"] = "Alchimie"
-L["Blacksmithing"] = "Schmiedekunst"
-L["Enchanting"] = "Verzauberkunst"
-L["Engineering"] = "Ingenieurskunst"
-L["Jewelcrafting"] = "Juwelenschleifen"
-L["Leatherworking"] = "Lederverarbeitung"
-L["Tailoring"] = "Schneiderei"
-L["Inscription"] = "Inschriftenkunde"
+L["Alchemy"] = GetSpellInfo(2259) 
+L["Blacksmithing"] = GetSpellInfo(2018) 
+L["Enchanting"] = GetSpellInfo(7411) 
+L["Engineering"] = GetSpellInfo(4036) 
+L["Jewelcrafting"] = GetSpellInfo(25229) 
+L["Leatherworking"] = GetSpellInfo(2108) 
+L["Tailoring"] = GetSpellInfo(3908) 
+L["Inscription"] = GetSpellInfo(45357) 
 
 -- Gathering
-L["Skinning"] = "K\195\188rschnerei"
-L["Mining"] = "Bergbau"
+L["Skinning"] = GetSpellInfo(8613) 
+L["Mining"] = GetSpellInfo(2575) 
 L["Herbalism"] = "Kr\195\164uterkunde"
 
 -- Other skills
 L["Lockpicking"] = "Schlo\195\159knacken"
-L["Poisons"] = "Gifte"
 L["Runeforging"] = "Runen schmieden"
 
 -----------------------------------------------------------------------
@@ -70,7 +69,6 @@ L["Kr\195\164uterkunde"] = "Herbalism"
 
 -- Other skills
 L["Schlo\195\159knacken"] = "Lockpicking"
-L["Gifte"] = "Poisons"
 L["Runen schmieden"] = "Runeforging"
 
 
