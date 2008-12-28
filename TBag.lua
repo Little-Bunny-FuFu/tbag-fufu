@@ -3110,6 +3110,7 @@ function TBag:LayoutWindow(frame)
 
           TBag:AssignButtonsToFrame(frame,(barnum+iBar), framename.."_bar_"..(barnum+iBar),
             calc_dat[iBar.."_width"], calc_dat["height"] );
+	    barframe[iBar]:Show();
         else
           barframe[iBar]:Hide();
         end
