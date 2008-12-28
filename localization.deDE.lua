@@ -16,6 +16,34 @@ local L = TBag.LOCALE
 L[""] = ""  -- Needed to preserve nil returns
 
 -----------------------------------------------------------------------
+-- SKILLS
+-----------------------------------------------------------------------
+
+-- Secondary skills
+L["Cooking"] = GetSpellInfo(2550)
+L["Fishing"] = GetSpellInfo(7620)
+L["First Aid"] = GetSpellInfo(3273)
+
+-- Primary professions
+L["Alchemy"] = GetSpellInfo(2259) 
+L["Blacksmithing"] = GetSpellInfo(2018) 
+L["Enchanting"] = GetSpellInfo(7411) 
+L["Engineering"] = GetSpellInfo(4036) 
+L["Jewelcrafting"] = GetSpellInfo(25229) 
+L["Leatherworking"] = GetSpellInfo(2108) 
+L["Tailoring"] = GetSpellInfo(3908) 
+L["Inscription"] = GetSpellInfo(45357) 
+
+-- Gathering
+L["Skinning"] = GetSpellInfo(8613) 
+L["Mining"] = GetSpellInfo(2575) 
+L["Herbalism"] = GetSpellInfo(9134) 
+
+-- Other skills
+L["Lockpicking"] = GetSpellInfo(1809) 
+L["Runeforging"] = GetSpellInfo(53428) 
+
+-----------------------------------------------------------------------
 -- ITEM TYPES
 -----------------------------------------------------------------------
 
