@@ -21,67 +21,27 @@ use WWW::Mechanize;
 ##############
 
 # Version of the iteminfo db
-my $db_version = 1;
+my $db_version = 2;
 
 # URL snipets used to get what we need
 my $wowhead_url = 'http://www.wowhead.com/';
 my $item_tag = '?item=';
-my $trade_filter = '?items&filter=';
-
-# Name of a trade as the key with a hash of the parameters
-# to pass to wowhead to implement the filter. 
-my %trades = (
-  'Alchemy'        => { 'cr' => '86', 'crv' => '0', 'crs' => '1' },
-	'Blacksmithing'  => { 'cr' => '86', 'crv' => '0', 'crs' => '2' }, 
-	'Enchanting',    => { 'cr' => '86', 'crv' => '0', 'crs' => '4' }, 
-	'Engineering'    => { 'cr' => '86', 'crv' => '0', 'crs' => '5' },
-	'Inscription'    => { 'cr' => '86', 'crv' => '0', 'crs' => '15' },
-	'Jewelcrafting'  => { 'cr' => '86', 'crv' => '0', 'crs' => '7' },
-	'Leatherworking' => { 'cr' => '86', 'crv' => '0', 'crs' => '8' }, 
-	'Tailoring'      => { 'cr' => '86', 'crv' => '0', 'crs' => '10' },
-);
-my %secondary = (
-  'Cooking'        => { 'cr' => '86', 'crv' => '0', 'crs' => '3' },
-	'First Aid'      => { 'cr' => '86', 'crv' => '0', 'crs' => '6' },
-);
-my %skills = (
-	'Mining'         => { 'cr' => '86', 'crv' => '0', 'crs' => '9' },
-);
+my $trade_filter = '?spells=';
 
 # Maping of the skill ids that wowhead uses (appears to be
-# completely specific to them).  Needed for limiting reagents
-# to the right trade skills.
-my %trade_ids = (
-	'Alchemy' => 171,
-	'Blacksmithing' => 164,
-	'Enchanting' => 333,
-	'Engineering' => 202,
-  'Inscription' => 773,
-	'Jewelcrafting' => 755,
-	'Leatherworking' => 165,
-	'Tailoring' => 197,
-	'Cooking' => 185,
-	'First Aid' => 129,
-	'Mining'  => 186,
-);
-
-# Quality splits to avoid the 200 item limit of wowhead's search
-# Same basic format as %trades
-my %quality_levels =  (
-	'Epic+'       => { 'qu' => '4:5:6:7' },
-	'Rare'        => { 'qu' => '3'     },
-	'Uncommon'    => { 'qu' => '2'     },
-	'Poor/Common' => { 'qu' => '0:1'   },
-);
-
-# Item level splits for Inscription since there are more than 200
-# common items for inscription.
-# Same basic format as %trades
-my %ilevels = (
-	'0-30'  => { 'maxle' => '30' },
-	'31-60' => { 'minle' => '31', 'maxle' => '60' },
-	'61-90' => { 'minle' => '61', 'maxle' => '90' },
-	'91+'   => { 'minle' => '91' }, 
+# completely specific to them).
+my %trades = (
+	'Alchemy' => '11.171',
+	'Blacksmithing' => '11.164',
+	'Enchanting' => '11.333',
+	'Engineering' => '11.202',
+	 'Inscription' => '11.773',
+	'Jewelcrafting' => '11.755',
+	'Leatherworking' => '11.165',
+	'Tailoring' => '11.197',
+	'Cooking' => '9.185',
+	'First Aid' => '9.129',
+	'Mining'  => '11.186',
 );
 
 
@@ -96,14 +56,6 @@ my %TBag_Reagents;
 my %TBag_TradeCreations;
 for my $trade (keys %trades) {
 	$TBag_TradeCreations{$trade} = { };
-}
-my %TBag_SecondCreations;
-for my $second (keys %secondary) {
-	$TBag_SecondCreations{$second} = { };
-}
-my %TBag_SkillCreations;
-for my $skill (keys %skills) {
-	$TBag_SkillCreations{$skill} = { };
 }
 
 ###################
@@ -157,23 +109,11 @@ function TBag:MergeCreations(TBagCfg,tradetype,new)
 end
 
 function TBag:RefreshCreations(TBagCfg)
-  if (TBagCfg[self.S_TRADES] == nil or TBagCfg[self.S_TRADES][self.S_VERSION] ~= $db_version) then
-    TBagCfg[self.S_TRADES] = TradeCreations;
-  elseif (TBagCfg[self.S_TRADES][self.S_UPDATE] == nil or
-          TBagCfg[self.S_TRADES][self.S_UPDATE] < TradeCreations[self.S_UPDATE]) then
-    self:MergeCreations(TBagCfg,self.S_TRADES,TradeCreations);
-  end
-  if (TBagCfg[self.S_SECOND] == nil or TBagCfg[self.S_SECOND][self.S_VERSION] ~= $db_version) then
-    TBagCfg[self.S_SECOND] = SecondCreations;
-  elseif (TBagCfg[self.S_SECOND][self.S_UPDATE] == nil or
-          TBagCfg[self.S_SECOND][self.S_UPDATE] < TradeCreations[self.S_UPDATE]) then
-    self:MergeCreations(TBagCfg,self.S_SECOND,SecondCreations);
-  end
-  if (TBagCfg[self.S_SKILLS] == nil or TBagCfg[self.S_SKILLS][self.S_VERSION] ~= $db_version) then
-    TBagCfg[self.S_SKILLS] = SkillCreations;
-  elseif (TBagCfg[self.S_SKILLS][self.S_UPDATE] == nil or
-          TBagCfg[self.S_SKILLS][self.S_UPDATE] < SkillCreations[self.S_UPDATE]) then
-    self:MergeCreations(TBagCfg,self.S_SKILLS,SkillCreations);
+  if (TBagCfg[self.S_CREATED] == nil or TBagCfg[self.S_CREATED][self.S_VERSION] ~= $db_version) then
+    TBagCfg[self.S_CREATED] = TradeCreations;
+  elseif (TBagCfg[self.S_CREATED][self.S_UPDATE] == nil or
+          TBagCfg[self.S_CREATED][self.S_UPDATE] < TradeCreations[self.S_UPDATE]) then
+    self:MergeCreations(TBagCfg,self.S_CREATED,TradeCreations);
   end
 end
 
@@ -251,25 +191,41 @@ sub output_trades {
 # reagents to make the item.
 sub parse_reagents {
 	my $data = shift;
-	my $skill = shift;
-	my @return;
 
-	my (@recipes) = $data =~ /{(.*?)}/g;
-	foreach my $recipe (@recipes) {
-		my ($recipe_skill) = $recipe =~ /skill:\[(\d+)\]/;
-		if ($recipe_skill == $skill) {
-			my ($reagents) = $recipe =~ /reagents:\[(.*)\],\w/;
-			push(@return, $reagents =~ /\[(\d+),\d+\]/g);
-		}
-	}
+	my ($reagents) = $data =~ /reagents:\[(.*)\],\w/;
+	my(@return) = $reagents =~ /\[(\d+),\d+\]/g;
 	return \@return;
 }
 
-# Takes a data segment and retrieves all the item ids.
-sub parse_item_ids {
-	my $data = shift;
-  my (@return) = $data =~ /\{id:(\d+),/g;
+# Takes a data segment and splits it into individual spell entries
+sub parse_spells {
+  my $data = shift;
+	my (@return) = $data =~ /\{(.*?)\}/g;
 	return \@return;
+}
+
+# Takes a single spell entry and returns the correct key entry
+sub parse_id {
+  my $data = shift;
+  my $trade = shift;
+	my ($name) = $data =~ /name:'(.*?)',/;
+	if ($name =~ /^\d/) {
+		# item
+	  my ($id) = $data =~ /creates:\[(\d+),/;
+		return $id
+	} elsif ($name =~ /^\@/) {
+	  my ($id) = $data =~ /id:(\d+),/;
+    # Ugly special case to avoid Cooking Fire from showing as
+    # an enchant.  It's the only spell we should pickup that's
+    # not an enchant.
+    if ($trade eq 'Cooking') {
+      return "spell:$id";
+    } else {
+      return "enchant:$id";
+    }
+  } else {
+		die("Unknown item type: $name");
+	}
 }
 
 # Finds a data segment matches the template and section in the html page.
@@ -282,78 +238,35 @@ sub parse_data {
   return $contain_data;
 }		
 
-# Takes an array of hashes that have filter arguments and combines them
-sub build_filter_argument {
-  my %filter;
-	my $filter_argument;
-
-	foreach my $hash (@_) {
-		foreach my $key (keys %$hash) {
-      if (exists($filter{$key})) {
-				$filter{$key} .= ':' . $hash->{$key};
-		  } else {
-				$filter{$key} = $hash->{$key};
-			}
-		}
-	}
-  foreach my $key (keys %filter) {
-		if (defined($filter_argument)) {
-			$filter_argument .= ';';
-		}
-    $filter_argument .= $key . '=' . $filter{$key};
-  }
-
-	return $filter_argument;
-}
-
-# Builds a useful URL from an array of hashes that have filter arguments
-sub build_url {
-  my $filter_argument = build_filter_argument(@_);
-	return "${wowhead_url}${trade_filter}${filter_argument}";
-}
-
-
 # Go through all the items made by a given trade and record their
 # item ids and the item ids of their reagents into the hash.
 sub handle_trade {
 	my $mech = shift;
 	my $trade = shift;
-	my $trade_filter = shift;
 	my $var = shift;
 	my ($trade_content, $trade_data, $ids);
 
 
-	foreach my $quality (keys %quality_levels) {
-		foreach my $ilevel (keys  %ilevels) {
-			my $url = build_url($trade_filter,$quality_levels{$quality},$ilevels{$ilevel});
-			print STDERR "TRADE [$trade] = $url",$/;
-			$mech->get($url);
-			die("Couldn't get $url") unless $mech->success();
-			$trade_content = $mech->response()->decoded_content;
-			$trade_data = parse_data('item','items',$trade_content);
-			$ids = parse_item_ids($trade_data);
-			my ($found, $displayed) = $trade_content =~ /LANG\.lvnote_itemsfound,\s*(\d+),\s*(\d+)/;
-			if ($found > $displayed) {
-				die("$trade $quality $ilevel had too many items ($found)\n");
-			}
-			print STDERR "Items: ",scalar(@$ids),"\n";
-			foreach my $id (@$ids) {
-				$var->{$trade}->{$id} = 1;
-				my $item_url = "${wowhead_url}${item_tag}${id}";
-				print STDERR $item_url,$/;
-				$mech->get($item_url);
-				die("Couldn't get $item_url") unless $mech->success;
-				my $item_contents = $mech->response()->decoded_content;
-				my $item_data = parse_data('spell','created-by',$item_contents);
-				my $item_reagents = parse_reagents($item_data, $trade_ids{$trade});
-				foreach my $reagent_id (@{$item_reagents}) {
-					$TBag_Reagents{$reagent_id} = {} unless $TBag_Reagents{$reagent_id};
-					$TBag_Reagents{$reagent_id}->{$trade} = {} unless $TBag_Reagents{$reagent_id}->{$trade};
-					$TBag_Reagents{$reagent_id}->{$trade}->{$id} = 1;
-				}
-			}
+	my $url = "${wowhead_url}${trade_filter}$trades{$trade}";
+
+	print STDERR "TRADE [$trade] = $url",$/;
+	$mech->get($url);
+	die("Couldn't get $url") unless $mech->success();
+	my $trade_content = $mech->response()->decoded_content;
+	my $trade_data = parse_data('spell','spells',$trade_content);
+	my $spells = parse_spells($trade_data);
+	print STDERR "Items: ",scalar(@$spells),"\n";
+	foreach my $spell (@$spells) {
+		my $id = parse_id($spell,$trade);
+		my $reagents = parse_reagents($spell);
+		foreach my $reagent_id (@$reagents) {
+  		$TBag_Reagents{$reagent_id}->{$trade} = {} unless $TBag_Reagents{$reagent_id}->{$trade};
+	  	$TBag_Reagents{$reagent_id}->{$trade}->{$id} = 1;
+	  }
+		if (scalar(@$reagents) => 1 and $id !~ /(enchant|spell):/) {
+			$var->{$trade}->{$id} = 1;
 		}
-	}	
+	}
 }
 
 # Go through all the different trades and run handle_trade for each.
@@ -361,17 +274,9 @@ sub handle_trade {
 sub scrape_trade_items {
 	my $mech = shift;
 	foreach my $trade (keys %trades) {
-    handle_trade($mech,$trade,$trades{$trade},\%TBag_TradeCreations);
-	}
-  foreach my $second (keys %secondary) {
-		handle_trade($mech,$second,$secondary{$second},\%TBag_SecondCreations);
-	}
-	foreach my $skill (keys %skills) {
-		handle_trade($mech,$skill,$skills{$skill},\%TBag_SkillCreations);
+    handle_trade($mech,$trade,\%TBag_TradeCreations);
 	}
 	output_trades('TradeCreations',\%TBag_TradeCreations);
-	output_trades('SecondCreations',\%TBag_SecondCreations);
-	output_trades('SkillCreations',\%TBag_SkillCreations);
 	output_reagents();
 }
 			           

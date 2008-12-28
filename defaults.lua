@@ -433,6 +433,7 @@ TBag.DefaultSearchList = {
   { L["COOKING"], L[""], L["Raw "], L["Consumable"], L[""] },
   { L["COOKING"], L[""], L["[Ff]ish"], L["Consumable"], L[""] },
   { L["COOKING"], L[""], L[" Meat"], L["Trade Goods"], L[""] },
+  { L["ENCHANTING"], L["ENCHANTING"], L[""], L[""], L[""] },
   { L["ENCHANTING"], L[""], L["%a+ Dust"], L[""], L[""] },
   { L["ENCHANTING"], L[""], L["Lesser %a+ Essence"], L[""], L[""] },
   { L["ENCHANTING"], L[""], L["Greater %a+ Essence"], L[""], L[""] },

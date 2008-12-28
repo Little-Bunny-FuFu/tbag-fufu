@@ -521,6 +521,9 @@ function TBag:CleanConfig()
   TBagCfg["Bnk"]["show_top_gfx"] = nil;
   TBagCfg["Bnk"]["show_top_graphics"] = nil;
   TBagCfg["Bnk"]["show_blizzard_frames"] = nil;
+  TBagCfg[TBag.S_SKILLS] = nil;
+  TBagCfg[TBag.S_TRADES] = nil;
+  TBagCfg[TBag.S_SECOND] = nil;
   for player,_ in pairs(TBagInfo) do
     TBagInfo[player]["spell"] = nil;
     TBagInfo[player]["combat"] = nil;
@@ -1068,7 +1071,6 @@ function TBag:SetDefLayout(cfg, bagarr, row1offset, reset)
   self:SetCatBar(cfg, L["COMBO"], 7, reset);
 
   self:SetCatBar(cfg, L["BUFF"], 6, reset);
-  self:SetCatBar(cfg, string.format(L["%s_CREATED"],L["POISONS"]), 6, reset);
 
   self:SetCatBar(cfg, L["CLASS_REAGENT"], 5, reset);
   self:SetCatBar(cfg, L["DUMMY"], 5, reset);
@@ -2508,7 +2510,7 @@ function TBag:SortItmCache(cfg, playerid, itmcache, baritm, bagarr)
   -- variables used in inner loop
   ----- 2nd loop
   local barnum;
-  local trade1, trade2 = self:GetTwoProfessions(playerid);
+  local trade1, trade2 = self.Professions:GetTwoProfessions(playerid);
 
   -- wipe the forced show table
   for key,_ in pairs (self.FORCED_SHOW) do
@@ -2645,7 +2647,7 @@ function TBag:PickBar(cfg, playerid, itm, trade1, trade2)
     itm[self.I_KEYWORD][self.S_RARITY..itm[self.I_RARITY]] = 1;
   end
 
-  self:MakeAllTradeKeywords(itm, cfg["trade_created_sort"], trade1, trade2);
+  self.Professions:MakeAllTradeKeywords(itm, cfg["trade_created_sort"], trade1, trade2);
 
   if (trade1 ~= "") then
     self:SetCatBar(cfg, self:Cat(trade1), L["TRADE1"], 1);

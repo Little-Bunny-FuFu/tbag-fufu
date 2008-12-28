@@ -10,7 +10,6 @@ function TBag:VARIABLES_LOADED()
   self:RegisterEvent("ITEM_LOCK_CHANGED")
   self:RegisterEvent("UNIT_INVENTORY_CHANGED")
   self:RegisterEvent("PLAYER_LEAVING_WORLD")
-  self:RegisterEvent("CRAFT_SHOW")
   self:RegisterEvent("MAIL_INBOX_UPDATE")
   self:RegisterEvent("TRADE_SKILL_SHOW")
   self:RegisterEvent("AUCTION_HOUSE_SHOW")
@@ -21,11 +20,16 @@ function TBag:VARIABLES_LOADED()
   self:RegisterEvent("PLAYERBANKSLOTS_CHANGED")
   self:RegisterEvent("PLAYERBANKBAGSLOTS_CHANGED")
   self:RegisterEvent("PLAYER_LEVEL_UP")
+  self:RegisterEvent("SKILL_LINES_CHANGED")
 
   -- Scan equipment on login.
   TBag:ScanEquipped()
   TBagInfo[TBag.PLAYERID][TBag.G_BASIC][TBag.S_LEVEL] = UnitLevel("player")
   TBagInfo[TBag.PLAYERID][TBag.G_BASIC][TBag.S_FACTION] = UnitFactionGroup("player")
+end
+
+function TBag:SKILL_LINES_CHANGED()
+  TBag.Professions:ScanAllTradeRanks()
 end
 
 function TBag:BAG_UPDATE(event, bag)
@@ -110,8 +114,7 @@ local events = {
   ["AUCTION_HOUSE_SHOW"] = TBag.UIFRAME_SHOW,
   ["MAIL_SHOW"] = TBag.UIFRAME_SHOW,
   ["MERCHANT_SHOW"] = TBag.UIFRAME_SHOW,
-  ["CRAFT_SHOW"] = TBag.Craft,
-  ["TRADE_SKILL_SHOW"] = TBag.Trade,
+  ["TRADE_SKILL_SHOW"] = TBag.Professions.ScanRecipes,
   ["UNIT_INVENTORY_CHANGED"] = TBag.ScanEquipped,
   ["MAIL_INBOX_UPDATE"] = TBag.ScanMail,
   ["PLAYER_LEAVING_WORLD"] = TBag.PLAYER_LEAVING_WORLD,
@@ -120,6 +123,7 @@ local events = {
   ["PLAYERBANKSLOTS_CHANGED"] = TBag.PLAYERBANKSLOTS_CHANGED,
   ["PLAYERBANKBAGSLOTS_CHANGED"] = TBag.PLAYERBANKBAGSLOTS_CHANGED,
   ["PLAYER_LEVEL_UP"] = TBag.PLAYER_LEVEL_UP,
+  ["SKILL_LINES_CHANGED"] = TBag.SKILL_LINES_CHANGED,
 }
 
 function TBag:OnEvent(event, ...)

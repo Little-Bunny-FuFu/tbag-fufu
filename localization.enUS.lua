@@ -62,34 +62,6 @@ local L = TBag.LOCALE
 L[""] = true -- Needed to preserve nil returns
 
 -----------------------------------------------------------------------
--- SKILLS
------------------------------------------------------------------------
-
--- Secondary skills
-L["Cooking"] = true
-L["Fishing"] = true
-L["First Aid"] = true
-
--- Primary professions
-L["Alchemy"] = true
-L["Blacksmithing"] = true
-L["Enchanting"] = true
-L["Engineering"] = true
-L["Jewelcrafting"] = true
-L["Leatherworking"] = true
-L["Tailoring"] = true
-L["Inscription"] = true
-
--- Gathering
-L["Skinning"] = true
-L["Mining"] = true
-L["Herbalism"] = true
-
--- Other skills
-L["Lockpicking"] = true
-L["Runeforging"] = true
-
------------------------------------------------------------------------
 -- ITEM TYPES
 -----------------------------------------------------------------------
 

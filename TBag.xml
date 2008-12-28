@@ -4,7 +4,7 @@
   <Script file="TBagCmd.lua"/>
   <Script file="Hooks.lua"/>
   <Script file="TBagOpt.lua"/>
-  <Script file="TBagTrade.lua"/>
+  <Script file="Professions.lua"/>
   <Script file="TBagItemInfo.lua"/>
   <Script file="Events.lua"/>
   <Script file="TBagTest.lua"/>
