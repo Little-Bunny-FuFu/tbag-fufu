@@ -866,3 +866,4 @@ L["Zapthrottle Mote Extractor"] = false
 L["Wand of Holiday Cheer"] = false
 L["Rolls a pair of dice"] = false
 L["Blessed Medallion of Karabor"] = false
+L["Frenzyheart Brew"] = false 
