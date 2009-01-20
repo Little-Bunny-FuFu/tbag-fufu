@@ -786,6 +786,7 @@ L["Murloc Costume"] = "Murlockost\195\188m"
 L["Weighted Jack%-o'%-Lantern"] = "Gewichtige K\195\188rbislaterne"
 L["Gordok Ogre Suit"] = "Ogeranzug der Gordok"
 L["Transforms your mount into something more festive"] = "Verwandelt Euer Reittier in eine etwas festlichere Gestalt"
+L["Your mount will be more festive"] = false
 L["Shoots a.*firework"] = "Schie\195\159t .*ein ?h?e?r?r?l?i?c?h?e?s? ?Feuerwerk"
 L["Place on the ground to launch .* rockets"] = "Auf dem Boden aufstellen, um .* zu verschießen"
 L["Throw into a .* launcher"] = "Mit einem Z\195\188nder"

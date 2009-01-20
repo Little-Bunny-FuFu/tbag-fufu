@@ -830,6 +830,7 @@ L["Murloc Costume"] = true
 L["Weighted Jack%-o'%-Lantern"] = true
 L["Gordok Ogre Suit"] = true
 L["Transforms your mount into something more festive"] = true
+L["Your mount will be more festive"] = true
 L["Shoots a.*firework"] = true
 L["Place on the ground to launch .* rockets"] = true
 L["Throw into a .* launcher"] = true

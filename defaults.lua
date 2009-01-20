@@ -50,6 +50,7 @@ TBag.DefaultSearchList = {
   { L["COSTUMES"], L[""], L["Weighted Jack%-o'%-Lantern"], L[""], L[""] },
   { L["COSTUMES"], L[""], L["Gordok Ogre Suit"], L[""], L[""] },
   { L["COSTUMES"], L[""], L["Transforms your mount into something more festive"], L[""], L[""] },
+  { L["COSTUMES"], L[""], L["Your mount will be more festive"], L[""], L[""] },
   { L["COSTUMES"], L[""], L["Iron Boot Flask"], L[""], L[""] },
   { L["COSTUMES"], L[""], L["Frenzyheart Brew"], L[""], L[""] },
   { L["FIREWORKS"], L[""], L["Shoots a.*firework"], L["Consumable"], L[""] },
