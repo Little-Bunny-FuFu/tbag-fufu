@@ -695,6 +695,7 @@ L[" Bandage"] = "verband"
 L["Instantly restores %d+ life"] = "Stellt sofort %d+ Gesundheit"
 L[" well fed "] = " satt "
 L["Restores %d+ health.* increases your "] = "Stellt im Verlauf von %d+ Sek. insgesamt %d+ Gesundheit wieder her. .* Erh\195\182ht "
+L["If you spend at least %d+ seconds eating you will"] = false
 L["Must remain seated while drinking%."] = "Ihr m\195\188sst beim Trinken sitzen bleiben%."
 L["Restores %d+ mana over %d+ sec"] = "Stellt im Verlauf von %d+ Sek. insgesamt %d+ Mana wieder her"
 L["Restores %d+ health and %d+ mana over %d+ sec"] = "Stellt .*%d+ Sek%. .*%d+ Gesundheit und %d+ Mana wieder her%."

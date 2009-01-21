@@ -739,6 +739,7 @@ L[" Bandage"] = true
 L["Instantly restores %d+ life"] = true
 L[" well fed "] = true
 L["Restores %d+ health.* increases your "] = true
+L["If you spend at least %d+ seconds eating you will"] = true
 L["Must remain seated while drinking%."] = true
 L["Restores %d+ mana over %d+ sec"] = true
 L["Restores %d+ health and %d+ mana over %d+ sec"] = true
