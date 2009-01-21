@@ -835,3 +835,4 @@ L["Wand of Holiday Cheer"] = "Zauberstab der Festtagsfreude"
 L["Rolls a pair of dice"] = "W\195\188rfelt" 
 L["Blessed Medallion of Karabor"] = "Gesegnetes Medaillon von Karabor" 
 L["Frenzyheart Brew"] = "Wildherzenbier"
+L["Tiny Green Ragdoll"] = false 

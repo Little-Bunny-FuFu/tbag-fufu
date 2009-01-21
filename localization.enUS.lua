@@ -879,3 +879,4 @@ L["Wand of Holiday Cheer"] = true
 L["Rolls a pair of dice"] = true
 L["Blessed Medallion of Karabor"] = true
 L["Frenzyheart Brew"] = true
+L["Tiny Green Ragdoll"] = true
