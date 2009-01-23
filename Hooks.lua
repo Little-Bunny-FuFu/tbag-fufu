@@ -20,9 +20,12 @@ Hooks.funcs = {
   "ToggleKeyRing",
   "OpenAllBags",
   "ContainerFrameItemButton_OnModifiedClick",
+  "MerchantFrame_OnHide",
 }
 
 Hooks.savedfuncs = {}
+
+local inMerchantFrameOnHide = false
 
 function Hooks.Register(reg)
   local funcs = Hooks.funcs
@@ -144,7 +147,9 @@ end
 
 function Hooks.CloseBackpack()
   TBag:PrintDEBUG("event: CloseBackpack()")
-  TInvFrame:Hide()
+  if not inMerchantFrameOnHide then
+    TInvFrame:Hide()
+  end
 end
 
 function Hooks.ToggleBackpack()
@@ -278,4 +283,10 @@ function Hooks.ContainerFrameItemButton_OnModifiedClick(self, button, ...)
 
   -- Fall through to the original code
   return func(self, button, ...)
+end
+
+function Hooks.MerchantFrame_OnHide(...)
+  inMerchantFrameOnHide = true
+  Hooks.savedfuncs.MerchantFrame_OnHide(...)
+  inMerchantFrameOnHide = false
 end
