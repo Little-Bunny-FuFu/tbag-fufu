@@ -1,3 +1,23 @@
+* 20090122-r301-Shefki
+  Note: This version contains a number of sorting changes the following
+  commands are advised after backing up any modified sorting rules you have.
+  /tinv resetsorts
+  /tbnk resetsorts
+ - Properly sort a number of new items added with Wrath and 3.0.8.
+ - Major rework of the tradeskill categorization code, properly
+   supports Enchanting now.
+ - Item DB update for 3.0.8.  Due to the tradeskill rework the itemdb
+   is actually dumped and replaced with a new format as well.
+ - Rogue poisons are now treated like other class reagents.
+ - Show icon on tracked tokens when we have zero of them.
+ - Inventory window will no longer close on Merchant Frames closing.
+ - Don't show the Interface Options Dialog when Escape is pressed and only
+   closes a TBag window.
+ - Properly handle OpenAllBags (including the keybinding).
+ - Fix the Select Character submenu in the context menu.
+ - Fix backgrounds and borders on bars.
+ - deDE update
+
 * 20081112-r276-Shefki
   - Fixed search splitting items by character level.
   - Fixed a bug that caused some settings to not immediately take effect
