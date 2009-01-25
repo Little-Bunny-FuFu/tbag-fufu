@@ -836,4 +836,4 @@ L["Rolls a pair of dice"] = "W\195\188rfelt"
 L["Blessed Medallion of Karabor"] = "Gesegnetes Medaillon von Karabor" 
 L["Frenzyheart Brew"] = "Wildherzenbier"
 L["Tiny Green Ragdoll"] = "Winzige gr\195\188ne Stoffpuppe" 
-L["Festival Firecracker"] = false
+L["Festival Firecracker"] = "Festtagsknallfrosch"
