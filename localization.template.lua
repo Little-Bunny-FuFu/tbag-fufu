@@ -870,3 +870,4 @@ L["Rolls a pair of dice"] = false
 L["Blessed Medallion of Karabor"] = false
 L["Frenzyheart Brew"] = false
 L["Tiny Green Ragdoll"] = false 
+L["Festival Firecracker"] = false

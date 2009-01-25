@@ -58,6 +58,7 @@ TBag.DefaultSearchList = {
   { L["FIREWORKS"], L[""], L["Place on the ground to launch .* rockets"], L[""], L[""] },
   { L["FIREWORKS"], L[""], L["Throw into a .* launcher"], L["Miscellaneous"], L[""] },
   { L["FIREWORKS"], L[""], L["Throw into a .* launcher"], L["Consumable"], L[""] },
+  { L["FIREWORKS"], L[""], L["Festival Firecracker"], L[""], L[""] },
   { L["MOUNT"], L[""], L["Requires Riding %("], L[""], L[""] },
   { L["MOUNT"], L[""], L["Rickety Magic Broom"], L[""], L[""] },
   { L["TOYS"], L[""], L["Brazier of Dancing Flames"], L[""], L[""] },

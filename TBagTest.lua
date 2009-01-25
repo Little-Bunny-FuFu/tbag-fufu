@@ -127,6 +127,7 @@ local tests = {
   [19026] = L["FIREWORKS"],
   [9315] = L["FIREWORKS"],
   [23714] = L["TRINKET"],
+  [21747] = L["FIREWORKS"],
 
   -- Consumables
   [33927] = L["CONSUMABLE"],
