@@ -75,6 +75,7 @@ TBag.DefaultSearchList = {
   { L["TOYS"], L[""], L["Wand of Holiday Cheer"], L[""], L[""] },
 
   { L["TOYS"], L[""], L["Elune Stone"], L[""], L[""] },
+  { L["TOYS"], L[""], L["Elder's Moonstone"], L[""], L[""] },
   { L["TOYS"], L[""], L["Shower a nearby target with a cascade of"], L["Miscellaneous"], L[""] },
   { L["TOYS"], L[""], L["Path of Illidan"], L[""], L[""] },
   { L["TOYS"], L[""], L["Titanium Seal of Dalaran"], L[""], L[""] },

@@ -871,3 +871,4 @@ L["Blessed Medallion of Karabor"] = false
 L["Frenzyheart Brew"] = false
 L["Tiny Green Ragdoll"] = false 
 L["Festival Firecracker"] = false
+L["Elder's Moonstone"] = false
