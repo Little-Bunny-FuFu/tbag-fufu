@@ -837,4 +837,4 @@ L["Blessed Medallion of Karabor"] = "Gesegnetes Medaillon von Karabor"
 L["Frenzyheart Brew"] = "Wildherzenbier"
 L["Tiny Green Ragdoll"] = "Winzige gr\195\188ne Stoffpuppe" 
 L["Festival Firecracker"] = "Festtagsknallfrosch"
-L["Elder's Moonstone"] = false
+L["Elder's Moonstone"] = "Mondstein der Urahnen"
