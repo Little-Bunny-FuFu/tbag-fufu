@@ -28,7 +28,7 @@ TBag.DefaultSearchList = {
 
   { L["MINIPET"], L[""], L["Right Click to summon and dismiss"], L[""], L[""] },
   { L["MINIPET"], L[""], L["Summons or dismisses a Spirit of"], L[""], L[""] },
-  { L["MINIPET"], L[""], L["Use: Teaches you how to summon this companion."], L[""], L[""] },
+  { L["MINIPET"], L[""], L["Use: Teaches you how to summon a?n?d? ?d?i?s?m?i?s?s? ?this companion."], L[""], L[""] },
   { L["MINIPET"], L[""], L["Papa Hummel's Old%-Fashioned Pet Biscuit"], L[""], L[""] },
   { L["MINIPET"], L[""], L["Silver Shafted Arrow"], L[""], L[""] },
   { L["MINIPET"], L[""], L["Rope Pet Leash"], L[""], L[""] },

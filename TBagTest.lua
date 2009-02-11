@@ -58,6 +58,10 @@ local tests = {
   [37431] = L["MINIPET"],
   [37460] = L["MINIPET"],
   [43626] = L["MINIPET"],
+  [44721] = L["MINIPET"],
+  [39898] = L["MINIPET"],
+  [39899] = L["MINIPET"],
+  [39896] = L["MINIPET"],
  
   -- Combat Pets
   [23767] = L["COMBATPETS"],
