@@ -136,7 +136,11 @@ function Professions:GetReagents()
   return TBagCfg[TBag.S_REAGENT]
 end
 
+local scanningTrades = false
 function Professions:GetSkillRank(trade)
+  if scanningTrades then return end
+  scanningTrades = true
+  local skillRankReturn
   -- Localize the trade naem to search for since we use English names
   -- for the rest of the trade skill code.
   trade = L[trade]
@@ -148,21 +152,24 @@ function Professions:GetSkillRank(trade)
       size = GetNumSkillLines() - size
       for j = idx+1, idx+size do
         skillName, isHeader, isExpanded, skillRank = GetSkillLineInfo(j)
-	if not isHeader and trade == skillName then
+        if not isHeader and trade == skillName then
           CollapseSkillHeader(idx)
-	  return skillRank
-	end
+          skillRankReturn = skillRank
+        end
       end
       CollapseSkillHeader(idx)
     else
       if not isHeader and trade == skillName then
-        return skillRank
+        skillRankReturn = skillRank
       end
     end
   end
+  scanningTrades = false
+  return skillRankReturn
 end
 
 function Professions:ScanAllTradeRanks()
+  if scanningTrades then return end
   local player = TBag:GetPlayer(TBag.PLAYERID) 
   player[TBag.S_TRADES] = player[TBag.S_TRADES] or {}
   player[TBag.S_SECOND] = player[TBag.S_SECOND] or {}
