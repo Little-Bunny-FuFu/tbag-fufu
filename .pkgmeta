@@ -1,4 +1,5 @@
 package-as: TBag
+manual-changelog: Changelog.txt
 
 ignore:
   - dist.sh
