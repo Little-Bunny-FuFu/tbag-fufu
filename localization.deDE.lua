@@ -1,4 +1,4 @@
-﻿-- $Id$
+-- $Id$
 
 -- German translation maintained by Dessa <dessa@gmake.de>.
 
@@ -566,7 +566,7 @@ L["Use: Permanently"] = "Benutzen: .*dauerhaft"
 L["Hearthstone"] = "Ruhestein"
 L["Right Click to summon and dismiss"] = "Mit Rechtsklick .* beschw\195\182ren und freigeben%." 
 L["Summons or dismisses a Spirit of"] = "Beschw\195\182rt einen .*[gG]eist"
-L["Use: Teaches you how to summon a?n?d? ?d?i?s?m?i?s?s? ?this companion."] = "Benutzen: Lehrt Euch, wie man dieses Haustier beschw\195\182rt."
+L["Use: Teaches you how to summon a?n?d? ?d?i?s?m?i?s?s? ?this companion."] = "Benutzen: Lehrt Euch, wie man diese[ns] [GH][ea][fu].+[ht][ri][te][er]n? beschw\195\182rt.*"
 L["Requires Riding %("] = "Ben\195\182tigt Reiten %("
 L["%a+ Scarab"] = "%a+skarab\195\164us"
 L["%a+ Idol"] = "%a+g\195\182tze"
@@ -699,7 +699,7 @@ L["If you spend at least %d+ seconds eating you will"] = "Wenn Ihr mindestens 10
 L["Must remain seated while drinking%."] = "Ihr m\195\188sst beim Trinken sitzen bleiben%."
 L["Restores %d+ mana over %d+ sec"] = "Stellt im Verlauf von %d+ Sek. insgesamt %d+ Mana wieder her"
 L["Restores %d+ health and %d+ mana over %d+ sec"] = "Stellt .*%d+ Sek%. .*%d+ Gesundheit und %d+ Mana wieder her%."
-L["Restores .* health and .*mana .* %d+ sec"] = "Stellt %d+ Sek%. .* Gesundheit und .* Mana[s] wieder her"
+L["Restores .* health and .*mana .* %d+ sec"] = "Stellt .*%d+ Sek%. .* Gesundheit und .* Mana[s] wieder her"
 L["Must remain seated while eating%."] = "Ihr m\195\188sst beim Essen sitzen bleiben%."
 L["Restores %d+ health over %d+ sec"] = "Stellt im Verlauf von %d+ Sek. insgesamt %d+ Gesundheit wieder her%."
 L["Thistle Tea"] = "Disteltee"
