@@ -1,3 +1,13 @@
+* 20090215-r312-Shefki
+  Note: This version contains a number of sorting changes the following
+  commands are advised after backing up any modified sorting rules you have.
+  /tinv resetsorts
+  /tbnk resetsorts
+ - Fix a infinite loop in the tradeskill handling code.
+ - Update sorting to handle some of the Lunar Festival items.
+ - Pets gained from the Cracked Egg properly sort as MINIPETS now.
+ - Update deDE.
+
 * 20090122-r301-Shefki
   Note: This version contains a number of sorting changes the following
   commands are advised after backing up any modified sorting rules you have.
