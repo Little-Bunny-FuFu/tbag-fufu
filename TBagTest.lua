@@ -57,6 +57,7 @@ local tests = {
   [22200] = L["MINIPET"],
   [37431] = L["MINIPET"],
   [37460] = L["MINIPET"],
+  [44820] = L["MINIPET"],
   [43626] = L["MINIPET"],
   [44721] = L["MINIPET"],
   [39898] = L["MINIPET"],
@@ -169,7 +170,10 @@ local tests = {
   [34498] = L["TOYS"],
   [44430] = L["TOYS"],
   [44606] = L["TOYS"],
+  [45057] = L["TOYS"],
   [44482] = L["TOYS"],
+  [44599] = L["TOYS"],
+  [44601] = L["TOYS"],
   [44481] = L["TOYS"],
   [21328] = L["TOYS"],
   [36863] = L["TOYS"],
@@ -652,6 +656,12 @@ local tests = {
 -- Found from wowhead but apparently not seen on any of the realms
 tests[38266] = nil  
 
+if not TBag.wrath_310 then
+	tests[44820] = nil
+	tests[44599] = nil
+	tests[44601] = nil
+	tests[45057] = nil
+end
 
 local function build_itm(id,itm)
   itm[TBag.I_ITEMLINK] = "item:"..id..":0:0:0:0:0:0:0";
