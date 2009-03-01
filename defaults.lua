@@ -85,6 +85,8 @@ TBag.DefaultSearchList = {
   { L["TOYS"], L[""], L["Wind%-Up Train Wrecker"], L[""], L[""] },
   { L["TOYS"], L[""], L["Rolls a pair of dice"], L[""], L[""] },
   { L["TOYS"], L[""], L["Tiny Green Ragdoll"], L[""], L[""] },
+  { L["TOYS"], L[""], L["Sandbox Tiger"], L[""], L[""] },
+  { L["TOYS"], L[""], L["Foam Sword Rack"], L[""], L[""] },
 
   
   { L["AHN_QIRAJ"], L[""], L["%a+ Scarab"], L["Quest"], L[""] },

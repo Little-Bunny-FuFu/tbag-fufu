@@ -179,6 +179,8 @@ local tests = {
   [36863] = L["TOYS"],
   [36862] = L["TOYS"],
   [21745] = L["TOYS"],
+  [45063] = L["TOYS"],
+  [45047] = L["TOYS"],
 
   -- Mounts
   [33977] = L["MOUNT"],
@@ -661,6 +663,8 @@ if not TBag.wrath_310 then
 	tests[44599] = nil
 	tests[44601] = nil
 	tests[45057] = nil
+	tests[45047] = nil
+	tests[45063] = nil
 end
 
 local function build_itm(id,itm)

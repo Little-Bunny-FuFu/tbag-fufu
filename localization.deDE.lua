@@ -839,3 +839,5 @@ L["Tiny Green Ragdoll"] = "Winzige gr\195\188ne Stoffpuppe"
 L["Festival Firecracker"] = "Festtagsknallfrosch"
 L["Elder's Moonstone"] = "Mondstein der Urahnen"
 L["Wind%-Up Train Wrecker"] = false
+L["Sandbox Tiger"] = false
+L["Foam Sword Rack"] = false
