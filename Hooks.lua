@@ -20,7 +20,10 @@ Hooks.funcs = {
   "ToggleKeyRing",
   "OpenAllBags",
   "ContainerFrameItemButton_OnModifiedClick",
-  "MerchantFrame_OnHide",
+}
+
+Hooks.scripts = {
+  ["MerchantFrame"] = "OnHide"
 }
 
 Hooks.savedfuncs = {}
@@ -29,6 +32,7 @@ local inMerchantFrameOnHide = false
 
 function Hooks.Register(reg)
   local funcs = Hooks.funcs
+  local scripts = Hooks.scripts
   local savedfuncs = Hooks.savedfuncs
   
   if (reg == Hooks.REGISTER) then
@@ -43,6 +47,19 @@ function Hooks.Register(reg)
         TBag:PrintDEBUG("** Hook function for '"..funcname.." SKIPPED **")
       end
     end
+    for framename,script in pairs(scripts) do
+      local funcname = framename..'_'..script
+      local ourfunc = Hooks[funcname]
+
+      if ourfunc then
+        local frame = _G[framename]
+        savedfuncs[funcname] = frame:GetScript(script)
+        frame:SetScript(script, ourfunc)
+        TBag:PrintDEBUG("Hook script for '"..funcname.." installed.")
+      else
+        TBag:PrintDEBUG("** Hook script for '"..funcname.." SKIPPED **")
+      end
+    end
   elseif (reg == Hooks.UNREGISTER) then
     -- unregister hooks
     for _,funcname in ipairs(funcs) do
@@ -51,7 +68,18 @@ function Hooks.Register(reg)
       if ourfunc and savedfuncs[funcname] then
         setglobal(funcname, savedfuncs[funcname])
         savedfuncs[funcname] = nil
-	TBag:PrintDEBUG("Hook function for '"..funcname.." removed.")
+        TBag:PrintDEBUG("Hook function for '"..funcname.." removed.")
+      end
+    end
+    for framename,script in pairs(scripts) do
+      local funcname = framename..'_'..script
+      local ourfunc = Hooks[funcname]
+
+      if ourfunc and savedfuncs[funcname] then
+        local frame = _G[framename]
+        frame:SetScript(script, savedfuncs[funcname])
+        savedfuncs[funcname] = nil
+        TBag:PrintDEBUG("Hook script for '"..funcname.." removed.")
       end
     end
   elseif (reg == Hooks.CHECK) then
@@ -60,6 +88,18 @@ function Hooks.Register(reg)
     for _,funcname in ipairs(funcs) do
       local ourfunc = Hooks[funcname]
       local curfunc = _G[funcname]
+
+      if ourfunc == curfunc then
+        TBag:Print("  "..funcname.." is hooked properly.", 0, 1, 0.25)
+      else
+        TBag:Print("  "..funcname.." is NOT hooked.", 1, 0.2, 0.2)
+      end
+    end
+    for framename,script in pairs(scripts) do
+      local funcname = framename..'_'..script
+      local ourfunc = Hooks[funcname]
+      local frame = _G[framename]
+      local curfunc = frame:GetScript(script)
 
       if ourfunc == curfunc then
         TBag:Print("  "..funcname.." is hooked properly.", 0, 1, 0.25)
