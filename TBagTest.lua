@@ -48,6 +48,7 @@ local tests = {
 
   -- Hearthstones
   [6948] = L["HEARTH"],
+  [19254] = L["MISC"], -- Has Hearthstone in the tooltip, but isn't one.
 
   -- Minipets
   [4401] = L["MINIPET"],  
