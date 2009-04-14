@@ -221,7 +221,6 @@ TBag.DefaultSearchList = {
   { L["TRADE_TOOL"], L[""], L["Blood Scythe"], L[""], L[""] },
   { L["TRADE_TOOL"], L[""], L["Herbalist's Gloves"], L[""], L[""] },
   { L["TRADE_TOOL"], L[""], L["Virtuoso Inking Set"], L[""], L[""] },
-  { L["TRADE_TOOL"], L[""], L["Flint and Tinder"], L[""], L[""] },
   { L["TRADE_TOOL"], L[""], L["Zapthrottle Mote Extractor"], L[""], L[""] },
   { string.format(L["EQUIPPED_%s"],L["WEAPON"]), L["EQUIPPED"],
     L[""], L["Dwarven Fishing Pole"], L[""] },

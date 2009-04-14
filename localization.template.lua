@@ -863,7 +863,6 @@ L["Toy Train Set"] = false
 L["Engineer's Ink"] = false
 L["Rickety Magic Broom"] = false
 L["Iron Boot Flask"] = false 
-L["Flint and Tinder"] = false
 L["Zapthrottle Mote Extractor"] = false
 L["Wand of Holiday Cheer"] = false
 L["Rolls a pair of dice"] = false

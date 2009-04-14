@@ -1,4 +1,4 @@
--- $Id$
+﻿-- $Id$
 
 -- German translation maintained by Dessa <dessa@gmake.de>.
 
@@ -824,12 +824,11 @@ L["Ink"] = "%a+tinte"
 L[" Parchment"] = "Pergament"
 L[" Pigment"] = "[Pp]igmente"
 L["Grindgear Toy Gorilla"] = "Schleifritzelspielzeuggorilla"
-L["Copper Racer"] = "Zuverl\195\164ssiger Kupferflitzer"
+L["Copper Racer"] = "Kupferflitzer"
 L["Toy Train Set"] = "Spielzeugzug"
 L["Engineer's Ink"] = "Ingenieurstinte"
 L["Rickety Magic Broom"] = "Maroder Zauberbesen"
 L["Iron Boot Flask"] = "Eiserner Flachmann" 
-L["Flint and Tinder"] = "Feuerstein und Zunder" 
 L["Zapthrottle Mote Extractor"] = "Schockdrosselnder Partikelextraktor" 
 L["Wand of Holiday Cheer"] = "Zauberstab der Festtagsfreude" 
 L["Rolls a pair of dice"] = "W\195\188rfelt" 
@@ -838,6 +837,6 @@ L["Frenzyheart Brew"] = "Wildherzenbier"
 L["Tiny Green Ragdoll"] = "Winzige gr\195\188ne Stoffpuppe" 
 L["Festival Firecracker"] = "Festtagsknallfrosch"
 L["Elder's Moonstone"] = "Mondstein der Urahnen"
-L["Wind%-Up Train Wrecker"] = false
-L["Sandbox Tiger"] = false
-L["Foam Sword Rack"] = false
+L["Wind%-Up Train Wrecker"] = "Aufziehbarer Zugzerst\195\182rer"
+L["Sandbox Tiger"] = "Sandkastentiger"
+L["Foam Sword Rack"] = "Schaumstoffschwertst\195\164nder"

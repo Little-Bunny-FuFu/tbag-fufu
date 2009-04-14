@@ -395,7 +395,6 @@ local tests = {
   [19727] = L["TRADE_TOOL"],
   [7349] = L["TRADE_TOOL"],
   [39505] = L["TRADE_TOOL"],
-  [4471] = L["TRADE_TOOL"],
   [40772] = L["TRADE_TOOL"],
   [3567] = L["WEAPON"], -- Avoid matching fishing pole
   [4598] = L["EXPLOSIVES"], -- ditto
