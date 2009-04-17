@@ -1,3 +1,15 @@
+* 20090417-r321-Shefki
+  Note: This version contains a number of sorting changes the following
+  commands are advised after backing up any modified sorting rules you have.
+  /tinv resetsorts
+  /tbnk resetsorts
+  - 3.1.0 compatability
+  - Minor sorting changes for 3.1.0
+  - Workaround a bug in the Auctionner-Advanced Appraiser module that caused
+    the alt click support to do weird things.
+  - Item db update for 3.1.0
+  - TOC bump to mark addon as current.
+
 * 20090215-r312-Shefki
   Note: This version contains a number of sorting changes the following
   commands are advised after backing up any modified sorting rules you have.
