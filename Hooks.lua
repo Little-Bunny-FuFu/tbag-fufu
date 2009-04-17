@@ -280,7 +280,8 @@ function Hooks.ContainerFrameItemButton_OnModifiedClick(self, button, ...)
         end
       elseif AuctionFrame and AuctionFrame:IsShown() then
         if alt_panel then
-          AuctionFrameTab_OnClick(nil,3)
+          this = AuctionFrameTab3 -- Workaround for AucAdvanced Apraiser module
+          AuctionFrameTab_OnClick(AuctionFrameTab3)
         end
         -- If we have auctioneer do not auto pickup let auctioneer do it.
         if not AuctionFramePost then
@@ -293,7 +294,7 @@ function Hooks.ContainerFrameItemButton_OnModifiedClick(self, button, ...)
         end
       elseif MailFrame and MailFrame:IsShown() then
         if alt_panel then
-          MailFrameTab_OnClick(nil,2)
+          MailFrameTab_OnClick(MailFrameTab2)
         end
         if alt_pickup and PanelTemplates_GetSelectedTab(MailFrame) == 2 then
           PickupContainerItem(itm[TBag.I_BAG], itm[TBag.I_SLOT])
