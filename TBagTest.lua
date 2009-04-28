@@ -256,6 +256,15 @@ local tests = {
   [31910] = L["DARKMOON_FAIRE"],
   [31891] = L["ACT_ON"],
   [31892] = L["DARKMOON_FAIRE"],
+  [44276] = L["ACT_ON"],
+  [44284] = L["DARKMOON_FAIRE"],
+  [44326] = L["ACT_ON"],
+  [44274] = L["DARKMOON_FAIRE"],
+  [44259] = L["ACT_ON"],
+  [44266] = L["DARKMOON_FAIRE"],
+  [44294] = L["ACT_ON"],
+  [44292] = L["DARKMOON_FAIRE"],
+  [21136] = L["QUEST"], -- Tooltip text has of Storms so it matched old Darkmoon Faire rules
 
   -- Thorium Brotherhood
   [18944] = L["THORIUM_BROTHER"],
