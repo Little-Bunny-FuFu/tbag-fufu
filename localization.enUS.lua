@@ -878,3 +878,5 @@ L["Elder's Moonstone"] = true
 L["Wind%-Up Train Wrecker"] = true
 L["Sandbox Tiger"] = true
 L["Foam Sword Rack"] = true
+L["Unusual Compass"] = true
+L["Blossoming Branch"] = true

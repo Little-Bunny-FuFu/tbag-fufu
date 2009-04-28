@@ -868,3 +868,5 @@ L["Elder's Moonstone"] = false
 L["Wind%-Up Train Wrecker"] = false
 L["Sandbox Tiger"] = false
 L["Foam Sword Rack"] = false
+L["Unusual Compass"] = false 
+L["Blossoming Branch"] = false 

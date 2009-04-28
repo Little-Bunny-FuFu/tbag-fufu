@@ -53,6 +53,7 @@ TBag.DefaultSearchList = {
   { L["COSTUMES"], L[""], L["Your mount will be more festive"], L[""], L[""] },
   { L["COSTUMES"], L[""], L["Iron Boot Flask"], L[""], L[""] },
   { L["COSTUMES"], L[""], L["Frenzyheart Brew"], L[""], L[""] },
+  { L["COSTUMES"], L[""], L["Blossoming Branch"], L[""], L[""] },
   { L["FIREWORKS"], L[""], L["Shoots a.*firework"], L["Consumable"], L[""] },
   { L["FIREWORKS"], L[""], L["Shoots a.*firework"], L["Weapon"], L[""] },
   { L["FIREWORKS"], L[""], L["Place on the ground to launch .* rockets"], L[""], L[""] },
@@ -87,6 +88,7 @@ TBag.DefaultSearchList = {
   { L["TOYS"], L[""], L["Tiny Green Ragdoll"], L[""], L[""] },
   { L["TOYS"], L[""], L["Sandbox Tiger"], L[""], L[""] },
   { L["TOYS"], L[""], L["Foam Sword Rack"], L[""], L[""] },
+  { L["TOYS"], L[""], L["Unusual Compass"], L[""], L[""] },
 
   
   { L["AHN_QIRAJ"], L[""], L["%a+ Scarab"], L["Quest"], L[""] },

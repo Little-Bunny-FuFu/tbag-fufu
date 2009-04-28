@@ -834,3 +834,5 @@ L["Elder's Moonstone"] = "Mondstein der Urahnen"
 L["Wind%-Up Train Wrecker"] = "Aufziehbarer Zugzerst\195\182rer"
 L["Sandbox Tiger"] = "Sandkastentiger"
 L["Foam Sword Rack"] = "Schaumstoffschwertst\195\164nder"
+L["Unusual Compass"] = false 
+L["Blossoming Branch"] = false 
