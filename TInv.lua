@@ -1054,7 +1054,7 @@ function Inv.RightClickMenu_populate(self, level)
         ["func"] = function()
             local bag, slot;
 
-            for index, bag in ipairs(TInv_Bags) do
+            for index, bag in ipairs(TInvFrame.bags) do
               if (TInvFrame.cfg["show_Bag"..bag] == 1) then
                 if (table.getn(TInvItm[TInvFrame.playerid][bag]) > 0) then
                   for slot = 1, table.getn(TInvItm[TInvFrame.playerid][bag]) do
