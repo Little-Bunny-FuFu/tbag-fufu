@@ -79,9 +79,12 @@ end
 
 -- Set reset=1 to restore default values
 function Bank:init(reset)
-  setmetatable(TBag.MainFrame, getmetatable(TBnkFrame))
-  setmetatable(TBag.Bank,{__index=TBag.MainFrame})
-  setmetatable(TBnkFrame,{__index=TBag.Bank})
+  if not Bank.metatabledone then
+    setmetatable(TBag.MainFrame, getmetatable(TBnkFrame))
+    setmetatable(TBag.Bank,{__index=TBag.MainFrame})
+    setmetatable(TBnkFrame,{__index=TBag.Bank})
+    Bank.metatabledone = true
+  end
   self = TBnkFrame
 
   -- Bank switching

@@ -101,9 +101,12 @@ end
 
 -- Set reset = 1 to restore default values
 function Inv:init(reset)
-  setmetatable(TBag.MainFrame,getmetatable(TInvFrame))
-  setmetatable(TBag.Inv,{__index=TBag.MainFrame})
-  setmetatable(TInvFrame,{__index=TBag.Inv})
+  if not Inv.metatabledone then
+    setmetatable(TBag.MainFrame,getmetatable(TInvFrame))
+    setmetatable(TBag.Inv,{__index=TBag.MainFrame})
+    setmetatable(TInvFrame,{__index=TBag.Inv})
+    Inv.metatabledone = true
+  end
   self = TInvFrame
 
   -- View switching
