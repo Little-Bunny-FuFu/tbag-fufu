@@ -2961,7 +2961,6 @@ function TBag:LayoutWindow(frame)
   local baritm = frame.BARITM
   local bar_x = cfg.bar_x
   local edit_mode = frame.edit_mode
-  local buttonmax = frame.BUTTON_MAX
   local assignfunc = frame.AssignButtonsToFrame
   local PAD_BOTTOM = 0;
   local PAD_TOP = 0;

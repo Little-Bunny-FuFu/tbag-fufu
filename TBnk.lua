@@ -94,10 +94,6 @@ function Bank:init(reset)
 
   self.CACHE_REQ = TBag.REQ_NONE
   
-  -- Graphics Settings
-  self.BANKBUTTON_MAX = 28;
-  self.BUTTON_MAX = 240;
-
   self.cfg = nil;
   self.BARITM = {};
   self.hilight_new = 0;

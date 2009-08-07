@@ -113,8 +113,6 @@ function Inv:init(reset)
   self.playerid  = "";
   self.bags = TBag.Inv_Bags
 
-  self.BUTTON_MAX = 109;
-
   self.CACHE_REQ = TBag.REQ_NONE;
 
   self.cfg  = nil;
