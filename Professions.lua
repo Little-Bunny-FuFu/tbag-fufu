@@ -315,7 +315,7 @@ function Professions:MakeTradeCreationKeywords(itm, itemid, trade1, trade2, docr
             itm[TBag.I_KEYWORD][string.format(L["%s_CREATED"],L["TRADE1"])] = 1
           end
           if trade == trade2 then
-            itm[TBag.I_KEYWORD][string.format(L["%s_CREATED"],L["TRADE1"])] = 1
+            itm[TBag.I_KEYWORD][string.format(L["%s_CREATED"],L["TRADE2"])] = 1
           end
         else
           itm[TBag.I_KEYWORD][string.format(L["%s_CREATED"],L[TBag:Cat(trade)])] = nil
