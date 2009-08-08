@@ -188,39 +188,116 @@ function Professions:ScanAllTradeRanks()
   end
 end
 
+local function trade_skill_tooltip_scan(i, j)
+  local tt = TBag_tt
+
+  if (not tt) then
+    tt = CreateFrame("GameTooltip","TBag_tt")
+    -- Allow tooltip set methods to dynamically add new lines based on these
+    tt:AddFontStrings(
+      tt:CreateFontString("$parentTextLeft1", nil, "GameTooltipText"),
+      tt:CreateFontString("$parentTextRight1", nil, "GameTooltipText")
+    )
+  end
+  tt:SetOwner(UIParent, "ANCHOR_NONE")  -- this makes sure that tooltip.valid = true
+  tt:ClearLines()
+   
+  tt:SetTradeSkillItem(i, j)
+  local _,link = tt:GetItem()
+  return link
+end
+
+local function add_craft(created, reagent, tradeskillName, i)
+  -- Note we can't use GetTradeSkillItemLink() or GetTradeSkillReagentItemLink()
+  -- because it will return nil if the item is already cached.  We can use the
+  -- tooltip because it'll give us enough of the link to get what we want.
+  local craftItemLink = trade_skill_tooltip_scan(i) 
+  if not craftItemLink then return end
+  TBag:SetItemLink(created, craftItemLink)
+
+  for j = 1, GetTradeSkillNumReagents(i) do
+    local reagentItemLink = trade_skill_tooltip_scan(i, j)
+    if reagentItemLink then
+      Professions:SetReagentLink(reagent, craftItemLink, tradeskillName, reagentItemLink)
+    end
+  end
+end
+
+local function get_count(...)
+  return select('#', ...)
+end
+
 function Professions.ScanRecipes() 
-  -- Load the info for the tradeskill currently open
-  local numTradeSkills = GetNumTradeSkills()
-  if (numTradeSkills > 0) then
-    -- Get the name of the tradeskill and reverse it to enUS
-    local tradeskillName = RL[GetTradeSkillLine()]
+  -- Get the name of the tradeskill and reverse it to enUS
+  local tradeskillName = RL[GetTradeSkillLine()]
 
-    if tradeskillName then
-      -- Then save to the global item cache
-      local created = Professions:GetTradeCreated(tradeskillName)
-      local reagent = Professions:GetReagents()
+  if tradeskillName then
+    -- Then save to the global item cache
+    local created = Professions:GetTradeCreated(tradeskillName)
+    local reagent = Professions:GetReagents()
 
-      for i = 1, numTradeSkills do
-        local craftName, craftType, numAvailable, isExpanded = GetTradeSkillInfo(i)
-	local craftItemLink = GetTradeSkillItemLink(i)
-
-	if craftType ~= "header" then
-	  TradeSkillFrame_SetSelection(i)
-	  TradeSkillFrame_Update()
-
-	  -- remember: a craft might just be a skill and not a physical item
-	  TBag:SetItemLink(created, craftItemLink)
-
-	  local numReagents = GetTradeSkillNumReagents(i)
-	  if numReagents > 0 then
-            for j = 1, numReagents do
-              local reagentItemLink = GetTradeSkillReagentItemLink(i,j)
-	      Professions:SetReagentLink(reagent, craftItemLink, tradeskillName, reagentItemLink)
-	    end
-	  end
-        end
+    -- Save the current filters 
+    local numInvFilters = get_count(GetTradeSkillInvSlots())
+    local numSubClasses = get_count(GetTradeSkillSubClasses())
+    local saveInvFilter, saveClassFilter, saveMakeable
+    for i = 0, numInvFilters do
+      if GetTradeSkillInvSlotFilter(i) then
+        saveInvFilter = i
+        break
       end
     end
+    for i = 0, numSubClasses do
+      if GetTradeSkillSubClassFilter(i) then
+        saveClassFilter = i
+        break
+      end
+    end
+    local saveNameFilter = GetTradeSkillItemNameFilter()
+    local saveMinLevel, saveMaxLevel = GetTradeSkillItemLevelFilter()
+
+    -- Wipe the current filters
+    SetTradeSkillInvSlotFilter(0, 1, 1)
+    SetTradeSkillSubClassFilter(0, 1, 1)
+    SetTradeSkillItemLevelFilter(0, 0)
+    SetTradeSkillItemNameFilter("")
+  
+    -- Detect if the OnlyShowMakeable flag was set based on the number of
+    -- trade skills we get.  Since there's no query function for this we
+    -- have to guess if it's there.
+    local origNumTradeSkills = GetNumTradeSkills()
+    TradeSkillOnlyShowMakeable(false)
+    local numTradeSkills = GetNumTradeSkills()
+    if numTradeSkills > origNumTradeSkills then
+      saveMakeable = true
+    else
+      saveMakeable = false
+    end
+
+    -- Iterate the trade skills
+    for i = 1, numTradeSkills do
+      local craftName, craftType, numAvailable, isExpanded = GetTradeSkillInfo(i)
+
+      if craftType == "header" then
+        if not isExpanded then
+          local numTradeSkills = numTradeSkills
+          ExpandTradeSkillSubClass(i)
+          numTradeSkills = GetNumTradeSkills() - numTradeSkills
+          for j = i+1, i+numTradeSkills do
+            add_craft(created, reagent, tradeskillName, j)
+          end
+          CollapseTradeSkillSubClass(i)
+        end
+      else
+        add_craft(created, reagent, tradeskillName, i)
+      end
+    end
+
+    -- Restore the saved filters
+    SetTradeSkillItemNameFilter(saveNameFilter or "")
+    SetTradeSkillItemLevelFilter(saveMinLevel, saveMaxLevel)
+    SetTradeSkillInvSlotFilter(saveInvFilter, 1, 1)
+    SetTradeSkillSubClassFilter(saveClassFilter, 1, 1)
+    TradeSkillOnlyShowMakeable(saveMakeable)
   end
 end
 
