@@ -6,7 +6,6 @@ TBag.Tokens = {}
 local Tokens = TBag.Tokens
 
 function Tokens.GetItemStringFromCurrencyIndex(index)
-  local ttname = "TBag_tt"
   local tt = TBag_tt
 
   if (not tt) then
