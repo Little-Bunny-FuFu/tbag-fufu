@@ -184,6 +184,8 @@ local tests = {
   [45063] = L["TOYS"],
   [45047] = L["TOYS"],
   [45984] = L["TOYS"],
+  [46779] = L["TOYS"],
+  [46780] = L["TOYS"],
 
   -- Mounts
   [33977] = L["MOUNT"],
@@ -616,6 +618,8 @@ local tests = {
   [35625] = L["REAGENT"],
   [35627] = L["REAGENT"],
   [36860] = L["REAGENT"],
+  [45087] = L["REAGENT"],
+  [47556] = L["REAGENT"],
 
   -- Trades
   [8925] = L["ALCHEMY"],
@@ -632,6 +636,12 @@ local tests = {
   [22449] = L["ENCHANTING"],
   [22202] = L["BLACKSMITHING"], -- Similar to enchanting but shouldn't match
   [22203] = L["BLACKSMITHING"], -- ditto
+  [18986] = L["ENGINEERING"],
+  [30544] = L["ENGINEERING"],
+  [18984] = L["ENGINEERING"],
+  [30542] = L["ENGINEERING"],
+  [48933] = L["ENGINEERING"],
+  [47828] = L["ENGINEERING"],
 
   -- Rogue Poisons
   [21835] = string.format(L["%s_REAGENT"],L["ROGUE"]),

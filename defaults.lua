@@ -89,6 +89,8 @@ TBag.DefaultSearchList = {
   { L["TOYS"], L[""], L["Sandbox Tiger"], L[""], L[""] },
   { L["TOYS"], L[""], L["Foam Sword Rack"], L[""], L[""] },
   { L["TOYS"], L[""], L["Unusual Compass"], L[""], L[""] },
+  { L["TOYS"], L[""], L["Path of Cenarius"], L[""], L[""] },
+  { L["TOYS"], L[""], L["Ogre Pinata"], L[""], L[""] },
 
   
   { L["AHN_QIRAJ"], L[""], L["%a+ Scarab"], L["Quest"], L[""] },
@@ -226,6 +228,10 @@ TBag.DefaultSearchList = {
   { L["EXPLOSIVES"], L[""], L["Goblin Fishing Pole"], L[""], L[""] },
   { L["FISHING"], L[""], L["Fishing"], L[""], L[""] },
   { L["FOOD"], L[""], L["Everlasting Underspore Frond"], L["Armor"], L[""] },
+  { L["ENGINEERING"], L[""], L["Ultrasafe Transporter:"], L["Armor"], L[""] },
+  { L["ENGINEERING"], L[""], L["Dimensional Ripper - "], L["Armor"], L[""] },
+  { L["ENGINEERING"], L[""], L["Wormhole Generator:"], L["Armor"], L[""] },
+  { L["ENGINEERING"], L[""], L["Goblin Beam Welder"], L[""], L[""] },
 
   { string.format(L["EQUIPPED_%s"],L["TRINKET"]), L["EQUIPPED"],
     L["Trinket"], L["Trade Goods"], L[""] },
@@ -419,6 +425,8 @@ TBag.DefaultSearchList = {
   { L["REAGENT"], L[""], L["Heart of Darkness"], L["Trade Goods"], L[""]},
   { L["REAGENT"], L[""], L["Sunmote"], L["Trade Goods"], L[""]},
   { L["REAGENT"], L[""], L["Frozen Orb"], L["Trade Goods"], L[""]},
+  { L["REAGENT"], L[""], L["Runed Orb"], L["Trade Goods"], L[""]},
+  { L["REAGENT"], L[""], L["Crusader Orb"], L["Trade Goods"], L[""]},
   { L["REAGENT"], L[""], L["Crystallized %a+"], L["Trade Goods"], L["Elemental"]},
   { L["REAGENT"], L[""], L["Eternal %a+"], L["Trade Goods"], L["Elemental"]},
 
