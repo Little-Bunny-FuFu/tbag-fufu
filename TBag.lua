@@ -1900,41 +1900,21 @@ function TBag:ColorFont(cfg, stock, font, colorname)
 end
 
 function TBag.SetColorFunc(prev)
-  local r,g,b,opacity;
+  local r, g, b, opacity
 
-  r = nil;
-  g = nil;
-  b = nil;
-  opacity = nil;
-
-  if (this:GetName() == "ColorPickerFrame") then
-    r,g,b = this:GetColorRGB();
-    opacity = OpacitySliderFrame:GetValue();
-
-    if (UIDROPDOWNMENU_MENU_VALUE ~= nil) then
-      if ((r ~= nil) and (g ~= nil) and (b ~= nil) and (opacity ~= nil)) then
-        TBag:SetColor(UIDROPDOWNMENU_MENU_VALUE["cfg"],
-          UIDROPDOWNMENU_MENU_VALUE["colorname"],
-          r, g, b, opacity, 1);
-      end
-      UIDROPDOWNMENU_MENU_VALUE["updatefunc"]();
-    end
-
-  elseif (this:GetName() == "OpacitySliderFrame") then
-    opacity = OpacitySliderFrame:GetValue();
-
-    if (UIDROPDOWNMENU_MENU_VALUE ~= nil) then
-      r, g, b, _ = TBag:GetColor(UIDROPDOWNMENU_MENU_VALUE["cfg"],
-          UIDROPDOWNMENU_MENU_VALUE["colorname"]);
-      if ((r ~= nil) and (g ~= nil) and (b ~= nil) and (opacity ~= nil)) then
-        TBag:SetColor(UIDROPDOWNMENU_MENU_VALUE["cfg"],
-          UIDROPDOWNMENU_MENU_VALUE["colorname"],
-          r, g, b, opacity, 1);
-      end
-      UIDROPDOWNMENU_MENU_VALUE["updatefunc"]();
-    end
+  if prev then
+    r, g, b, opacity = prev.r, prev.g, prev.b, prev.opacity
   else
-    return;
+    r, g, b = ColorPickerFrame:GetColorRGB()
+    opacity = OpacitySliderFrame:GetValue()
+  end
+
+  local value = UIDROPDOWNMENU_MENU_VALUE
+  if value then 
+    if r and g and b and opacity then
+      TBag:SetColor(value.cfg, value.colorname, r, g, b, opacity, 1)
+      value.updatefunc()
+    end
   end
 end
 
