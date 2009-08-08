@@ -147,6 +147,7 @@ L["EMPTY_%s_SLOTS"] = false
 L["IN_%s_BAG"] = false
 L["%s_CREATED"] = false
 L["SOULBOUND_%s"] = false
+L["ACCOUNTBOUND_%s"] = false
 L["EQUIPPED_%s"] = false
 L["%s_TOOL"] = false
 L["%s_REAGENT"] = false
@@ -312,6 +313,7 @@ L["BBAG7"] = false
   
 -- Keywords
 L["SOULBOUND"] = false
+L["ACCOUNTBOUND"] = false
 L["EQUIPPED"] = false
 
 -----------------------------------------------------------------------

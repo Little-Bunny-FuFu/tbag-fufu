@@ -113,6 +113,7 @@ L["EMPTY_%s_SLOTS"] = "LEERE_%s_PL\195\132TZE"
 L["IN_%s_BAG"] = "IN_%s_TASCHE"
 L["%s_CREATED"] = "%s_ERSTELLT"
 L["SOULBOUND_%s"] = "SEELENGEBUNDEN_%s"
+L["ACCOUNTBOUND_%s"] = false 
 L["EQUIPPED_%s"] = "ANGELEGT_%s"
 L["%s_TOOL"] = "%s_WERKZEUG"
 L["%s_REAGENT"] = "%s_REAGENZ"
@@ -278,6 +279,7 @@ L["BBAG7"] = "BANKTASCHE7"
   
 -- Keywords
 L["SOULBOUND"] = "SEELENGEBUNDEN"
+L["ACCOUNTBOUND"] = false
 L["EQUIPPED"] = "ANGELEGT"
 
 -----------------------------------------------------------------------

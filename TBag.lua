@@ -1028,6 +1028,27 @@ function TBag:SetDefLayout(cfg, bagarr, row1offset, reset)
   self:SetCatBar(cfg, string.format(L["SOULBOUND_%s"],L["13_OFFHAND"]), 13, reset);
   self:SetCatBar(cfg, string.format(L["SOULBOUND_%s"],L["ARMOR"]), 13, reset);
   self:SetCatBar(cfg, string.format(L["SOULBOUND_%s"],L["WEAPON"]), 13, reset);
+
+  self:SetCatBar(cfg, string.format(L["ACCOUNTBOUND_%s"],L["RELIC"]), 14, reset);
+  self:SetCatBar(cfg, string.format(L["ACCOUNTBOUND_%s"],L["RING"]), 14, reset);
+  self:SetCatBar(cfg, string.format(L["ACCOUNTBOUND_%s"],L["TRINKET"]), 14, reset);
+
+  self:SetCatBar(cfg, string.format(L["ACCOUNTBOUND_%s"],L["01_HEAD"]), 13, reset);
+  self:SetCatBar(cfg, string.format(L["ACCOUNTBOUND_%s"],L["02_NECK"]), 13, reset);
+  self:SetCatBar(cfg, string.format(L["ACCOUNTBOUND_%s"],L["03_SHOULDER"]), 13, reset);
+  self:SetCatBar(cfg, string.format(L["ACCOUNTBOUND_%s"],L["04_BACK"]), 13, reset);
+  self:SetCatBar(cfg, string.format(L["ACCOUNTBOUND_%s"],L["05_CHEST"]), 13, reset);
+  self:SetCatBar(cfg, string.format(L["ACCOUNTBOUND_%s"],L["06_SHIRT"]), 13, reset);
+  self:SetCatBar(cfg, string.format(L["ACCOUNTBOUND_%s"],L["07_TABARD"]), 13, reset);
+  self:SetCatBar(cfg, string.format(L["ACCOUNTBOUND_%s"],L["08_WRIST"]), 13, reset);
+  self:SetCatBar(cfg, string.format(L["ACCOUNTBOUND_%s"],L["09_HANDS"]), 13, reset);
+  self:SetCatBar(cfg, string.format(L["ACCOUNTBOUND_%s"],L["10_WAIST"]), 13, reset);
+  self:SetCatBar(cfg, string.format(L["ACCOUNTBOUND_%s"],L["11_LEGS"]), 13, reset);
+  self:SetCatBar(cfg, string.format(L["ACCOUNTBOUND_%s"],L["12_FEET"]), 13, reset);
+  self:SetCatBar(cfg, string.format(L["ACCOUNTBOUND_%s"],L["13_OFFHAND"]), 13, reset);
+  self:SetCatBar(cfg, string.format(L["ACCOUNTBOUND_%s"],L["ARMOR"]), 13, reset);
+  self:SetCatBar(cfg, string.format(L["ACCOUNTBOUND_%s"],L["WEAPON"]), 13, reset);
+
   self:SetCatBar(cfg, string.format(L["%s_CREATED"],L["TRADE1"]), 13, reset);
   self:SetCatBar(cfg, string.format(L["%s_CREATED"],L["TRADE2"]), 13, reset);
 
@@ -2348,6 +2369,7 @@ function TBag:UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, comparr,
           itm[self.I_KEYWORD] = itmcache[bag][slot][self.I_KEYWORD];
 	  itm[self.I_SOULBOUND] = itmcache[bag][slot][self.I_SOULBOUND];
           itm[self.I_CHARGES] = itmcache[bag][slot][self.I_CHARGES];
+          itm[self.I_ACCTBOUND] = itmcache[bag][slot][self.I_ACCTBOUND];
 
           if (itm[self.I_ITEMLINK] ~= nil) then
             -- there's an item in the bag, let's find out more about it
@@ -2650,8 +2672,12 @@ function TBag:PickBar(cfg, playerid, itm, trade1, trade2)
 
   if (itm[self.I_SOULBOUND] == 1) then
     itm[self.I_KEYWORD][L["SOULBOUND"]] = 1;
+  elseif (itm[self.I_ACCTBOUND]) then
+    itm[self.I_KEYWORD][L["ACCOUNTBOUND"]] = 1;
+  end
 
-    -- Only treat soulbound equipment as equipped
+  if (itm[self.I_SOULBOUND] == 1 or itm[self.I_ACCTBOUND]) then
+    -- Only treat soulbound or accountbound equipment as equipped
     if ( self:GetPlayerInfo(playerid, self.S_EQUIPPED) ~= nil ) then
       if (self:GetPlayerInfo(playerid, self.S_EQUIPPED)[ itemid ] ~= nil) then
       itm[self.I_KEYWORD][L["EQUIPPED"]] = 1;

@@ -159,6 +159,7 @@ L["EMPTY_%s_SLOTS"] = true
 L["IN_%s_BAG"] = true
 L["%s_CREATED"] = true
 L["SOULBOUND_%s"] = true
+L["ACCOUNTBOUND_%s"] = true
 L["EQUIPPED_%s"] = true
 L["%s_TOOL"] = true
 L["%s_REAGENT"] = true
@@ -324,6 +325,7 @@ L["BBAG7"] = true
   
 -- Keywords
 L["SOULBOUND"] = true
+L["ACCOUNTBOUND"] = true
 L["EQUIPPED"] = true
 
 -----------------------------------------------------------------------
