@@ -301,7 +301,7 @@ function Professions.ScanRecipes()
   end
 end
 
-function Professions:MakeTradeCreationKeywords(itm, itemid, docreated)
+function Professions:MakeTradeCreationKeywords(itm, itemid, trade1, trade2, docreated)
   if not itm or not itemid then return end
   if not itm[TBag.I_ITEMLINK] then return end
   local created = TBagCfg[TBag.S_CREATED]
@@ -311,9 +311,15 @@ function Professions:MakeTradeCreationKeywords(itm, itemid, docreated)
       if created[trade][itemid] then
         if docreated == 1 then
           itm[TBag.I_KEYWORD][string.format(L["%s_CREATED"],L[TBag:Cat(trade)])] = 1
-	else
+          if trade == trade1 then
+            itm[TBag.I_KEYWORD][string.format(L["%s_CREATED"],L["TRADE1"])] = 1
+          end
+          if trade == trade2 then
+            itm[TBag.I_KEYWORD][string.format(L["%s_CREATED"],L["TRADE1"])] = 1
+          end
+        else
           itm[TBag.I_KEYWORD][string.format(L["%s_CREATED"],L[TBag:Cat(trade)])] = nil
-	end
+        end
       end
     end
   end
@@ -352,6 +358,6 @@ end
 
 function Professions:MakeAllTradeKeywords(itm, docreated, trade1, trade2)
   local itemid = TBag:GetItemID(itm[TBag.I_ITEMLINK])
-  self:MakeTradeCreationKeywords(itm, itemid, docreated)
+  self:MakeTradeCreationKeywords(itm, itemid, trade1, trade2, docreated)
   self:MakeTradeReagentKeywords(itm, itemid, trade1, trade2)
 end
