@@ -1,3 +1,22 @@
+* 20090810-r342-Shefki
+  Note: This version contains a number of sorting changes the following
+  commands are advised after backing up any modified sorting rules you have.
+  /tinv resetsorts
+  /tbnk resetsorts
+  - Fix for the reset new dropdown menu.
+  - Fix for the reset command line command.
+  - Fix for the cancel button on the color picker.
+  - Improve support for Heirloom items.
+  - Rework profession scanning code to no longer depend upon the blizzard
+    tradeskill UI.
+  - TRADE1_CREATED and TRADE2_CREATED actually work now.
+  - Improve sorting for Darkmoon cards.
+  - Sorting updates for some items added in 3.1 previously missed.
+  - Sorting updates for items added in 3.2.0
+  - Item db update for 3.2.0
+  - deDE update.
+  - TOC bump to mark addon as current.
+
 * 20090417-r324-Shefki
   Note: This version contains a number of sorting changes the following
   commands are advised after backing up any modified sorting rules you have.
