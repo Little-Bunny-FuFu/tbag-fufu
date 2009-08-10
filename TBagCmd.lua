@@ -1,6 +1,6 @@
 -- $Id$
 
-local _G = getfenv(0) 
+local _G = getfenv(0)
 local TBag = _G.TBag
 
 -- Localization support
@@ -43,7 +43,7 @@ end
 
 function TBnk_cmd(msg)
   local cmd, params = TBag:SplitStr(msg," ");
-  
+
   cmd = string.lower(cmd);
 
   if (cmd == L["hide"]) then
@@ -74,7 +74,7 @@ function TBnk_cmd(msg)
     TBag:PrintCachedCharacters();
   elseif (cmd == L["deletechar"]) then
     local char, realm = TBag:SplitStr(params," ");
-    TBag:DeleteCachedCharacter(char,realm); 
+    TBag:DeleteCachedCharacter(char,realm);
   elseif (cmd == L["config"]) then
     TBnk_OptsFrame:Show();
   elseif (cmd == L["getcat"] and TBag.GetCategory and type(TBag.GetCategory) == "function") then
@@ -89,7 +89,7 @@ end
 
 function TInv_cmd(msg)
   local cmd, params = TBag:SplitStr(msg," ");
-  
+
   cmd = string.lower(cmd);
 
   if (cmd == L["hide"]) then
@@ -120,7 +120,7 @@ function TInv_cmd(msg)
     TBag:PrintCachedCharacters();
   elseif (cmd == L["deletechar"]) then
     local char, realm = TBag:SplitStr(params," ");
-    TBag:DeleteCachedCharacter(char,realm); 
+    TBag:DeleteCachedCharacter(char,realm);
   elseif (cmd == L["config"]) then
     TInv_OptsFrame:Show();
   elseif (cmd == L["getcat"] and TBag.GetCategory and type(TBag.GetCategory) == "function") then

@@ -70,7 +70,7 @@ function TBnkOpt_CreateCfgOpt()
 
   TBnk_CfgOpt = {};
 
-  TBag:CreateCfgOpt(TBnk_CfgOpt, TBnkFrame.cfg, TBnkFrame.bags, function () TBnkFrame:UpdateWindow() end, 
+  TBag:CreateCfgOpt(TBnk_CfgOpt, TBnkFrame.cfg, TBnkFrame.bags, function () TBnkFrame:UpdateWindow() end,
     TBnkOpt_ResizeUpdate, TBnkOpt_ForceUpdate);
 
     TBag:CreateNewOpt(TBnk_CfgOpt, TBnkFrame.cfg, function () TBnkFrame:UpdateWindow() end);
@@ -123,7 +123,7 @@ function TBnk_Options_UpdateWindow()
 	if (TBnk_Opts_CurrentPosition > TBnk_Config_MaxScroll) then
 		TBnk_Opts_CurrentPosition = TBnk_Config_MaxScroll;
 	end
-	
+
 	local y, x_start, x_width;
 	local current_Opt = math.floor(TBnk_Opts_CurrentPosition);
 	local fade = 1 - (TBnk_Opts_CurrentPosition - current_Opt);
@@ -144,7 +144,7 @@ function TBnk_Options_UpdateWindow()
 			use_fade = 1;
 		end
 		y = TBag:EnableLine(
-		_G["TBnk_OptsFrame_Line_"..i+1], "TBnk_OptsFrame", 
+		_G["TBnk_OptsFrame_Line_"..i+1], "TBnk_OptsFrame",
           TBnk_Options_FRAME_LINE_HEIGHT, TBnk_OptS_CONTROL_SLIDER_HEIGHT,
           TBnk_CfgOpt[i+current_Opt], y, x_start, x_width, use_fade );
 	end

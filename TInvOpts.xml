@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/"> 
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
   <Script file="TInvOpts.lua"/>
 
   <Slider name="TInv_SliderTemplate" orientation="HORIZONTAL" virtual="true" enableMouse="true">
@@ -113,7 +113,7 @@
     </Frames>
   </Frame>
 
-  <Frame name="TInv_OptsFrame" toplevel="true" frameStrata="MEDIUM" movable="true" enableMouse="true" hidden="true" parent="UIParent"> 
+  <Frame name="TInv_OptsFrame" toplevel="true" frameStrata="MEDIUM" movable="true" enableMouse="true" hidden="true" parent="UIParent">
     <Size><AbsDimension x="800" y="500"/></Size>
     <Anchors>
       <Anchor point="CENTER">
@@ -242,7 +242,7 @@
 	  </OnLoad>
           <OnClick>
             TBag:AssignCats(TInvFrame.cfg, 1);
-            TBag:BuildBarClassList(TInvFrame.BC_LIST, TInvFrame.cfg); 
+            TBag:BuildBarClassList(TInvFrame.BC_LIST, TInvFrame.cfg);
           </OnClick>
         </Scripts>
       </Button>

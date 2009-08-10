@@ -1,13 +1,13 @@
-﻿-- $Id$
+-- $Id$
 
--- localization files should be edited with a utf-8 
+-- localization files should be edited with a utf-8
 -- compatable editor and done so with utf-8 encoding.
 
 -- See localization.template.lua to start a new translation.
 
--- A few of these translations are set to constants from 
+-- A few of these translations are set to constants from
 -- Blizzard's GlobalStrings.lua which should be translated
--- for every locale already.  They should be left to the 
+-- for every locale already.  They should be left to the
 -- constants unless for some reason they are not translated
 -- and need to be.
 
@@ -131,7 +131,7 @@ L["Soulbound"] = true
 L["Account Bound"] = true
 
 -----------------------------------------------------------------------
--- BAG DISPLAY NAMES 
+-- BAG DISPLAY NAMES
 -----------------------------------------------------------------------
 
 L["Keyring"] = true
@@ -278,7 +278,7 @@ L["TRINKET"] = true
 L["ARMOR"] = true
 L["WEAPON"] = true
 L["OTHER"] = true
- 
+
 -- Class Categories
 L["DRUID"] = true
 L["WARLOCK"] = true
@@ -292,7 +292,7 @@ L["HUNTER"] = true
 L["DEATHKNIGHT"] = true
 L["CLASS_TOOL"] = true
 L["CLASS_REAGENT"] = true
-  
+
 -- Short bag type names used for EMPTY_%s_SLOTS and IN_%s_BAG categories
 -- 3-4 characters is about right for these.
 L["QUIV"] = true
@@ -322,7 +322,7 @@ L["BBAG4"] = true
 L["BBAG5"] = true
 L["BBAG6"] = true
 L["BBAG7"] = true
-  
+
 -- Keywords
 L["SOULBOUND"] = true
 L["ACCOUNTBOUND"] = true
@@ -338,7 +338,7 @@ L["Character data cached for:"] = true
 L["Removed cache for %q"] = true
 L["Couldn't find and remove cache for %q"] = true
 -----------------------------------------------------------------------
--- SEARCH OUTPUT STRINGS 
+-- SEARCH OUTPUT STRINGS
 -----------------------------------------------------------------------
 L["Search results for %q:"] = true
 L["No results|r for %q"] = true
@@ -354,7 +354,7 @@ L[" on %s's %s"] = true -- Used when an item is found on a characters body
 L[" as %s's %s"] = true -- Used when an item is used as a container for a character
 
 -----------------------------------------------------------------------
--- HEARTHSTONE 
+-- HEARTHSTONE
 -----------------------------------------------------------------------
 -- These two strings are used to replace the home location on the tooltip
 -- for Hearthstones.  The first string should be translated to match the
@@ -374,7 +374,7 @@ L["%%1%s%%3"] = true
 L["<home location>"] = true
 
 -----------------------------------------------------------------------
--- CHARGES 
+-- CHARGES
 -----------------------------------------------------------------------
 -- Pattern to get the charges from a tooltip
 -- Probably only need to chage the Charges.
@@ -388,13 +388,13 @@ L["(%d+) Charges?"] = true
 L["%d |4Charge:Charges;"] = true
 
 -----------------------------------------------------------------------
--- BINDING STRINGS 
+-- BINDING STRINGS
 -----------------------------------------------------------------------
 L["Toggle Bank Window"] = true
 L["Toggle Inventory Window"] = true
-  
+
 -----------------------------------------------------------------------
--- COMMAND LINE STRINGS 
+-- COMMAND LINE STRINGS
 -----------------------------------------------------------------------
 -- commands
 L["hide"] = true
@@ -464,7 +464,7 @@ L["Unlock Window"] = true
 L["Allow window to be moved by dragging it."] = true
 L["Lock Window"] = true
 L["Prevent window from being moved by dragging it."] = true
-  
+
 L["<++>"] = true
 L["Increase Window Size"] = true
 L["Increase the number of columns displayed"] = true
@@ -484,7 +484,7 @@ L["Keywords"] = true
 L["Tooltip Search"] = true
 L["Type"] = true
 L["SubType"] = true
-  
+
 -- Menus and Tooltips
 L["Main Background Color"] = true
 L["Main Border Color"] = true
@@ -590,7 +590,7 @@ L["Show Keyring Empty Slots (Enable Show above):"] = true
 L["Show Soul Shard Count On Soul Bags:"] = true
 
 -----------------------------------------------------------------------
--- Unit Tests 
+-- Unit Tests
 -----------------------------------------------------------------------
 L["TEST RUN STARTING"] = true
 L[" Retrieving item information"] = true
@@ -599,7 +599,7 @@ L["FAIL: %s (%s) expected %q but got %q"] = true
 L["ALL TESTS SUCCESSFUL"] = true
 
 -----------------------------------------------------------------------
--- Default Search List Strings 
+-- Default Search List Strings
 -----------------------------------------------------------------------
 L["This Item Begins a Quest"] = true
 L["<Right Click to Open>"] = true
@@ -890,3 +890,4 @@ L["Wormhole Generator:"] = true
 L["Goblin Beam Welder"] = true
 L["Runed Orb"] = true
 L["Crusader Orb"] = true
+L["Gnomish Army Knife"] = true

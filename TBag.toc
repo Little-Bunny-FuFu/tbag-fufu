@@ -1,18 +1,18 @@
-﻿## Interface: 30200
+## Interface: 30200
 ## Title: TBag
 ## Notes: The last bag addon you'll ever need.  Autosorting, viewable anywhere, easy to use yet amazingly configurable.
-## Notes-deDE: Das einzige Taschenaddon was du jemals brauchen wirst. Automatisches Sortieren, überall einsehbar, Benutzerfreundlich, dabei aber unglaublich gut Konfigurierbar. 
+## Notes-deDE: Das einzige Taschenaddon was du jemals brauchen wirst. Automatisches Sortieren, überall einsehbar, Benutzerfreundlich, dabei aber unglaublich gut Konfigurierbar.
 ## X-Category: Inventory
 ## Author: Talos, Modified by Shefki
 ## X-Email: shefki@shefki.org
 ## X-Website: http://wow.curse.com/downloads/details/8064/
-## X-Feedback: http://wow.curseforge.com/projects/tbag-shefki/tickets/ 
-## RequiredDeps: 
+## X-Feedback: http://wow.curseforge.com/projects/tbag-shefki/tickets/
+## RequiredDeps:
 ## OptionalDeps: Auctioneer
 ## SavedVariables: TBagCfg, TBagInfo, TBnkItm, TInvItm, TContItm, TBodyItm, TMailItm, TTknItm
 ## X-Localizations: enUS, deDE
 ## X-CompatibleLocales: enUS, deDE
-## 
+##
 stub.lua
 localization.enUS.lua
 localization.deDE.lua

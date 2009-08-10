@@ -34,7 +34,7 @@ end
 
 function TBag:BAG_UPDATE(event, bag)
   local frame, stack
-  if bag then 
+  if bag then
     if TBag:Member(TInvFrame.bags, bag) then
       frame = TInvFrame
       stack = self.STACK_INV
@@ -49,13 +49,13 @@ function TBag:BAG_UPDATE(event, bag)
   if not self:IsStacking(stack) and frame.cfg.stack_auto == 1 and self:IsLive(frame) then
     frame.cfg.stack_once = 1
   end
-  
+
   frame:UpdateWindow()
 end
 
 function TBag:BAG_UPDATE_COOLDOWN(event, bag)
   -- If we're given an argument check if it's a inventory bag and ignore the event
-  -- if it isn't.  If not argument is passed we have to update the window 
+  -- if it isn't.  If not argument is passed we have to update the window
   -- regardless.  /sigh
   if not bag then
     TInvFrame:UpdateWindow()
@@ -90,7 +90,7 @@ function TBag:BANKFRAME_OPENED()
 end
 
 function TBag:BANKFRAME_CLOSED()
-  TBnkFrame.atbank = 0 
+  TBnkFrame.atbank = 0
   TBnkFrame:Hide()
 end
 
@@ -103,7 +103,7 @@ function TBag:PLAYERBANKBAGSLOTS_CHANGED()
 end
 
 function TBag:PLAYER_LEVEL_UP(level)
-  TBagInfo[TBag.PLAYERID][TBag.G_BASIC][TBag.S_LEVEL] = level 
+  TBagInfo[TBag.PLAYERID][TBag.G_BASIC][TBag.S_LEVEL] = level
 end
 
 local events = {

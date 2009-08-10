@@ -4,7 +4,7 @@ TBag ist ein WoW Addon das ein alternatives Interface für Taschen und Bank bere
 Es ist aus einer Modifikation von Engbags entstanden welches praktisch die selben
 Funktionen hat, dabei aber neue Funktionen bereitstellt.
 
-Talos, der eigentliche Autor von TBag sagte dies als er das Addon herausgab: 
+Talos, der eigentliche Autor von TBag sagte dies als er das Addon herausgab:
 
 "Zusätzlich zu der Automatischen Sortierung, welche du sicher schon kennen und lieben gelernt hast
 habe ich viele neue Funktionen hinzugefügt wie zum Beispiel eine Suche nach Items
@@ -33,7 +33,7 @@ TBag kann nur das "sehen" was du bereits gesehen hast, daher ist für jeden Char
 5) Offne alle deine Handelsfenster
 
 Dies Erlaubt dir den Inhalt deiner Taschen und der Bank deiner Charaktere durch Klicken auf das Namensmenü
-oben Links zu jeder Zeit anzusehen (Sortiert nach ihren Berufen) 
+oben Links zu jeder Zeit anzusehen (Sortiert nach ihren Berufen)
 Dies gibt dir auch die Möglichkeit eine vollständige Itemsuche über die Such-Textbox unten links durchzuführen
 
 Todo/Bekannte Fehler
@@ -60,7 +60,7 @@ Todo/Bekannte Fehler
   um sie nützlicher zu machen.
 
 * Lokalisierung.  Das Aufräumen der Übersetzung ist fertig, ich brauche nur Übersetzer.
-  Falls du interessiert bist eine Übersetzung anzufertigen dann Kontaktiere mich auf Curse. 
+  Falls du interessiert bist eine Übersetzung anzufertigen dann Kontaktiere mich auf Curse.
 
 Kontakt
 

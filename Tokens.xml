@@ -53,21 +53,21 @@
             <Offset x="-13" y="0"/>
           </Anchor>
         </Anchors>
-      </Frame> 
+      </Frame>
       <Frame name="$parentToken2" inherits="TBag_TokenButtonTemplate" id="2">
         <Anchors>
           <Anchor point="RIGHT" relativeTo="$parentToken1" relativePoint="LEFT">
             <Offset x="-2" y="0"/>
           </Anchor>
         </Anchors>
-      </Frame> 
+      </Frame>
       <Frame name="$parentToken3" inherits="TBag_TokenButtonTemplate" id="3">
         <Anchors>
           <Anchor point="RIGHT" relativeTo="$parentToken2" relativePoint="LEFT">
             <Offset x="-2" y="0"/>
           </Anchor>
         </Anchors>
-      </Frame> 
+      </Frame>
     </Frames>
     <Scripts>
       <OnShow>

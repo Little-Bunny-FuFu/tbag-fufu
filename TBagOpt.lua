@@ -1,6 +1,6 @@
 -- $Id$
 
-local _G = getfenv(0) 
+local _G = getfenv(0)
 local TBag = _G.TBag
 
 -- Localization Support
@@ -77,7 +77,7 @@ end
 
 function TBag:MakeHeader(cfgopt, text)
   table.insert(cfgopt,  {} );
-  table.insert(cfgopt,  { 
+  table.insert(cfgopt,  {
     { ["type"] = "Text", ["ID"] = 1, ["width"] = 1.0, ["color"] = TBAG_HEADER_COLOR, ["align"] = "center",
       ["text"] = text },
   });
@@ -178,19 +178,19 @@ function TBag:MakeItemSearch(cfgopt, cfg, swapfunc)
         ["param1"] = key, ["param2"] = key+1,
         ["func"] = swapfunc
       },
-      { ["type"] = "Edit", ["ID"] = 1, ["width"] = 0.20, ["letters"]=25, ["param1"] = cfg, ["param2"] = key, ["param3"] = 1, 
+      { ["type"] = "Edit", ["ID"] = 1, ["width"] = 0.20, ["letters"]=25, ["param1"] = cfg, ["param2"] = key, ["param3"] = 1,
       ["defaultValue"] = TBag.GetItemSearchUpper, ["func"] = TBag.AssignItemSearchUpper
       },
-      { ["type"] = "Edit", ["ID"] = 2, ["width"] = 0.18, ["letters"]=25, ["param1"] = cfg, ["param2"] = key, ["param3"] = 2, 
+      { ["type"] = "Edit", ["ID"] = 2, ["width"] = 0.18, ["letters"]=25, ["param1"] = cfg, ["param2"] = key, ["param3"] = 2,
       ["defaultValue"] = TBag.GetItemSearchUpper, ["func"] = TBag.AssignItemSearchUpper
       },
-      { ["type"] = "Edit", ["ID"] = 3, ["width"] = 0.32, ["letters"]=50, ["param1"] = cfg, ["param2"] = key, ["param3"] = 3, 
+      { ["type"] = "Edit", ["ID"] = 3, ["width"] = 0.32, ["letters"]=50, ["param1"] = cfg, ["param2"] = key, ["param3"] = 3,
       ["defaultValue"] = TBag.GetItemSearch, ["func"] = TBag.AssignItemSearch
 },
-      { ["type"] = "Edit", ["ID"] = 4, ["width"] = 0.12, ["letters"]=25, ["param1"] = cfg, ["param2"] = key, ["param3"] = 4, 
+      { ["type"] = "Edit", ["ID"] = 4, ["width"] = 0.12, ["letters"]=25, ["param1"] = cfg, ["param2"] = key, ["param3"] = 4,
       ["defaultValue"] = TBag.GetItemSearch, ["func"] = TBag.AssignItemSearch
       },
-      { ["type"] = "Edit", ["ID"] = 5, ["width"] = 0.08, ["letters"]=25, ["param1"] = cfg, ["param2"] = key, ["param3"] = 5, 
+      { ["type"] = "Edit", ["ID"] = 5, ["width"] = 0.08, ["letters"]=25, ["param1"] = cfg, ["param2"] = key, ["param3"] = 5,
       ["defaultValue"] = TBag.GetItemSearch, ["func"] = TBag.AssignItemSearch
       }
       });
@@ -200,43 +200,43 @@ end
 function TBag:CreateCfgOpt(cfgopt, cfg, bagarr, updatefunc, resizefunc, forcefunc)
   self:MakeHeader(cfgopt, L["Main Sizing Preferences"]);
   self:MakeSlider(cfgopt, L["Number of Item Columns:"],
-    cfg, "maxColumns", self.NUMCOL_MIN, self.NUMCOL_MAX, 1, 
+    cfg, "maxColumns", self.NUMCOL_MIN, self.NUMCOL_MAX, 1,
     forcefunc);
   self:MakeSlider(cfgopt, L["Number of Horizontal Bars:"],
-    cfg, "bar_x", 1, cfg["maxColumns"], 1, 
+    cfg, "bar_x", 1, cfg["maxColumns"], 1,
     forcefunc);
   self:MakeSlider(cfgopt, L["Window Scale:"],
-    cfg, "scale", 0.1, 1.0, 0.05, 
+    cfg, "scale", 0.1, 1.0, 0.05,
     forcefunc);
   self:MakeSlider(cfgopt, L["Item Button Size:"],
-    cfg, "frameButtonSize", self.N_BUTTON_MIN, self.N_BUTTON_MAX, 1, 
+    cfg, "frameButtonSize", self.N_BUTTON_MIN, self.N_BUTTON_MAX, 1,
     resizefunc);
   self:MakeSlider(cfgopt, L["Item Button Padding:"],
-    cfg, "framePad", 0, self.N_SPACE_MAX, 1, 
+    cfg, "framePad", 0, self.N_SPACE_MAX, 1,
     resizefunc);
   self:MakeSlider(cfgopt, L["Spacing - X Button:"],
-    cfg, "frameXSpace", 0, self.N_SPACE_MAX, 1, 
+    cfg, "frameXSpace", 0, self.N_SPACE_MAX, 1,
     resizefunc);
   self:MakeSlider(cfgopt, L["Spacing - Y Button:"],
-    cfg, "frameYSpace", 0, self.N_SPACE_MAX, 1, 
+    cfg, "frameYSpace", 0, self.N_SPACE_MAX, 1,
     resizefunc);
   self:MakeSlider(cfgopt, L["Spacing - X Pool:"],
-    cfg, "frameXPool", 0, self.N_SPACE_MAX, 1, 
+    cfg, "frameXPool", 0, self.N_SPACE_MAX, 1,
     resizefunc);
   self:MakeSlider(cfgopt, L["Spacing - Y Pool:"],
-    cfg, "frameYPool", 0, self.N_SPACE_MAX, 1, 
+    cfg, "frameYPool", 0, self.N_SPACE_MAX, 1,
     resizefunc);
   self:MakeSlider(cfgopt, L["Count Font Size:"],
-    cfg, "count_font", self.N_FONT_MIN, self.N_FONT_MAX, 1, 
+    cfg, "count_font", self.N_FONT_MIN, self.N_FONT_MAX, 1,
     resizefunc);
   self:MakeSlider(cfgopt, L["Count Placement - X:"],
-    cfg, "count_font_x", 0, self.N_BUTTON_MAX, 1, 
+    cfg, "count_font_x", 0, self.N_BUTTON_MAX, 1,
     resizefunc);
   self:MakeSlider(cfgopt, L["Count Placement - Y:"],
-    cfg, "count_font_y", 0, self.N_BUTTON_MAX, 1, 
+    cfg, "count_font_y", 0, self.N_BUTTON_MAX, 1,
     resizefunc);
   self:MakeSlider(cfgopt, L["New Tag Font Size:"],
-    cfg, "new_font", self.N_FONT_MIN, self.N_FONT_MAX, 1, 
+    cfg, "new_font", self.N_FONT_MIN, self.N_FONT_MAX, 1,
     resizefunc);
 
   local bag;

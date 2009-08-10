@@ -34,7 +34,7 @@ function Hooks.Register(reg)
   local funcs = Hooks.funcs
   local scripts = Hooks.scripts
   local savedfuncs = Hooks.savedfuncs
-  
+
   if (reg == Hooks.REGISTER) then
     for _,funcname in ipairs(funcs) do
       local ourfunc = Hooks[funcname]
@@ -121,12 +121,12 @@ hooksecurefunc('CloseAllWindows', CloseAllWindows)
 function Hooks.OpenBag(bag)
   TBag:PrintDEBUG("event: OpenBag("..bag..")")
   local mainFrame
-  if TBag:Member(TInvFrame.bags,bag) then 
+  if TBag:Member(TInvFrame.bags,bag) then
     mainFrame = TInvFrame
   else
     mainFrame = TBnkFrame
   end
-  
+
   if mainFrame.cfg["show_Bag"..bag] ~= 1 then
     TBag:GetBagFrame(bag):SetChecked(true)
   end
@@ -153,14 +153,14 @@ function Hooks.ToggleBag(bag)
   end
   local isBagShown = mainFrame.cfg["show_Bag"..bag] == 1
   local isVisible = mainFrame:IsVisible()
-  
+
   -- If the frame is already visible and the bag is set to
   -- always be shown just hide the frame.
   if isVisible and isBagShown then
     mainFrame:Hide()
     return
   end
-  
+
   -- Toggle the checked state of the bag frame if the
   -- bag isn't  permanetly set to be shown, this will
   -- toggle the shown state of the Bag.
@@ -168,7 +168,7 @@ function Hooks.ToggleBag(bag)
     local bagFrame = TBag:GetBagFrame(bag)
     bagFrame:SetChecked(not bagFrame:GetChecked())
   end
-  
+
   -- If the frame was already visible when we started
   -- force an update, otherwise show it which will
   -- force an update for us.
@@ -217,9 +217,9 @@ function Hooks.OpenAllBags()
 	inv_bag_toggled = true
       end
     end
-  end 
+  end
 
-  if inv_bag_toggled then 
+  if inv_bag_toggled then
     inv_shown = true
     TInvFrame:Show()
     if TInvFrame.CACHE_REQ > TBag.REQ_NONE then
@@ -232,7 +232,7 @@ function Hooks.OpenAllBags()
   -- Toggle the normally hidden bank bags based on
   -- if the inventory is hidden or shown
   if TBnkFrame:IsVisible() then
-    for _, bag in ipairs(TBnkFrame.bags) do 
+    for _, bag in ipairs(TBnkFrame.bags) do
       if TBnkFrame.cfg["show_Bag"..bag] ~= 1 then
         local bagframe = TBag:GetBagFrame(bag)
 	if bagframe:GetChecked() ~= inv_shown then
@@ -244,7 +244,7 @@ function Hooks.OpenAllBags()
     end
   end
 
-  if bnk_bag_toggled then 
+  if bnk_bag_toggled then
     TBnkFrame:UpdateWindow(TBag.REQ_PART)
   end
 
@@ -253,10 +253,10 @@ end
 
 function Hooks.ContainerFrameItemButton_OnModifiedClick(self, button, ...)
   TBag:PrintDEBUG("event: ItemButton_OnModifiedClick self="..self:GetName())
- 
+
   -- Original func
   local func = Hooks.savedfuncs["ContainerFrameItemButton_OnModifiedClick"]
-  
+
   -- Get the itm and ultimately know if it's one of our buttons
   local itm = TBag:GetItmFromFrame(TBag.BUTTONS, self)
   if not itm then return func(self, button, ...) end

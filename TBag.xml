@@ -13,7 +13,7 @@
     <Size>
       <AbsDimension x="64" y="64"/>
     </Size>
-  </Texture>  
+  </Texture>
 
   <Frame name="TBagainerFrameTemplate" frameStrata="MEDIUM" enableMouse="true" virtual="true">
     <Size>
@@ -21,7 +21,7 @@
     </Size>
   </Frame>
 
-  <Frame name="TBag_BarFrameTemplate" toplevel="false" frameStrata="MEDIUM" movable="false" enableMouse="false" hidden="true" virtual="true"> 
+  <Frame name="TBag_BarFrameTemplate" toplevel="false" frameStrata="MEDIUM" movable="false" enableMouse="false" hidden="true" virtual="true">
     <Size><AbsDimension x="200" y="46"/></Size>
     <Anchors>
       <Anchor point="BOTTOMRIGHT">
@@ -70,7 +70,7 @@
         self:ClearFocus();
       </OnEscapePressed>
       <OnEnterPressed>
-        if (self:GetText() ~= "") then    
+        if (self:GetText() ~= "") then
 	  TBag:DoSearch(self:GetText());
 	end
         self:ClearFocus();

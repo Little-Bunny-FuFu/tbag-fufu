@@ -1,6 +1,6 @@
--- $Id$ 
+-- $Id$
 
-local _G = getfenv(0) 
+local _G = getfenv(0)
 local TBag = _G.TBag
 TBag.Bank = {}
 local Bank = TBag.Bank
@@ -93,7 +93,7 @@ function Bank:init(reset)
   self.bags = TBag.Bnk_Bags
 
   self.CACHE_REQ = TBag.REQ_NONE
-  
+
   self.cfg = nil;
   self.BARITM = {};
   self.hilight_new = 0;
@@ -117,11 +117,11 @@ function Bank:init(reset)
 
 
   TBag:Init();
-  
+
   self.cfg = TBagCfg["Bnk"]
   local cfg = self.cfg
   self.atbank = 0
-  
+
   if ( TBnk_WIPECONFIGONLOAD == 1 ) then
     cfg = {};
   end
@@ -148,7 +148,7 @@ function Bank:init(reset)
 
   -- load default values
   self:InitDefVals(reset);
-  
+
   self:CalcButtonSize(cfg["frameButtonSize"], cfg["framePad"]);
 
   for _, bag in ipairs(self.bags) do
@@ -157,7 +157,7 @@ function Bank:init(reset)
   self:InitBagGfx()
 
   self:SetReplaceBank();
-  
+
   if (cfg["moveLock"] == 0) then
     TBnkLockNorm:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Locked-Up");
     TBnkLockPush:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Locked-Down");
@@ -207,7 +207,7 @@ function Bank:init(reset)
   TBag:BuildBarClassList(self.BC_LIST, cfg);
 
   -- Do one sorting to init the baritm array
-  self.BARITM = TBag:SortItmCache(cfg, 
+  self.BARITM = TBag:SortItmCache(cfg,
     self.playerid, TBnkItm[self.playerid], self.BARITM, self.bags);
   TBag:LayoutWindow(self)
 end
@@ -220,13 +220,13 @@ function Bank:UpdatePurchaseGfx()
   else
     MoneyFrame_Update("TBnk_SlotCostFrame", 0);
   end
-  
+
   if (self.atbank == 1 and not full and self.cfg["show_purchasetoggle"] == 1) then
     TBnk_Button_ShowPurchase:Show()
   else
     TBnk_Button_ShowPurchase:Hide()
   end
-	
+
   TBag:PrintDEBUG("Bank:UpdatePurchaseGfx: "..numSlots..", "..cost);
   TBag:PrintDEBUG("Bank:UpdatePurchaseGfx: "..self.cfg["show_purchase_button"]..", "..self.atbank..", "..self.edit_mode);
 
@@ -270,12 +270,12 @@ function Bank:UpdateBagGfx()
     bag = i + 4;
 
     TBag:UpdateBagColors(bag);
- 
+
     TBag:GetBagFrameTexture(bag):SetTexture(
       TBag:GetBagTexture(self.playerid, bag));
 
     local free, size = TBag:UpdateSlots(self.playerid, bag, self.cfg["show_bag_sizes"]);
-   
+
     totalfree = totalfree + free;
     totalsize = totalsize + size;
   end
@@ -288,9 +288,9 @@ function Bank:InitBagGfx()
   -- Spoof the bank
   local button = TBnkFrameBagBank;
   SetItemButtonTextureVertexColor(button, 1.0,1.0,1.0, 1.0);
-  TBag:GetBagFrameTexture(BANK_CONTAINER):SetTexture( 
+  TBag:GetBagFrameTexture(BANK_CONTAINER):SetTexture(
         TBag:GetBagTexture(TBnkFrame.playerid, BANK_CONTAINER));
-	
+
 
   for i=1, NUM_BANKBAGSLOTS do
     button = _G["TBnkFrameBag"..i];
@@ -353,7 +353,7 @@ end
 
 function Bank.Button_Reload_OnClick()
   -- To avoid cleaning the bank cache, you only can reload bags at bank.
-  if (TBnkFrame.atbank==1) then  
+  if (TBnkFrame.atbank==1) then
     -- Hell, let's be paranoid
     if (TBnkFrame.playerid == TBag.PLAYERID) then
       TBag:ClearItmCache(TBnkItm[TBnkFrame.playerid], TBnkFrame.bags);
@@ -587,12 +587,12 @@ function Bank:SetBottomLeftButton_Anchors()
     TBnkFrameBag4:ClearAllPoints()
     TBnkFrameBag4:SetPoint("BOTTOMLEFT",TBnkFrameBagBank,"TOPLEFT",0,3);
   else
-    -- Now separate row required 
+    -- Now separate row required
     TBnkFrameBag4:ClearAllPoints()
     TBnkFrameBag4:SetPoint("BOTTOMLEFT",TBnkFrameBag3,"BOTTOMRIGHT",3,0);
   end
 
-  -- Figure the number of columns needed to require a row for the 
+  -- Figure the number of columns needed to require a row for the
   -- slot purchase controls.
   local slotpurchase_row = 0;
   if (TBnkFrameBagBank:IsVisible()) then
@@ -612,7 +612,7 @@ function Bank:SetBottomLeftButton_Anchors()
     TBnk_SlotCostFrame:ClearAllPoints();
     TBnk_SlotCostFrame:SetPoint("RIGHT",TBnk_PurchaseButton,"LEFT",10,0);
   else
-    -- No separate row is required 
+    -- No separate row is required
 
     -- Since the bag buttons show and hide together the previous button
     -- is really the last bag button not the one in button_left.
@@ -627,7 +627,7 @@ function Bank:SetBottomLeftButton_Anchors()
     else
       TBnk_SlotCostFrame:SetPoint("BOTTOMLEFT",TBnkFrame,"BOTTOMLEFT",10,12);
     end
-    
+
     -- Set the anchor for the PurchaseButton
     TBnk_PurchaseButton:ClearAllPoints();
     TBnk_PurchaseButton:SetPoint("LEFT",TBnk_SlotCostFrame,"RIGHT",-10,0);
@@ -639,7 +639,7 @@ function Bank:SetBottomRightButton_Anchors()
   local buttons = {
     "TBnkFrame_MoneyFrame",
     "TBnkFrame_TokenFrame",
-  } 
+  }
   local button_right = nil
 
   for _, button_name in ipairs(buttons) do
@@ -659,7 +659,7 @@ function Bank:SetBottomRightButton_Anchors()
         button_right = button
       end
     end
-  end 
+  end
 end
 
 function Bank:SetButton_Anchors()
@@ -680,9 +680,9 @@ function Bank.Toggle_CloseButton()
     TBnkFrame.cfg["show_closebutton"] = 1;
     TBnk_Button_Close:Show();
     TBnkFrame:SetButton_Anchors();
-  end 
-end 
-  
+  end
+end
+
 function Bank.Toggle_LockButton()
   if (TBnkFrame.cfg["show_lockbutton"] == 1) then
     TBnkFrame.cfg["show_lockbutton"] = 0;
@@ -693,8 +693,8 @@ function Bank.Toggle_LockButton()
     TBnk_Button_MoveLockToggle:Show();
     TBnkFrame:SetButton_Anchors();
   end
-end 
-    
+end
+
 function Bank.Toggle_HighlightButton()
   if (TBnkFrame.cfg["show_hilightbutton"] == 1) then
     TBnkFrame.cfg["show_hilightbutton"] = 0;
@@ -704,9 +704,9 @@ function Bank.Toggle_HighlightButton()
     TBnkFrame.cfg["show_hilightbutton"] = 1;
     TBnk_Button_HighlightToggle:Show();
     TBnkFrame:SetButton_Anchors();
-  end 
-end   
-        
+  end
+end
+
 function Bank.Toggle_EditButton()
   if (TBnkFrame.cfg["show_editbutton"] == 1) then
     TBnkFrame.cfg["show_editbutton"] = 0;
@@ -717,8 +717,8 @@ function Bank.Toggle_EditButton()
     TBnk_Button_ChangeEditMode:Show();
     TBnkFrame:SetButton_Anchors();
   end
-end 
-    
+end
+
 function Bank.Toggle_ReloadButton()
   if (TBnkFrame.cfg["show_reloadbutton"] == 1) then
     TBnkFrame.cfg["show_reloadbutton"] = 0;
@@ -812,7 +812,7 @@ function Bank.Toggle_Purchase()
     TBnkFrame:SetButton_Anchors();
   else
     TBnkFrame.cfg["show_purchasetoggle"] = 1;
-    local _, full = TBag:GetNumBankSlots(TBnkFrame.playerid);   
+    local _, full = TBag:GetNumBankSlots(TBnkFrame.playerid);
     if (TBnkFrame.atbank == 1 and not full)  then
       TBnk_Button_ShowPurchase:Show();
       TBnkFrame:SetButton_Anchors();
@@ -966,7 +966,7 @@ function Bank.RightClickMenu_populate(self, level)
     [TBag.SORTBY_NORM] = L["Sort by name"],
     [TBag.SORTBY_REV] = L["Sort last words first"]
     }) do
-  
+
     if (TBag:GetGrp(TBnkFrame.cfg, TBag.G_BAR_SORT, bar) == key) then
       checked = 1;
     else
@@ -977,7 +977,7 @@ function Bank.RightClickMenu_populate(self, level)
   ["value"] = { [TBag.I_BAR]=bar, ["sortby"]=key };
   ["func"] = function()
     TBag:SetGrpDef(TBnkFrame.cfg, TBag.G_BAR_SORT, this.value[TBag.I_BAR], this.value["sortby"], 1);
-    TBnkFrame:UpdateWindow(TBag.REQ_MUST);    
+    TBnkFrame:UpdateWindow(TBag.REQ_MUST);
   end,
   ["checked"] = checked
   };
@@ -1170,7 +1170,7 @@ function Bank.RightClickMenu_populate(self, level)
     info = { ["disabled"] = 1 };
     UIDropDownMenu_AddButton(info, level);
 
-    
+
     info = {
       ["text"] = L["Set Size"];
       ["value"] = { ["opt"]="set_scale" },
@@ -1191,27 +1191,27 @@ function Bank.RightClickMenu_populate(self, level)
       info = { ["disabled"] = 1 };
       UIDropDownMenu_AddButton(info, level);
 
-      info = {      
+      info = {
         ["text"] = L["Anchor"];
         ["value"] = { ["opt"]="anchor" },
         ["hasArrow"] = 1
-        };  
+        };
       UIDropDownMenu_AddButton(info, level);
-      
+
       info = { ["disabled"] = 1 };
       UIDropDownMenu_AddButton(info, level);
-      
+
       info = {
         ["text"] = L["Hide"];
         ["value"] = { ["opt"]="hide_frames" },
         ["hasArrow"] = 1
         };
       UIDropDownMenu_AddButton(info, level);
-      
+
       info = { ["disabled"] = 1 };
       UIDropDownMenu_AddButton(info, level);
 
-      
+
     elseif (level == 2) then
       if (UIDROPDOWNMENU_MENU_VALUE ~= nil) then
         if (UIDROPDOWNMENU_MENU_VALUE["opt"] == "set_scale") then
@@ -1221,7 +1221,7 @@ function Bank.RightClickMenu_populate(self, level)
               ["value"] = value;
               ["func"] = function()
                 if ( (type(this.value) == "number") and (this.value >= TBag.N_BUTTON_MIN) ) then
-                    TBnkFrame.cfg["frameButtonSize"], TBnkFrame.cfg["count_font"], 
+                    TBnkFrame.cfg["frameButtonSize"], TBnkFrame.cfg["count_font"],
                       TBnkFrame.cfg["count_font_x"], TBnkFrame.cfg["count_font_y"],
                       TBnkFrame.cfg["scale"] = TBag:NicePlacement(this.value);
                   TBnkFrame:CalcButtonSize(TBnkFrame.cfg["frameButtonSize"], TBnkFrame.cfg["framePad"]);
@@ -1259,7 +1259,7 @@ function Bank.RightClickMenu_populate(self, level)
           if (TBnkFrame.cfg["frameXRelativeTo"] == "RIGHT" and
               TBnkFrame.cfg["frameYRelativeTo"] == "TOP") then
             info["checked"] = 1;
-          end 
+          end
           UIDropDownMenu_AddButton(info, level);
           info = {
             ["text"] = L["BOTTOMLEFT"];            ["func"] = function ()
@@ -1438,7 +1438,7 @@ function Bank:UpdateWindow(resort_req)
   -- Setup stackarr and comparr
   local stackarr = TBag:CreateStackArr();
   local comparr = TBag:CreateCompArr();
-  
+
   -- Always set the class cats for this player's class
   TBag:SetClassCats(self.cfg, self.playerid, 1);
   local cache_req = TBag:UpdateItmCache(self.cfg, self.playerid, TBnkItm[self.playerid], self.bags, stackarr, comparr, self.atbank);
@@ -1495,7 +1495,7 @@ function Bank:UpdateWindow(resort_req)
     if (self.playerid == TBag.PLAYERID) then
       type = "PLAYER"
     end
-    MoneyFrame_SetType(TBnkFrame_MoneyFrame,type)	    
+    MoneyFrame_SetType(TBnkFrame_MoneyFrame,type)
     MoneyFrame_Update("TBnkFrame_MoneyFrame", TBag:GetMoney(self.playerid));
   end
   TBnkFrame:UpdatePurchaseGfx();

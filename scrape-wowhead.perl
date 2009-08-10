@@ -236,7 +236,7 @@ sub parse_data {
 
   my ($contain_data) = $content =~ /^new Listview\(\{template:\s+'$template',\s+id:\s+'$section_id'.*?data:\s+\[(.*?)\]\}\)\;$/m;
   return $contain_data;
-}		
+}
 
 # Go through all the items made by a given trade and record their
 # item ids and the item ids of their reagents into the hash.
@@ -279,7 +279,7 @@ sub scrape_trade_items {
 	output_trades('TradeCreations',\%TBag_TradeCreations);
 	output_reagents();
 }
-			           
+
 ############
 ### Main ###
 ############

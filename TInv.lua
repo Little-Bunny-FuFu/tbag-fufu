@@ -1,6 +1,6 @@
 -- $Id$
 
-local _G = getfenv(0) 
+local _G = getfenv(0)
 local TBag = _G.TBag
 TBag.Inv = {}
 local Inv = TBag.Inv
@@ -42,7 +42,7 @@ function Inv:SetDefPos(cfg, reset)
   TBag:SetDef(cfg, "frameXRelativeTo", "LEFT", reset, TBag.StrFunc, {"RIGHT","LEFT"} );
   TBag:SetDef(cfg, "frameYRelativeTo", "BOTTOM", reset, TBag.StrFunc, {"TOP","BOTTOM"} );
 end
-  
+
 -- set reset to 1 to restore all default values
 function Inv:InitDefVals(reset)
   local i, key, value;
@@ -68,10 +68,10 @@ function Inv:InitDefVals(reset)
   TBag:SetDefColors(cfg, reset);
 
   self:SetDefPos(cfg, reset);
-  
+
   TBag:SetDef(cfg, "show_searchbox", 1, reset, TBag.NumFunc, 0, 1);
   TBag:SetDef(cfg, "show_bankbutton", 1, reset, TBag.NumFunc, 0, 1);
-  
+
 end
 
 function Inv:SetPlayer(playerid)
@@ -136,7 +136,7 @@ function Inv:init(reset)
   self.BGF_WIDTH = 38;
   self.BGF_HEIGHT = 38;
 
- 
+
   TBag:Init();
   self.cfg = TBagCfg["Inv"];
   local cfg = self.cfg
@@ -177,19 +177,19 @@ function Inv:init(reset)
   TBag.Hooks.Register(TBag.Hooks.UNREGISTER);
   TBag.Hooks.Register(TBag.Hooks.REGISTER);
 
-  -- Setup the token system 
+  -- Setup the token system
   TBag.Tokens.Enable()
   TBag.Tokens.Scan()
 
   if (cfg["moveLock"] == 0) then
-    TInvLockNorm:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Locked-Up"); 
-    TInvLockPush:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Locked-Down"); 
+    TInvLockNorm:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Locked-Up");
+    TInvLockPush:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Locked-Down");
   else
-    TInvLockNorm:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Unlocked-Up"); 
-    TInvLockPush:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Unlocked-Down"); 
+    TInvLockNorm:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Unlocked-Up");
+    TInvLockPush:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Unlocked-Down");
   end
 
-  
+
   if (cfg["show_bagbuttons"] == 0) then
     TInvacterBag0Slot:Hide();
     TInvacterBag1Slot:Hide();
@@ -241,7 +241,7 @@ function Inv:init(reset)
   TBag:ClearItmCache(TInvItm[self.playerid], self.bags);
   TBag:UpdateItmCache(cfg, self.playerid, TInvItm[self.playerid], self.bags);
 
-  self.BARITM = TBag:SortItmCache(cfg, 
+  self.BARITM = TBag:SortItmCache(cfg,
     self.playerid, TInvItm[self.playerid], self.BARITM, self.bags);
   TBag:LayoutWindow(self)
 end
@@ -254,7 +254,7 @@ function Inv:UpdateBagGfx()
   for _, bag in ipairs(self.bags) do
     local free, size = TBag:UpdateSlots(self.playerid, bag, cfg["show_bag_sizes"]);
     local bagtype = TBag:GetBagType(self.playerid, bag);
-    -- Don't count ammo, quivers or keyring slots as empty slots 
+    -- Don't count ammo, quivers or keyring slots as empty slots
     -- quivers are type 1, ammo type 2, soul type 4 and keyring 256
     if (bagtype == nil or (type(bagtype) == "number" and  bit.band(263,bagtype) == 0)) then
       totalfree = totalfree + free;
@@ -267,11 +267,11 @@ function Inv:UpdateBagGfx()
       totalfree = totalfree + free;
       totalsize = totalsize + size;
     end
-  
+
     -- Update the textures as well
     TBag:GetBagFrameTexture(bag):SetTexture(
         TBag:GetBagTexture(self.playerid, bag));
-      
+
     if (bag > 0) then
       -- Deal with the count of soulshards in a soulbag.
       if (cfg["show_soulshard_count"] == 1) then
@@ -306,7 +306,7 @@ function Inv.Button_HighlightToggle_OnClick(self)
                                  L["Highlight items marked as new."]);
       end
     end
-    return;    
+    return;
   elseif (TInvFrame.hilight_new == 0) then
     TInvFrame.hilight_new = 1;
     if (GameTooltip:GetOwner() == TInv_Button_HighlightToggle) then
@@ -359,16 +359,16 @@ function Inv.Button_MoveLockToggle_OnClick(self)
   PlaySound("igMainMenuOptionCheckBoxOn");
   if (TInvFrame.cfg["moveLock"] == 0) then
     TInvFrame.cfg["moveLock"] = 1;
-    TInvLockNorm:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Unlocked-Up"); 
-    TInvLockPush:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Unlocked-Down"); 
+    TInvLockNorm:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Unlocked-Up");
+    TInvLockPush:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Unlocked-Down");
     if (GameTooltip:GetOwner() == TInv_Button_MoveLockToggle) then
-      GameTooltip_AddNewbieTip(self, L["Lock Window"], 1.0, 1.0, 1.0, 
+      GameTooltip_AddNewbieTip(self, L["Lock Window"], 1.0, 1.0, 1.0,
                                L["Prevent window from being moved by dragging it."]);
     end
   else
     TInvFrame.cfg["moveLock"] = 0;
-    TInvLockNorm:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Locked-Up"); 
-    TInvLockPush:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Locked-Down"); 
+    TInvLockNorm:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Locked-Up");
+    TInvLockPush:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Locked-Down");
     if (GameTooltip:GetOwner() == TInv_Button_MoveLockToggle) then
       GameTooltip_AddNewbieTip(self, L["Unlock Window"], 1.0, 1.0, 1.0,
                                L["Allow window to be moved by dragging it."]);
@@ -388,7 +388,7 @@ function Inv.BagSlotButton_OnEnter(self)
   else
     GameTooltip:AddLine(L["Equip Container"], 1,1,1);
   end
-  
+
   GameTooltip:Show();
 end
 
@@ -408,10 +408,10 @@ function Inv:SetTopLeftButton_Anchors()
     dropdown:SetPoint("TOPLEFT",TInvFrame,"TOPLEFT",-10,-5);
     button_left = dropdown;
   end
-  
+
   for _,button_name in ipairs(buttons) do
     button = _G[button_name];
-    if (button) then 
+    if (button) then
       button:ClearAllPoints();
       if (button_left) then
         if (button_left == dropdown) then
@@ -441,7 +441,7 @@ function Inv:SetTopRightButton_Anchors()
 
   for _,button_name in ipairs(buttons) do
     local button = _G[button_name];
-    if (button) then 
+    if (button) then
       if (button_right) then
         button:SetPoint("TOPRIGHT",button_right,"TOPLEFT",10,0);
       else
@@ -475,11 +475,11 @@ function Inv:SetBottomLeftButton_Anchors()
 
   for _,button_name in ipairs(buttons) do
     button = _G[button_name];
-    if (button) then 
+    if (button) then
       button:ClearAllPoints();
       if (button_left) then
         if (button_left == search) then
-          -- First button after search 
+          -- First button after search
           button:SetPoint("BOTTOMLEFT",button_left,"TOPLEFT",0,4);
         else
           -- button following another button
@@ -698,7 +698,7 @@ function Inv.RightClick_DeleteItemOverride()
 
   if ( (bag ~= nil) and (slot ~= nil) ) then
     itm = TInvItm[TInvFrame.playerid][bag][slot];
-    
+
     if (itm[TBag.I_ITEMLINK] ~= nil) then
       local id = TBag:GetItemID(itm[TBag.I_ITEMLINK]);
       if TInvFrame.cfg["item_overrides"][id] ~= nil then
@@ -897,21 +897,21 @@ function Inv.RightClickMenu_populate(self, level)
 
     info = { ["disabled"] = 1 };
     UIDropDownMenu_AddButton(info, level);
-    
+
     info = { ["text"] = L["Hide Bar:"], ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
     UIDropDownMenu_AddButton(info, level);
-  
+
     for key,value in pairs({
       [0] = L["Show items assigned to this bar"],
       [1] = L["Hide items assigned to this bar"]
       }) do
-    
+
       if (TBag:GetGrp(TInvFrame.cfg, TBag.G_BAR_HIDE, bar) == key) then
         checked = 1;
       else
         checked = nil;
       end
-  
+
       info = {
         ["text"] = value;
         ["value"] = { [TBag.I_BAR]=bar, ["value"]=key };
@@ -920,7 +920,7 @@ function Inv.RightClickMenu_populate(self, level)
 	  TBnkFrame:UpdateWindow();
       end,
     ["checked"] = checked
-    }; 
+    };
       UIDropDownMenu_AddButton(info, level);
     end
 
@@ -1086,7 +1086,7 @@ function Inv.RightClickMenu_populate(self, level)
       info = { ["disabled"] = 1 };
       UIDropDownMenu_AddButton(info, level);
 
-      
+
       info = {
         ["text"] = L["Set Size"];
         ["value"] = { ["opt"]="set_scale" },
@@ -1137,7 +1137,7 @@ function Inv.RightClickMenu_populate(self, level)
               ["value"] = value;
               ["func"] = function()
                   if ( (type(this.value) == "number") and (this.value >= TBag.N_BUTTON_MIN) ) then
-                    TInvFrame.cfg["frameButtonSize"], TInvFrame.cfg["count_font"], 
+                    TInvFrame.cfg["frameButtonSize"], TInvFrame.cfg["count_font"],
                       TInvFrame.cfg["count_font_x"], TInvFrame.cfg["count_font_y"],
                       TInvFrame.cfg["scale"] = TBag:NicePlacement(this.value);
 		    TInvFrame:CalcButtonSize(TInvFrame.cfg["frameButtonSize"], TInvFrame.cfg["framePad"]);
@@ -1343,7 +1343,7 @@ function Inv:UpdateWindow(resort_req)
 
 --  UpdateAddOnMemoryUsage();
 --  TBag:PrintDEBUG('TInv_UpdateWindow Start Memory = '..tostring(GetAddOnMemoryUsage("TBag")));
-  
+
   -- Set the overall scale
   self:SetScale(self.cfg["scale"]);
 
@@ -1359,7 +1359,7 @@ function Inv:UpdateWindow(resort_req)
   -- Setup stackarr and comparr
   local stackarr = TBag:CreateStackArr();
   local comparr = TBag:CreateCompArr();
-  
+
   -- SORTING and ITEMCACHE
   if (resort_req == nil) then resort_req = TBag.REQ_NONE; end
   local cache_req = TBag:UpdateItmCache(self.cfg, self.playerid, TInvItm[self.playerid], self.bags,stackarr,comparr);
@@ -1378,8 +1378,8 @@ function Inv:UpdateWindow(resort_req)
   end
 
   if (resort_req >= TBag.REQ_MUST) then
-    self.CACHE_REQ = TBag.REQ_NONE 
-    self.BARITM = TBag:SortItmCache(self.cfg, 
+    self.CACHE_REQ = TBag.REQ_NONE
+    self.BARITM = TBag:SortItmCache(self.cfg,
       self.playerid, TInvItm[self.playerid], self.BARITM, self.bags);
     TBag:LayoutWindow(self)
   else if (cache_req > self.CACHE_REQ) then
@@ -1428,7 +1428,7 @@ function Inv:UpdateWindow(resort_req)
       self.cfg["frame"..self.cfg["frameXRelativeTo"]] / frame:GetScale(),
       self.cfg["frame"..self.cfg["frameYRelativeTo"]] / frame:GetScale());
 
-    
+
     TBag:ColorFrame(self.cfg, frame, TBag.MAIN_BAR);
 
     if (self.edit_mode == 1) then
@@ -1440,7 +1440,7 @@ function Inv:UpdateWindow(resort_req)
     end
 
   self:SetButton_Anchors();
-  
+
   Inv.WindowIsUpdating = 0;
 --  UpdateAddOnMemoryUsage();
 --  TBag:PrintDEBUG('TInv_UpdateWindow End Memory = '..tostring(GetAddOnMemoryUsage("TBag")));

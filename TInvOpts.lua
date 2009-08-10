@@ -73,7 +73,7 @@ function TInvOpt_CreateCfgOpt()
   TInv_CfgOpt = {};
 
   TBag:CreateCfgOpt(TInv_CfgOpt, TInvFrame.cfg, TInvFrame.bags, function ()
-    TInvFrame:UpdateWindow() end, 
+    TInvFrame:UpdateWindow() end,
     TInvOpt_ResizeUpdate, TInvOpt_ForceUpdate);
 
   TBag:MakeCheck(TInv_CfgOpt, L["Alt Key Auto-Pickup:"],
@@ -86,7 +86,7 @@ function TInvOpt_CreateCfgOpt()
 
   TBag:MakeCheck(TInv_CfgOpt, L["Show Soul Shard Count On Soul Bags:"],
     TInvFrame.cfg, "show_soulshard_count", TInvOpt_ResizeUpdate);
-    
+
     TBag:CreateNewOpt(TInv_CfgOpt, TInvFrame.cfg, function () TInvFrame:UpdateWindow() end);
 
   TBag:MakeItemSearchHeader(TInv_CfgOpt);
@@ -130,7 +130,7 @@ function TInv_Options_UpdateWindow()
 	if (TInv_Opts_CurrentPosition > TInv_Config_MaxScroll) then
 		TInv_Opts_CurrentPosition = TInv_Config_MaxScroll;
 	end
-	
+
 	local y, x_start, x_width;
 	local current_opt = math.floor(TInv_Opts_CurrentPosition);
 	local fade = 1 - (TInv_Opts_CurrentPosition - current_opt);
@@ -151,8 +151,8 @@ function TInv_Options_UpdateWindow()
 			use_fade = 1;
 		end
 		y = TBag:EnableLine(
-		_G["TInv_OptsFrame_Line_"..i+1], "TInv_OptsFrame", 
-          TINVOPT_FRAME_LINE_HEIGHT, TINV_OPTS_CONTROL_SLIDER_HEIGHT, 
+		_G["TInv_OptsFrame_Line_"..i+1], "TInv_OptsFrame",
+          TINVOPT_FRAME_LINE_HEIGHT, TINV_OPTS_CONTROL_SLIDER_HEIGHT,
           TInv_CfgOpt[i+current_opt], y, x_start, x_width, use_fade );
 	end
 

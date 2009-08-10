@@ -1,10 +1,10 @@
 This is the long awaited update to TBag that fixes a number of bugs.
 
 TBag is a WoW Addon that provides an alternative bag and bank interface.  It was
-built by modifying Engbags an addon who has essnetially the same functionality 
+built by modifying Engbags an addon who has essnetially the same functionality
 is missing some of the features of TBag.
 
-Talos the original author of TBag has this to say about it when he released it: 
+Talos the original author of TBag has this to say about it when he released it:
 
 "In addition to the auto-sorting you've come to know and love, I've added many new
 features, including searching for items (in mail, etc.) You can also see and use
@@ -33,7 +33,7 @@ TBag can only "see" something you've seen, so for every character:
 This allows you to view the bag and bank contents of your characters at any time
 (sorted according to their trade skills) by clicking the name dropdown in the
 upper left. It also enables you to do a full item search from the search
-textbox in the lower left corner of the bagframe. 
+textbox in the lower left corner of the bagframe.
 
 Todo/Known Issues
 
@@ -55,10 +55,10 @@ Todo/Known Issues
   clean out and review of essentially every single line.  There is a lot of code
   duplication that is unnecessary.  While this is something I might like to do, it
   is *NOT* a priority.  My major priorities are fixing annoying bugs and tweaking
-  features to be more useful.  
+  features to be more useful.
 
 * Localization.  Localization cleanup is complete, just need translators.  If
-  you're interested in translating contact me on Curse. 
+  you're interested in translating contact me on Curse.
 
 Contacting Me
 

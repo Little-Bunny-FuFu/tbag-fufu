@@ -35,15 +35,15 @@ function MainFrame:IncreaseColumns()
     self.cfg.maxColumns = self.cfg.maxColumns + 1
     self:UpdateWindow(TBag.REQ_MUST)
   end
-end 
-    
+end
+
 function MainFrame:DecreaseColumns()
   if self.cfg.maxColumns > TBag.NUMCOL_MIN then
     self.cfg.maxColumns = self.cfg.maxColumns - 1
     self:UpdateWindow(TBag.REQ_MUST)
   end
 end
-  
+
 function MainFrame:DragStart()
   if not self.isMoving and self.cfg.moveLock == 1 then
     -- Raise the window and turn off top level while dragging.
@@ -65,7 +65,7 @@ function MainFrame:DragStop()
 
     self:StopMovingOrSizing()
     self.isMoving = false
-  
+
     -- save the position
     local scale = self:GetScale()
     self.cfg.frameLEFT   = self:GetLeft()   * scale
@@ -94,7 +94,7 @@ end
 function MainFrame:OnHide()
   PlaySound("igBackPackClose")
   self:DragStop()
-  
+
   -- Unhighlight any bags that are still highlighted.
   for _, bag in ipairs(self.bags) do
     local bagframe = TBag:GetBagFrame(bag)
@@ -104,19 +104,19 @@ function MainFrame:OnHide()
     end
   end
   TBag:UpdateButtonHighlights()
- 
+
   if self.atbank and self.atbank == 1 then
     self.atbank = 0
     CloseBankFrame()
   end
-  
+
   -- Always reset to the global player for event processing
   self:SetPlayer(TBag.PLAYERID)
 end
 
 function MainFrame:OnShow()
   PlaySound("igBackPackOpen")
-  
+
   -- Always default to the current player
   self:SetPlayer(TBag.PLAYERID)
   self.edit_mode = 0
@@ -124,7 +124,7 @@ function MainFrame:OnShow()
   if self == TBnkFrame then
     TInvFrame:Show()
   end
-  
+
   self:UpdateWindow(TBag.REQ_PART)
 
   -- Bring ourselves to the top

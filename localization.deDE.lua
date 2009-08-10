@@ -1,4 +1,4 @@
-﻿-- $Id$
+-- $Id$
 
 -- German translation maintained by Dessa <dessa@gmake.de>.
 
@@ -25,23 +25,23 @@ L["Fishing"] = GetSpellInfo(7620)
 L["First Aid"] = GetSpellInfo(3273)
 
 -- Primary professions
-L["Alchemy"] = GetSpellInfo(2259) 
-L["Blacksmithing"] = GetSpellInfo(2018) 
-L["Enchanting"] = GetSpellInfo(7411) 
-L["Engineering"] = GetSpellInfo(4036) 
-L["Jewelcrafting"] = GetSpellInfo(25229) 
-L["Leatherworking"] = GetSpellInfo(2108) 
-L["Tailoring"] = GetSpellInfo(3908) 
-L["Inscription"] = GetSpellInfo(45357) 
+L["Alchemy"] = GetSpellInfo(2259)
+L["Blacksmithing"] = GetSpellInfo(2018)
+L["Enchanting"] = GetSpellInfo(7411)
+L["Engineering"] = GetSpellInfo(4036)
+L["Jewelcrafting"] = GetSpellInfo(25229)
+L["Leatherworking"] = GetSpellInfo(2108)
+L["Tailoring"] = GetSpellInfo(3908)
+L["Inscription"] = GetSpellInfo(45357)
 
 -- Gathering
-L["Skinning"] = GetSpellInfo(8613) 
-L["Mining"] = GetSpellInfo(2575) 
-L["Herbalism"] = GetSpellInfo(9134) 
+L["Skinning"] = GetSpellInfo(8613)
+L["Mining"] = GetSpellInfo(2575)
+L["Herbalism"] = GetSpellInfo(9134)
 
 -- Other skills
-L["Lockpicking"] = GetSpellInfo(1809) 
-L["Runeforging"] = GetSpellInfo(53428) 
+L["Lockpicking"] = GetSpellInfo(1809)
+L["Runeforging"] = GetSpellInfo(53428)
 
 -----------------------------------------------------------------------
 -- ITEM TYPES
@@ -85,7 +85,7 @@ L["Soulbound"] = ITEM_SOULBOUND
 L["Account Bound"] = ITEM_ACCOUNTBOUND
 
 -----------------------------------------------------------------------
--- BAG DISPLAY NAMES 
+-- BAG DISPLAY NAMES
 -----------------------------------------------------------------------
 
 L["Keyring"] = KEYRING
@@ -113,7 +113,7 @@ L["EMPTY_%s_SLOTS"] = "LEERE_%s_PL\195\132TZE"
 L["IN_%s_BAG"] = "IN_%s_TASCHE"
 L["%s_CREATED"] = "%s_ERSTELLT"
 L["SOULBOUND_%s"] = "SEELENGEBUNDEN_%s"
-L["ACCOUNTBOUND_%s"] = false 
+L["ACCOUNTBOUND_%s"] = "ACCOUNTGEBUNDEN_%s"
 L["EQUIPPED_%s"] = "ANGELEGT_%s"
 L["%s_TOOL"] = "%s_WERKZEUG"
 L["%s_REAGENT"] = "%s_REAGENZ"
@@ -232,7 +232,7 @@ L["TRINKET"] = "SCHMUCK"
 L["ARMOR"] = "R\195\156STUNG"
 L["WEAPON"] = "WAFFE"
 L["OTHER"] = "ANDERE"
- 
+
 -- Class Categories
 L["DRUID"] = "DRUIDE"
 L["WARLOCK"] = "HEXENMEISTER"
@@ -246,7 +246,7 @@ L["HUNTER"] = "J\195\132GER"
 L["DEATHKNIGHT"] = "TODESRITTER"
 L["CLASS_TOOL"] = "KLASSENWERKZEUG"
 L["CLASS_REAGENT"] = "KLASSENREAGENZ"
-  
+
 -- Short bag type names used for EMPTY_%s_SLOTS and IN_%s_BAG categories
 -- 3-4 characters is about right for these.
 L["QUIV"] = "K\195\150CH"
@@ -276,10 +276,10 @@ L["BBAG4"] = "BANKTASCHE4"
 L["BBAG5"] = "BANKTASCHE5"
 L["BBAG6"] = "BANKTASCHE6"
 L["BBAG7"] = "BANKTASCHE7"
-  
+
 -- Keywords
 L["SOULBOUND"] = "SEELENGEBUNDEN"
-L["ACCOUNTBOUND"] = false
+L["ACCOUNTBOUND"] = "ACCOUNTGEBUNDEN"
 L["EQUIPPED"] = "ANGELEGT"
 
 -----------------------------------------------------------------------
@@ -287,14 +287,14 @@ L["EQUIPPED"] = "ANGELEGT"
 -----------------------------------------------------------------------
 
 L["%sSetting keybind to %q"] = "%sSetze Tastenk\195\188rzel auf %q"
-L["Unassigned category %s has been assigned to slot 1"] = 
-      "Unzugeordnete Kategorie %s wurde dem Slot 1 zugewiesen" 
+L["Unassigned category %s has been assigned to slot 1"] =
+      "Unzugeordnete Kategorie %s wurde dem Slot 1 zugewiesen"
 L["Character data cached for:"] = "Charakterdaten gespeichert f\195\188r:"
 L["Removed cache for %q"] = "Cache gel\195\182scht f\195\188r %q"
-L["Couldn't find and remove cache for %q"] = 
-      "Kann den Cache nicht finden f\195\188r %q"       
+L["Couldn't find and remove cache for %q"] =
+      "Kann den Cache nicht finden f\195\188r %q"
 -----------------------------------------------------------------------
--- SEARCH OUTPUT STRINGS 
+-- SEARCH OUTPUT STRINGS
 -----------------------------------------------------------------------
 L["Search results for %q:"] = "Suchergebnis f\195\188r %q:"
 L["No results|r for %q"] = "Keine Ergebnisse|r f\195\188r %q"
@@ -310,7 +310,7 @@ L[" on %s's %s"] = " an %s's %s" -- Used when an item is found on a characters b
 L[" as %s's %s"] = " als %s's %s" -- Used when an item is used as a container for a character
 
 -----------------------------------------------------------------------
--- HEARTHSTONE 
+-- HEARTHSTONE
 -----------------------------------------------------------------------
 -- These two strings are used to replace the home location on the tooltip
 -- for Hearthstones.  The first string should be translated to match the
@@ -330,7 +330,7 @@ L["%%1%s%%3"] = "%%1%s%%3"
 L["<home location>"] = "<Heimatort>"
 
 -----------------------------------------------------------------------
--- CHARGES 
+-- CHARGES
 -----------------------------------------------------------------------
 -- Pattern to get the charges from a tooltip
 -- Probably only need to chage the Charges.
@@ -344,13 +344,13 @@ L["(%d+) Charges?"] = "(%d+) Aufladung?n?"
 L["%d |4Charge:Charges;"] = "%d |4Aufladung:Aufladungen;"
 
 -----------------------------------------------------------------------
--- BINDING STRINGS 
+-- BINDING STRINGS
 -----------------------------------------------------------------------
 L["Toggle Bank Window"] = "Zeige Bankfester"
 L["Toggle Inventory Window"] = "Zeige Inventarfester"
-  
+
 -----------------------------------------------------------------------
--- COMMAND LINE STRINGS 
+-- COMMAND LINE STRINGS
 -----------------------------------------------------------------------
 -- commands
 L["hide"] = "hide"
@@ -440,7 +440,7 @@ L["Keywords"] = "Schl\195\188sselw\195\182rter"
 L["Tooltip Search"] = "Tooltip Suche"
 L["Type"] = "Typ"
 L["SubType"] = "SubTyp"
-  
+
 -- Menus and Tooltips
 L["Main Background Color"] = "Allgemeine Hintergrundfarbe"
 L["Main Border Color"] = "Allgemeine Randfarbe"
@@ -546,7 +546,7 @@ L["Show Keyring Empty Slots (Enable Show above):"] = "Zeige leere Pl\195\164tze 
 L["Show Soul Shard Count On Soul Bags:"] = "Zeige Seelensplitter Anzahl auf Seelentaschen:"
 
 -----------------------------------------------------------------------
--- Unit Tests 
+-- Unit Tests
 -----------------------------------------------------------------------
 L["TEST RUN STARTING"] = "TESTLAUF STARTET"
 L[" Retrieving item information"] = " Frage Gegenstandsinformationen ab"
@@ -555,7 +555,7 @@ L["FAIL: %s (%s) expected %q but got %q"] = "FEHLGESCHLAGEN: %s (%s) erwartet %q
 L["ALL TESTS SUCCESSFUL"] = "ALLE TESTS ERFOLGREICH"
 
 -----------------------------------------------------------------------
--- Default Search List Strings 
+-- Default Search List Strings
 -----------------------------------------------------------------------
 L["This Item Begins a Quest"] = ITEM_STARTS_QUEST
 L["<Right Click to Open>"] = ITEM_OPENABLE
@@ -565,8 +565,8 @@ L["Mark of Thrallmar"] = "Abzeichen von Thrallmar"
 L["Halaa Battle Token"] = "Kampfmarke von Halaa"
 L["Spirit Shard"] = "Geistsplitter"
 L["Use: Permanently"] = "Benutzen: .*dauerhaft"
-L["Hearthstone%s"] = "Ruhestein"
-L["Right Click to summon and dismiss"] = "Mit Rechtsklick .* beschw\195\182ren und freigeben%." 
+L["Hearthstone%s"] = "Ruhestein%s"
+L["Right Click to summon and dismiss"] = "Mit Rechtsklick .* beschw\195\182ren und freigeben%."
 L["Summons or dismisses a Spirit of"] = "Beschw\195\182rt einen .*[gG]eist"
 L["Use: Teaches you how to summon a?n?d? ?d?i?s?m?i?s?s? ?this companion."] = "Benutzen: Lehrt Euch, wie man diese[ns] [GH][ea][fu].+[ht][ri][te][er]n? beschw\195\182rt.*"
 L["Requires Riding %("] = "Ben\195\182tigt Reiten %("
@@ -601,8 +601,8 @@ L["Small Furry Paw"] = "Kleine pelzige Tatze"
 L["Evil Bat Eye"] = "B\195\182ses Fledermausauge"
 L["Torn Bear Pelt"] = "Zerrissener B\195\164renpelz"
 L["Glowing Scorpid Blood"] = "Leuchtendes Skorpidblut"
-L["Property of the Darkmoon Faire."] = "Eigentum des Dunkelmond%-Jahrmarkts" 
-L["Combine the %a+ through %a+ of %a+ to complete the set."] = "Vereint alle Karten vom %a+ bis zur %a+ de[sr] %a+, um das Set zu vervollst\195\164ndigen." 
+L["Property of the Darkmoon Faire."] = "Eigentum des Dunkelmond%-Jahrmarkts"
+L["Combine the %a+ through %a+ of %a+ to complete the set."] = "Vereint alle Karten vom %a+ bis zur %a+ de[sr] %a+"
 L["Incendosaur Scale"] = "Incendosaurierschuppe"
 L["Dark Iron Residue"] = "Dunkeleisenr\195\188ckst\195\164nde"
 L["Deadwood Headdress Feather"] = "Kopfputzfeder der Totenwaldfelle"
@@ -721,14 +721,14 @@ L[" Mortar"] = "[%a+]*[Mm]\195\182rser"
 L["Scroll"] = "Rolle"
 L["Use: Increases "] = "Benutzen: Erh\195\182ht "
 L["Use: Absorbs "] = "Benutzen: Absorbiert "
-L["Use: Regenerate "] = "Benutzen: .* regenerieren" 
+L["Use: Regenerate "] = "Benutzen: .* regenerieren"
 L["Use: While applied to target weapon"] = "bei Anwendung auf eine Waffe"
 L[" Sharpening Stone"] = "[%a+]*[Ww]etzstein"
 L[" Weightstone"] = "[%a+]*[Gg]ewichtsstein"
 L["Mistletoe"] = "Mistelzweig"
 L["Flame Cap"] = "Flammenkappe"
-L["[AG][li][lv][oe]w?s the [Ii]mbiber "] = "[Dd]e[rm] Anwender" 
-L[" Key"] = ".*[Ss]chl\195\188ssel" 
+L["[AG][li][lv][oe]w?s the [Ii]mbiber "] = "[Dd]e[rm] Anwender"
+L[" Key"] = ".*[Ss]chl\195\188ssel"
 L["Light Feather"] = "Leichte Feder"
 L["Infernal Stone"] = "H\195\182llenstein"
 L["Demonic Figurine"] = "D\195\164monenstatuette"
@@ -761,7 +761,7 @@ L["Sunmote"] = "Sonnenpartikel"
 L["Heart of Darkness"] = "Herz der Dunkelheit"
 L[" Vial"] = "[Pp]hiole"
 L["[cC]loth"] = "[sS]toff"
-L["Coats a weapon with poison that lasts for"] = "\195\156berzieht eine Waffe mit Gift" 
+L["Coats a weapon with poison that lasts for"] = "\195\156berzieht eine Waffe mit Gift"
 L["Raw "] = "%s?[Rr]oher "
 L["[Ff]ish"] = "[Ff]isch"
 L[" Meat"] = "%a+%s?[Ff]leisch"
@@ -815,7 +815,7 @@ L["Titanium Seal of Dalaran"] = "Titansiegel von Dalaran"
 L["Frozen Orb"] = "Gefrorene Kugel"
 L["Crystallized %a+"] = "Kristallisierte?[rs] %a+"
 L["Eternal %a+"] = "\195\132onen%a+"
-L["Virtuoso Inking Set"] = "Kaiserliches Schreibzeug"
+L["Virtuoso Inking Set"] = "Schreibzeug des Virtuosen"
 L["Ink"] = "%a+tinte"
 L[" Parchment"] = "Pergament"
 L[" Pigment"] = "[Pp]igmente"
@@ -824,25 +824,26 @@ L["Copper Racer"] = "Kupferflitzer"
 L["Toy Train Set"] = "Spielzeugzug"
 L["Engineer's Ink"] = "Ingenieurstinte"
 L["Rickety Magic Broom"] = "Maroder Zauberbesen"
-L["Iron Boot Flask"] = "Eiserner Flachmann" 
-L["Zapthrottle Mote Extractor"] = "Schockdrosselnder Partikelextraktor" 
-L["Wand of Holiday Cheer"] = "Zauberstab der Festtagsfreude" 
-L["Rolls a pair of dice"] = "W\195\188rfelt" 
-L["Blessed Medallion of Karabor"] = "Gesegnetes Medaillon von Karabor" 
+L["Iron Boot Flask"] = "Eiserner Flachmann"
+L["Zapthrottle Mote Extractor"] = "Schockdrosselnder Partikelextraktor"
+L["Wand of Holiday Cheer"] = "Zauberstab der Festtagsfreude"
+L["Rolls a pair of dice"] = "W\195\188rfelt"
+L["Blessed Medallion of Karabor"] = "Gesegnetes Medaillon von Karabor"
 L["Frenzyheart Brew"] = "Wildherzenbier"
-L["Tiny Green Ragdoll"] = "Winzige gr\195\188ne Stoffpuppe" 
+L["Tiny Green Ragdoll"] = "Winzige gr\195\188ne Stoffpuppe"
 L["Festival Firecracker"] = "Festtagsknallfrosch"
 L["Elder's Moonstone"] = "Mondstein der Urahnen"
 L["Wind%-Up Train Wrecker"] = "Aufziehbarer Zugzerst\195\182rer"
 L["Sandbox Tiger"] = "Sandkastentiger"
 L["Foam Sword Rack"] = "Schaumstoffschwertst\195\164nder"
-L["Unusual Compass"] = "Ungew\195\182hnlicher Kompass" 
-L["Blossoming Branch"] = "Bl\195\188hender Zweig" 
-L["Path of Cenarius"] = false
-L["Ogre Pinata"] = false
-L["Ultrasafe Transporter:"] = false 
-L["Dimensional Ripper - "] = false 
-L["Wormhole Generator:"] = false 
-L["Goblin Beam Welder"] = false 
-L["Runed Orb"] = false 
-L["Crusader Orb"] = false 
+L["Unusual Compass"] = "Ungew\195\182hnlicher Kompass"
+L["Blossoming Branch"] = "Bl\195\188hender Zweig"
+L["Path of Cenarius"] = "Pfad des Cenarius"
+L["Ogre Pinata"] = "Ogerpinata"
+L["Ultrasafe Transporter:"] = "Extrem sicherer Transporter:"
+L["Dimensional Ripper - "] = "Dimensionszerfetzer:"
+L["Wormhole Generator:"] = "Wurmlochgenerator"
+L["Goblin Beam Welder"] = "Goblinisches Lichtbogenschwei\195\159ger\195\164t"
+L["Runed Orb"] = "Runenbeschriebene Kugel"
+L["Crusader Orb"] = "Kugel des Kreuzfahrers"
+L["Gnomish Army Knife"] = "Gnomisches Armeemesser"

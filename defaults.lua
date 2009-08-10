@@ -92,7 +92,7 @@ TBag.DefaultSearchList = {
   { L["TOYS"], L[""], L["Path of Cenarius"], L[""], L[""] },
   { L["TOYS"], L[""], L["Ogre Pinata"], L[""], L[""] },
 
-  
+
   { L["AHN_QIRAJ"], L[""], L["%a+ Scarab"], L["Quest"], L[""] },
   { L["AHN_QIRAJ"], L[""], L["%a+ Idol"], L["Quest"], L[""] },
   { L["AHN_QIRAJ"], L[""], L["Qiraji %a+ %a+"], L["Quest"], L[""] },
@@ -220,6 +220,7 @@ TBag.DefaultSearchList = {
   { L["TRADE_TOOL"], L[""], L["Herbalist's Gloves"], L[""], L[""] },
   { L["TRADE_TOOL"], L[""], L["Virtuoso Inking Set"], L[""], L[""] },
   { L["TRADE_TOOL"], L[""], L["Zapthrottle Mote Extractor"], L[""], L[""] },
+  { L["TRADE_TOOL"], L[""], L["Gnomish Army Knife"], L[""], L[""] },
   { string.format(L["EQUIPPED_%s"],L["WEAPON"]), L["EQUIPPED"],
     L[""], L["Dwarven Fishing Pole"], L[""] },
   { string.format(L["SOULBOUND_%s"],L["WEAPON"]), L["SOULBOUND"],

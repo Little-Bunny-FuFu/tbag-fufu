@@ -2,7 +2,7 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/"   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"   xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
   <Script file="TBnk.lua"/>
 
-  <Frame name="TBnkFrame" inherits="TBag_MainTemplate"> 
+  <Frame name="TBnkFrame" inherits="TBag_MainTemplate">
     <Frames>
       <Button name="TBnk_Button_Close">
         <Size><AbsDimension x="34" y="34"/></Size>
@@ -196,7 +196,7 @@
             self:SetID(BANK_CONTAINER)
           </OnLoad>
         </Scripts>
-      </CheckButton> 
+      </CheckButton>
       <CheckButton name="TBnkFrameBag1" inherits="TBag_BagButtonTemplate" id="5">
         <Anchors>
           <Anchor point="LEFT" relativeTo="TBnkFrameBagBank" relativePoint="RIGHT">
@@ -293,7 +293,7 @@
           <OnLoad>
             -- Copy the width of the Blizzard Purchase Button since we're using their
             -- text for our text in case they change it for different locales in the
-            -- code.  However, we should be set above in the XML to the one used in 
+            -- code.  However, we should be set above in the XML to the one used in
             -- the English locales anyway.
             if (BankFramePurchaseButton) then
               self:SetWidth(BankFramePurchaseButton:GetWidth());

@@ -1,8 +1,8 @@
 <!-- $Id$ -->
 <Ui xmlns="http://www.blizzard.com/wow/ui/"   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"   xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
-  <Script file="TInv.lua"/> 
+  <Script file="TInv.lua"/>
 
-  <Frame name="TInvFrame" inherits="TBag_MainTemplate"> 
+  <Frame name="TInvFrame" inherits="TBag_MainTemplate">
     <Frames>
       <Button name="TInv_Button_Close">
         <Size><AbsDimension x="34" y="34"/></Size>
@@ -18,7 +18,7 @@
         </Anchors>
         <Scripts>
           <OnClick>
-            TInvFrame:Hide() 
+            TInvFrame:Hide()
           </OnClick>
         </Scripts>
       </Button>
@@ -228,7 +228,7 @@
           </Anchor>
         </Anchors>
       </CheckButton>
-      
+
 
       <CheckButton name="TInvMenuBarBackpackButton" inherits="TBag_BagButtonTemplate" id="0">
         <Anchors>
@@ -238,7 +238,7 @@
             </Offset>
           </Anchor>
         </Anchors>
-      </CheckButton> 
+      </CheckButton>
 
       <CheckButton name="TInvingButton" hidden="false" inherits="TBag_BagButtonTemplate">
         <Anchors>
@@ -274,5 +274,5 @@
         </Scripts>
       </Frame>
     </Frames>
-  </Frame> 
+  </Frame>
 </Ui>

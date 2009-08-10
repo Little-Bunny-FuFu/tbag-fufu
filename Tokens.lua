@@ -1,5 +1,5 @@
 -- $Id$
-local _G = getfenv(0) 
+local _G = getfenv(0)
 local TBag = _G.TBag
 local L = TBag.LOCALE
 TBag.Tokens = {}
@@ -42,7 +42,7 @@ function Tokens.SetItmFromCurrencyIndex(index,itm)
   itm[TBag.I_TYPE] = extraType
   itm[TBag.I_ICON] = icon
   if not isHeader and extraType == 0 and count > 0 then
-    itm[TBag.I_ITEMLINK] = Tokens.GetItemStringFromCurrencyIndex(index)	
+    itm[TBag.I_ITEMLINK] = Tokens.GetItemStringFromCurrencyIndex(index)
   end
   return true
 end
@@ -51,7 +51,7 @@ local scanning = false
 function Tokens.Scan()
   if scanning then return end
   scanning = true
-  
+
   local n = 0
   if not TTknItm[TBag.PLAYERID] then
     TTknItm[TBag.PLAYERID] = {}
@@ -90,7 +90,7 @@ end
 function Tokens.UpdateTokenButtonFromItm(button, itm, playerid)
   -- Update watched tokens
   if itm[TBag.I_NAME] then
-    button.extraCurrencyType = itm[TBag.I_TYPE] 
+    button.extraCurrencyType = itm[TBag.I_TYPE]
     button.itemstring = itm[TBag.I_ITEMLINK]
     button.count_val = itm[TBag.I_COUNT]
     if itm[TBag.I_TYPE]  == 1 then --Arena points
@@ -136,7 +136,7 @@ function Tokens.Update(frame)
       i = i + 1
     end
     if i > MAX_WATCHED_TOKENS then return end
-  end 
+  end
   for n = i, MAX_WATCHED_TOKENS do
     _G[framename.."Token"..n]:Hide()
     if n == 1 then

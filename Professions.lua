@@ -47,7 +47,7 @@ Professions.skills = {
 -- names to English for storage.
 local RL = {}
 for _,v in pairs(Professions.trades) do
-  RL[L[v]] = v 
+  RL[L[v]] = v
 end
 for _,v in pairs(Professions.seconds) do
   RL[L[v]] = v
@@ -106,13 +106,13 @@ function Professions:GetTwoProfessions(playerid)
     TRADE2 = TRADE1
     TRADE1 = k
   end
-  return TRADE1, TRADE2 
+  return TRADE1, TRADE2
 end
 
 function Professions:GetTradeType(trade)
   if TBag:Member(self.trades, trade) then
     return TBag.S_SECOND
-  elseif TBag:Member(self.seconds, trade) then 
+  elseif TBag:Member(self.seconds, trade) then
     return TBag.S_TRADES
   else
     return TBag.S_SKILLS
@@ -120,7 +120,7 @@ function Professions:GetTradeType(trade)
 end
 
 function Professions:GetTradeCreated(trade)
-  if not TBagCfg[TBag.S_CREATED] then	
+  if not TBagCfg[TBag.S_CREATED] then
     TBagCfg[TBag.S_CREATED] = {}
     TBagCfg[TBag.S_CREATED][TBag.S_VERSION] = self.DB_VERSION
   end
@@ -170,7 +170,7 @@ end
 
 function Professions:ScanAllTradeRanks()
   if scanningTrades then return end
-  local player = TBag:GetPlayer(TBag.PLAYERID) 
+  local player = TBag:GetPlayer(TBag.PLAYERID)
   player[TBag.S_TRADES] = player[TBag.S_TRADES] or {}
   player[TBag.S_SECOND] = player[TBag.S_SECOND] or {}
   for _,v in ipairs(self.trades) do
@@ -201,7 +201,7 @@ local function trade_skill_tooltip_scan(i, j)
   end
   tt:SetOwner(UIParent, "ANCHOR_NONE")  -- this makes sure that tooltip.valid = true
   tt:ClearLines()
-   
+
   tt:SetTradeSkillItem(i, j)
   local _,link = tt:GetItem()
   return link
@@ -211,7 +211,7 @@ local function add_craft(created, reagent, tradeskillName, i)
   -- Note we can't use GetTradeSkillItemLink() or GetTradeSkillReagentItemLink()
   -- because it will return nil if the item is already cached.  We can use the
   -- tooltip because it'll give us enough of the link to get what we want.
-  local craftItemLink = trade_skill_tooltip_scan(i) 
+  local craftItemLink = trade_skill_tooltip_scan(i)
   if not craftItemLink then return end
   TBag:SetItemLink(created, craftItemLink)
 
@@ -227,7 +227,7 @@ local function get_count(...)
   return select('#', ...)
 end
 
-function Professions.ScanRecipes() 
+function Professions.ScanRecipes()
   -- Get the name of the tradeskill and reverse it to enUS
   local tradeskillName = RL[GetTradeSkillLine()]
 
@@ -236,7 +236,7 @@ function Professions.ScanRecipes()
     local created = Professions:GetTradeCreated(tradeskillName)
     local reagent = Professions:GetReagents()
 
-    -- Save the current filters 
+    -- Save the current filters
     local numInvFilters = get_count(GetTradeSkillInvSlots())
     local numSubClasses = get_count(GetTradeSkillSubClasses())
     local saveInvFilter, saveClassFilter, saveMakeable
@@ -260,7 +260,7 @@ function Professions.ScanRecipes()
     SetTradeSkillSubClassFilter(0, 1, 1)
     SetTradeSkillItemLevelFilter(0, 0)
     SetTradeSkillItemNameFilter("")
-  
+
     -- Detect if the OnlyShowMakeable flag was set based on the number of
     -- trade skills we get.  Since there's no query function for this we
     -- have to guess if it's there.

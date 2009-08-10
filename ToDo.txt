@@ -24,9 +24,9 @@ Memory Usage
     Make sure to prefix mail and body slot info
   Fix timestamps / rarity on empty slots
   Do we need bag type per slot?
-  Make Item Link extract 8 numbers, and shorten and expand from :0  
+  Make Item Link extract 8 numbers, and shorten and expand from :0
     Get rid of item: prefix?
-  
+
 
 Test key ring
   This Item Begins a Quest not working
@@ -62,7 +62,7 @@ Sleek mode without bags or buttons etc.
 
 Need to close and disable clicking bags on alternate views, maybe highlight
 
-Allow drag and drop onto bank icon, also do highlighting 
+Allow drag and drop onto bank icon, also do highlighting
 
 Get locked appearance to work properly with CT_MailMod
 
@@ -83,7 +83,7 @@ Hmmm... they auto allocate
 6-11 = BankBags
 
 AuctionsItemButton
-AuctionFramePostAuctionItem on 
+AuctionFramePostAuctionItem on
 AuctionFramePost
 AuctionFrameAuctions
 

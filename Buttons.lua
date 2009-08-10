@@ -1,7 +1,7 @@
 -- $Id$
 -- Implementation of the base templates for various buttons.
 
-local _G = getfenv(0) 
+local _G = getfenv(0)
 local TBag = _G.TBag
 local L = TBag.LOCALE
 
@@ -23,14 +23,14 @@ function ItemButton:OnEnter()
   if mainFrame.edit_selected == "" then
     mainFrame.edit_hilight = cat
   end
-  
+
   -- Tool Tip Anchor
   if self:GetLeft() < GetScreenWidth()/2 then
     GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
   else
     GameTooltip:SetOwner(self, "ANCHOR_LEFT")
   end
-  
+
   local hasCooldown, repairCost
   if not link then
     if mainFrame.edit_mode == 1 then
@@ -44,7 +44,7 @@ function ItemButton:OnEnter()
     hasCooldown, repairCost = TBag:SetInventoryItem(GameTooltip, mainFrame.playerid,
                                                     link, bag, slot)
   end
-  
+
   -- Set charges if remote viewing, Blizzard's code does it otherwise.
   if charges and not TBag:IsLive(mainFrame) then
     GameTooltip:AddLine(string.format(L["%d |4Charge:Charges;"], tonumber(charges)),
@@ -83,14 +83,14 @@ function ItemButton:OnEnter()
       GameTooltip:AddLine(L["Item has no category"], 1,0,0 )
     end
   end
-  
+
   if mainFrame.cfg.spotlight_hover == 1 then
     local r, g, b, a = TBag:GetColor(mainFrame.cfg, "bag_"..bag)
     local bagFrameSpot = TBag:GetBagFrameSpotlight(bag)
     bagFrameSpot:SetVertexColor(r, g, b, a)
     bagFrameSpot:Show()
   end
-  
+
   if mainFrame.edit_mode == 1 then
     GameTooltip:Show()
     mainFrame:UpdateWindow()
@@ -108,7 +108,7 @@ function ItemButton:OnLeave()
   if mainFrame.edit_selected == "" then
     mainFrame.edit_hilight = ""
   end
-  
+
   if GameTooltip:IsOwned(self) then
     GameTooltip:Hide()
     ResetCursor()
@@ -140,13 +140,13 @@ function ItemButton:OnClick(button)
     if (mainFrame.edit_selected == "") then
       -- you clicked, we selected
       mainFrame.edit_selected = cat
-      mainFrame.edit_hilight = cat 
+      mainFrame.edit_hilight = cat
     else
       -- we got a click, and we already had one selected.  let's move the items
       TBag:SetCatBar(mainFrame.cfg, mainFrame.edit_selected, bar, 1);
 
       mainFrame.edit_selected = "";
-      mainFrame.edit_hilight = cat 
+      mainFrame.edit_hilight = cat
 
       -- resort will force a window update
       mainFrame:UpdateWindow(TBag.REQ_MUST);
@@ -213,7 +213,7 @@ function ItemButton.Update(self)
   local frame_bkgr = _G[framename.."_bkgr"]
   local frame_stock = _G[framename.."Stock"]
   local editFrame = _G[framename.."_EditButton"]
-  
+
   -- Hide buttons attached to bars which are marked to be hidden
   -- unless of course it is set to a forced show.
   if TBag:GetGrp(cfg, TBag.G_BAR_HIDE, itm[TBag.I_BAR]) == 1 and
@@ -241,9 +241,9 @@ function ItemButton.Update(self)
     frame_texture:SetAlpha(0.35)
   end
   SetItemButtonTexture(self, texture)
-  
+
   SetItemButtonCount(self, itm[TBag.I_COUNT])
-  
+
   if mainFrame.edit_mode == 1 then
     -- we should be hilighting an entire class of item
     if itm[TBag.I_CAT] ~= mainFrame.edit_hilight then
@@ -273,7 +273,7 @@ function ItemButton.Update(self)
       frame_stock:Hide()
       if mainFrame.hilight_new == 1 then
         -- We're hilighting new items and the item isn't new
-	-- or we would be in the above if statement not this else. 
+	-- or we would be in the above if statement not this else.
         self:SetAlpha(0.25)
       else
           self:SetAlpha(1)
@@ -339,7 +339,7 @@ function BarButton:OnEnter()
   local mainFrame = self:GetParent()
   if mainFrame.edit_mode ~= 1 then return end
   local bar = self:GetID()
-  
+
   GameTooltip:SetOwner(self, "ANCHOR_LEFT")
   GameTooltip:ClearLines()
 
@@ -368,7 +368,7 @@ function BarButton:OnClick(button)
   local mainFrame = self:GetParent()
   if mainFrame.edit_mode ~= 1 then return end
   local bar = self:GetID()
-  
+
   if button == "LeftButton" then
     if mainFrame.edit_selected ~= "" then
       TBag:SetCatBar(mainFrame.cfg, mainFrame.edit_selected, bar, 1)
@@ -425,7 +425,7 @@ function BagButton:OnEnter()
     GameTooltip:SetText(L["Keyring"], 1.0, 1.0, 1.0)
     GameTooltip:Show()
     return
-  elseif mainFrame.playerid == TBag.PLAYERID and 
+  elseif mainFrame.playerid == TBag.PLAYERID and
 	 GameTooltip:SetInventoryItem("player", ContainerIDToInventoryID(bag)) then
     GameTooltip:Show()
     return
@@ -481,14 +481,14 @@ function BagButton:OnClick(button,down,drag)
     end
     return
   end
- 
+
   -- Empty bag slot do nothing, has to follow the above to allow equiping
   -- of bags.
   if bag > 0 and (not itm[TBag.I_ITEMLINK] or itm[TBag.I_ITEMLINK] == "") then
     self:SetChecked(not self:GetChecked())
     return
   end
-  
+
   -- Handle linking of the bags
   if IsModifiedClick("CHATLINK") then
     local hyperlink = TBag:MakeHyperlink(itm[TBag.I_ITEMLINK], itm[TBag.I_NAME],
@@ -529,7 +529,7 @@ function BagButton:ItemAnimOnEvent(event, invid, texture)
     else
       id = bag
     end
-    
+
     if id == invid then
       self:ReplaceIconTexture(texture)
       self:SetSequence(0)
@@ -568,7 +568,7 @@ end
 
 function ColumnsButton:OnEnter()
   local normal, newbie
- 
+
   if self:GetText() == L["<++>"] then
     normal = L["Increase Window Size"]
     newbie = L["Increase the number of columns displayed"]
@@ -576,7 +576,7 @@ function ColumnsButton:OnEnter()
     normal = L["Decrease Window Size"]
     newbie = L["Decrease the number of columns displayed"]
   end
-  
+
   GameTooltip:SetOwner(self, "ANCHOR_LEFT")
   GameTooltip_AddNewbieTip(self, normal, 1.0, 1.0, 1.0, newbie)
 end

@@ -1,7 +1,7 @@
 <!-- $Id$ -->
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
   <Script file="Buttons.lua"/>
-	
+
     <Button name="TBag_EditButtonTemplate" hidden="true" virtual="true" setAllPoints="true">
       <Size><AbsDimension x="40" y="40"/></Size>
       <Scripts>
@@ -87,7 +87,7 @@
       <Model name="$parentItemAnim" inherits="ItemAnimTemplate" setAllPoints="true">
         <Scripts>
           <OnEvent>
-	    TBag.BagButton.ItemAnimOnEvent(self,event,...) 
+	    TBag.BagButton.ItemAnimOnEvent(self,event,...)
           </OnEvent>
         </Scripts>
       </Model>
@@ -119,12 +119,12 @@
     <Size><AbsDimension x="28" y="28"/></Size>
     <Layers>
       <Layer level="ARTWORK">
-        <FontString name="$parentText" font="Fonts\ARIALN.TTF" justifyH="CENTER" outline="NORMAL"> 
+        <FontString name="$parentText" font="Fonts\ARIALN.TTF" justifyH="CENTER" outline="NORMAL">
           <Anchors>
             <Anchor point="CENTER"/>
           </Anchors>
           <FontHeight><AbsValue val="18"/></FontHeight>
-          <Color r="1" g="0" b="0.25"/> 
+          <Color r="1" g="0" b="0.25"/>
         </FontString>
       </Layer>
     </Layers>
@@ -187,7 +187,7 @@
         GameTooltip:Hide();
         ResetCursor();
       </OnLeave>
-    </Scripts>        
+    </Scripts>
   </Button>
 
 </Ui>

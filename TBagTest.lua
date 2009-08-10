@@ -51,9 +51,9 @@ local tests = {
   [19254] = L["MISC"], -- Has Hearthstone in the tooltip, but isn't one.
 
   -- Minipets
-  [4401] = L["MINIPET"],  
-  [8492] = L["MINIPET"],  
-  [23083] = L["MINIPET"],  
+  [4401] = L["MINIPET"],
+  [8492] = L["MINIPET"],
+  [23083] = L["MINIPET"],
   [35223] = L["MINIPET"],
   [22200] = L["MINIPET"],
   [37431] = L["MINIPET"],
@@ -64,7 +64,7 @@ local tests = {
   [39898] = L["MINIPET"],
   [39899] = L["MINIPET"],
   [39896] = L["MINIPET"],
- 
+
   -- Combat Pets
   [23767] = L["COMBATPETS"],
   [31666] = L["COMBATPETS"],
@@ -146,7 +146,7 @@ local tests = {
   [35227] = L["TOYS"],
   [32566] = L["TOYS"],
   [34480] = L["TOYS"],
-  [19035] = L["MISC"].."|"..L["ACT_OPEN"], -- Similar name, ACT_OPEN or MISC 
+  [19035] = L["MISC"].."|"..L["ACT_OPEN"], -- Similar name, ACT_OPEN or MISC
   [38301] = L["TOYS"],
   [32542] = L["TOYS"],
   [35557] = L["TOYS"],
@@ -224,7 +224,7 @@ local tests = {
   [12843] = L["ARGENT_DAWN"],
   [12841] = L["ARGENT_DAWN"],
   [12840] = L["ARGENT_DAWN"],
- 
+
   -- Cenarion Circle
   [20801] = L["CENARION_CIRCLE"],
   [20800] = L["CENARION_CIRCLE"],
@@ -273,11 +273,11 @@ local tests = {
   -- Thorium Brotherhood
   [18944] = L["THORIUM_BROTHER"],
   [18945] = L["THORIUM_BROTHER"],
- 
+
   -- Timbermaw
   [21377] = L["TIMBERMAW"],
   [21383] = L["TIMBERMAW"],
- 
+
   -- Zul'Grub
   [19858] = L["ZUL_GURUB"],
   [19699] = L["ZUL_GURUB"],
@@ -293,7 +293,7 @@ local tests = {
   [19722] = L["ZUL_GURUB"],
   [19722] = L["ZUL_GURUB"],
   [22637] = L["ZUL_GURUB"],
-  
+
   -- Ogri'la
   [32572] = L["OGRI'LA"],
   [32684] = L["OGRI'LA"],
@@ -304,7 +304,7 @@ local tests = {
   [33784] = L["OGRI'LA"],
   [33784] = L["OGRI'LA"],
   [32602] = L["OGRI'LA"],
-  
+
   -- Netherwing
   [32506] = L["NETHERWING"],
   [32464] = L["NETHERWING"],
@@ -333,7 +333,7 @@ local tests = {
   [29209] = L["CONSORTIUM"],
   [31957] = L["CONSORTIUM"],
   [29460] = L["CONSORTIUM"],
- 
+
   -- Halaa
   [26044] = L["HALAA"],
   [26042] = L["HALAA"],
@@ -345,7 +345,7 @@ local tests = {
   [30810] = L["SCRYER"],
   [29739] = L["SCRYER"],
   [29736] = L["SCRYER"],
-  
+
   -- Aldor
   [25802] = L["ALDOR"],
   [29425] = L["ALDOR"],
@@ -362,13 +362,13 @@ local tests = {
 
   -- Trinket
   [28830] = L["TRINKET"],
-  
+
   -- Quest
   [11018] = L["QUEST"],
   [7297] = L["QUEST"],
   [32649] = L["QUEST"],
   [32757] = L["02_NECK"],
-  
+
   -- Gray items
   [3300] = L["GRAY_ITEMS"],
 
@@ -376,7 +376,7 @@ local tests = {
   [21876] = L["BAG"],
   [29143] = L["BAG"],
   [34106] = L["BAG"],
- 
+
   -- Projectiles
   [31737] = L["PROJECTILE"],
   [31735] = L["PROJECTILE"],
@@ -412,7 +412,7 @@ local tests = {
   [3567] = L["WEAPON"], -- Avoid matching fishing pole
   [4598] = L["EXPLOSIVES"], -- ditto
   [19970] = L["FISHING"],
- 
+
   -- Inscription
   [43125] = L["INSCRIPTION"],
   [43117] = L["INSCRIPTION"],
@@ -434,18 +434,18 @@ local tests = {
   [43122] = L["INSCRIPTION"],
   [6929] = L["QUEST"], -- Bath'rah's Parchment
   [10648] = L["INSCRIPTION"],
-  [11105] = L["QUEST"], -- Curled Map Parchment 
+  [11105] = L["QUEST"], -- Curled Map Parchment
   [3706] = L["ACT_ON"], -- Enscorcelled Parchment
-  [9553] = L["QUEST"], -- Etched Parchment 
-  [9323] = L["QUEST"], -- Gadrin's Parchment 
+  [9553] = L["QUEST"], -- Etched Parchment
+  [9323] = L["QUEST"], -- Gadrin's Parchment
   [39501] = L["INSCRIPTION"],
   [39354] = L["INSCRIPTION"],
   [39502] = L["INSCRIPTION"],
-  [12635] = L["QUEST"], -- Simple Parchment 
-  [5348] = L["QUEST"], -- Worn Parchment 
-  [3767] = L["GRAY_ITEMS"], -- Fine Parchment 
-  [40737] = L["08_WRIST"], -- Pigmented Clan Bindings 
-  [44061] = L["05_CHEST"], -- Pigmented Clan Bindings 
+  [12635] = L["QUEST"], -- Simple Parchment
+  [5348] = L["QUEST"], -- Worn Parchment
+  [3767] = L["GRAY_ITEMS"], -- Fine Parchment
+  [40737] = L["08_WRIST"], -- Pigmented Clan Bindings
+  [44061] = L["05_CHEST"], -- Pigmented Clan Bindings
   [43104] = L["INSCRIPTION"],
   [43108] = L["INSCRIPTION"],
   [43109] = L["INSCRIPTION"],
@@ -566,7 +566,7 @@ local tests = {
 
   -- Reagents
   [17056] = L["CLASS_REAGENT"],
-  [5565] = string.format(L["%s_REAGENT"],L["WARLOCK"]), 
+  [5565] = string.format(L["%s_REAGENT"],L["WARLOCK"]),
   [16583] = string.format(L["%s_REAGENT"],L["WARLOCK"]),
   [22147] = string.format(L["%s_REAGENT"],L["DRUID"]),
   [17037] = string.format(L["%s_REAGENT"],L["DRUID"]),
@@ -675,9 +675,9 @@ local tests = {
   [43235] = string.format(L["%s_REAGENT"],L["ROGUE"]),
 }
 
--- Known items not working on any realm 
+-- Known items not working on any realm
 -- Found from wowhead but apparently not seen on any of the realms
-tests[38266] = nil  
+tests[38266] = nil
 
 if not TBag.wrath_310 then
 	tests[44820] = nil
@@ -696,16 +696,16 @@ local function build_itm(id,itm)
     = TBag:GetItemInfo(itm[TBag.I_ITEMLINK]);
 end
 
--- Executes a single test 
+-- Executes a single test
 --   inputs: itemid and the expected category
---   output: result (boolean), itm (table produced) 
+--   output: result (boolean), itm (table produced)
 local function test(id,cat)
   local itm = { };
   local result = false
 
   build_itm(id,itm);
   TBag:PickBar(cfg, "TBAGTEST|TBAGTEST", itm, "", "");
-  for c in cat:gmatch("[^|]+") do 
+  for c in cat:gmatch("[^|]+") do
     if c == itm[TBag.I_CAT] then
       result = true
     end
@@ -719,23 +719,23 @@ function TBag:GetCategory(id)
  local _, itm = test(id,"TEST")
  local link = self:MakeHyperlink(itm[self.I_ITEMLINK],itm[self.I_NAME],
                                  itm[self.I_RARITY],80);
- link = tostring(link); 
+ link = tostring(link);
  TBag:Print(string.format("%s (%s) = %s",link,tostring(id),tostring(itm[self.I_CAT])))
 end
 
 function TBag:RunTests(verbose)
   local fail = false;
   -- Initialize the cfg with default values
-  self:InitDefVals(cfg, self.Inv_Bags, 0, 1);  
+  self:InitDefVals(cfg, self.Inv_Bags, 0, 1);
 
   self:Print(L["TEST RUN STARTING"]);
-  
+
   for id,cat in pairs(tests) do
     local result, itm = test(id,cat)
     local link = self:MakeHyperlink(itm[self.I_ITEMLINK],itm[self.I_NAME],
                                     itm[self.I_RARITY],80);
-    link = tostring(link); 
-    
+    link = tostring(link);
+
     if (result == true) then
       if (verbose) then
         local output = string.format(L["SUCCESS: %s"], link);
