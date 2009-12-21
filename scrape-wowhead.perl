@@ -80,6 +80,10 @@ sub output_header {
 local _G = getfenv(0)
 local TBag = _G.TBag
 
+local function do_nothing()
+  return
+end
+
 EOH
 }
 
@@ -115,6 +119,11 @@ function TBag:RefreshCreations(TBagCfg)
           TBagCfg[self.S_CREATED][self.S_UPDATE] < TradeCreations[self.S_UPDATE]) then
     self:MergeCreations(TBagCfg,self.S_CREATED,TradeCreations);
   end
+  -- Replace this function with a noop and remove the data and the merge function
+  -- that only needs to be here the first time.
+  TBag.RefreshCreations = do_nothing
+  TBag.MergeCreations = nil
+  TradeCreations = nil
 end
 
 function TBag:MergeReagents(TBagCfg,new)
@@ -147,6 +156,11 @@ function TBag:RefreshReagents(TBagCfg)
           TBagCfg[self.S_REAGENT][self.S_UPDATE] < Reagents[self.S_UPDATE]) then
     self:MergeReagents(TBagCfg,Reagents);
   end
+  -- Replace this function with a noop and remove the data and the merge function
+  -- that only needs to be here the first time.
+  TBag.RefreshReagents = do_nothing
+  TBag.MergeReagents = nil
+  Reagents = nil
 end
 EOF
 }
