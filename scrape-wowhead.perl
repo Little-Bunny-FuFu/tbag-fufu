@@ -21,7 +21,7 @@ use WWW::Mechanize;
 ##############
 
 # Version of the iteminfo db
-my $db_version = 2;
+my $db_version = 3;
 
 # URL snipets used to get what we need
 my $wowhead_url = 'http://www.wowhead.com/';
