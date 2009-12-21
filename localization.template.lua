@@ -889,3 +889,6 @@ L["Truesilver Shafted Arrow"] = false
 L["Kirin Tor Familiar"] = false
 L["Unhatched Mr. Chilly"] = false
 L["Frosty's Collar"] = false
+L["Perpetual Purple Firework"] = false
+L["Carved Ogre Idol"] = false
+L["The Flag of Ownership"] = false

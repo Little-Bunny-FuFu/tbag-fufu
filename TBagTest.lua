@@ -110,6 +110,7 @@ local tests = {
   [43499] = L["COSTUMES"],
   [44719] = L["COSTUMES"],
   [44792] = L["COSTUMES"],
+  [49704] = L["COSTUMES"],
 
   -- Fireworks
   [21570] = L["FIREWORKS"],
@@ -138,8 +139,9 @@ local tests = {
   [9317] = L["FIREWORKS"],
   [19026] = L["FIREWORKS"],
   [9315] = L["FIREWORKS"],
-  [23714] = L["TRINKET"],
+  [23714] = L["FIREWORKS"], -- it's actually the old trinket that converts to the new non-trinket
   [21747] = L["FIREWORKS"],
+  [49703] = L["FIREWORKS"],
 
   -- Consumables
   [33927] = L["CONSUMABLE"],
@@ -192,6 +194,7 @@ local tests = {
   [46779] = L["TOYS"],
   [46780] = L["TOYS"],
   [49917] = L["TOYS"],
+  [38578] = L["TOYS"],
 
   -- Mounts
   [33977] = L["MOUNT"],

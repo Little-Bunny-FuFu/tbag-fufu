@@ -58,12 +58,14 @@ TBag.DefaultSearchList = {
   { L["COSTUMES"], L[""], L["Iron Boot Flask"], L[""], L[""] },
   { L["COSTUMES"], L[""], L["Frenzyheart Brew"], L[""], L[""] },
   { L["COSTUMES"], L[""], L["Blossoming Branch"], L[""], L[""] },
+  { L["COSTUMES"], L[""], L["Carved Ogre Idol"], L[""], L[""] },
   { L["FIREWORKS"], L[""], L["Shoots a.*firework"], L["Consumable"], L[""] },
   { L["FIREWORKS"], L[""], L["Shoots a.*firework"], L["Weapon"], L[""] },
   { L["FIREWORKS"], L[""], L["Place on the ground to launch .* rockets"], L[""], L[""] },
   { L["FIREWORKS"], L[""], L["Throw into a .* launcher"], L["Miscellaneous"], L[""] },
   { L["FIREWORKS"], L[""], L["Throw into a .* launcher"], L["Consumable"], L[""] },
   { L["FIREWORKS"], L[""], L["Festival Firecracker"], L[""], L[""] },
+  { L["FIREWORKS"], L[""], L["Perpetual Purple Firework"], L[""], L[""] },
   { L["MOUNT"], L[""], L["Requires Riding %("], L[""], L[""] },
   { L["MOUNT"], L[""], L["Summons and dismisses a rideable"], L[""], L[""] },
   { L["MOUNT"], L[""], L["Rickety Magic Broom"], L[""], L[""] },
@@ -97,6 +99,7 @@ TBag.DefaultSearchList = {
   { L["TOYS"], L[""], L["Path of Cenarius"], L[""], L[""] },
   { L["TOYS"], L[""], L["Ogre Pinata"], L[""], L[""] },
   { L["TOYS"], L[""], L["Brazie's Gnomish Pleasure Device"], L[""], L[""] },
+  { L["TOYS"], L[""], L["The Flag of Ownership"], L[""], L[""] },
 
 
   { L["AHN_QIRAJ"], L[""], L["%a+ Scarab"], L["Quest"], L[""] },

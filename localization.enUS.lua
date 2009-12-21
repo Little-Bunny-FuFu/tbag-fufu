@@ -899,3 +899,6 @@ L["Truesilver Shafted Arrow"] = true
 L["Kirin Tor Familiar"] = true
 L["Unhatched Mr. Chilly"] = true
 L["Frosty's Collar"] = true
+L["Perpetual Purple Firework"] = true
+L["Carved Ogre Idol"] = true
+L["The Flag of Ownership"] = true
