@@ -849,3 +849,4 @@ L["Crusader Orb"] = "Kugel des Kreuzfahrers"
 L["Gnomish Army Knife"] = "Gnomisches Armeemesser"
 L["Primordial Saronite"] = "Urt\195\188mliches Saronit"
 L["Brazie's Gnomish Pleasure Device"] = false
+L["Summons and dismisses a rideable"] = false
