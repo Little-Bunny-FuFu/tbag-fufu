@@ -1,3 +1,16 @@
+* 20091220-r355-Shefki
+  Note: This version contains a number of sorting changes the following
+  commands are advised after backing up any modified sorting rules you have.
+  /tinv resetsorts
+  /tbnk resetsorts
+  - Free some unneeded statically used memory, should lower static memory
+    usage of the addon by about 600 KiB.
+  - Item db update for 3.3.0 and a db version update to clear the cache
+    for newly changed recipes.
+  - Fix some minipets that weren't sorting as minipets.
+  - Sorting fixes for a number of card game redemption items.
+  - ToC bump to mark addon as current.
+ 
 * 20090810-r345-Shefki
   Note: This version contains a number of sorting changes the following
   commands are advised after backing up any modified sorting rules you have.
