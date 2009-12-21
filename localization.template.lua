@@ -881,3 +881,5 @@ L["Goblin Beam Welder"] = false
 L["Runed Orb"] = false
 L["Crusader Orb"] = false
 L["Gnomish Army Knife"] = false
+L["Primordial Saronite"] = false
+L["Brazie's Gnomish Pleasure Device"] = false

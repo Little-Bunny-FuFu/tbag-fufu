@@ -891,3 +891,5 @@ L["Goblin Beam Welder"] = true
 L["Runed Orb"] = true
 L["Crusader Orb"] = true
 L["Gnomish Army Knife"] = true
+L["Primordial Saronite"] = true
+L["Brazie's Gnomish Pleasure Device"] = true

@@ -847,3 +847,5 @@ L["Goblin Beam Welder"] = "Goblinisches Lichtbogenschwei\195\159ger\195\164t"
 L["Runed Orb"] = "Runenbeschriebene Kugel"
 L["Crusader Orb"] = "Kugel des Kreuzfahrers"
 L["Gnomish Army Knife"] = "Gnomisches Armeemesser"
+L["Primordial Saronite"] = "Urt\195\188mliches Saronit"
+L["Brazie's Gnomish Pleasure Device"] = false

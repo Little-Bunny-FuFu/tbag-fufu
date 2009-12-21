@@ -91,6 +91,7 @@ TBag.DefaultSearchList = {
   { L["TOYS"], L[""], L["Unusual Compass"], L[""], L[""] },
   { L["TOYS"], L[""], L["Path of Cenarius"], L[""], L[""] },
   { L["TOYS"], L[""], L["Ogre Pinata"], L[""], L[""] },
+  { L["TOYS"], L[""], L["Brazie's Gnomish Pleasure Device"], L[""], L[""] },
 
 
   { L["AHN_QIRAJ"], L[""], L["%a+ Scarab"], L["Quest"], L[""] },
@@ -463,6 +464,7 @@ TBag.DefaultSearchList = {
   { L["REAGENT"], L[""], L["Frozen Orb"], L["Trade Goods"], L[""]},
   { L["REAGENT"], L[""], L["Runed Orb"], L["Trade Goods"], L[""]},
   { L["REAGENT"], L[""], L["Crusader Orb"], L["Trade Goods"], L[""]},
+  { L["REAGENT"], L[""], L["Primordial Saronite"], L["Trade Goods"], L[""]},
   { L["REAGENT"], L[""], L["Crystallized %a+"], L["Trade Goods"], L["Elemental"]},
   { L["REAGENT"], L[""], L["Eternal %a+"], L["Trade Goods"], L["Elemental"]},
 

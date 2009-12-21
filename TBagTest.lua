@@ -186,6 +186,7 @@ local tests = {
   [45984] = L["TOYS"],
   [46779] = L["TOYS"],
   [46780] = L["TOYS"],
+  [49917] = L["TOYS"],
 
   -- Mounts
   [33977] = L["MOUNT"],
@@ -620,6 +621,7 @@ local tests = {
   [36860] = L["REAGENT"],
   [45087] = L["REAGENT"],
   [47556] = L["REAGENT"],
+  [49908] = L["REAGENT"],
 
   -- Trades
   [8925] = L["ALCHEMY"],
