@@ -1,3 +1,6 @@
+*  20091221-r358-Shefki
+  - deDE update
+
 * 20091220-r355-Shefki
   Note: This version contains a number of sorting changes the following
   commands are advised after backing up any modified sorting rules you have.
