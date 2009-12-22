@@ -1,7 +1,8 @@
-## Interface: 30300
+﻿## Interface: 30300
 ## Title: TBag
 ## Notes: The last bag addon you'll ever need.  Autosorting, viewable anywhere, easy to use yet amazingly configurable.
 ## Notes-deDE: Das einzige Taschenaddon was du jemals brauchen wirst. Automatisches Sortieren, überall einsehbar, Benutzerfreundlich, dabei aber unglaublich gut Konfigurierbar.
+## Notes-ruRU: Модификация сумок. Возможности - авто-сортировка, просмотр сумок, банка в лубом месте, легок в использовании, гибкие настройки. 
 ## X-Category: Inventory
 ## Author: Talos, Modified by Shefki
 ## X-Email: shefki@shefki.org
@@ -10,12 +11,13 @@
 ## RequiredDeps:
 ## OptionalDeps: Auctioneer
 ## SavedVariables: TBagCfg, TBagInfo, TBnkItm, TInvItm, TContItm, TBodyItm, TMailItm, TTknItm
-## X-Localizations: enUS, deDE
-## X-CompatibleLocales: enUS, deDE
+## X-Localizations: enUS, deDE, ruRU
+## X-CompatibleLocales: enUS, deDE, ruRU
 ##
 stub.lua
 localization.enUS.lua
 localization.deDE.lua
+localization.ruRU.lua
 defaults.lua
 Tokens.xml
 TBag.xml
