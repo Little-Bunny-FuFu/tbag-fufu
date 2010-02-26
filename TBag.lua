@@ -454,6 +454,7 @@ function TBag:CreateDummyBag(bag, template)
 
   if (dbag) then
     local buttonname;
+    local level = dbag:GetFrameLevel() + 1
 
     for slot = 1, MAX_CONTAINER_ITEMS do
       buttonname = self:GetBagItemButtonName(bag, slot);
@@ -461,6 +462,7 @@ function TBag:CreateDummyBag(bag, template)
         local button = CreateFrame("Button", buttonname, dbag, template);
         button:SetID(slot);
         button:Hide();
+        button:SetFrameLevel(level)
       end
     end
   end
@@ -468,18 +470,23 @@ end
 
 function TBag:CreateFrame(type, name, parent, template, num, append)
   local idx;
+  local level = parent:GetFrameLevel() + 1
   if (num) then
     for idx = 1, num do
       local full_name = name..idx..append
-      if not (_G[full_name]) then
-        CreateFrame(type, full_name, parent, template);
+      local frame = _G[full_name]
+      if not (frame) then
+        frame = CreateFrame(type, full_name, parent, template);
       end
-      _G[full_name]:SetID(idx)
+      frame:SetID(idx)
+      frame:SetFrameLevel(level)
     end
   else
-    if not (_G[name]) then
-      CreateFrame(type, name, parent, template);
+    local frame = _G[name]
+    if not (name) then
+      frame = CreateFrame(type, name, parent, template);
     end
+    frame:SetFrameLevel(level)
   end
 end
 
