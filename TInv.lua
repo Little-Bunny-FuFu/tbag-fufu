@@ -1315,6 +1315,7 @@ function Inv.RightClickMenu_populate(self, level)
       end
     end
   end
+  TBag:FixMenuFrameLevels()
 end
 
 

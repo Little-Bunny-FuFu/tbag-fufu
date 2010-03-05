@@ -3494,6 +3494,30 @@ function TBag:UserDropdown_Init(onclickfunc, TItm, curplayer, selRealm,level)
   end
 end
 
+-- For some resaon CreateFrame doesn't always properly set frame levels right
+-- The UIDropDownMenu code depends on it working properly.  When it doesn't work
+-- properly the buttons end up with a frame level of 2 and ends up behind the
+-- parent window which is the background.  As a result they appear grayed out
+-- and unclickable.  This iterates the frames and sets them to their proper frame
+-- level.
+function TBag:FixMenuFrameLevels()
+  for l=1,UIDROPDOWNMENU_MAXLEVELS do
+    for b=1,UIDROPDOWNMENU_MAXBUTTONS do
+      local button = _G["DropDownList"..l.."Button"..b]
+      if button then
+        local button_parent = button:GetParent()
+        if button_parent then
+          local button_level = button:GetFrameLevel()
+          local parent_level = button_parent:GetFrameLevel()
+          if button_level <= parent_level then
+            button:SetFrameLevel(parent_level + 2)
+          end
+        end
+      end
+    end
+  end
+end
+
 -- Shit to bypass FluidFrames (Hook), very inefficient but FF works in this way.
 -- Original version borrowed from EngBags 1.25 and then the current hooksecurefunc
 -- method from sag_ich_nicht.

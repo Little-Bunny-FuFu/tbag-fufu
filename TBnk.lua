@@ -1389,6 +1389,7 @@ function Bank.RightClickMenu_populate(self, level)
       end
     end
   end
+  TBag:FixMenuFrameLevels()
 end
 
 
