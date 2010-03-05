@@ -64,6 +64,7 @@ function MainFrame:DragStop()
     self:Raise()
 
     self:StopMovingOrSizing()
+    self:SetUserPlaced(false)
     self.isMoving = false
 
     -- save the position

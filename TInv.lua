@@ -108,6 +108,7 @@ function Inv:init(reset)
     Inv.metatabledone = true
   end
   self = TInvFrame
+  self:SetUserPlaced(false) -- remove us from layout-cache
 
   -- View switching
   self.playerid  = "";

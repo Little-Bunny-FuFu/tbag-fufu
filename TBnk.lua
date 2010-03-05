@@ -86,6 +86,7 @@ function Bank:init(reset)
     Bank.metatabledone = true
   end
   self = TBnkFrame
+  self:SetUserPlaced(false) -- remove us from the layout-cache
 
   -- Bank switching
   self.playerid = "";
