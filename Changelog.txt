@@ -1,4 +1,16 @@
-*  20091221-r358-Shefki
+* 20100304-r366-Shefki
+  Note: This version contains a number of sorting changes the following
+  commands are advised after backing up any modified sorting rules you have.
+  /tinv resetsorts
+  /tbnk resetsorts
+  - Workaround for a Blizzard bug that causes tbag windows to be
+    non-interactive for some people.
+  - Workaround for a Blizzard bug that causes some menu items to be
+    non-interactive for some people.
+  - Some tiny tweaks for 3.3.3 sorting.
+  - ruRU added as a translation (99% complete).
+
+* 20091221-r358-Shefki
   - deDE update
 
 * 20091220-r355-Shefki
