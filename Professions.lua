@@ -141,7 +141,7 @@ function Professions:GetSkillRank(trade)
   if scanningTrades then return end
   scanningTrades = true
   local skillRankReturn
-  -- Localize the trade naem to search for since we use English names
+  -- Localize the trade name to search for since we use English names
   -- for the rest of the trade skill code.
   trade = L[trade]
   for idx = 1, GetNumSkillLines() do
