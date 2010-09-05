@@ -441,8 +441,9 @@ function Bank.SlotTargetButton_OnClick(self, button)
   end
 end
 
-function Bank.RightClick_DeleteItemOverride()
+function Bank.RightClick_DeleteItemOverride(self)
   local bag, slot, itm;
+  local this = self or _G.this
 
   bag = this.value[TBag.I_BAG];
   slot = this.value[TBag.I_SLOT];
@@ -463,8 +464,9 @@ function Bank.RightClick_DeleteItemOverride()
   end
 end
 
-function Bank.RightClick_SetItemOverride()
+function Bank.RightClick_SetItemOverride(self)
   local bag, slot, itm, new_barclass;
+  local this = self or _G.this
 
   bag = this.value[TBag.I_BAG];
   slot = this.value[TBag.I_SLOT];
@@ -947,7 +949,8 @@ function Bank.RightClickMenu_populate(self, level)
     info = {
     ["text"] = string.format(L["Move: |c%s%s|r"],TBag.C_CAT,value);
     ["value"] = value;
-    ["func"] = function()
+    ["func"] = function(self)
+  local this = self or _G.this
   TBnkFrame.edit_selected = (this.value);
   TBnkFrame.edit_hilight = (this.value);
   TBnkFrame:UpdateWindow();
@@ -976,7 +979,8 @@ function Bank.RightClickMenu_populate(self, level)
     info = {
   ["text"] = value;
   ["value"] = { [TBag.I_BAR]=bar, ["sortby"]=key };
-  ["func"] = function()
+  ["func"] = function(self)
+    local this = self or _G.this
     TBag:SetGrpDef(TBnkFrame.cfg, TBag.G_BAR_SORT, this.value[TBag.I_BAR], this.value["sortby"], 1);
     TBnkFrame:UpdateWindow(TBag.REQ_MUST);
   end,
@@ -1005,7 +1009,8 @@ function Bank.RightClickMenu_populate(self, level)
     info = {
       ["text"] = value;
       ["value"] = { [TBag.I_BAR]=bar, ["value"]=key };
-      ["func"] = function()
+      ["func"] = function(self)
+        local this = self or _G.this
         TBag:SetGrpDef(TBnkFrame.cfg, TBag.G_USE_NEW, this.value[TBag.I_BAR], this.value["value"], 1);
         TBnkFrame:UpdateWindow();
     end,
@@ -1034,7 +1039,8 @@ function Bank.RightClickMenu_populate(self, level)
     info = {
       ["text"] = value;
       ["value"] = { [TBag.I_BAR]=bar, ["value"]=key };
-      ["func"] = function()
+      ["func"] = function(self)
+        local this = self or _G.this
         TBag:SetGrpDef(TBnkFrame.cfg, TBag.G_BAR_HIDE, this.value[TBag.I_BAR], this.value["value"], 1);
         TBnkFrame:UpdateWindow();
     end,
@@ -1220,7 +1226,8 @@ function Bank.RightClickMenu_populate(self, level)
             info = {
               ["text"] = value.."x"..value;
               ["value"] = value;
-              ["func"] = function()
+              ["func"] = function(self)
+                local this = self or _G.this
                 if ( (type(this.value) == "number") and (this.value >= TBag.N_BUTTON_MIN) ) then
                     TBnkFrame.cfg["frameButtonSize"], TBnkFrame.cfg["count_font"],
                       TBnkFrame.cfg["count_font_x"], TBnkFrame.cfg["count_font_y"],
@@ -1552,7 +1559,8 @@ function Bank.UserDropdown_Initialize(self, level)
     TBnkItm, TBnkFrame.playerid, TBag.REALM, level);
 end
 
-function Bank.UserDropdown_OnClick()
+function Bank.UserDropdown_OnClick(self)
+  local this = self or _G.this
   UIDropDownMenu_SetSelectedValue(TBnk_UserDropdown, this.value);
   if ( this.value ) then
     TBnkFrame:SetPlayer(this.value);

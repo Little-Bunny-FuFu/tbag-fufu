@@ -29,7 +29,7 @@ TInv_Opts_CurrentPosition = 1;
 TInv_Config_MaxScroll = 1;
 
 
-function TInv_Opts_ControlValueChanged(v)
+function TInv_Opts_ControlValueChanged(this,v)
 	if ( (TINVOPT_UPDATE_HAPPENING == 0) and (this.change_value_func ~= nil) ) then
 		this.change_value_func(v, this.func_param1, this.func_param2, this.func_param3, this.func_param4);
 	end

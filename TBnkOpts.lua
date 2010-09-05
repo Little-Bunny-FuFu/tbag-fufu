@@ -28,7 +28,7 @@ TBnk_Options_FRAME_HEIGHT = (TBnk_Options_FRAME_LINE_HEIGHT*(TBnk_OptS_SCROLL_LI
 TBnk_Opts_CurrentPosition = 1;
 TBnk_Config_MaxScroll = 1;
 
-function TBnk_Opts_ControlValueChanged(v)
+function TBnk_Opts_ControlValueChanged(this,v)
 	if ( (TBnk_Options_UPDATE_HAPPENING == 0) and (this.change_value_func ~= nil) ) then
 		this.change_value_func(v, this.func_param1, this.func_param2, this.func_param3, this.func_param4);
 	end

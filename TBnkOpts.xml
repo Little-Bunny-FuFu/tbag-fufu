@@ -19,6 +19,7 @@
     </Backdrop>
     <Scripts>
       <OnEnter>
+        local this = self or _G.this     
         if ( this.tooltipText ) then
           GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
           GameTooltip:SetText(this.tooltipText, nil, nil, nil, nil, 1);
@@ -32,7 +33,9 @@
         GameTooltip:Hide();
       </OnLeave>
       <OnValueChanged>
-        TBnk_Opts_ControlValueChanged(arg1);
+        local this = self or _G.this     
+        local arg1 = value or _G.arg1
+        TBnk_Opts_ControlValueChanged(this, arg1);
         _G[this:GetName().."_disp_text"]:SetText( this:GetValue() );
       </OnValueChanged>
     </Scripts>
@@ -49,13 +52,16 @@
   <EditBox name="TBnk_InputBoxTemplate" inherits="InputBoxTemplate" virtual="true" autoFocus="false">
     <Scripts>
       <OnTabPressed>
+        local this = self or _G.this     
         this:ClearFocus();
       </OnTabPressed>
       <OnEnterPressed>
+        local this = self or _G.this     
         this:ClearFocus();
       </OnEnterPressed>
       <OnTextChanged>
-        TBnk_Opts_ControlValueChanged(this:GetText());
+        local this = self or _G.this     
+        TBnk_Opts_ControlValueChanged(this,this:GetText());
       </OnTextChanged>
     </Scripts>
   </EditBox>
@@ -63,7 +69,8 @@
   <Button name="TBnk_Opts_ButtonTemplate" inherits="GameMenuButtonTemplate" virtual="true" hidden="true">
     <Scripts>
       <OnClick>
-        TBnk_Opts_ControlValueChanged();
+        local this = self or _G.this     
+        TBnk_Opts_ControlValueChanged(this);
       </OnClick>
     </Scripts>
   </Button>
@@ -139,6 +146,7 @@
       <Slider name="TBnk_OptsFrame_ScrollBar" inherits="UIPanelScrollBarTemplate">
         <Scripts>
           <OnValueChanged>
+            local arg1 = value or _G.arg1
             TBnk_Opts_CurrentPosition = arg1;
             TBnk_Options_UpdateWindow();
           </OnValueChanged>
@@ -181,6 +189,7 @@
         </Anchors>
         <Scripts>
           <OnLoad>
+            local this = self or _G.this     
             this:SetText(TBag.LOCALE["Reset"]);
           </OnLoad>
           <OnClick>
@@ -202,6 +211,7 @@
         </Anchors>
         <Scripts>
           <OnLoad>
+            local this = self or _G.this     
             this:SetText(TBag.LOCALE["Close"]);
           </OnLoad>
           <OnClick>
@@ -220,6 +230,7 @@
         </Anchors>
         <Scripts>
           <OnLoad>
+            local this = self or _G.this     
             this:SetText(TBag.LOCALE["Add New Cat"]);
           </OnLoad>
           <OnClick>
@@ -238,6 +249,7 @@
         </Anchors>
         <Scripts>
           <OnLoad>
+            local this = self or _G.this     
             this:SetText(TBag.LOCALE["Assign Cats"]);
           </OnLoad>
           <OnClick>
@@ -251,6 +263,8 @@
 
     <Scripts>
       <OnMouseDown>
+        local this = self or _G.this     
+        local arg1 = button or _G.arg1     
         if ( arg1 == "LeftButton" ) then
           if (not this.isMoving) then
               this:StartMoving();
@@ -259,18 +273,21 @@
         end
       </OnMouseDown>
       <OnMouseUp>
+        local this = self or _G.this     
         if (this.isMoving) then
                   this:StopMovingOrSizing();
                   this.isMoving = false;
         end
       </OnMouseUp>
       <OnDragStart>
+        local this = self or _G.this     
         if (not this.isMoving) then
             this:StartMoving();
             this.isMoving = true;
         end
       </OnDragStart>
       <OnDragStop>
+        local this = self or _G.this     
         if (this.isMoving) then
                   this:StopMovingOrSizing();
                   this.isMoving = false;

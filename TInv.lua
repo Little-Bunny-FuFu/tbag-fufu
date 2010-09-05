@@ -691,8 +691,9 @@ function Inv.Toggle_Total()
   end
 end
 
-function Inv.RightClick_DeleteItemOverride()
+function Inv.RightClick_DeleteItemOverride(self)
   local bag, slot, itm;
+  local this = self or _G.this
 
   bag = this.value[TBag.I_BAG];
   slot = this.value[TBag.I_SLOT];
@@ -713,8 +714,9 @@ function Inv.RightClick_DeleteItemOverride()
   end
 end
 
-function Inv.RightClick_SetItemOverride()
+function Inv.RightClick_SetItemOverride(self)
   local bag, slot, itm, new_barclass;
+  local this = self or _G.this
 
   bag = this.value[TBag.I_BAG];
   slot = this.value[TBag.I_SLOT];
@@ -857,7 +859,8 @@ function Inv.RightClickMenu_populate(self, level)
       info = {
         ["text"] = string.format(L["Move: |c%s%s|r"],TBag.C_CAT,value);
         ["value"] = value;
-        ["func"] = function()
+        ["func"] = function(self)
+          local this = self or _G.this
           TInvFrame.edit_selected = (this.value);
           TInvFrame.edit_hilight = (this.value);
 	  TInvFrame:UpdateWindow();
@@ -887,7 +890,8 @@ function Inv.RightClickMenu_populate(self, level)
       info = {
         ["text"] = value;
         ["value"] = { [TBag.I_BAR]=bar, ["sortby"]=key };
-        ["func"] = function()
+        ["func"] = function(self)
+            local this = self or _G.this
             TBag:SetGrpDef(TInvFrame.cfg, TBag.G_BAR_SORT, this.value[TBag.I_BAR], this.value["sortby"], 1);
             TInvFrame:UpdateWindow(TBag.REQ_MUST);
           end,
@@ -916,7 +920,8 @@ function Inv.RightClickMenu_populate(self, level)
       info = {
         ["text"] = value;
         ["value"] = { [TBag.I_BAR]=bar, ["value"]=key };
-        ["func"] = function()
+        ["func"] = function(self)
+          local this = self or _G.this
           TBag:SetGrpDef(TInvFrame.cfg, TBag.G_BAR_HIDE, this.value[TBag.I_BAR], this.value["value"], 1);
 	  TBnkFrame:UpdateWindow();
       end,
@@ -946,7 +951,8 @@ function Inv.RightClickMenu_populate(self, level)
       info = {
         ["text"] = value;
         ["value"] = { [TBag.I_BAR]=bar, ["value"]=key };
-        ["func"] = function()
+        ["func"] = function(self)
+            local this = self or _G.this
             TBag:SetGrpDef(TInvFrame.cfg, TBag.G_USE_NEW, this.value[TBag.I_BAR], this.value["value"], 1);
 	    TInvFrame:UpdateWindow(TBag.REQ_MUST);
           end,
@@ -1136,7 +1142,8 @@ function Inv.RightClickMenu_populate(self, level)
             info = {
               ["text"] = value.."x"..value;
               ["value"] = value;
-              ["func"] = function()
+              ["func"] = function(self)
+                  local this = self or _G.this
                   if ( (type(this.value) == "number") and (this.value >= TBag.N_BUTTON_MIN) ) then
                     TInvFrame.cfg["frameButtonSize"], TInvFrame.cfg["count_font"],
                       TInvFrame.cfg["count_font_x"], TInvFrame.cfg["count_font_y"],
@@ -1460,7 +1467,8 @@ function Inv.UserDropdown_OnLoad(self)
 --  OptionsFrame_EnableDropDown(self);
 end
 
-function Inv.UserDropdown_OnClick()
+function Inv.UserDropdown_OnClick(self)
+  local this = self or _G.this
   UIDropDownMenu_SetSelectedValue(TInv_UserDropdown, this.value);
   if ( this.value ) then
     TInvFrame:SetPlayer(this.value);
