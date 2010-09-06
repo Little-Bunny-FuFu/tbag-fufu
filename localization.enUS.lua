@@ -69,6 +69,7 @@ L[""] = true -- Needed to preserve nil returns
 L["Cooking"] = true
 L["Fishing"] = true
 L["First Aid"] = true
+L["Archaeology"] = true
 
 -- Primary professions
 L["Alchemy"] = true

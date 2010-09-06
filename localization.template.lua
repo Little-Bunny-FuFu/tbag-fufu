@@ -57,6 +57,7 @@ L[""] = false  -- Needed to preserve nil returns
 L["Cooking"] = GetSpellInfo(2550)
 L["Fishing"] = GetSpellInfo(7620)
 L["First Aid"] = GetSpellInfo(3273)
+L["Archaeology"] = GetSpellInfo(78670)
 
 -- Primary professions
 L["Alchemy"] = GetSpellInfo(2259)
