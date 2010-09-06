@@ -1,3 +1,7 @@
+* 20100905-r372-Shefki
+ - Changes to allow TBag to work without errors on Cataclysm beta.
+ - ruRU update.
+
 * 20100304-r366-Shefki
   Note: This version contains a number of sorting changes the following
   commands are advised after backing up any modified sorting rules you have.
