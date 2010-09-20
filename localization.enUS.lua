@@ -903,3 +903,4 @@ L["Frosty's Collar"] = true
 L["Perpetual Purple Firework"] = true
 L["Carved Ogre Idol"] = true
 L["The Flag of Ownership"] = true
+L["Gnomeregan Pride"] = true

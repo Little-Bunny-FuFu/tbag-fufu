@@ -59,6 +59,7 @@ TBag.DefaultSearchList = {
   { L["COSTUMES"], L[""], L["Frenzyheart Brew"], L[""], L[""] },
   { L["COSTUMES"], L[""], L["Blossoming Branch"], L[""], L[""] },
   { L["COSTUMES"], L[""], L["Carved Ogre Idol"], L[""], L[""] },
+  { L["COSTUMES"], L[""], L["Gnomeregan Pride"], L[""], L[""] },
   { L["FIREWORKS"], L[""], L["Shoots a.*firework"], L["Consumable"], L[""] },
   { L["FIREWORKS"], L[""], L["Shoots a.*firework"], L["Weapon"], L[""] },
   { L["FIREWORKS"], L[""], L["Place on the ground to launch .* rockets"], L[""], L[""] },

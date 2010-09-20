@@ -859,4 +859,4 @@ L["Frosty's Collar"] = "Ошейник Морозца"
 L["Perpetual Purple Firework"] = "Нескончаемый лиловый фейерверк"
 L["Carved Ogre Idol"] = "Резной огрский идол"
 L["The Flag of Ownership"] = "Знамя победителя"
-
+L["Gnomeregan Pride"] = "Гордость Гномрегана" 

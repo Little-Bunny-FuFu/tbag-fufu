@@ -893,3 +893,4 @@ L["Frosty's Collar"] = false
 L["Perpetual Purple Firework"] = false
 L["Carved Ogre Idol"] = false
 L["The Flag of Ownership"] = false
+L["Gnomeregan Pride"] = false
