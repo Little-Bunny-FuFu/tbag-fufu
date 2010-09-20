@@ -81,6 +81,11 @@ TBag.I_SOULBOUND = "sb";
 TBag.I_ACCTBOUND = "ab";
 TBag.I_CHARGES         = "ch";
 
+-- Quest item info
+TBag.I_QUEST_ITEM = "qi";
+TBag.I_QUEST_ID = "qd";
+TBag.I_QUEST_ACTIVE = "qa";
+
 -- Tokens
 TBag.I_HEADER = "hd";
 TBag.I_EXPAND = "ex";
@@ -2391,6 +2396,7 @@ function TBag:UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, comparr,
             else
               itm[self.I_NEED] = 0;
             end
+            itm[self.I_QUEST_ITEM],itm[self.I_QUEST_ID],itm[self.I_QUEST_ACTIVE] = GetContainerItemQuestInfo(bag, slot);
 
             if (itm[self.I_CHARGES]) then
               -- If the item has cached charges scan the tooltip again.

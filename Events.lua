@@ -21,6 +21,8 @@ function TBag:VARIABLES_LOADED()
   self:RegisterEvent("PLAYERBANKBAGSLOTS_CHANGED")
   self:RegisterEvent("PLAYER_LEVEL_UP")
   self:RegisterEvent("SKILL_LINES_CHANGED")
+  self:RegisterEvent("QUEST_ACCEPTED")
+  self:RegisterEvent("UNIT_QUEST_LOG_CHANGED")
 
   -- Scan equipment on login.
   TBag:ScanEquipped()
@@ -106,6 +108,18 @@ function TBag:PLAYER_LEVEL_UP(event, level)
   TBagInfo[TBag.PLAYERID][TBag.G_BASIC][TBag.S_LEVEL] = level
 end
 
+function TBag:QUEST_ACCEPTED()
+      TInvFrame:UpdateWindow()
+end
+
+function TBag:UNIT_QUEST_LOG_CHANGED(event, unit)
+      if unit == "player" then
+              TInvFrame:UpdateWindow()
+      end
+end
+ 
+
+
 local events = {
   ["VARIABLES_LOADED"] = TBag.VARIABLES_LOADED,
   ["BAG_UPDATE"] = TBag.BAG_UPDATE,
@@ -124,6 +138,8 @@ local events = {
   ["PLAYERBANKBAGSLOTS_CHANGED"] = TBag.PLAYERBANKBAGSLOTS_CHANGED,
   ["PLAYER_LEVEL_UP"] = TBag.PLAYER_LEVEL_UP,
   ["SKILL_LINES_CHANGED"] = TBag.SKILL_LINES_CHANGED,
+  ["QUEST_ACCEPTED"] = TBag.QUEST_ACCEPTED,
+  ["UNIT_QUEST_LOG_CHANGED"] = TBag.UNIT_QUEST_LOG_CHANGED,
 }
 
 function TBag:OnEvent(event, ...)

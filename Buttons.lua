@@ -213,6 +213,7 @@ function ItemButton.Update(self)
   local frame_bkgr = _G[framename.."_bkgr"]
   local frame_stock = _G[framename.."Stock"]
   local editFrame = _G[framename.."_EditButton"]
+  local questTexture = _G[framename.."IconQuestTexture"]
 
   -- Hide buttons attached to bars which are marked to be hidden
   -- unless of course it is set to a forced show.
@@ -241,6 +242,17 @@ function ItemButton.Update(self)
     frame_texture:SetAlpha(0.35)
   end
   SetItemButtonTexture(self, texture)
+
+  -- Handle quest overlays
+  if itm[TBag.I_QUEST_ID] and not itm[TBag.I_QUEST_ACTIVE] then
+    questTexture:SetTexture(TEXTURE_ITEM_QUEST_BANG)
+    questTexture:Show()
+  elseif itm[TBag.I_QUEST_ID] or itm[TBag.I_QUEST_ITEM] then
+    questTexture:SetTexture(TEXTURE_ITEM_QUEST_BORDER)
+    questTexture:Show()
+  else
+    questTexture:Hide()
+  end
 
   SetItemButtonCount(self, itm[TBag.I_COUNT])
 
