@@ -24,7 +24,6 @@
       <Size><AbsDimension x="40" y="40"/></Size>
       <Frames>
         <Button name="$parent_EditButton" inherits="TBag_EditButtonTemplate"/>
-        <Cooldown name="$parent_Cooldown" inherits="CooldownFrameTemplate"/>
         <Frame name="$parentHighlightFrame" setAllPoints="true">
           <Layers>
             <Layer>

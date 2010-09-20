@@ -182,7 +182,7 @@ end
 -- which allows it to short circuit getting the frames itm and mainFrame
 -- such as when it is called from ItemButton.Update.
 function ItemButton.UpdateCooldown(self, itm, mainFrame)
-  local cooldownFrame = _G[self:GetName().."_Cooldown"]
+  local cooldownFrame = _G[self:GetName().."Cooldown"]
   if not cooldownFrame then return end
   if not itm then itm = TBag:GetItmFromFrame(TBag.BUTTONS, self) end
   if not itm or not next(itm) then return end
