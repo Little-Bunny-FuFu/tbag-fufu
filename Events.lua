@@ -102,7 +102,7 @@ function TBag:PLAYERBANKBAGSLOTS_CHANGED()
   TBnkFrame:UpdateWindow(TBag.REQ_MUST)
 end
 
-function TBag:PLAYER_LEVEL_UP(level)
+function TBag:PLAYER_LEVEL_UP(event, level)
   TBagInfo[TBag.PLAYERID][TBag.G_BASIC][TBag.S_LEVEL] = level
 end
 
