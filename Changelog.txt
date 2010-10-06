@@ -1,3 +1,14 @@
+* 20101006-r379-Shefki
+  Note: This version contains a number of sorting changes the following
+  commands are advised after backing up any modified sorting rules you have.
+  /tinv resetsorts
+  /tbnk resetsorts
+ - More Cataclysm fixes.
+ - Add support for quest overlays added to default UI in 3.3.3.
+ - Remove an unnecessary and extra cooldown frame.
+ - Fix a bug in player level up detection.
+ - Sorting addition for the Gnomeregan Pride costume.
+
 * 20100905-r372-Shefki
  - Changes to allow TBag to work without errors on Cataclysm beta.
  - ruRU update.
