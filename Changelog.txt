@@ -1,4 +1,4 @@
-* 20101006-r379-Shefki
+* 20101006-r381-Shefki
   Note: This version contains a number of sorting changes the following
   commands are advised after backing up any modified sorting rules you have.
   /tinv resetsorts
@@ -8,6 +8,7 @@
  - Remove an unnecessary and extra cooldown frame.
  - Fix a bug in player level up detection.
  - Sorting addition for the Gnomeregan Pride costume.
+ - Flag addon as Cataclysm compatabile.
 
 * 20100905-r372-Shefki
  - Changes to allow TBag to work without errors on Cataclysm beta.
