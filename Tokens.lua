@@ -27,7 +27,11 @@ end
 
 function Tokens.SetItmFromCurrencyIndex(index,itm)
   local name, isHeader, isExpand, isUnused, isWatched, count, extraType, icon
-  name, isHeader, isExpand, isUnused, isWatched, count, extraType, icon = GetCurrencyListInfo(index)
+  if not TBag.cata_400 then
+    name, isHeader, isExpand, isUnused, isWatched, count, extraType, icon = GetCurrencyListInfo(index)
+  else
+    name, isHeader, isExpand, isUnused, isWatched, count, icon = GetCurrencyListInfo(index)
+  end
 
   if not name then
     return false
@@ -41,7 +45,7 @@ function Tokens.SetItmFromCurrencyIndex(index,itm)
   itm[TBag.I_COUNT] = count
   itm[TBag.I_TYPE] = extraType
   itm[TBag.I_ICON] = icon
-  if not isHeader and extraType == 0 and count > 0 then
+  if not TBag.cata_400 and not isHeader and extraType == 0 and count > 0 then
     itm[TBag.I_ITEMLINK] = Tokens.GetItemStringFromCurrencyIndex(index)
   end
   return true
@@ -93,6 +97,7 @@ function Tokens.UpdateTokenButtonFromItm(button, itm, playerid)
     button.extraCurrencyType = itm[TBag.I_TYPE]
     button.itemstring = itm[TBag.I_ITEMLINK]
     button.count_val = itm[TBag.I_COUNT]
+    button.name = itm[TBag.I_NAME]
     if itm[TBag.I_TYPE]  == 1 then --Arena points
       button.icon:SetTexture("Interface\\PVPFrame\\PVP-ArenaPoints-Icon")
       button.icon:SetTexCoord(0, 1, 0, 1)
@@ -105,7 +110,8 @@ function Tokens.UpdateTokenButtonFromItm(button, itm, playerid)
         button.icon:SetTexCoord(0, 1, 0, 1)
       end
     else
-      local icon = GetItemIcon(itm[TBag.I_ITEMLINK]) or itm[TBag.I_ICON]
+      local itemlink = itm[TBag.I_ITEMLINK]
+      local icon = itemlink and GetItemIcon(itemlink) or itm[TBag.I_ICON]
       button.icon:SetTexture(icon)
       button.icon:SetTexCoord(0, 1, 0, 1)
     end
@@ -147,7 +153,9 @@ end
 
 function Tokens.Button_OnEnter(self)
   GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-  if ( self.extraCurrencyType == 1 ) then
+  if TBag.cata_400 then
+    GameTooltip:SetText(self.name, 1, 1, 1, 1)
+  elseif ( self.extraCurrencyType == 1 ) then
     GameTooltip:SetText(ARENA_POINTS,
                         HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b)
     GameTooltip:AddLine(TOOLTIP_ARENA_POINTS, nil, nil, nil, 1)
