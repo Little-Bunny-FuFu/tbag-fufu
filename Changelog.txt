@@ -1,3 +1,7 @@
+* 20101017-r385-Shefki
+ - Update TOC
+ - Fix an error that prevented adjusting order of sorts for Inventory window. 
+
 * 20101006-r381-Shefki
   Note: This version contains a number of sorting changes the following
   commands are advised after backing up any modified sorting rules you have.
