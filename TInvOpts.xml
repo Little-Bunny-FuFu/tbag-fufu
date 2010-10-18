@@ -69,6 +69,7 @@
   <Button name="TInv_Opts_ButtonTemplate" inherits="GameMenuButtonTemplate" virtual="true" hidden="true">
     <Scripts>
       <OnClick>
+        local this = self or _G.this 
         TInv_Opts_ControlValueChanged(this);
       </OnClick>
     </Scripts>
