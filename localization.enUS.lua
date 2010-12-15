@@ -894,7 +894,6 @@ L["Runed Orb"] = true
 L["Crusader Orb"] = true
 L["Gnomish Army Knife"] = true
 L["Primordial Saronite"] = true
-L["Brazie's Gnomish Pleasure Device"] = true
 L["Summons and dismisses a rideable"] = true
 L["Nurtured Penguin Egg"] = true
 L["Truesilver Shafted Arrow"] = true

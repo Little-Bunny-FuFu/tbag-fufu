@@ -884,7 +884,6 @@ L["Runed Orb"] = false
 L["Crusader Orb"] = false
 L["Gnomish Army Knife"] = false
 L["Primordial Saronite"] = false
-L["Brazie's Gnomish Pleasure Device"] = false
 L["Summons and dismisses a rideable"] = false
 L["Nurtured Penguin Egg"] = false
 L["Truesilver Shafted Arrow"] = false

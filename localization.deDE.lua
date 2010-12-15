@@ -850,7 +850,6 @@ L["Runed Orb"] = "Runenbeschriebene Kugel"
 L["Crusader Orb"] = "Kugel des Kreuzfahrers"
 L["Gnomish Army Knife"] = "Gnomisches Armeemesser"
 L["Primordial Saronite"] = "Urt\195\188mliches Saronit"
---L["Brazie's Gnomish Pleasure Device"] = false -- never seen on deDE Servers yet, wonder if it ever gets there..
 L["Summons and dismisses a rideable"] = "Beschw\195\182rt einen reitbaren"
 L["Nurtured Penguin Egg"] = "Bebr\195\188tetes Pinguinei" 
 L["Truesilver Shafted Arrow"] = "Echtsilberschaftpfeil" 
