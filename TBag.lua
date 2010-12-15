@@ -80,6 +80,7 @@ TBag.I_NEED      = "sn";
 TBag.I_SOULBOUND = "sb";
 TBag.I_ACCTBOUND = "ab";
 TBag.I_CHARGES         = "ch";
+TBag.I_REFORGE   = "rf";
 
 -- Quest item info
 TBag.I_QUEST_ITEM = "qi";
@@ -513,11 +514,11 @@ end
 
 function TBag:GetItemID(itemlink)
   if itemlink and type(itemlink) == "string" then
-    local a,b,c,d,e,f,g,h =
-          itemlink:match("item:(%d+):(%d+):(%d+):(%d+):(%d+):(%d+):(%-?%d+):(%-?%d+)")
+    local a,b,c,d,e,f,g,h,i,j =
+          itemlink:match("item:(%d+):(%d+):(%d+):(%d+):(%d+):(%d+):(%-?%d+):(%-?%d+):(%d+):(%d+)")
     if a then
       local itemstring = string.join(":","item",a,b,c,d,e,f,g,h)
-      return a, itemstring
+      return a, itemstring, j
     end
   end
 
@@ -640,7 +641,7 @@ function TBag:AddSearchResult(itm, playername, place, playerid)
   if itm[self.I_ACCTBOUND] then
     level = TBag:GetPlayerInfo(playerid,TBag.G_BASIC)[TBag.S_LEVEL]
   end
-  local itemlink = self:MakeHyperlink(itemstring,itm[self.I_NAME],itm[self.I_RARITY],level);
+  local itemlink = self:MakeHyperlink(itemstring,itm[self.I_NAME],itm[self.I_RARITY],level,itm[self.I_REFORGE]);
 
   if (itemlink) then
     self:PrintDEBUG("TBag:AddSearchResult "..count.." "..itemlink
@@ -1706,7 +1707,7 @@ function TBag:GetBagNumFrame(bag)
 end
 
 
-function TBag:MakeHyperlink(itemstring,name,quality,level)
+function TBag:MakeHyperlink(itemstring,name,quality,level,reforge)
   local itemlink;
   -- First try to generate the itemlink off TBag's cached data.
   -- If we don't have the info to do it then fall back on GetItemInfo().
@@ -1721,6 +1722,11 @@ function TBag:MakeHyperlink(itemstring,name,quality,level)
       -- failsave in case level isn't passed through.
       itemstring = itemstring..":"..UnitLevel("player")
     end
+		if reforge then
+			itemstring = itemstring..":"..reforge
+		else
+			itemstring = itemstring..":0"
+		end
     itemlink = color.."|H"..itemstring.."|h["..name.."]|h|r";
   elseif (itemstring) then
     _,itemlink = GetItemInfo(itemstring);
@@ -2152,7 +2158,7 @@ function TBag:UpdateHearth(tt, itemlink, playerid)
   end
 end
 
-function TBag:SetInventoryItem(tt, playerid, itemlink, bag, slot)
+function TBag:SetInventoryItem(tt, playerid, itemlink, bag, slot, reforge)
   local hasCooldown, repairCost;
 
   -- If we are the current player, it might be safe to set inventory directly
@@ -2169,7 +2175,8 @@ function TBag:SetInventoryItem(tt, playerid, itemlink, bag, slot)
       if itemlink and itemlink ~= "" then
         local level = TBag:GetPlayerInfo(playerid,TBag.G_BASIC)[TBag.S_LEVEL] or
                     UnitLevel("player")
-        itemlink = itemlink..":"..level
+				
+        itemlink = itemlink..":"..level..":"..(reforge or 0)
       end
       tt:SetHyperlink(itemlink);
       self:UpdateHearth(tt, itemlink, playerid);
@@ -2179,7 +2186,7 @@ function TBag:SetInventoryItem(tt, playerid, itemlink, bag, slot)
     if itemlink and itemlink ~= "" then
       local level = TBag:GetPlayerInfo(playerid,TBag.G_BASIC)[TBag.S_LEVEL] or
                     UnitLevel("player")
-      itemlink = itemlink..":"..level
+      itemlink = itemlink..":"..level..":"..(reforge or 0)
     end
     tt:SetHyperlink(itemlink);
     self:UpdateHearth(tt, itemlink, playerid);
@@ -2188,7 +2195,7 @@ function TBag:SetInventoryItem(tt, playerid, itemlink, bag, slot)
   return hasCooldown, repairCost;
 end
 
-function TBag:MakeToolTipStr(playerid, itemlink, bag, slot, mailitem, attach)
+function TBag:MakeToolTipStr(playerid, itemlink, bag, slot, mailitem, attach, reforge)
   local ttname = "TBag_tt";
   local tt = TBag_tt
   local tooltip = "";
@@ -2207,7 +2214,7 @@ function TBag:MakeToolTipStr(playerid, itemlink, bag, slot, mailitem, attach)
 
   -- Set as much information as we have
   if (itemlink) and (bag) and (slot) then
-    hasCooldown, repairCost = self:SetInventoryItem(tt, playerid, itemlink, bag, slot);
+    hasCooldown, repairCost = self:SetInventoryItem(tt, playerid, itemlink, bag, slot,reforge);
   elseif (itemlink) and (bag) then
     -- Just a bag id means it's a slotid used for scanning inventory items.
     local slotid = bag;
@@ -2217,7 +2224,7 @@ function TBag:MakeToolTipStr(playerid, itemlink, bag, slot, mailitem, attach)
   elseif (itemlink) then
     local level = TBag:GetPlayerInfo(playerid,TBag.G_BASIC)[TBag.S_LEVEL] or
                   UnitLevel("player")
-    itemlink = itemlink..":"..level
+    itemlink = itemlink..":"..level..":"..(reforge or 0)
     tt:SetHyperlink(itemlink);
   end
 
@@ -2388,10 +2395,11 @@ function TBag:UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, comparr,
 	  itm[self.I_SOULBOUND] = itmcache[bag][slot][self.I_SOULBOUND];
           itm[self.I_CHARGES] = itmcache[bag][slot][self.I_CHARGES];
           itm[self.I_ACCTBOUND] = itmcache[bag][slot][self.I_ACCTBOUND];
+          itm[self.I_REFORGE] = itmcache[bag][slot][self.I_REFORGE];
 
           if (itm[self.I_ITEMLINK] ~= nil) then
             -- there's an item in the bag, let's find out more about it
-            id, itm[self.I_ITEMLINK] = self:GetItemID(itm[self.I_ITEMLINK]);
+            id, itm[self.I_ITEMLINK], itm[self.I_REFORGE] = self:GetItemID(itm[self.I_ITEMLINK]);
 
 
             local stacksize;
@@ -2410,7 +2418,7 @@ function TBag:UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, comparr,
               -- Down below we check the tooltip on every item the first time we
               -- see it.  Since items can't just get charges this allows us
               -- to still update charges without eating a huge performance hit.
-              tooltip = self:MakeToolTipStr(playerid, itm[self.I_ITEMLINK], bag, slot);
+              tooltip = self:MakeToolTipStr(playerid, itm[self.I_ITEMLINK], bag, slot, itm[self.I_REFORGE]);
               itm[self.I_CHARGES] = self:GetItmCharges(tooltip);
             end
 
@@ -2445,7 +2453,7 @@ function TBag:UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, comparr,
             end
             if (not tooltip) then
               -- Haven't already made it so make it now.
-              tooltip = self:MakeToolTipStr(playerid, itm[self.I_ITEMLINK], bag, slot);
+              tooltip = self:MakeToolTipStr(playerid, itm[self.I_ITEMLINK], bag, slot, itm[self.I_REFORGE]);
             end
             if (string.find(tooltip, L["Soulbound"])) then
               itm[self.I_SOULBOUND] = 1;
@@ -2705,7 +2713,7 @@ function TBag:PickBar(cfg, playerid, itm, trade1, trade2)
   end
 
   -- Load tooltip
-  tooltip = self:MakeToolTipStr(playerid, itm[self.I_ITEMLINK], itm[self.I_BAG], itm[self.I_SLOT]);
+  tooltip = self:MakeToolTipStr(playerid, itm[self.I_ITEMLINK], itm[self.I_BAG], itm[self.I_SLOT], itm[self.I_REFORGE]);
 
   -- self:PrintDEBUG("Tooltip Text: "..tooltip);
 
@@ -2802,7 +2810,7 @@ function TBag:ScanEquipped()
     if (itemLink) then
       self:SetItemLink(self:GetPlayerInfo(self.PLAYERID, self.S_EQUIPPED), itemLink);
 
-      _, dbag[self.I_ITEMLINK] = self:GetItemID(itemLink);
+      _, dbag[self.I_ITEMLINK], dbag[self.I_REFORGE] = self:GetItemID(itemLink);
 
       dbag[self.I_NAME],_,dbag[self.I_RARITY] = GetItemInfo(dbag[self.I_ITEMLINK]);
       dbag[self.I_COUNT] = 1;

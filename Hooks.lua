@@ -309,7 +309,7 @@ function Hooks.ContainerFrameItemButton_OnModifiedClick(self, button, ...)
     if itm[TBag.I_ITEMLINK] then
       if IsModifiedClick("CHATLINK") then
         local hl = TBag:MakeHyperlink(itm[TBag.I_ITEMLINK], itm[TBag.I_NAME],
-	                              itm[TBag.I_RARITY],TBag:GetPlayerInfo(mainFrame.playerid,TBag.G_BASIC)[TBag.S_LEVEL] or UnitLevel("player"))
+	                              itm[TBag.I_RARITY],TBag:GetPlayerInfo(mainFrame.playerid,TBag.G_BASIC)[TBag.S_LEVEL] or UnitLevel("player"),itm[TBag.I_REFORGE])
         ChatEdit_InsertLink(hl)
 	return
       elseif IsModifiedClick("DRESSUP") then

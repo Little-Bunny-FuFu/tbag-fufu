@@ -19,6 +19,7 @@ function ItemButton:OnEnter()
   local bar, bag, slot = itm[TBag.I_BAR], itm[TBag.I_BAG], itm[TBag.I_SLOT]
   local cat, link = itm[TBag.I_CAT], itm[TBag.I_ITEMLINK]
   local charges = itm[TBag.I_CHARGES]
+	local reforge = itm[TBag.I_REFORGE]
 
   if mainFrame.edit_selected == "" then
     mainFrame.edit_hilight = cat
@@ -42,7 +43,7 @@ function ItemButton:OnEnter()
     end
   else
     hasCooldown, repairCost = TBag:SetInventoryItem(GameTooltip, mainFrame.playerid,
-                                                    link, bag, slot)
+                                                    link, bag, slot, reforge)
   end
 
   -- Set charges if remote viewing, Blizzard's code does it otherwise.
@@ -505,7 +506,7 @@ function BagButton:OnClick(button,down,drag)
   if IsModifiedClick("CHATLINK") then
     local hyperlink = TBag:MakeHyperlink(itm[TBag.I_ITEMLINK], itm[TBag.I_NAME],
                                          itm[TBag.I_RARITY],
-					 TBag:GetPlayerInfo(mainFrame.playerid,TBag.G_BASIC)[TBag.S_LEVEL] or UnitLevel("player"))
+					 TBag:GetPlayerInfo(mainFrame.playerid,TBag.G_BASIC)[TBag.S_LEVEL] or UnitLevel("player"),itm[TBag.I_REFORGE])
     if hyperlink and ChatEdit_InsertLink(hyperlink) then
       self:SetChecked(not self:GetChecked())
       return
