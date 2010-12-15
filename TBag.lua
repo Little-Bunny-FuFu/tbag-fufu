@@ -1009,6 +1009,8 @@ function TBag:SetDefLayout(cfg, bagarr, row1offset, reset)
   self:SetCatBar(cfg, string.format(L["IN_%s_BAG"],L["MINE"]), 16, reset);
   self:SetCatBar(cfg, string.format(L["IN_%s_BAG"],L["LTHR"]), 16, reset);
   self:SetCatBar(cfg, string.format(L["IN_%s_BAG"],L["INSC"]), 16, reset);
+  self:SetCatBar(cfg, string.format(L["IN_%s_BAG"],L["TACKLE"]), 16, reset);
+  self:SetCatBar(cfg, string.format(L["IN_%s_BAG"],L["UNKNOWN"]), 16, reset);
   self:SetCatBar(cfg, string.format(L["EMPTY_%s_SLOTS"],L["ENCH"]), 16, reset);
   self:SetCatBar(cfg, string.format(L["EMPTY_%s_SLOTS"],L["ENG"]), 16, reset);
   self:SetCatBar(cfg, string.format(L["EMPTY_%s_SLOTS"],L["GEM"]), 16, reset);
@@ -1016,6 +1018,8 @@ function TBag:SetDefLayout(cfg, bagarr, row1offset, reset)
   self:SetCatBar(cfg, string.format(L["EMPTY_%s_SLOTS"],L["MINE"]), 16, reset);
   self:SetCatBar(cfg, string.format(L["EMPTY_%s_SLOTS"],L["LTHR"]), 16, reset);
   self:SetCatBar(cfg, string.format(L["EMPTY_%s_SLOTS"],L["INSC"]), 16, reset);
+  self:SetCatBar(cfg, string.format(L["EMPTY_%s_SLOTS"],L["TACKLE"]), 16, reset);
+  self:SetCatBar(cfg, string.format(L["EMPTY_%s_SLOTS"],L["UNKNOWN"]), 16, reset);
 
   self:SetCatBar(cfg, L["CLOTH"], 15, reset);
   self:SetCatBar(cfg, L["FIRST_AID"], 15, reset);
@@ -1538,6 +1542,8 @@ function TBag:GetBagTypeName(bagType)
     return L["MINE"];
   elseif (bagType == 4096) then
     return L["PET"];
+  elseif (bagType == 32768) then
+    return L["TACKLE"];
   else
     return L["UNKNOWN"];
   end

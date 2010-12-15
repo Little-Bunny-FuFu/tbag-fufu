@@ -261,6 +261,7 @@ L["ENCH"] = "VERZ"
 L["LTHR"] = "LED"
 L["PET"] = "PET"
 L["INSC"] = "INSCH"
+L["TACKLE"] = false
 
 -- Bag Position Names, also used for EMPTY_%s_SLOTS and IN_%s_BAG categories
 L["KEYRING"] = "SCHL\195\156SSELBUND"

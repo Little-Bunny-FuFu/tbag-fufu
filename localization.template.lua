@@ -295,6 +295,7 @@ L["ENCH"] = false
 L["LTHR"] = false
 L["PET"] = false
 L["INSC"] = false
+L["TACKLE"] = false
 
 -- Bag Position Names, also used for EMPTY_%s_SLOTS and IN_%s_BAG categories
 L["KEYRING"] = false
