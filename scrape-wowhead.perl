@@ -206,7 +206,7 @@ sub output_trades {
 sub parse_reagents {
 	my $data = shift;
 
-	my ($reagents) = $data =~ /reagents:\[(.*)\],\w/;
+	my ($reagents) = $data =~ /"reagents":\[(\[.*\])\],"\w/;
 	my(@return) = $reagents =~ /\[(\d+),\d+\]/g;
 	return \@return;
 }
@@ -222,13 +222,13 @@ sub parse_spells {
 sub parse_id {
   my $data = shift;
   my $trade = shift;
-	my ($name) = $data =~ /name:'(.*?)',/;
+	my ($name) = $data =~ /"name":['"](.*?)['"],/;
 	if ($name =~ /^\d/) {
 		# item
-	  my ($id) = $data =~ /creates:\[(\d+),/;
+	  my ($id) = $data =~ /"creates":\[(\d+),/;
 		return $id
 	} elsif ($name =~ /^\@/) {
-	  my ($id) = $data =~ /id:(\d+),/;
+	  my ($id) = $data =~ /"id":(\d+),/;
     # Ugly special case to avoid Cooking Fire from showing as
     # an enchant.  It's the only spell we should pickup that's
     # not an enchant.
