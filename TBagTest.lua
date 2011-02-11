@@ -388,14 +388,15 @@ local tests = {
   [34106] = L["BAG"],
 
   -- Projectiles
+  -- Obsolete as of Cata, ammo is gone
+  --[[
   [31737] = L["PROJECTILE"],
   [31735] = L["PROJECTILE"],
+  ]]
 
   -- Books
-  [29549] = L["BOOK"],
   [21993] = L["BOOK"],
   [16072] = L["BOOK"],
-  [22153] = L["BOOK"],
   [21953] = L["DESIGN"],
   [33151] = L["FORMULA"],
   [22919] = L["RECIPE"],
@@ -419,6 +420,7 @@ local tests = {
   [7349] = L["TRADE_TOOL"],
   [39505] = L["TRADE_TOOL"],
   [40772] = L["TRADE_TOOL"],
+  [60223] = L["TRADE_TOOL"],
   [3567] = L["WEAPON"], -- Avoid matching fishing pole
   [4598] = L["EXPLOSIVES"], -- ditto
   [19970] = L["FISHING"],
@@ -445,7 +447,6 @@ local tests = {
   [6929] = L["QUEST"], -- Bath'rah's Parchment
   [10648] = L["INSCRIPTION"],
   [11105] = L["QUEST"], -- Curled Map Parchment
-  [3706] = L["ACT_ON"], -- Enscorcelled Parchment
   [9553] = L["QUEST"], -- Etched Parchment
   [9323] = L["QUEST"], -- Gadrin's Parchment
   [39501] = L["INSCRIPTION"],
@@ -493,7 +494,7 @@ local tests = {
 
   -- Restores
   [21991] = L["BANDAGE"],
-  [5509] = L["HEALTHSTONE"],
+  [5509] = L["HEALTHSTONE"]..'|'..L["CONSUMABLE"], -- If you don't have it doesn't include all the text
   [32578] = L["HEALTHSTONE"],
   [27666] = L["FOOD_BUFF"],
   [13810] = L["FOOD_BUFF"],
@@ -532,6 +533,8 @@ local tests = {
   [34440] = L["COMBO_RESTORE"],
   [20002] = L["COMBO_RESTORE"],
   [12190] = L["COMBO_RESTORE"],
+  [57099] = L["COMBO_RESTORE"],
+  [9144] = L["COMBO_RESTORE"],
   [22832] = L["MANA_RESTORE"],
   [32902] = L["MANA_RESTORE"],
   [22829] = L["HEALTH_RESTORE"],
@@ -543,7 +546,6 @@ local tests = {
   [12586] = L["CURE"],
   [31437] = L["CURE"],
   [5951] = L["CURE"],
-  [9030] = L["CURE"],
   [9030] = L["CURE"],
   [25550] = L["CURE"],
   [17744] = L["TRINKET"], -- Might match deDE pattern for removing poisons
@@ -577,17 +579,12 @@ local tests = {
   -- Reagents
   [17056] = L["CLASS_REAGENT"],
   [5565] = string.format(L["%s_REAGENT"],L["WARLOCK"]),
-  [16583] = string.format(L["%s_REAGENT"],L["WARLOCK"]),
   [22147] = string.format(L["%s_REAGENT"],L["DRUID"]),
   [17037] = string.format(L["%s_REAGENT"],L["DRUID"]),
-  [22148] = string.format(L["%s_REAGENT"],L["DRUID"]),
   [44614] = string.format(L["%s_REAGENT"],L["DRUID"]),
-  [44605] = string.format(L["%s_REAGENT"],L["DRUID"]),
   [17020] = string.format(L["%s_REAGENT"],L["MAGE"]),
   [17031] = string.format(L["%s_REAGENT"],L["MAGE"]),
   [17032] = string.format(L["%s_REAGENT"],L["MAGE"]),
-  [21177] = string.format(L["%s_REAGENT"],L["PALADIN"]),
-  [17033] = string.format(L["%s_REAGENT"],L["PALADIN"]),
   [17029] = string.format(L["%s_REAGENT"],L["PRIEST"]),
   [44615] = string.format(L["%s_REAGENT"],L["PRIEST"]),
   [17030] = string.format(L["%s_REAGENT"],L["SHAMAN"]),
@@ -633,7 +630,7 @@ local tests = {
   [49908] = L["REAGENT"],
 
   -- Trades
-  [8925] = L["ALCHEMY"],
+  [3371] = L["ALCHEMY"],
   [4305] = L["CLOTH"],
   [21877] = L["CLOTH"],
   [3173] = L["COOKING"],
@@ -655,8 +652,6 @@ local tests = {
   [47828] = L["ENGINEERING"],
 
   -- Rogue Poisons
-  [21835] = string.format(L["%s_REAGENT"],L["ROGUE"]),
-  [43237] = string.format(L["%s_REAGENT"],L["ROGUE"]),
   [3775] = string.format(L["%s_REAGENT"],L["ROGUE"]),
   [2892] = string.format(L["%s_REAGENT"],L["ROGUE"]),
   [2893] = string.format(L["%s_REAGENT"],L["ROGUE"]),
@@ -691,12 +686,12 @@ local tests = {
 tests[38266] = nil
 
 if not TBag.wrath_310 then
-	tests[44820] = nil
-	tests[44599] = nil
-	tests[44601] = nil
-	tests[45057] = nil
-	tests[45047] = nil
-	tests[45063] = nil
+  tests[44820] = nil
+  tests[44599] = nil
+  tests[44601] = nil
+  tests[45057] = nil
+  tests[45047] = nil
+  tests[45063] = nil
 end
 
 local function build_itm(id,itm)
