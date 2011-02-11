@@ -515,7 +515,7 @@ end
 function TBag:GetItemID(itemlink)
   if itemlink and type(itemlink) == "string" then
     local a,b,c,d,e,f,g,h,i,j =
-          itemlink:match("item:(%d+):(%d+):(%d+):(%d+):(%d+):(%d+):(%-?%d+):(%-?%d+):(%d+):(%d+)")
+          itemlink:match("item:(%d+):(%d+):(%d+):(%d+):(%d+):(%d+):(%-?%d+):(%-?%d+):?(%d*):?(%d*)")
     if a then
       local itemstring = string.join(":","item",a,b,c,d,e,f,g,h)
       return a, itemstring, j
