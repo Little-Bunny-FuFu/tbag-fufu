@@ -194,6 +194,7 @@ local tests = {
   [46779] = L["TOYS"],
   [46780] = L["TOYS"],
   [38578] = L["TOYS"],
+  [46709] = L["TOYS"],
 
   -- Mounts
   [33977] = L["MOUNT"],

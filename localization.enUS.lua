@@ -911,3 +911,4 @@ L["Carved Ogre Idol"] = true
 L["The Flag of Ownership"] = true
 L["Gnomeregan Pride"] = true
 L["High%-Powered Bolt Gun"] = true
+L["MiniZep Controller"] = true

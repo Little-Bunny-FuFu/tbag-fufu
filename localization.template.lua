@@ -901,3 +901,4 @@ L["Carved Ogre Idol"] = false
 L["The Flag of Ownership"] = false
 L["Gnomeregan Pride"] = false
 L["High%-Powered Bolt Gun"] = false
+L["MiniZep Controller"] = false

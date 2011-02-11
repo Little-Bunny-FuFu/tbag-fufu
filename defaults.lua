@@ -100,6 +100,7 @@ TBag.DefaultSearchList = {
   { L["TOYS"], L[""], L["Path of Cenarius"], L[""], L[""] },
   { L["TOYS"], L[""], L["Ogre Pinata"], L[""], L[""] },
   { L["TOYS"], L[""], L["The Flag of Ownership"], L[""], L[""] },
+  { L["TOYS"], L[""], L["MiniZep Controller"], L[""], L[""] },
 
 
   { L["AHN_QIRAJ"], L[""], L["%a+ Scarab"], L["Quest"], L[""] },
