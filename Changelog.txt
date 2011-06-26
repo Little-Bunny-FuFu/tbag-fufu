@@ -1,3 +1,7 @@
+* 20110626-r405-Shefki
+ - 4.2 compatability.  Keyring was removed from the game.
+   This release is backwards compatable with 4.1 as well.
+
 * 20110626-r401-Shefki
  - Fix the bug with toggling the inventory window with the default game
    keybinds.
