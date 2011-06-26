@@ -1,3 +1,7 @@
+* 20110210-r401-Shefki
+ - Fix the bug with toggling the inventory window with the default game
+   keybinds.
+
 * 20110210-r398-Shefki
   Note: This version contains a number of sorting changes the following
   commands are advised after backing up any modified sorting rules you have.
