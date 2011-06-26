@@ -250,6 +250,10 @@
         </Anchors>
         <Scripts>
           <OnLoad>
+            if (select(4,GetBuildInfo()) &gt;= 40200) then 
+              self:Hide()
+              return
+            end
             TBag.BagButton.OnLoad(self)
             self:SetID(KEYRING_CONTAINER)
           </OnLoad>

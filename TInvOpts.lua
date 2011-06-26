@@ -81,8 +81,10 @@ function TInvOpt_CreateCfgOpt()
   TBag:MakeCheck(TInv_CfgOpt, L["Alt Key Auto-Panel:"],
     TInvFrame.cfg, "alt_panel", TInvOpt_ResizeUpdate);
 
-  TBag:MakeCheck(TInv_CfgOpt, L["Show Keyring Empty Slots (Enable Show above):"],
-    TInvFrame.cfg, "show_keyring_empty_slots", TInvOpt_ResizeUpdate);
+  if (select(4,GetBuildInfo()) < 40200) then 
+    TBag:MakeCheck(TInv_CfgOpt, L["Show Keyring Empty Slots (Enable Show above):"],
+      TInvFrame.cfg, "show_keyring_empty_slots", TInvOpt_ResizeUpdate);
+	end
 
   TBag:MakeCheck(TInv_CfgOpt, L["Show Soul Shard Count On Soul Bags:"],
     TInvFrame.cfg, "show_soulshard_count", TInvOpt_ResizeUpdate);

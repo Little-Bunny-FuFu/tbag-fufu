@@ -162,7 +162,11 @@ local L = TBag.LOCALE;
 
 TBag.BAGMIN = KEYRING_CONTAINER;
 TBag.BAGMAX = 11;
-TBag.Inv_Bags = { BACKPACK_CONTAINER, 4, 3, 2, 1, KEYRING_CONTAINER };
+TBag.Inv_Bags = { BACKPACK_CONTAINER, 4, 3, 2, 1 };
+if (select(4,GetBuildInfo()) < 40200) then
+  TBag.Inv_Bags[#TBag.Inv_Bags+1] = KEYRING_CONTAINER;
+end
+	
 TBag.Bnk_Bags = { BANK_CONTAINER, 5, 6, 7, 8, 9, 10, 11 };
 TBag.Body_Slots = {
   ["HeadSlot"] = 1,
