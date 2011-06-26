@@ -1,4 +1,4 @@
-* 20110210-r401-Shefki
+* 20110626-r401-Shefki
  - Fix the bug with toggling the inventory window with the default game
    keybinds.
 
