@@ -18,7 +18,7 @@ Hooks.funcs = {
   "CloseBackpack",
   "ToggleBackpack",
   "ToggleKeyRing",
-  "OpenAllBags",
+  "ToggleAllBags",
   "ContainerFrameItemButton_OnModifiedClick",
 }
 
@@ -202,7 +202,7 @@ function Hooks.ToggleKeyRing()
   Hooks.ToggleBag(KEYRING_CONTAINER)
 end
 
-function Hooks.OpenAllBags()
+function Hooks.ToggleAllBags()
   TBag:PrintDEBUG("event: OpenAllBags()")
   local inv_bag_toggled  = false
   local inv_shown = false
