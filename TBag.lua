@@ -14,6 +14,7 @@ if TBag.VERSION  == "\64project-version\64" then
   TBag.VERSION = short_date..'-r'..string.sub(rev, string.find(rev, '%d+'))..dev..'-Shefki'
 end
 
+local cata_420 = select(4,GetBuildInfo()) >= 40200
 
 
 BINDING_HEADER_TBag = "TBag";
@@ -163,7 +164,7 @@ local L = TBag.LOCALE;
 TBag.BAGMIN = KEYRING_CONTAINER;
 TBag.BAGMAX = 11;
 TBag.Inv_Bags = { BACKPACK_CONTAINER, 4, 3, 2, 1 };
-if (select(4,GetBuildInfo()) < 40200) then
+if not cata_420 then
   TBag.Inv_Bags[#TBag.Inv_Bags+1] = KEYRING_CONTAINER;
 end
 	
@@ -1719,6 +1720,8 @@ function TBag:MakeHyperlink(itemstring,name,quality,level,reforge)
   if (name) and (itemstring) and (quality) then
     quality = tonumber(quality);
     local _,_,_,color = GetItemQualityColor(quality);
+
+    local color_prefix = cata_420 and '|c' or ''
     -- item links now include the level of the linker in Wrath.
     if level then
       itemstring = itemstring..":"..level
@@ -1731,7 +1734,7 @@ function TBag:MakeHyperlink(itemstring,name,quality,level,reforge)
 		else
 			itemstring = itemstring..":0"
 		end
-    itemlink = color.."|H"..itemstring.."|h["..name.."]|h|r";
+    itemlink = color_prefix..color.."|H"..itemstring.."|h["..name.."]|h|r";
   elseif (itemstring) then
     _,itemlink = GetItemInfo(itemstring);
   end
