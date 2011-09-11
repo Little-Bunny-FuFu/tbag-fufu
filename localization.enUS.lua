@@ -912,3 +912,5 @@ L["The Flag of Ownership"] = true
 L["Gnomeregan Pride"] = true
 L["High%-Powered Bolt Gun"] = true
 L["MiniZep Controller"] = true
+L["Leyara's Locket"] = true
+L["Mushroom Chair"] = true

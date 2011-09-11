@@ -902,3 +902,5 @@ L["The Flag of Ownership"] = false
 L["Gnomeregan Pride"] = false
 L["High%-Powered Bolt Gun"] = false
 L["MiniZep Controller"] = false
+L["Leyara's Locket"] = false
+L["Mushroom Chair"] = false

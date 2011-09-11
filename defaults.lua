@@ -60,6 +60,7 @@ TBag.DefaultSearchList = {
   { L["COSTUMES"], L[""], L["Blossoming Branch"], L[""], L[""] },
   { L["COSTUMES"], L[""], L["Carved Ogre Idol"], L[""], L[""] },
   { L["COSTUMES"], L[""], L["Gnomeregan Pride"], L[""], L[""] },
+  { L["COSTUMES"], L[""], L["Leyara's Locket"], L[""], L[""] },
   { L["FIREWORKS"], L[""], L["Shoots a.*firework"], L["Consumable"], L[""] },
   { L["FIREWORKS"], L[""], L["Shoots a.*firework"], L["Miscellaneous"], L[""] },
   { L["FIREWORKS"], L[""], L["Place on the ground to launch .* rockets"], L[""], L[""] },
@@ -101,6 +102,7 @@ TBag.DefaultSearchList = {
   { L["TOYS"], L[""], L["Ogre Pinata"], L[""], L[""] },
   { L["TOYS"], L[""], L["The Flag of Ownership"], L[""], L[""] },
   { L["TOYS"], L[""], L["MiniZep Controller"], L[""], L[""] },
+  { L["TOYS"], L[""], L["Mushroom Chair"], L[""], L[""] },
 
 
   { L["AHN_QIRAJ"], L[""], L["%a+ Scarab"], L["Quest"], L[""] },
