@@ -15,6 +15,7 @@ if TBag.VERSION  == "\64project-version\64" then
 end
 
 local cata_420 = select(4,GetBuildInfo()) >= 40200
+local mop_500 = select(4,GetBuildInfo()) >= 50000
 
 
 BINDING_HEADER_TBag = "TBag";
@@ -187,7 +188,7 @@ TBag.Body_Slots = {
   ["BackSlot"] = 15,
   ["MainHandSlot"] = 16,
   ["SecondaryHandSlot"] = 17,
-  ["RangedSlot"] = 18,
+  ["RangedSlot"] = not mop_500 and 18 or nil,
   ["TabardSlot"] = 19
 };
 
