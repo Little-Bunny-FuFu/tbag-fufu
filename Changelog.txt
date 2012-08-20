@@ -1,3 +1,7 @@
+* 20120819-r412-Shefki
+ - 5.0 compatability.  Ranged slot was removed from the game.
+   This release is backwards compatible with 4.x as well.
+
 * 20110626-r405-Shefki
  - 4.2 compatability.  Keyring was removed from the game.
    This release is backwards compatable with 4.1 as well.
