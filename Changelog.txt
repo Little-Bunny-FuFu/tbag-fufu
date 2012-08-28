@@ -1,3 +1,7 @@
+* 20120828-r416-Shefki
+ - Workaround a bug on Blizzard's side resulting in TBag tainting the GlyphUI in 5.x
+ - Add translation keys for MONK.
+
 * 20120819-r412-Shefki
  - 5.0 compatability.  Ranged slot was removed from the game.
    This release is backwards compatible with 4.x as well.
