@@ -247,6 +247,7 @@ L["SHAMAN"] = "ШАМАН"
 L["WARRIOR"] = "ВОИН"
 L["HUNTER"] = "ОХОТНИК"
 L["DEATHKNIGHT"] = "РЫЦАРЬ_СМЕРТИ"
+L["MONK"] = false
 L["CLASS_TOOL"] = "КЛАССОВАЯ_ВЕЩЬ"
 L["CLASS_REAGENT"] = "КЛАССОВЫЙ_РЕАГЕНТ"
   

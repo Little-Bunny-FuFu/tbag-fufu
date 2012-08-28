@@ -279,6 +279,7 @@ L["SHAMAN"] = false
 L["WARRIOR"] = false
 L["HUNTER"] = false
 L["DEATHKNIGHT"] = false
+L["MONK"] = false
 L["CLASS_TOOL"] = false
 L["CLASS_REAGENT"] = false
 

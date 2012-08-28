@@ -291,6 +291,7 @@ L["SHAMAN"] = true
 L["WARRIOR"] = true
 L["HUNTER"] = true
 L["DEATHKNIGHT"] = true
+L["MONK"] = true
 L["CLASS_TOOL"] = true
 L["CLASS_REAGENT"] = true
 
