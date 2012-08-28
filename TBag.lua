@@ -288,7 +288,7 @@ function TBag:Init()
   _G[self:GetDummyBagFrameName(BANK_CONTAINER)]:SetID(BANK_CONTAINER);
 
   -- Initialize any player related info
-  local group;
+  local group,_;
   group = TBagInfo[self.PLAYERID][self.G_BASIC];
   _, group[self.S_CLASS] = UnitClass("player");
   group[self.S_HEARTH] = GetBindLocation();
@@ -1560,6 +1560,7 @@ end
 -- Redo this using system calls to the actual frame
 function TBag:GetBagType(playerid, bag)
   local type = 0;
+  local _;
 
   if ( bag < self.BAGMIN ) or ( bag > self.BAGMAX ) then return nil; end
 
@@ -1796,6 +1797,7 @@ function TBag:GetSlotInfo(playerid, bag)
 --        self:Print("b="..bag..", size="..size);
       end
       for i=1, size do
+        local _
         _, item = GetContainerItemInfo(bag, i);
         if (not item) then
           free = free + 1;
@@ -2226,6 +2228,7 @@ function TBag:MakeToolTipStr(playerid, itemlink, bag, slot, mailitem, attach, re
   elseif (itemlink) and (bag) then
     -- Just a bag id means it's a slotid used for scanning inventory items.
     local slotid = bag;
+    local _
     _, hasCooldown, repairCost = tt:SetInventoryItem("player", slotid);
   elseif (itemlink) and (mailitem) and (attach) then
     tt:SetInboxItem(mailitem, attach);
@@ -2367,6 +2370,7 @@ function TBag:UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, comparr,
         itmcache[bag] = {};
       end
 
+      local _
       _, size = self:GetSlotInfo(playerid, bag);
 
       -- If a bag decreases in size wipe the keys for the
@@ -2818,6 +2822,7 @@ function TBag:ScanEquipped()
     if (itemLink) then
       self:SetItemLink(self:GetPlayerInfo(self.PLAYERID, self.S_EQUIPPED), itemLink);
 
+      local _
       _, dbag[self.I_ITEMLINK], dbag[self.I_REFORGE] = self:GetItemID(itemLink);
 
       dbag[self.I_NAME],_,dbag[self.I_RARITY] = GetItemInfo(dbag[self.I_ITEMLINK]);
@@ -3483,6 +3488,7 @@ local ItemMover__co = coroutine.create(ItemMover__main);
 -- resume the coroutine
 local function ItemMover_Resume()
   if (coroutine.status(ItemMover__co) == "suspended") then
+    local _
     _,instructions = coroutine.resume(ItemMover__co,ItemMover__instructions);
   end
 end
