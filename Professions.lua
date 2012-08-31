@@ -4,6 +4,14 @@ local _G = getfenv(0)
 local TBag = _G.TBag
 local L = TBag.LOCALE
 
+local mop_500 = select(4,GetBuildInfo()) >= 50000
+local GetTradeSkillCategoryFilter = GetTradeSkillCategoryFilter
+local SetTradeSkillCategoryFilter = SetTradeSkillCategoryFilter
+if not mop_500 then
+	GetTradeSkillCategoryFilter = GetTradeSkillSubClassFilter
+	SetTradeSkillCategoryFilter = SetTradeSkillSubClassFilter
+end
+
 -- Constants used throughout the addon
 TBag.S_TRADES  = "trades"
 TBag.S_SECOND  = "second"
@@ -309,7 +317,7 @@ function Professions.ScanRecipes()
       end
     end
     for i = 0, numSubClasses do
-      if GetTradeSkillSubClassFilter(i) then
+      if GetTradeSkillCategoryFilter(i) then
         saveClassFilter = i
         break
       end
@@ -319,7 +327,7 @@ function Professions.ScanRecipes()
 
     -- Wipe the current filters
     SetTradeSkillInvSlotFilter(0, 1, 1)
-    SetTradeSkillSubClassFilter(0, 1, 1)
+    SetTradeSkillCategoryFilter(0, 1, 1)
     SetTradeSkillItemLevelFilter(0, 0)
     SetTradeSkillItemNameFilter("")
 
@@ -358,7 +366,7 @@ function Professions.ScanRecipes()
     SetTradeSkillItemNameFilter(saveNameFilter or "")
     SetTradeSkillItemLevelFilter(saveMinLevel, saveMaxLevel)
     SetTradeSkillInvSlotFilter(saveInvFilter, 1, 1)
-    SetTradeSkillSubClassFilter(saveClassFilter, 1, 1)
+    SetTradeSkillCategoryFilter(saveClassFilter, 1, 1)
     TradeSkillOnlyShowMakeable(saveMakeable)
   end
 end
