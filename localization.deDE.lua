@@ -38,7 +38,7 @@ L["Inscription"] = GetSpellInfo(45357)
 -- Gathering
 L["Skinning"] = GetSpellInfo(8613)
 L["Mining"] = GetSpellInfo(2575)
-L["Herbalism"] = GetSpellInfo(9134)
+L["Herbalism"] = "Kr\195\164uterkunde"
 
 -- Other skills
 L["Lockpicking"] = GetSpellInfo(1809)
