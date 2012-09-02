@@ -297,6 +297,22 @@ local function get_count(...)
   return select('#', ...)
 end
 
+local function process_skill_line(i, numTradeSkills, created, reagent, tradeskillName)
+  local craftName, craftType, numAvailable, isExpanded = GetTradeSkillInfo(i)
+  if craftType == "header" or craftType == "subheader" then
+    if not isExpanded then
+      ExpandTradeSkillSubClass(i)
+      local skillsUnderHeader = GetNumTradeSkills() - numTradeSkills
+      for j = i+1, i+skillsUnderHeader do
+        process_skill_line(j, numTradeSkills+skillsUnderHeader, created, reagent, tradeskillName)
+      end
+      CollapseTradeSkillSubClass(i)
+    end
+  else
+    add_craft(created, reagent, tradeskillName, i)
+  end
+end
+
 function Professions.ScanRecipes()
   -- Get the name of the tradeskill and reverse it to enUS
   local tradeskillName = RL[GetTradeSkillLine()]
@@ -345,21 +361,7 @@ function Professions.ScanRecipes()
 
     -- Iterate the trade skills
     for i = 1, numTradeSkills do
-      local craftName, craftType, numAvailable, isExpanded = GetTradeSkillInfo(i)
-
-      if craftType == "header" then
-        if not isExpanded then
-          local numTradeSkills = numTradeSkills
-          ExpandTradeSkillSubClass(i)
-          numTradeSkills = GetNumTradeSkills() - numTradeSkills
-          for j = i+1, i+numTradeSkills do
-            add_craft(created, reagent, tradeskillName, j)
-          end
-          CollapseTradeSkillSubClass(i)
-        end
-      else
-        add_craft(created, reagent, tradeskillName, i)
-      end
+      process_skill_line(i, numTradeSkills, created, reagent, tradeskillName)
     end
 
     -- Restore the saved filters
