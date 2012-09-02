@@ -1,4 +1,4 @@
-* 20120902-r421-Shefki
+* 20120902-r423-Shefki
  - Resolves an error when opening the Inscription frame.
 
 * 20120830-r419-Shefki
