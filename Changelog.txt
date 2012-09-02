@@ -1,3 +1,6 @@
+* 20120902-r426-Shefki
+ - Fix an error for Herbalists using German or Russian clients.
+
 * 20120902-r423-Shefki
  - Resolves an error when opening the Inscription frame.
 
