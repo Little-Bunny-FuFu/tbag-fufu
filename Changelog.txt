@@ -1,3 +1,6 @@
+* 20120902-r421-Shefki
+ - Resolves an error when opening the Inscription frame.
+
 * 20120830-r419-Shefki
  - Resolve errors when opening tradeskill windows.
 
