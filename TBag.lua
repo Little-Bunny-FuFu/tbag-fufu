@@ -510,9 +510,15 @@ function TBag:ResetNew(itm)
 end
 
 function TBag:GetItemInfo(itemid)
-  if (itemid) then
-    local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, invTexture = GetItemInfo(itemid);
-    return itemName, itemType, itemSubType, itemRarity, itemLink, itemStackCount;
+  if itemid then
+    if tostring(itemid):sub(1,10) ~= "battlepet:" then
+      local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, invTexture = GetItemInfo(itemid);
+      return itemName, itemType, itemSubType, itemRarity, itemLink, itemStackCount;
+    else
+      local _,species,_,quality = strsplit(":", itemid)
+      local itemName = C_PetJournal.GetPetInfoBySpeciesID(species)
+      return itemName, "Miscellaneous", "Companion Pets", quality, itemid, 1
+    end
   else
     return;
   end
@@ -525,6 +531,12 @@ function TBag:GetItemID(itemlink)
     if a then
       local itemstring = string.join(":","item",a,b,c,d,e,f,g,h)
       return a, itemstring, j
+    end
+    a,b,c,d,e,f,g =
+          itemlink:match("battlepet:(%d+):(%d+):(%d+):(%d+):(%d+):(%d+):(%d+)")
+    if a then
+      local itemstring = string.join(":","battlepet",a,b,c,d,e,f,g)
+      return -1, itemstring, nil, a
     end
   end
 
@@ -1724,18 +1736,20 @@ function TBag:MakeHyperlink(itemstring,name,quality,level,reforge)
     local _,_,_,color = GetItemQualityColor(quality);
 
     local color_prefix = cata_420 and '|c' or ''
-    -- item links now include the level of the linker in Wrath.
-    if level then
-      itemstring = itemstring..":"..level
-    else
-      -- failsave in case level isn't passed through.
-      itemstring = itemstring..":"..UnitLevel("player")
+    if itemstring:sub(1,5) == "item:" then
+      -- item links now include the level of the linker in Wrath.
+      if level then
+        itemstring = itemstring..":"..level
+      else
+        -- failsafe in case level isn't passed through.
+        itemstring = itemstring..":"..UnitLevel("player")
+      end
+      if reforge then
+        itemstring = itemstring..":"..reforge
+      else
+        itemstring = itemstring..":0"
+      end
     end
-		if reforge then
-			itemstring = itemstring..":"..reforge
-		else
-			itemstring = itemstring..":0"
-		end
     itemlink = color_prefix..color.."|H"..itemstring.."|h["..name.."]|h|r";
   elseif (itemstring) then
     _,itemlink = GetItemInfo(itemstring);
@@ -2171,6 +2185,12 @@ end
 function TBag:SetInventoryItem(tt, playerid, itemlink, bag, slot, reforge)
   local hasCooldown, repairCost;
 
+  if itemlink and itemlink:sub(1,10) == "battlepet:" then
+    local _, speciesID, level, breedQuality, maxHealth, power, speed, battlePetID = strsplit(":",itemlink)
+    BattlePetToolTip_Show(tonumber(speciesID), tonumber(level), tonumber(breedQuality), tonumber(maxHealth), tonumber(power), tonumber(speed))
+    return
+  end
+
   -- If we are the current player, it might be safe to set inventory directly
   if (playerid == self.PLAYERID) then
     -- Inventory and being at the bank is always safe
@@ -2210,6 +2230,10 @@ function TBag:MakeToolTipStr(playerid, itemlink, bag, slot, mailitem, attach, re
   local tt = TBag_tt
   local tooltip = "";
   local hasCooldown, repairCost;
+
+  if itemlink and itemlink:sub(1,10) == "battlepet:" then
+    return ""
+  end
 
   if (not tt) then
     tt = CreateFrame("GameTooltip","TBag_tt");
@@ -2848,10 +2872,19 @@ function TBag:ScanMail()
     if (itemCount) then
       TMailItm[self.PLAYERID][idx] = {};
       for slot = 1, itemCount do
-	TMailItm[self.PLAYERID][idx][slot] = {};
+        TMailItm[self.PLAYERID][idx][slot] = {};
         local itm = TMailItm[self.PLAYERID][idx][slot];
         local name, itemTexture, count, quality, canUse = GetInboxItem(idx,slot);
         local _,itemlink = self:GetItemID(GetInboxItemLink(idx,slot));
+        if itemlink and itemlink:sub(1,11)  == "item:82800:" then
+          -- Deal with Pet Cages *sigh*
+          local _, speciesID, level, breedQuality, maxHealth, power, speed, petname = GameTooltip:SetInboxItem(idx, slot)
+          if speciesID and speciesID > 0 then
+            itemlink = string.format("battlepet:%d:%d:%d:%d:%d:%d:0",speciesID, level, breedQuality, maxHealth, power, speed)
+            name = petname
+            quality = breedQuality
+          end
+        end
 
         -- GetInboxItem is currently bugged and returns -1 for the quality
         -- so try and get the correct quality from GetItemInfo
@@ -2862,7 +2895,7 @@ function TBag:ScanMail()
         itm[self.I_NAME] = name;
         itm[self.I_COUNT] = count;
         itm[self.I_ITEMLINK] = itemlink;
-	itm[self.I_RARITY] = quality;
+        itm[self.I_RARITY] = quality;
         local tooltip = self:MakeToolTipStr(playerid, itm[self.I_ITEMLINK], nil, nil,
                                             idx, slot);
         itm[self.I_CHARGES] = self:GetItmCharges(tooltip);

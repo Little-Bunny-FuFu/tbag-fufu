@@ -20,6 +20,7 @@ function ItemButton:OnEnter()
   local cat, link = itm[TBag.I_CAT], itm[TBag.I_ITEMLINK]
   local charges = itm[TBag.I_CHARGES]
 	local reforge = itm[TBag.I_REFORGE]
+  local pet = link and link:sub(1,10) == "battlepet:"
 
   if mainFrame.edit_selected == "" then
     mainFrame.edit_hilight = cat
@@ -67,6 +68,10 @@ function ItemButton:OnEnter()
     GameTooltip_ShowCompareItem()
   end
 
+  if pet then
+    GameTooltip:SetOwner(BattlePetTooltip, "ANCHOR_BOTTOM")
+  end
+
   if mainFrame.edit_mode == 1 then
     if cat then
       if mainFrame.edit_selected ~= "" then
@@ -112,6 +117,7 @@ function ItemButton:OnLeave()
 
   if GameTooltip:IsOwned(self) then
     GameTooltip:Hide()
+    BattlePetTooltip:Hide()
     ResetCursor()
   end
 
@@ -233,9 +239,15 @@ function ItemButton.Update(self)
   end
 
   -- Set the texture for for the button
-  if itm[TBag.I_ITEMLINK] then
+  local itemlink = itm[TBag.I_ITEMLINK]
+  if itemlink then
     frame_texture:SetAlpha(1)
-    texture = GetItemIcon(itm[TBag.I_ITEMLINK])
+    if itemlink:sub(1,5) == "item:" then
+      texture = GetItemIcon(itm[TBag.I_ITEMLINK])
+    elseif itemlink:sub(1,10) == "battlepet:" then
+      local _, _, _, speciesID = TBag:GetItemID(itemlink)
+      _, texture = C_PetJournal.GetPetInfoBySpeciesID(speciesID)
+    end
   else
     if cfg.show_bag_icons == 1 then
       texture = TBag:GetBagTexture(playerid, bag)

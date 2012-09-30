@@ -25,6 +25,7 @@ TBag.DefaultSearchList = {
   { L["ENCHANTS"], L[""], L["Use: Permanently"], L["Miscellaneous"], L[""] },
   { L["GLYPHS"], L[""], L[""], L["Glyph"], L[""] },
   { L["HEARTH"], L[""], L["Hearthstone%s"], L["Miscellaneous"], L[""] },
+  { L["MINIPET"], L[""], L[""], L["Miscellaneous"], L["Companion Pets"] },
   { L["MINIPET"], L[""], L["Right Click to summon and dismiss"], L[""], L[""] },
   { L["MINIPET"], L[""], L["Summons or dismisses a Spirit of"], L[""], L[""] },
   { L["MINIPET"], L[""], L["Use: Teaches you how to summon a?n?d? ?d?i?s?m?i?s?s? ?this companion."], L[""], L[""] },
