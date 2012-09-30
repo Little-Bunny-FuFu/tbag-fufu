@@ -1,3 +1,6 @@
+* 20120929-r432-Shefki
+- Resolve problems with caged pets.
+
 * 20120913-r429-Shefki
  - Fix the problem with the Fishing spell causing errors in 5.0.5 for German
  and Russian clients.
