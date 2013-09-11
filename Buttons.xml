@@ -41,6 +41,10 @@
       <OnLoad>
         ContainerFrameItemButton_OnLoad(self);
         self.UpdateTooltip = TBag.ItemButton.OnEnter;
+        local newitem = _G[self:GetName() .. "NewItemTexture"]
+        if newitem then
+          newitem:Hide();
+        end
       </OnLoad>
       <OnEnter>
         TBag.ItemButton.OnEnter(self, motion);
