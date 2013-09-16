@@ -30,8 +30,13 @@ TBnk_Config_MaxScroll = 1;
 
 function TBnk_Opts_ControlValueChanged(this,v)
 	if ( (TBnk_Options_UPDATE_HAPPENING == 0) and (this.change_value_func ~= nil) ) then
+		local step = this.GetValueStep and this:GetValueStep() or nil
+		if v and step and  step > 0 then
+			v = math.ceil(v / step) * step
+		end
 		this.change_value_func(v, this.func_param1, this.func_param2, this.func_param3, this.func_param4);
 	end
+	return v
 end
 
 function TBnkOpt_SwapSearchItems(unused_value, key1, key2)

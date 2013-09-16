@@ -35,8 +35,8 @@
       <OnValueChanged>
         local this = self or _G.this     
         local arg1 = value or _G.arg1
-        TBnk_Opts_ControlValueChanged(this, arg1);
-        _G[this:GetName().."_disp_text"]:SetText( this:GetValue() );
+        arg1 = TBnk_Opts_ControlValueChanged(this, arg1);
+        _G[this:GetName().."_disp_text"]:SetText( arg1 );
       </OnValueChanged>
     </Scripts>
     <ThumbTexture name="$parentThumb" file="Interface\Buttons\UI-SliderBar-Button-Horizontal">
