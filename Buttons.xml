@@ -45,6 +45,10 @@
         if newitem then
           newitem:Hide();
         end
+        local battlepay = _G[self:GetName()].BattlepayItemTexture;
+        if battlepay then
+          battlepay:Hide();
+        end
       </OnLoad>
       <OnEnter>
         TBag.ItemButton.OnEnter(self, motion);
