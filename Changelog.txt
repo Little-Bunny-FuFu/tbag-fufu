@@ -1,3 +1,7 @@
+* 20141014-r444-Shefki
+- Bump TOC for 6.0
+- Fix the blue  hue over the buttons in 6.0
+
 * 20130910-r439-Shefki
 - Bump TOC for 5.4
 - Fix the blue hue over the buttons in 5.4
