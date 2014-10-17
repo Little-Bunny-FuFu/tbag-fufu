@@ -2078,7 +2078,7 @@ function TBag:UpdateButtonHighlights()
       texture:SetVertexColor(r[bag], g[bag], b[bag], a[bag]);
       local cfg = self:GetCfgFromBag(bag);
 
-      if (self:GetBagFrame(bag):GetChecked() == 1 or isopen[bag]) and (cfg)
+      if (self:GetBagFrame(bag):GetChecked() or isopen[bag]) and (cfg)
         and (cfg["spotlight_open"] == 1) then
         --and (cfg["show_Bag"..bag] == 1) then
         texture:Show();
