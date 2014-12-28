@@ -23,6 +23,7 @@ function TBag:VARIABLES_LOADED()
   self:RegisterEvent("SKILL_LINES_CHANGED")
   self:RegisterEvent("QUEST_ACCEPTED")
   self:RegisterEvent("UNIT_QUEST_LOG_CHANGED")
+  self:RegisterEvent("PLAYER_ENTERING_WORLD")
 
   -- Scan equipment on login.
   TBag:ScanEquipped()
@@ -117,7 +118,12 @@ function TBag:UNIT_QUEST_LOG_CHANGED(event, unit)
               TInvFrame:UpdateWindow()
       end
 end
- 
+
+function TBag:PLAYER_ENTERING_WORLD(event)
+  -- One time extra scan to avoid bogus data on swapping characters
+  TBag.Tokens.Scan()
+  self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+end
 
 
 local events = {
@@ -140,6 +146,7 @@ local events = {
   ["SKILL_LINES_CHANGED"] = TBag.SKILL_LINES_CHANGED,
   ["QUEST_ACCEPTED"] = TBag.QUEST_ACCEPTED,
   ["UNIT_QUEST_LOG_CHANGED"] = TBag.UNIT_QUEST_LOG_CHANGED,
+  ["PLAYER_ENTERING_WORLD"] = TBag.PLAYER_ENTERING_WORLD,
 }
 
 function TBag:OnEvent(event, ...)
