@@ -1275,6 +1275,7 @@ function TBag:InitDefVals(cfg, bagarr, row1offset, reset)
   self:SetDef(cfg, "show_reloadbutton", 1, reset, self.NumFunc, 0, 1);
   self:SetDef(cfg, "show_editbutton", 1, reset, self.NumFunc, 0, 1);
   self:SetDef(cfg, "show_hilightbutton", 1, reset, self.NumFunc, 0, 1);
+  self:SetDef(cfg, "show_depositbutton", 1, reset, self.NumFunc, 0, 1);
   self:SetDef(cfg, "show_lockbutton", 1, reset, self.NumFunc, 0, 1);
   self:SetDef(cfg, "show_closebutton", 1, reset, self.NumFunc, 0, 1);
   self:SetDef(cfg, "show_total", 1, reset, self.NumFunc, 0, 1);
