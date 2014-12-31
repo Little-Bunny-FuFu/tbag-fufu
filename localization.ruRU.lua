@@ -106,6 +106,7 @@ L["Fifth Bank Bag"] = "Пятая сумка банка"
 L["Sixth Bank Bag"] = "Первая сумка банка"
 L["Seventh Bank Bag"] = "Седьмая сумка банка"
 L["Empty Slot"] = "Пустая ячейка"
+L["Purchasable Reagent Bank"] = false
 
 -----------------------------------------------------------------------
 -- CATEGORIES
@@ -416,9 +417,6 @@ L["Reloads your items and sorts them."] = "Перегрузить ваши ве�
 L["Toggle Bank"] = "Показать/спрятать банк"
 L["Displays bank contents in a view-only mode.  You may select another player's bank to view from the dropdown."] = "Показывает банк игрока в режиме просмотра. Вы также можете выбрать для просмотра банк другого персонажа."
 
-L["Toggle Purchase Info"] = "Показать информацию о покупках"
-L["Displays the purchase button and cost to buy a new bank slot.  This is disabled in read-only views and edit mode."] = "Показывает на экране сколько будет стоить новый слот в банке. Это отключено в режиме чтения и при редактировании сумок."
-
 L["Unlock Window"] = "Разблокировать окно"
 L["Allow window to be moved by dragging it."] = "Позволяет перемещать окно"
 L["Lock Window"] = "Закрепить окно"
@@ -471,7 +469,6 @@ L["Border Color for Bar %d"] = "Цвет границы для панелиа %d
 L["Select Character"] = "Выбрать персонажа"
 L["Edit Mode"] = "Режим редактирования"
 L["Lock window"] = "Закрепить окно"
-L["Show Purchase Info"] = "Показать информацию о покупке"
 L["Close Inventory"] = "Закрыть Инвертарь"
 L["Highlight New Items"] = "Выделить новые предметы"
 L["Reset NEW tag"] = "Сбросить пометку НОВЫЕ"
@@ -482,8 +479,8 @@ L["Hide"] = "Скрыть"
 L["Hide Player Dropdown"] = "Скрыть окно выбора персонажей"
 L["Hide Search Box"] = "Скрыть окно поиска"
 L["Hide Re-sort Button"] = "Скрыть кнопку пересортировки"
+L["Hide Reagent Deposit Button"] = false
 L["Hide Bank Button"] = "Скрыть кнопку банка"
-L["Hide Show Purchase Button"] = "Скрыть показа информации о покупке"
 L["Hide Edit Button"] = "Скрыть кнопку редактирования"
 L["Hide Highlight Button"] = "Скрыть кнопку выделения"
 L["Hide Lock Button"] = "Скрыть кнопку закрепления"
@@ -509,6 +506,7 @@ L["BOTTOMLEFT"] = "НИЗВЛЕВО"
 L["BOTTOMRIGHT"] = "НИЗВПРАВО"
 L["Show on TBag"] = "Показать в TBag"
 L["Checking this option will allow you to track this currency type in TBag for this character.\n\nYou can also Shift-click a currency to add or remove it from being tracked in TBag."] = "Выбрав этот вариант,вы позволите отслеживать этот тип валюты в TBag для этого персонажа.\n\n Также вы можете использовать комбинацию Shift-Click, чтобы добавить или удалить отслеживание валюты в TBag."
+L["Deposits all Reagents in your bag."] = false
 
 -- Option Window Strings
 L["Main Sizing Preferences"] = "Настройки размеров:"

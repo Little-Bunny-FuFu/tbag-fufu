@@ -1398,7 +1398,7 @@ function Inv:UpdateWindow(resort_req)
 
   -- Relink the button map
   for _,bag in ipairs(self.bags) do
-    for slot = 1, MAX_CONTAINER_ITEMS do
+    for slot = 1, TBag:GetBagMaxItems(bag) do
       TBag.BUTTONS[TBag:GetBagItemButtonName(bag, slot)] = TInvItm[self.playerid][bag][slot]
     end
   end
@@ -1416,7 +1416,7 @@ function Inv:UpdateWindow(resort_req)
     for slot = 1, size do
       TBag.ItemButton.Update(_G[TBag:GetBagItemButtonName(bag, slot)])
     end
-    for slot = size+1, MAX_CONTAINER_ITEMS do
+    for slot = size+1, TBag:GetBagMaxItems(bag) do
       _G[TBag:GetBagItemButtonName(bag, slot)]:Hide();
     end
   end

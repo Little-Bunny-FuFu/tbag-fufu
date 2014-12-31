@@ -130,32 +130,6 @@
         </Scripts>
       </Button>
 
-      <Button name="TBnk_Button_ShowPurchase">
-        <Size><AbsDimension x="20" y="20"/></Size>
-        <NormalTexture file="Interface\Icons\INV_Misc_Coin_01" />
-        <PushedTexture file="Interface\Icons\INV_Misc_Coin_01" />
-        <HighlightTexture file="Interface\Icons\Trade_Engineering" alphaMode="ADD" />
-        <Anchors>
-          <Anchor point="TOPLEFT" relativeTo="TBnk_Button_ChangeEditMode" relativePoint="TOPRIGHT">
-            <Offset>
-              <AbsDimension x="2" y="0"/>
-            </Offset>
-          </Anchor>
-        </Anchors>
-        <Scripts>
-          <OnClick>
-            TBnkFrame.Button_ShowPurchase_OnClick(self, button, down);
-          </OnClick>
-          <OnEnter>
-		  GameTooltip_AddNewbieTip(self, TBag.LOCALE["Toggle Purchase Info"], 1.0, 1.0, 1.0, TBag.LOCALE["Displays the purchase button and cost to buy a new bank slot.  This is disabled in read-only views and edit mode."]);
-          </OnEnter>
-          <OnLeave>
-            GameTooltip:Hide();
-            ResetCursor();
-          </OnLeave>
-        </Scripts>
-      </Button>
-
       <Button name="TBnk_Button_Reload">
         <Size><AbsDimension x="20" y="20"/></Size>
         <NormalTexture file="Interface\Icons\Spell_Frost_Stun" />
@@ -182,6 +156,32 @@
         </Scripts>
       </Button>
 
+      <Button name="TBnk_Button_DepositReagent">
+        <Size><AbsDimension x="20" y="20"/></Size>
+        <NormalTexture file="Interface\Icons\INV_Misc_Bag_SatchelofCenarius.blp" />
+        <PushedTexture file="Interface\Icons\INV_Misc_Bag_SatchelofCenarius.blp" />
+        <HighlightTexture file="Interface\Icons\INV_Misc_Bag_SatchelofCenarius.blp" alphaMode="ADD" />
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="TBnk_Button_Reload" relativePoint="TOPRIGHT">
+            <Offset>
+              <AbsDimension x="2" y="0"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+        <Scripts>
+          <OnClick>
+            TBnkFrame.Button_DepositReagent_OnClick(self, button, down);
+          </OnClick>
+          <OnEnter>
+		  GameTooltip_AddNewbieTip(self, REAGENTBANK_DEPOSIT, 1.0, 1.0, 1.0, TBag.LOCALE["Deposits all Reagents in your bag."]);
+          </OnEnter>
+          <OnLeave>
+            GameTooltip:Hide();
+            ResetCursor();
+          </OnLeave>
+        </Scripts>
+      </Button>
+
       <CheckButton name="TBnkFrameBagBank" inherits="TBag_BagButtonTemplate" id="-1">
         <Anchors>
           <Anchor point="BOTTOMLEFT" relativeTo="$parent_Total" relativePoint="BOTTOMRIGHT">
@@ -197,9 +197,24 @@
           </OnLoad>
         </Scripts>
       </CheckButton>
-      <CheckButton name="TBnkFrameBag1" inherits="TBag_BagButtonTemplate" id="5">
+      <CheckButton name="TBnkFrameBagReagent" inherits="TBag_BagButtonTemplate" id="-3">
         <Anchors>
           <Anchor point="LEFT" relativeTo="TBnkFrameBagBank" relativePoint="RIGHT">
+            <Offset>
+              <AbsDimension x="3" y="0"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+        <Scripts>
+          <OnLoad>
+            TBag.BagButton.OnLoad(self)
+            self:SetID(REAGENTBANK_CONTAINER)
+          </OnLoad>
+        </Scripts>
+      </CheckButton>
+      <CheckButton name="TBnkFrameBag1" inherits="TBag_BagButtonTemplate" id="5">
+        <Anchors>
+          <Anchor point="LEFT" relativeTo="TBnkFrameBagReagent" relativePoint="RIGHT">
             <Offset>
               <AbsDimension x="3" y="0"/>
             </Offset>
@@ -261,52 +276,7 @@
         </Anchors>
       </CheckButton>
 
-      <Frame name="TBnk_SlotCostFrame" inherits="SmallMoneyFrameTemplate" hidden="false">
-      <Size><AbsDimension x="10" y="25"/></Size>
-        <Anchors>
-          <Anchor point="BOTTOMLEFT" relativeTo="TBnkFrame" relativePoint="BOTTOMLEFT">
-            <Offset>
-              <AbsDimension x="10" y="40"/>
-            </Offset>
-          </Anchor>
-        </Anchors>
-        <Scripts>
-          <OnLoad>
-	    SmallMoneyFrame_OnLoad(self)
-	    MoneyFrame_SetType(self, "STATIC")
-          </OnLoad>
-        </Scripts>
-      </Frame>
-
-      <Button name="TBnk_PurchaseButton" inherits="UIPanelButtonTemplate" virtual="true" text="BANKSLOTPURCHASE" hidden="false">
-        <Size>
-          <AbsDimension x="124" y="22"/>
-        </Size>
-        <Anchors>
-          <Anchor point="LEFT" relativeTo="TBnk_SlotCostFrame" relativePoint="RIGHT">
-            <Offset>
-              <AbsDimension x="-10" y="0"/>
-            </Offset>
-          </Anchor>
-        </Anchors>
-        <Scripts>
-          <OnLoad>
-            -- Copy the width of the Blizzard Purchase Button since we're using their
-            -- text for our text in case they change it for different locales in the
-            -- code.  However, we should be set above in the XML to the one used in
-            -- the English locales anyway.
-            if (BankFramePurchaseButton) then
-              self:SetWidth(BankFramePurchaseButton:GetWidth());
-            end
-          </OnLoad>
-          <OnClick>
-            PlaySound("igMainMenuOption");
-            PurchaseSlot();
-	    TBnkFrame:UpdateBagGfx();
-          </OnClick>
-        </Scripts>
-      </Button>
-
+  <Frame name="TBnkainerFrame3" inherits="TBagainerFrameTemplate" id="0"/>
   <Frame name="TBnkainerFrame4" inherits="TBagainerFrameTemplate" id="0"/>
   <Frame name="TBnkainerFrame5" inherits="TBagainerFrameTemplate" id="5"/>
   <Frame name="TBnkainerFrame6" inherits="TBagainerFrameTemplate" id="6"/>

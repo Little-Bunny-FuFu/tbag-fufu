@@ -134,7 +134,8 @@ TBag.DBC = {  -- Default Bag Colors
   { ["r"] = 0.8, ["g"] = 0.15, ["b"] = 1, ["a"] = 1 },
   { ["r"] = 0.2, ["g"] = 1, ["b"] = 1, ["a"] = 1 },
   { ["r"] = 0, ["g"] = 0, ["b"] = 1, ["a"] = 1 },
-  { ["r"] = 1, ["g"] = 0.2, ["b"] = 0.8, ["a"] = 1 }
+  { ["r"] = 1, ["g"] = 0.2, ["b"] = 0.8, ["a"] = 1 },
+  { ["r"] = 0.4, ["g"] = 0.8, ["b"] = 1, ["a"] = 1 }
 };
 
 TBag.C_CAT  = "ffcc55ee";
@@ -162,14 +163,15 @@ local L = TBag.LOCALE;
 -- Main Bag and Item arrays
 -----------------------------------------------------------------------
 
-TBag.BAGMIN = KEYRING_CONTAINER;
+TBag.BAGMIN = REAGENTBANK_CONTAINER;
 TBag.BAGMAX = 11;
+TBag.MAX_REAGENTBANK_ITEMS = 98 -- has to be a constant since game can't tell us in time
 TBag.Inv_Bags = { BACKPACK_CONTAINER, 4, 3, 2, 1 };
 if not cata_420 then
   TBag.Inv_Bags[#TBag.Inv_Bags+1] = KEYRING_CONTAINER;
 end
 	
-TBag.Bnk_Bags = { BANK_CONTAINER, 5, 6, 7, 8, 9, 10, 11 };
+TBag.Bnk_Bags = { BANK_CONTAINER, REAGENTBANK_CONTAINER, 5, 6, 7, 8, 9, 10, 11 };
 TBag.Body_Slots = {
   ["HeadSlot"] = 1,
   ["NeckSlot"] = 2,
@@ -286,6 +288,7 @@ function TBag:Init()
   -- Can't set frames to negative values from XML. :(
   _G[self:GetDummyBagFrameName(KEYRING_CONTAINER)]:SetID(KEYRING_CONTAINER);
   _G[self:GetDummyBagFrameName(BANK_CONTAINER)]:SetID(BANK_CONTAINER);
+  _G[self:GetDummyBagFrameName(REAGENTBANK_CONTAINER)]:SetID(REAGENTBANK_CONTAINER);
 
   -- Initialize any player related info
   local group,_;
@@ -422,6 +425,15 @@ function TBag:SetPlayerBagCfg(playerid, bag, name, val)
   self:GetPlayerBag(playerid, bag)[name] = val;
 end
 
+function TBag:IsReagentBankUnlocked(playerid)
+  if (playerid == self.PLAYERID) then
+    return IsReagentBankUnlocked(playerid)
+  else
+    local size = self:GetPlayerBagCfg(playerid, REAGENTBANK_CONTAINER, self.I_BAGSIZE);
+    return size and size > 0
+  end
+end
+
 function TBag:SplitStr(strtosplit,splitchar)
   if (strtosplit) then
     local str1 = strtosplit;
@@ -468,7 +480,7 @@ function TBag:CreateDummyBag(bag, template)
     local buttonname;
     local level = dbag:GetFrameLevel() + 1
 
-    for slot = 1, MAX_CONTAINER_ITEMS do
+    for slot = 1, self:GetBagMaxItems(bag) do
       buttonname = self:GetBagItemButtonName(bag, slot);
       if not (_G[buttonname]) then
         local button = CreateFrame("Button", buttonname, dbag, template);
@@ -588,17 +600,18 @@ end
 
 -- Helper function to put an item in the generic bank bags
 -- since Blizzard doesn't provide this.
-local function PutItemInBank()
+local function PutItemInBank(reagent)
+  local bag = reagent and REAGENTBANK_CONTAINER or BANK_CONTAINER
   local texture, emptyBankSlot
-  for slot=1, GetContainerNumSlots(BANK_CONTAINER) do
-    texture = GetContainerItemInfo(BANK_CONTAINER, slot)
+  for slot=1, GetContainerNumSlots(bag) do
+    texture = GetContainerItemInfo(bag, slot)
     if not texture then
       emptyBankSlot = slot
       break
     end
   end
   if emptyBankSlot then
-    PickupContainerItem(BANK_CONTAINER, emptyBankSlot)
+    PickupContainerItem(bag, emptyBankSlot)
   else
     ClearCursor()
     UIErrorsFrame:AddMessage(ERR_BAG_FULL, 1.0, 0.1, 0.1, 1.0)
@@ -613,6 +626,8 @@ function TBag:PutItemInBag(bag)
     return PutKeyInKeyRing()
   elseif bag == BANK_CONTAINER then
     return PutItemInBank()
+  elseif bag == REAGENTBANK_CONTAINER then
+    return PutItemInBank(true)
   else
     return PutItemInBag(ContainerIDToInventoryID(bag))
   end
@@ -1501,6 +1516,7 @@ function TBag:GetBagDispName(bag)
   if ( bag < self.BAGMIN ) or ( bag > self.BAGMAX ) then return ""; end
   if (bag == KEYRING_CONTAINER) then return KEYRING; end
   if (bag == BANK_CONTAINER) then return L["Bank"]; end
+  if (bag == REAGENTBANK_CONTAINER) then return REAGENT_BANK; end
   if (bag == BACKPACK_CONTAINER) then return L["Backpack"]; end
   if (bag == 1) then return L["Fourth Bag"]; end
   if (bag == 2) then return L["Third Bag"]; end
@@ -1520,6 +1536,7 @@ function TBag:GetBagPosName(bag)
   if ( bag < self.BAGMIN ) or ( bag > self.BAGMAX ) then return ""; end
   if (bag == KEYRING_CONTAINER) then return L["KEYRING"]; end
   if (bag == BANK_CONTAINER) then return L["BANK"]; end
+  if (bag == REAGENTBANK_CONTAINER) then return L["REAGENTBANK"]; end
   if (bag == BACKPACK_CONTAINER) then return L["BACKPACK"]; end
   if (bag == 1) then return L["BAG1"]; end
   if (bag == 2) then return L["BAG2"]; end
@@ -1591,9 +1608,12 @@ function TBag:GetBagType(playerid, bag)
     self:SetPlayerBagCfg(playerid, bag, self.I_RARITY, quality);
     _,type = GetContainerNumFreeSlots(bag);
 
-    -- GetContainerNumFreeSlots doesn't return the bag type for the KEYRING.
+    -- GetContainerNumFreeSlots doesn't return the bag type for the KEYRING or
+    -- the REAGENTBANK.
     if (bag == KEYRING_CONTAINER) then
       type = 256;
+    elseif (bag == REAGENTBANK_CONTAINER) then
+      type = 1784; -- all professions bag types
     end
 
     if (id) then
@@ -1622,6 +1642,8 @@ function TBag:GetBagTexture(playerid, bag)
     texture = "Interface\\Buttons\\Button-Backpack-Up";
   elseif (bag == BANK_CONTAINER) then
     texture = "Interface\\Icons\\INV_Box_03";
+  elseif (bag == REAGENTBANK_CONTAINER) then
+    texture = "Interface\\Icons\\INV_Misc_Bag_SatchelofCenarius.blp";
   elseif (bag == KEYRING_CONTAINER) then
     texture = "Interface\\ContainerFrame\\KeyRing-Bag-Icon";
   else
@@ -1642,6 +1664,8 @@ function TBag:GetBagFrameName(bag)
     return "TInvingButton";
   elseif (bag == BANK_CONTAINER) then
     return "TBnkFrameBagBank";
+  elseif (bag == REAGENTBANK_CONTAINER) then
+    return "TBnkFrameBagReagent";
   elseif (bag == BACKPACK_CONTAINER) then
     return "TInvMenuBarBackpackButton";
   elseif self:Member(self.Inv_Bags, bag) then
@@ -1660,6 +1684,8 @@ function TBag:GetDummyBagFrameName(bag)
     return "TInvainerFrame12";
   elseif (bag == BANK_CONTAINER) then
     return "TBnkainerFrame4";
+  elseif (bag == REAGENTBANK_CONTAINER) then
+    return "TBnkainerFrame3";
   elseif self:Member(self.Inv_Bags, bag) then
     return "TInvainerFrame"..(bag);
   elseif self:Member(self.Bnk_Bags, bag) then
@@ -1678,6 +1704,8 @@ function TBag:GetBagIdxName(bag)
     return "KeyRing";
   elseif (bag == BANK_CONTAINER) then
     return "Bank";
+  elseif (bag == REAGENTBANK_CONTAINER) then
+    return "ReagentBank";
   else
     return tostring(bag);
   end
@@ -1725,6 +1753,12 @@ function TBag:GetBagNumFrame(bag)
   return _G[self:GetBagNumName(bag)];
 end
 
+function TBag:GetBagMaxItems(bag)
+  if bag == REAGENTBANK_CONTAINER then
+    return self.MAX_REAGENTBANK_ITEMS
+  end
+  return MAX_CONTAINER_ITEMS
+end
 
 function TBag:MakeHyperlink(itemstring,name,quality,level,reforge)
   local itemlink;
@@ -1808,7 +1842,11 @@ function TBag:GetSlotInfo(playerid, bag)
         size = GetKeyRingSize(KEYRING_CONTAINER);
       else
         size = GetContainerNumSlots(bag);
---        self:Print("b="..bag..", size="..size);
+        if bag == REAGENTBANK_CONTAINER and not IsReagentBankUnlocked() then
+          -- Game always shows the full size of the ReagentBank even if not unlocked
+          size = 0
+        end
+--      self:Print("b="..bag..", size="..size);
       end
       for i=1, size do
         local _
@@ -1896,7 +1934,7 @@ end
 
 function TBag:UpdateSlots(playerid, bag, showsize)
   local free, size = self:GetSlotInfo(playerid, bag);
-  -- self:Print(playerid..", b="..bag..", "..free.."/"..size..", AT="..TBnkFrame.atbank);
+--  self:Print(playerid..", b="..bag..", "..free.."/"..size..", AT="..TBnkFrame.atbank);
 
   self:SetFreeStr(self:GetBagNumFrame(bag), free, size, showsize);
 
@@ -2144,6 +2182,8 @@ function TBag:GetInvSlotID(bag, slot)
     id = KeyRingButtonIDToInvSlotID(slot);
   elseif (bag == BANK_CONTAINER) then
     id = BankButtonIDToInvSlotID(slot);
+  elseif (bag == REAGENTBANK_CONTAINER) then
+    id = ReagentBankButtonIDToInvSlotID(slot);
   elseif (bag >= BACKPACK_CONTAINER) and (bag <= self.BAGMAX) then
     id = 100*bag + slot;  -- ???
   end
@@ -2195,7 +2235,7 @@ function TBag:SetInventoryItem(tt, playerid, itemlink, bag, slot, reforge)
   if (playerid == self.PLAYERID) then
     -- Inventory and being at the bank is always safe
     if (self:Member(self.Inv_Bags, bag) or TBnkFrame.atbank == 1) then
-      if (bag == KEYRING_CONTAINER) or (bag == BANK_CONTAINER) then
+      if (bag == KEYRING_CONTAINER) or (bag == BANK_CONTAINER) or (bag == REAGENTBANK_CONTAINER) then
         hasCooldown, repairCost = tt:SetInventoryItem("player", self:GetInvSlotID(bag, slot));
       else
         hasCooldown, repairCost = tt:SetBagItem(bag, slot);
@@ -3080,8 +3120,7 @@ function TBag:LayoutWindow(frame)
  else
     -- TBnkFrame
     if (TBnkFrame_Total:IsVisible() or TBnkFrameBagBank:IsVisible() or
-        TBnkFrame_MoneyFrame:IsVisible() or TBnk_SlotCostFrame:IsVisible() or
-        TBnkFrame_TokenFrame:IsVisible()) then
+        TBnkFrame_MoneyFrame:IsVisible() or TBnkFrame_TokenFrame:IsVisible()) then
       PAD_BOTTOM = PAD_BOTTOM + self.PAD_BOTTOM_NORM;
     end
     if (edit_mode == 1) then
@@ -3091,7 +3130,7 @@ function TBag:LayoutWindow(frame)
     -- Do we need an extra row
     local bags_row = 0;
     if (TBnkFrameBagBank:IsVisible()) then
-      bags_row = bags_row + 4;
+      bags_row = bags_row + 5;
     end
     if (TBnkFrame_Total:IsVisible()) then
       bags_row = bags_row + 1;
@@ -3099,18 +3138,7 @@ function TBag:LayoutWindow(frame)
     if TBnkFrame_MoneyFrame:IsVisible() or TBnkFrame_TokenFrame:IsVisible() then
       bags_row = bags_row + 4;
     end
-    local slotpurchase_row = 0;
-    if (TBnkFrameBagBank:IsVisible()) then
-      slotpurchase_row = slotpurchase_row + 9;
-    end
-    if (TBnkFrame_Total:IsVisible()) then
-      slotpurchase_row = slotpurchase_row + 1;
-    end
-    if TBnkFrame_MoneyFrame:IsVisible() or TBnkFrame_TokenFrame:IsVisible() then
-      slotpurchase_row = slotpurchase_row + 4;
-    end
     if (cfg["maxColumns"] <= bags_row or
-       (cfg["maxColumns"] <= slotpurchase_row and TBnk_SlotCostFrame:IsVisible()) or
        (TBnkFrame_MoneyFrame:IsVisible() and TBnkFrame_TokenFrame:IsVisible())) then
       PAD_BOTTOM = PAD_BOTTOM + self.PAD_BOTTOM_NORM;
     end
@@ -3121,9 +3149,9 @@ function TBag:LayoutWindow(frame)
     end
 
     if (TBnk_UserDropdown:IsVisible() or TBnk_Button_HighlightToggle:IsVisible() or
-        TBnk_Button_ChangeEditMode:IsVisible() or TBnk_Button_ShowPurchase:IsVisible() or
-        TBnk_Button_Reload:IsVisible() or TBnk_Button_Close:IsVisible() or
-        TBnk_Button_MoveLockToggle:IsVisible()) then
+        TBnk_Button_ChangeEditMode:IsVisible() or
+        TBnk_Button_Reload:IsVisible() or TBnk_Button_DepositReagent:IsVisible() or
+        TBnk_Button_Close:IsVisible() or TBnk_Button_MoveLockToggle:IsVisible()) then
       PAD_TOP = self.PAD_TOP_NORM;
     end
   end

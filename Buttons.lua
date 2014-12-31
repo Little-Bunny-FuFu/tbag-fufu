@@ -450,6 +450,17 @@ function BagButton:OnEnter()
     GameTooltip:SetText(L["Keyring"], 1.0, 1.0, 1.0)
     GameTooltip:Show()
     return
+  elseif bag == REAGENTBANK_CONTAINER then
+    if TBag:IsReagentBankUnlocked(mainFrame.playerid) then
+      GameTooltip:SetText(REAGENT_BANK, 1.0, 1.0, 1.0);
+    else
+      GameTooltip:SetText(L["Purchasable Reagent Bank"], 1.0, 1.0, 1.0)
+      if mainFrame.atbank == 1 then
+        SetTooltipMoney(GameTooltip, GetReagentBankCost())
+      end
+    end
+    GameTooltip:Show()
+    return
   elseif mainFrame.playerid == TBag.PLAYERID and
 	 GameTooltip:SetInventoryItem("player", ContainerIDToInventoryID(bag)) then
     GameTooltip:Show()
@@ -476,6 +487,9 @@ function BagButton:OnEnter()
     else
       SetItemButtonTextureVertexColor(self, 1,0, 0.1, 0.1, 1.0)
       GameTooltip:AddLine(BANK_BAG_PURCHASE, 1.0, 1.0, 1.0)
+      if mainFrame.atbank == 1 then
+        SetTooltipMoney(GameTooltip, GetBankSlotCost(numSlots))
+      end
     end
   else
     GameTooltip:SetText(EQUIP_CONTAINER, 1.0, 1.0, 1.0)
@@ -496,6 +510,31 @@ function BagButton:OnClick(button,down,drag)
   local isLive = TBag:IsLive(mainFrame)
   local isBagShown = mainFrame.cfg["show_Bag"..bag] == 1
   local itm = TBag:GetPlayerBag(mainFrame.playerid,bag)
+
+  -- Unpurchased Reagent Bank
+  if (bag == REAGENTBANK_CONTAINER and not TBag:IsReagentBankUnlocked(mainFrame.playerid)) then
+    self:SetChecked(not self:GetChecked())
+    if mainFrame.atbank == 1 then
+      PlaySound("igMainMenuOption")
+      StaticPopup_Show("CONFIRM_BUY_REAGENTBANK_TAB")
+      mainFrame:UpdateBagGfx()
+    end
+    return
+  end
+
+  -- Unpurchased bag slot
+  local numSlots = TBag:GetNumBankSlots(mainFrame.playerid)
+  if bag > numSlots + 4 then
+    self:SetChecked(not self:GetChecked())
+    -- Needed to make the CONFIRM_BUY_BANK_SLOT popup work right
+    BankFrame.nextSlotCost = GetBankSlotCost(numSlots)
+    if mainFrame.atbank == 1 then
+      PlaySound("igMainMenuOption")
+      StaticPopup_Show("CONFIRM_BUY_BANK_SLOT")
+      mainFrame:UpdateBagGfx()
+    end
+    return
+  end
 
   -- Handle putting items in the bag
   if isLive and CursorHasItem() then

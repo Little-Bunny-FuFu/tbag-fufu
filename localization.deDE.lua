@@ -104,6 +104,7 @@ L["Fifth Bank Bag"] = "F\195\188nfte Banktasche"
 L["Sixth Bank Bag"] = "Sechste Banktasche"
 L["Seventh Bank Bag"] = "Siebte Banktasche"
 L["Empty Slot"] = "Leerer Platz"
+L["Purchasable Reagent Bank"] = false
 
 -----------------------------------------------------------------------
 -- CATEGORIES
@@ -416,9 +417,6 @@ L["Reloads your items and sorts them."] = "L\195\164d die Items neu und sortiert
 L["Toggle Bank"] = "Zeige Bank"
 L["Displays bank contents in a view-only mode.  You may select another player's bank to view from the dropdown."] = "Zeigt den Bankinhalt im Nur-Lesen Modus. Du kannst aus dem Men\195\188 die Bank eines anderen Spielers w\195\164hlen."
 
-L["Toggle Purchase Info"] = "Zeige Kauf Info"
-L["Displays the purchase button and cost to buy a new bank slot.  This is disabled in read-only views and edit mode."] = "Zeigt den Kauf Button and die Kosten um einen neuen Bankplatz zu kaufen. Deaktiviert im Nur-Lesen- und Bearbeitungsmodus."
-
 L["Unlock Window"] = "Entsperre Fenster"
 L["Allow window to be moved by dragging it."] = "Erlaubt das Fenster durch Ziehen zu verschieben."
 L["Lock Window"] = "Sperre Fenster"
@@ -471,7 +469,6 @@ L["Border Color for Bar %d"] = "Randfarbe f\195\188r Felder %d"
 L["Select Character"] = "Zeige Charakter"
 L["Edit Mode"] = "Bearbeitungsmodus"
 L["Lock window"] = "Fenster sperren"
-L["Show Purchase Info"] = "Zeige Kauf Info"
 L["Close Inventory"] = "Inventar Schlie\195\159en"
 L["Highlight New Items"] = "Neue Items Hervorheben"
 L["Reset NEW tag"] = "Setze NEU Markierung zur\195\188ck"
@@ -482,8 +479,8 @@ L["Hide"] = "Verstecken"
 L["Hide Player Dropdown"] = "Verstecke Spieler"
 L["Hide Search Box"] = "Verstecke Suchfeld"
 L["Hide Re-sort Button"] = "Verstecke neu Sortieren"
+L["Hide Reagent Deposit Button"] = false
 L["Hide Bank Button"] = "Verstecke Bank Knopf"
-L["Hide Show Purchase Button"] = "Verstecke Zeige Kaufen Knopf"
 L["Hide Edit Button"] = "Verstecke bearbeiten Knopf"
 L["Hide Highlight Button"] = "Verstecke Hervorheben Knopf"
 L["Hide Lock Button"] = "Verstecke Sperren Knopf"
@@ -509,6 +506,7 @@ L["BOTTOMLEFT"] = "UNTENLINKS"
 L["BOTTOMRIGHT"] = "UNTENRECHTS"
 L["Show on TBag"] = "Zeige in TBag"
 L["Checking this option will allow you to track this currency type in TBag for this character.\n\nYou can also Shift-click a currency to add or remove it from being tracked in TBag."] = "Ist diese Option aktiviert wird diese W\195\164hrung in TBag f\195\188r diesen Charakter angezeigt.\n\nDu kannst auch auf eine W\195\164hrung Shift-Rechtsklicken um sie in TBag anzuzeigen oder zu entfernen."
+L["Deposits all Reagents in your bag."] = false
 
 -- Option Window Strings
 L["Main Sizing Preferences"] = "Allgemeine Gr\195\182\195\159eneinstellungen"

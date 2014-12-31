@@ -138,6 +138,7 @@ L["Fifth Bank Bag"] = false
 L["Sixth Bank Bag"] = false
 L["Seventh Bank Bag"] = false
 L["Empty Slot"] = false
+L["Purchasable Reagent Bank"] = false
 
 -----------------------------------------------------------------------
 -- CATEGORIES
@@ -450,9 +451,6 @@ L["Reloads your items and sorts them."] = false
 L["Toggle Bank"] = false
 L["Displays bank contents in a view-only mode.  You may select another player's bank to view from the dropdown."] = false
 
-L["Toggle Purchase Info"] = false
-L["Displays the purchase button and cost to buy a new bank slot.  This is disabled in read-only views and edit mode."] = false
-
 L["Unlock Window"] = false
 L["Allow window to be moved by dragging it."] = false
 L["Lock Window"] = false
@@ -505,7 +503,6 @@ L["Border Color for Bar %d"] = false
 L["Select Character"] = false
 L["Edit Mode"] = false
 L["Lock window"] = false
-L["Show Purchase Info"] = false
 L["Close Inventory"] = false
 L["Highlight New Items"] = false
 L["Reset NEW tag"] = false
@@ -516,8 +513,8 @@ L["Hide"] = false
 L["Hide Player Dropdown"] = false
 L["Hide Search Box"] = false
 L["Hide Re-sort Button"] = false
+L["Hide Reagent Deposit Button"] = true
 L["Hide Bank Button"] = false
-L["Hide Show Purchase Button"] = false
 L["Hide Edit Button"] = false
 L["Hide Highlight Button"] = false
 L["Hide Lock Button"] = false
@@ -543,6 +540,7 @@ L["BOTTOMLEFT"] = false
 L["BOTTOMRIGHT"] = false
 L["Show on TBag"] = false
 L["Checking this option will allow you to track this currency type in TBag for this character.\n\nYou can also Shift-click a currency to add or remove it from being tracked in TBag."] = false
+L["Deposits all Reagents in your bag."] = true
 
 -- Option Window Strings
 L["Main Sizing Preferences"] = false

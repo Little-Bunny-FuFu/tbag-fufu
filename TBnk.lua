@@ -176,6 +176,7 @@ function Bank:init(reset)
     TBnkFrameBag6:Hide();
     TBnkFrameBag7:Hide();
     TBnkFrameBagBank:Hide();
+    TBnkFrameBagReagent:Hide();
   end
   if (cfg["show_userdropdown"] == 0) then
     TBnk_UserDropdown:Hide();
@@ -213,35 +214,13 @@ function Bank:init(reset)
   TBag:LayoutWindow(self)
 end
 
-function Bank:UpdatePurchaseGfx()
-  local numSlots, full = TBag:GetNumBankSlots(self.playerid);
-  local cost = GetBankSlotCost(numSlots);
-  if (not full) then
-    MoneyFrame_Update("TBnk_SlotCostFrame", cost);
+function Bank:UpdateDepositButton()
+  if (self.atbank == 1 and self.cfg["show_depositbutton"] == 1 and TBag:IsReagentBankUnlocked(self.playerid)) then
+    TBnk_Button_DepositReagent:Show()
   else
-    MoneyFrame_Update("TBnk_SlotCostFrame", 0);
-  end
-
-  if (self.atbank == 1 and not full and self.cfg["show_purchasetoggle"] == 1) then
-    TBnk_Button_ShowPurchase:Show()
-  else
-    TBnk_Button_ShowPurchase:Hide()
-  end
-
-  TBag:PrintDEBUG("Bank:UpdatePurchaseGfx: "..numSlots..", "..cost);
-  TBag:PrintDEBUG("Bank:UpdatePurchaseGfx: "..self.cfg["show_purchase_button"]..", "..self.atbank..", "..self.edit_mode);
-
-  if ((self.cfg["show_purchase_button"] == 1) and (self.atbank == 1)
-    and (self.edit_mode == 0) and not full and self.playerid == TBag.PLAYERID) then
-    -- Be EXTRA paranoid
-    TBnk_PurchaseButton:Show();
-    TBnk_SlotCostFrame:Show();
-  else
-    TBnk_SlotCostFrame:Hide();
-    TBnk_PurchaseButton:Hide();
+    TBnk_Button_DepositReagent:Hide()
   end
 end
-
 
 function Bank:UpdateBagGfx()
   local i;
@@ -253,6 +232,17 @@ function Bank:UpdateBagGfx()
 
   TBag:UpdateBagColors(bag);
   TBag:SetPlayerBagCfg(self.playerid, bag, TBag.I_ITEMLINK, nil);
+
+  bag = REAGENTBANK_CONTAINER;
+  if TBag:IsReagentBankUnlocked(self.playerid) then
+    SetItemButtonTextureVertexColor(TBnkFrameBagReagent, 1.0, 1.0, 1.0, 1.0);
+  else
+    SetItemButtonTextureVertexColor(TBnkFrameBagReagent, 1.0, 0.1, 0.1, 1.0);
+  end
+  free, size = TBag:UpdateSlots(self.playerid, bag, self.cfg["show_bag_sizes"]);
+  TBag:UpdateBagColors(bag);
+  totalfree = totalfree + free;
+  totalsize = totalsize + size;
 
   for i=1, numSlots do
     bag = i + 4;
@@ -291,6 +281,8 @@ function Bank:InitBagGfx()
   SetItemButtonTextureVertexColor(button, 1.0,1.0,1.0, 1.0);
   TBag:GetBagFrameTexture(BANK_CONTAINER):SetTexture(
         TBag:GetBagTexture(TBnkFrame.playerid, BANK_CONTAINER));
+  TBag:GetBagFrameTexture(REAGENTBANK_CONTAINER):SetTexture(
+        TBag:GetBagTexture(TBnkFrame.playerid, REAGENTBANK_CONTAINER));
 
 
   for i=1, NUM_BANKBAGSLOTS do
@@ -342,8 +334,6 @@ function Bank.Button_ChangeEditMode_OnClick()
   PlaySound("igMainMenuOptionCheckBoxOn");
   if (TBnkFrame.edit_mode == 0) then
     TBnkFrame.edit_mode = 1;
-    -- Always hide the purchase info on edit
-    TBnkFrame:UpdatePurchaseGfx();
   else
     TBnkFrame.edit_mode = 0;
   end
@@ -372,14 +362,8 @@ function Bank.Button_Reload_OnClick()
   TBag:PrintDEBUG("TBnk reloaded.");
 end
 
-function Bank.Button_ShowPurchase_OnClick()
- if (TBnkFrame.cfg["show_purchase_button"] == 0) then
-   TBnkFrame.cfg["show_purchase_button"] = 1;
- else
-   TBnkFrame.cfg["show_purchase_button"] = 0;
- end
- TBnkFrame:UpdatePurchaseGfx();
- TBnkFrame:SetButton_Anchors();
+function Bank.Button_DepositReagent_OnClick()
+  DepositReagentBank()
 end
 
 function Bank.Button_MoveLockToggle_OnClick(self)
@@ -487,8 +471,8 @@ function Bank:SetTopLeftButton_Anchors()
   local buttons = {
     "TBnk_Button_HighlightToggle",
     "TBnk_Button_ChangeEditMode",
-    "TBnk_Button_ShowPurchase",
     "TBnk_Button_Reload",
+    "TBnk_Button_DepositReagent",
   };
   local button_left = nil;
 
@@ -583,7 +567,7 @@ function Bank:SetBottomLeftButton_Anchors()
     bags_row = bags_row + 1;
   end
   if TBnkFrame_MoneyFrame:IsVisible() or TBnkFrame_TokenFrame:IsVisible() then
-    bags_row = bags_row + 3;
+    bags_row = bags_row + 4;
   end
 
   if (self.cfg["maxColumns"] <= bags_row) then
@@ -593,47 +577,6 @@ function Bank:SetBottomLeftButton_Anchors()
     -- Now separate row required
     TBnkFrameBag4:ClearAllPoints()
     TBnkFrameBag4:SetPoint("BOTTOMLEFT",TBnkFrameBag3,"BOTTOMRIGHT",3,0);
-  end
-
-  -- Figure the number of columns needed to require a row for the
-  -- slot purchase controls.
-  local slotpurchase_row = 0;
-  if (TBnkFrameBagBank:IsVisible()) then
-    slotpurchase_row = slotpurchase_row + 9;
-  end
-  if (TBnkFrame_Total:IsVisible()) then
-    slotpurchase_row = slotpurchase_row + 1;
-  end
-  if TBnkFrame_MoneyFrame:IsVisible() or TBnkFrame_TokenFrame:IsVisible() then
-    slotpurchase_row = slotpurchase_row + 4;
-  end
-
-
-  if (self.cfg["maxColumns"] <= slotpurchase_row) then
-    TBnk_PurchaseButton:ClearAllPoints();
-    TBnk_PurchaseButton:SetPoint("BOTTOMRIGHT",TBnkFrame,"BOTTOMRIGHT",-10,40);
-    TBnk_SlotCostFrame:ClearAllPoints();
-    TBnk_SlotCostFrame:SetPoint("RIGHT",TBnk_PurchaseButton,"LEFT",10,0);
-  else
-    -- No separate row is required
-
-    -- Since the bag buttons show and hide together the previous button
-    -- is really the last bag button not the one in button_left.
-    if (button_left == TBnkFrameBagBank) then
-      button_left = TBnkFrameBag7;
-    end
-
-    -- Set the anchor for the SlotCostFrame
-    TBnk_SlotCostFrame:ClearAllPoints();
-    if (button_left) then
-      TBnk_SlotCostFrame:SetPoint("BOTTOMLEFT",button_left,"BOTTOMRIGHT",3,-1);
-    else
-      TBnk_SlotCostFrame:SetPoint("BOTTOMLEFT",TBnkFrame,"BOTTOMLEFT",10,12);
-    end
-
-    -- Set the anchor for the PurchaseButton
-    TBnk_PurchaseButton:ClearAllPoints();
-    TBnk_PurchaseButton:SetPoint("LEFT",TBnk_SlotCostFrame,"RIGHT",-10,0);
   end
 
 end
@@ -734,6 +677,20 @@ function Bank.Toggle_ReloadButton()
   end
 end
 
+function Bank.Toggle_DepositReagentButton()
+  if (TBnkFrame.cfg["show_depositbutton"] == 1) then
+    TBnkFrame.cfg["show_depositbutton"] = 0;
+    TBnk_Button_DepositReagent:Hide();
+    TBnkFrame:SetButton_Anchors();
+  else
+    TBnkFrame.cfg["show_depositbutton"] = 1;
+    if (TBnkFrame.atbank == 1 and TBag:IsReagentBankUnlocked(TBnkFrame.playerid)) then
+      TBnk_Button_DepositReagent:Show();
+      TBnkFrame:SetButton_Anchors();
+    end
+  end
+end
+
 function Bank.Toggle_UserDropdown()
   if (TBnkFrame.cfg["show_userdropdown"] == 1) then
     TBnkFrame.cfg["show_userdropdown"] = 0;
@@ -781,6 +738,7 @@ function Bank.Toggle_BagSlotButtons()
     TBnkFrameBag6:Hide();
     TBnkFrameBag7:Hide();
     TBnkFrameBagBank:Hide();
+    TBnkFrameBagReagent:Hide();
     TBnkFrame:SetButton_Anchors();
   else
     TBnkFrame.cfg["show_bagbuttons"] = 1;
@@ -792,6 +750,7 @@ function Bank.Toggle_BagSlotButtons()
     TBnkFrameBag6:Show();
     TBnkFrameBag7:Show();
     TBnkFrameBagBank:Show();
+    TBnkFrameBagReagent:Show();
     TBnkFrame:SetButton_Anchors();
    end
 end
@@ -805,21 +764,6 @@ function Bank.Toggle_Total()
     TBnkFrame.cfg["show_total"] = 1;
     TBnkFrame_Total:Show();
     TBnkFrame:SetButton_Anchors();
-  end
-end
-
-function Bank.Toggle_Purchase()
-  if (TBnkFrame.cfg["show_purchasetoggle"] == 1) then
-    TBnkFrame.cfg["show_purchasetoggle"] = 0;
-    TBnk_Button_ShowPurchase:Hide();
-    TBnkFrame:SetButton_Anchors();
-  else
-    TBnkFrame.cfg["show_purchasetoggle"] = 1;
-    local _, full = TBag:GetNumBankSlots(TBnkFrame.playerid);
-    if (TBnkFrame.atbank == 1 and not full)  then
-      TBnk_Button_ShowPurchase:Show();
-      TBnkFrame:SetButton_Anchors();
-    end
   end
 end
 
@@ -1115,13 +1059,10 @@ function Bank.RightClickMenu_populate(self, level)
   UIDropDownMenu_AddButton(info, level);
 
     info = {
-  ["text"] = L["Show Purchase Info"],
+  ["text"] = REAGENTBANK_DEPOSIT,
   ["value"] = nil,
-  ["func"] = TBnkFrame.Button_ShowPurchase_OnClick
+  ["func"] = TBnkFrame.Button_DepositReagent_OnClick
   };
-  if (TBnkFrame.cfg["show_purchase_button"] == 1) then
-    info["checked"] = 1;
-  end
   UIDropDownMenu_AddButton(info, level);
 
     info = { ["disabled"] = 1 };
@@ -1319,20 +1260,20 @@ function Bank.RightClickMenu_populate(self, level)
           end
           UIDropDownMenu_AddButton(info, level);
           info = {
-            ["text"] = L["Hide Show Purchase Button"];
-            ["func"] = TBnkFrame.Toggle_Purchase;
-            ["keepShownOnClick"] = 1;
-            };
-          if (TBnkFrame.cfg["show_purchasetoggle"] == 0) then
-            info["checked"] = 1;
-          end
-          UIDropDownMenu_AddButton(info, level);
-          info = {
             ["text"] = L["Hide Re-sort Button"];
             ["func"] = TBnkFrame.Toggle_ReloadButton;
             ["keepShownOnClick"] = 1;
             };
           if (TBnkFrame.cfg["show_reloadbutton"] == 0) then
+            info["checked"] = 1;
+          end
+          UIDropDownMenu_AddButton(info, level);
+          info = {
+            ["text"] = L["Hide Reagent Deposit Button"];
+            ["func"] = TBnkFrame.Toggle_DepositReagentButton;
+            ["keepShownOnClick"] = 1;
+            };
+          if (TBnkFrame.cfg["show_depositbutton"] == 0) then
             info["checked"] = 1;
           end
           UIDropDownMenu_AddButton(info, level);
@@ -1475,8 +1416,12 @@ function Bank:UpdateWindow(resort_req)
 
   -- Relink the button map
   for _,bag in ipairs(self.bags) do
-    for slot = 1, MAX_CONTAINER_ITEMS do
-      TBag.BUTTONS[TBag:GetBagItemButtonName(bag, slot)] = TBnkItm[self.playerid][bag][slot]
+    for slot = 1, TBag:GetBagMaxItems(bag) do
+      if TBnkItm[self.playerid][bag] then
+        TBag.BUTTONS[TBag:GetBagItemButtonName(bag, slot)] = TBnkItm[self.playerid][bag][slot]
+      else
+        TBag.BUTTONS[TBag:GetBagItemButtonName(bag, slot)] = {}
+      end
     end
   end
 
@@ -1493,7 +1438,7 @@ function Bank:UpdateWindow(resort_req)
     for slot = 1, size do
       TBag.ItemButton.Update(_G[TBag:GetBagItemButtonName(bag, slot)])
     end
-    for slot = size+1, MAX_CONTAINER_ITEMS do
+    for slot = size+1, TBag:GetBagMaxItems(bag) do
       _G[TBag:GetBagItemButtonName(bag, slot)]:Hide();
     end
   end
@@ -1507,7 +1452,8 @@ function Bank:UpdateWindow(resort_req)
     MoneyFrame_SetType(TBnkFrame_MoneyFrame,type)
     MoneyFrame_Update("TBnkFrame_MoneyFrame", TBag:GetMoney(self.playerid));
   end
-  TBnkFrame:UpdatePurchaseGfx();
+
+  frame:UpdateDepositButton();
 
   frame:ClearAllPoints();
   frame:SetPoint(self.cfg["frameYRelativeTo"]..self.cfg["frameXRelativeTo"],
