@@ -2479,8 +2479,8 @@ function TBag:UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, comparr,
 
 
             local stacksize;
-            itm[self.I_NAME], itm[self.I_TYPE], itm[self.I_SUBTYPE], itm[self.I_RARITY], _, stacksize = self:GetItemInfo(itm[self.I_ITEMLINK]);
-            _, itm[self.I_COUNT], _, _, _ = GetContainerItemInfo(bag, slot);
+            itm[self.I_NAME], itm[self.I_TYPE], itm[self.I_SUBTYPE], _, _, stacksize = self:GetItemInfo(itm[self.I_ITEMLINK]);
+            _, itm[self.I_COUNT], _, itm[self.I_RARITY], _ = GetContainerItemInfo(bag, slot);
             if (stacksize) then
               itm[self.I_NEED] = stacksize - itm[self.I_COUNT];
             else
