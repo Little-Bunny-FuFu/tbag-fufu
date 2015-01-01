@@ -292,6 +292,7 @@ L["LTHR"] = true
 L["PET"] = true
 L["INSC"] = true
 L["TACKLE"] = true
+L["REAGENT"] = false
 
 -- Bag Position Names, also used for EMPTY_%s_SLOTS and IN_%s_BAG categories
 L["KEYRING"] = true
@@ -313,6 +314,7 @@ L["BBAG7"] = true
 L["SOULBOUND"] = true
 L["ACCOUNTBOUND"] = true
 L["EQUIPPED"] = true
+L["CRAFTINGREAGENT"] = true
 
 -----------------------------------------------------------------------
 -- CHAT STRINGS

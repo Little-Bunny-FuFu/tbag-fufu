@@ -248,6 +248,7 @@ L["LTHR"] = "КОЖВ"
 L["PET"] = "ПИТ"
 L["INSC"] = "НАЧР"
 L["TACKLE"] = false
+L["REAGENT"] = false
 
 -- Bag Position Names, also used for EMPTY_%s_SLOTS and IN_%s_BAG categories
 L["KEYRING"] = "КЛЮЧИ"
@@ -269,6 +270,7 @@ L["BBAG7"] = "БСУМКА7"
 L["SOULBOUND"] = "ПЕРСОНАЛЬНЫЙ ПРЕДМЕТ"
 L["ACCOUNTBOUND"] = "СВЯЗАН С УЧЕТНОЙ ЗАПИСЬЮ"
 L["EQUIPPED"] = "НА ПЕРСОНАЖЕ"
+L["CRAFTINGREAGENT"] = false
 
 -----------------------------------------------------------------------
 -- CHAT STRINGS

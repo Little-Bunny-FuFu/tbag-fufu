@@ -246,6 +246,7 @@ L["LTHR"] = "LED"
 L["PET"] = "PET"
 L["INSC"] = "INSCH"
 L["TACKLE"] = "SPINN"
+L["REAGENT"] = false
 
 -- Bag Position Names, also used for EMPTY_%s_SLOTS and IN_%s_BAG categories
 L["KEYRING"] = "SCHL\195\156SSELBUND"
@@ -267,6 +268,7 @@ L["BBAG7"] = "BANKTASCHE7"
 L["SOULBOUND"] = "SEELENGEBUNDEN"
 L["ACCOUNTBOUND"] = "ACCOUNTGEBUNDEN"
 L["EQUIPPED"] = "ANGELEGT"
+L["CRAFTINGREAGENT"] = false
 
 -----------------------------------------------------------------------
 -- CHAT STRINGS

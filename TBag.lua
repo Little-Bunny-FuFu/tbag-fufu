@@ -85,6 +85,7 @@ TBag.I_LINKSUFFIX = "ls"
 -- rf has been used
 --TBag.I_REFORGE   = "rf";
 TBag.I_NOVALUE = "nv";
+TBag.I_CRAFTINGREAGENT = "cr";
 
 -- Quest item info
 TBag.I_QUEST_ITEM = "qi";
@@ -1033,6 +1034,7 @@ function TBag:SetDefLayout(cfg, bagarr, row1offset, reset)
   self:SetCatBar(cfg, string.format(L["IN_%s_BAG"],L["LTHR"]), 16, reset);
   self:SetCatBar(cfg, string.format(L["IN_%s_BAG"],L["INSC"]), 16, reset);
   self:SetCatBar(cfg, string.format(L["IN_%s_BAG"],L["TACKLE"]), 16, reset);
+  self:SetCatBar(cfg, string.format(L["IN_%s_BAG"],L["REAGENT"]), 16, reset);
   self:SetCatBar(cfg, string.format(L["IN_%s_BAG"],L["UNKNOWN"]), 16, reset);
   self:SetCatBar(cfg, string.format(L["EMPTY_%s_SLOTS"],L["ENCH"]), 16, reset);
   self:SetCatBar(cfg, string.format(L["EMPTY_%s_SLOTS"],L["ENG"]), 16, reset);
@@ -1042,6 +1044,7 @@ function TBag:SetDefLayout(cfg, bagarr, row1offset, reset)
   self:SetCatBar(cfg, string.format(L["EMPTY_%s_SLOTS"],L["LTHR"]), 16, reset);
   self:SetCatBar(cfg, string.format(L["EMPTY_%s_SLOTS"],L["INSC"]), 16, reset);
   self:SetCatBar(cfg, string.format(L["EMPTY_%s_SLOTS"],L["TACKLE"]), 16, reset);
+  self:SetCatBar(cfg, string.format(L["EMPTY_%s_SLOTS"],L["REAGENT"]), 16, reset);
   self:SetCatBar(cfg, string.format(L["EMPTY_%s_SLOTS"],L["UNKNOWN"]), 16, reset);
 
   self:SetCatBar(cfg, L["CLOTH"], 15, reset);
@@ -1512,6 +1515,8 @@ function TBag:GetBagTypeName(bagType)
     return L["MINE"];
   elseif (bagType == 4096) then
     return L["PET"];
+  elseif (bagType == 2048) then
+    return L["REAGENT"];
   elseif (bagType == 32768) then
     return L["TACKLE"];
   else
@@ -1547,7 +1552,8 @@ function TBag:GetBagType(playerid, bag)
     if (bag == KEYRING_CONTAINER) then
       type = 256;
     elseif (bag == REAGENTBANK_CONTAINER) then
-      type = 1784; -- all professions bag types
+      type = 2048; -- This is an unused id and we're squating on it since the
+                   -- reagent bank doesn't have a real id
     end
 
     if (id) then
@@ -2472,6 +2478,14 @@ function TBag:UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, comparr,
             else
               itm[self.I_ACCTBOUND] = false
             end
+            -- PROFESSIONS_USED_IN_COOKING resolves to "Crafting Reagent" in English
+            -- It's a strange name for the constant but it used to be "Cooking Ingredenient" and
+            -- they broadended it without changing the constant name.
+            if (string.find(tooltip, PROFESSIONS_USED_IN_COOKING)) then
+              itm[self.I_CRAFTINGREAGENT] = true
+            else
+              itm[self.I_CRAFTINGREAGENT] = false
+            end
             itm[self.I_CHARGES] = self:GetItmCharges(tooltip);
           else
             -- item has not changed, maybe the count did?
@@ -2707,6 +2721,10 @@ function TBag:PickBar(cfg, playerid, itm, trade1, trade2)
     itm[self.I_KEYWORD][L["SOULBOUND"]] = 1;
   elseif (itm[self.I_ACCTBOUND]) then
     itm[self.I_KEYWORD][L["ACCOUNTBOUND"]] = 1;
+  end
+
+  if (itm[self.I_CRAFTINGREAGENT] == 1) then
+    itm[self.I_KEYWORD][L["CRAFTINGREAGENT"]] = 1;
   end
 
   if (itm[self.I_SOULBOUND] == 1 or itm[self.I_ACCTBOUND]) then
@@ -3323,7 +3341,9 @@ function TBag:Stack(where, itmcache, sa, ca)
                 end
 
                 -- Does the item go into this bag type?
-                if (bagtype and itmfam and bit.band(bagtype,itmfam) ~= 0) then
+                if (bagtype and itmfam) and
+                    ((bagtype == 2048 and itemitm[self.I_CRAFTINGREAGENT]) or
+                     (bit.band(bagtype,itmfam) ~= 0)) then
                   -- Drop one onto the other
                   self:ItemMover(itembag,itemslot,emptybag,emptyslot);
 
