@@ -699,7 +699,6 @@ L["[Mm]ining [Pp]ick"] = true
 L["[Bb]lacksmith [Hh]ammer"] = true
 L["Runed %a+ Rod"] = true
 L["Philosopher's Stone"] = true
-L["Salt Shaker"] = true
 L["Arclight Spanner"] = true
 L["Gyromatic Micro%-Adjust[oe]r"] = true
 L["Zulian Slicer"] = true

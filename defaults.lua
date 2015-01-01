@@ -168,7 +168,6 @@ TBag.DefaultSearchList = {
   { L["TRADE_TOOL"], L[""], L["[Bb]lacksmith [Hh]ammer"], L["Weapon"], L[""] },
   { L["TRADE_TOOL"], L[""], L["Runed %a+ Rod"], L[""], L[""] },
   { L["TRADE_TOOL"], L[""], L["Philosopher's Stone"], L[""], L[""] },
-  { L["TRADE_TOOL"], L[""], L["Salt Shaker"], L[""], L[""] },
   { L["TRADE_TOOL"], L[""], L["Arclight Spanner"], L["Weapon"], L[""] },
   { L["TRADE_TOOL"], L[""], L["Gyromatic Micro%-Adjust[oe]r"], L["Trade Goods"], L[""] },
   { L["TRADE_TOOL"], L[""], L["Zulian Slicer"], L[""], L[""] },

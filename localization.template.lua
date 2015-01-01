@@ -689,7 +689,6 @@ L["[Mm]ining [Pp]ick"] = false
 L["[Bb]lacksmith [Hh]ammer"] = false
 L["Runed %a+ Rod"] = false
 L["Philosopher's Stone"] = false
-L["Salt Shaker"] = false
 L["Arclight Spanner"] = false
 L["Gyromatic Micro%-Adjust[oe]r"] = false
 L["Zulian Slicer"] = false

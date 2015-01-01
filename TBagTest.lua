@@ -356,7 +356,6 @@ local tests = {
   [5956] = L["TRADE_TOOL"],
   [22462] = L["TRADE_TOOL"],
   [9149] = L["TRADE_TOOL"],
-  [15846] = L["TRADE_TOOL"],
   [6219] = L["TRADE_TOOL"],
   [10498] = L["TRADE_TOOL"],
   [12709] = L["TRADE_TOOL"],
