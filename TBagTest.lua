@@ -211,14 +211,6 @@ local tests = {
   [20885] = L["AHN_QIRAJ"],
   [20889] = L["AHN_QIRAJ"],
 
-  -- Cenarion Circle
-  [20801] = L["CENARION_CIRCLE"],
-  [20800] = L["CENARION_CIRCLE"],
-  [20802] = L["CENARION_CIRCLE"],
-  [20513] = L["CENARION_CIRCLE"],
-  [20514] = L["CENARION_CIRCLE"],
-  [20515] = L["CENARION_CIRCLE"],
-
   -- Darkmoon Faire
   [19182] = L["DARKMOON_FAIRE"],
   [4582] = L["DARKMOON_FAIRE"],

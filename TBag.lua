@@ -997,7 +997,6 @@ function TBag:SetDefLayout(cfg, bagarr, row1offset, reset)
   self:SetCatBar(cfg, L["LOWER_CITY"], 24, reset);
 
   self:SetCatBar(cfg, L["AHN_QIRAJ"], 23, reset);
-  self:SetCatBar(cfg, L["CENARION_CIRCLE"], 23, reset);
   self:SetCatBar(cfg, L["NETHERWING"], 23, reset);
 
   self:SetCatBar(cfg, L["BLACKWING_LAIR"], 22, reset);

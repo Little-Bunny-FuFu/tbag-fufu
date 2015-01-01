@@ -225,7 +225,6 @@ L["SCRYER"] = true
 L["SHA'TAR"] = true
 L["LOWER_CITY"] = true
 L["AHN_QIRAJ"] = true
-L["CENARION_CIRCLE"] = true
 L["NETHERWING"] = true
 L["BLACKWING_LAIR"] = true
 L["DARKMOON_FAIRE"] = true

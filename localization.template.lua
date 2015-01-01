@@ -213,7 +213,6 @@ L["SCRYER"] = false
 L["SHA'TAR"] = false
 L["LOWER_CITY"] = false
 L["AHN_QIRAJ"] = false
-L["CENARION_CIRCLE"] = false
 L["NETHERWING"] = false
 L["BLACKWING_LAIR"] = false
 L["DARKMOON_FAIRE"] = false
