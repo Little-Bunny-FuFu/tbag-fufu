@@ -422,6 +422,13 @@ local tests = {
   [3567] = L["WEAPON"], -- Avoid matching fishing pole
   [4598] = L["EXPLOSIVES"], -- ditto
   [19970] = L["FISHING"],
+  [110293] = L["FISHING"],
+  [110274] = L["FISHING"],
+  [110289] = L["FISHING"],
+  [110291] = L["FISHING"],
+  [110292] = L["FISHING"],
+  [110290] = L["FISHING"],
+  [110294] = L["FISHING"],
 
   -- Inscription
   [43125] = L["INSCRIPTION"],

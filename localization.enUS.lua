@@ -67,7 +67,7 @@ L[""] = true -- Needed to preserve nil returns
 
 -- Secondary skills
 L["Cooking"] = true
-L["Fishing"] = true
+L["[Fishing"] = true
 L["First Aid"] = true
 L["Archaeology"] = true
 
@@ -714,6 +714,7 @@ L["Blood Scythe"] = true
 L["Herbalist's Gloves"] = true
 L["Dwarven Fishing Pole"] = true
 L["Goblin Fishing Pole"] = true
+L["[Ff]ishing"] = true
 L["Everlasting Underspore Frond"] = true
 L["\nHead"] = true
 L["\nNeck"] = true

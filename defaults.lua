@@ -216,7 +216,7 @@ TBag.DefaultSearchList = {
     L[""], L["Dwarven Fishing Pole"], L[""] },
   { L["WEAPON"], L[""], L["Dwarven Fishing Pole"], L[""], L[""] },
   { L["EXPLOSIVES"], L[""], L["Goblin Fishing Pole"], L[""], L[""] },
-  { L["FISHING"], L[""], L["Fishing"], L[""], L[""] },
+  { L["FISHING"], L[""], L["[Ff]ishing"], L[""], L[""] },
   { L["FOOD"], L[""], L["Everlasting Underspore Frond"], L["Armor"], L[""] },
   { L["ENGINEERING"], L[""], L["Ultrasafe Transporter:"], L["Trade Goods"], L["Devices"] },
   { L["ENGINEERING"], L[""], L["Dimensional Ripper - "], L["Trade Goods"], L["Devices"] },

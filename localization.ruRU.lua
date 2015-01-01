@@ -670,6 +670,7 @@ L["Blood Scythe"] = "Кровокос"
 L["Herbalist's Gloves"] = "Перчатки травника"
 L["Dwarven Fishing Pole"] = " Дворфийская удочка"
 L["Goblin Fishing Pole"] = "Гоблинская удочка"
+L["[Ff]ishing"] = false
 L["Everlasting Underspore Frond"] = "Вечная Подспорная ветвь"
 L["\nHead"] = "\nГолова"
 L["\nNeck"] = "\nШея"

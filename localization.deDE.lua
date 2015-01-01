@@ -670,6 +670,7 @@ L["Blood Scythe"] = "Blutsense"
 L["Herbalist's Gloves"] = "Kr\195\164uterkundigenhandschuhe"
 L["Dwarven Fishing Pole"] = "Zwergenangelrute"
 L["Goblin Fishing Pole"] = "Goblinangelrute"
+L["[Ff]ishing"] = false
 L["Everlasting Underspore Frond"] = "Unverg\195\164nglicher Tiefensporenfarn"
 L["\nHead"] = "\nKopf"
 L["\nNeck"] = "\nHals"

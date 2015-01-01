@@ -704,6 +704,7 @@ L["Blood Scythe"] = false
 L["Herbalist's Gloves"] = false
 L["Dwarven Fishing Pole"] = false
 L["Goblin Fishing Pole"] = false
+L["[Ff]ishing"] = false
 L["Everlasting Underspore Frond"] = false
 L["\nHead"] = false
 L["\nNeck"] = false
