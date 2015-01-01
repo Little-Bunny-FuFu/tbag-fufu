@@ -642,15 +642,6 @@ local tests = {
 -- Found from wowhead but apparently not seen on any of the realms
 tests[38266] = nil
 
-if not TBag.wrath_310 then
-  tests[44820] = nil
-  tests[44599] = nil
-  tests[44601] = nil
-  tests[45057] = nil
-  tests[45047] = nil
-  tests[45063] = nil
-end
-
 local function build_itm(id,itm)
   itm[TBag.I_ITEMLINK] = "item:"..id..":0:0:0:0:0:0:0";
   itm[TBag.I_BAG] = 1;

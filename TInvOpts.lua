@@ -86,11 +86,6 @@ function TInvOpt_CreateCfgOpt()
   TBag:MakeCheck(TInv_CfgOpt, L["Alt Key Auto-Panel:"],
     TInvFrame.cfg, "alt_panel", TInvOpt_ResizeUpdate);
 
-  if (select(4,GetBuildInfo()) < 40200) then 
-    TBag:MakeCheck(TInv_CfgOpt, L["Show Keyring Empty Slots (Enable Show above):"],
-      TInvFrame.cfg, "show_keyring_empty_slots", TInvOpt_ResizeUpdate);
-	end
-
     TBag:CreateNewOpt(TInv_CfgOpt, TInvFrame.cfg, function () TInvFrame:UpdateWindow() end);
 
   TBag:MakeItemSearchHeader(TInv_CfgOpt);

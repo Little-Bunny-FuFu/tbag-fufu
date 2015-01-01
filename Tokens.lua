@@ -26,12 +26,7 @@ function Tokens.GetItemStringFromCurrencyIndex(index)
 end
 
 function Tokens.SetItmFromCurrencyIndex(index,itm)
-  local name, isHeader, isExpand, isUnused, isWatched, count, extraType, icon
-  if not TBag.cata_400 then
-    name, isHeader, isExpand, isUnused, isWatched, count, extraType, icon = GetCurrencyListInfo(index)
-  else
-    name, isHeader, isExpand, isUnused, isWatched, count, icon = GetCurrencyListInfo(index)
-  end
+  local name, isHeader, isExpand, isUnused, isWatched, count, icon = GetCurrencyListInfo(index)
 
   if not name then
     return false
@@ -43,11 +38,7 @@ function Tokens.SetItmFromCurrencyIndex(index,itm)
   itm[TBag.I_UNUSED] = isUnused
   itm[TBag.I_WATCH] = isWatched
   itm[TBag.I_COUNT] = count
-  itm[TBag.I_TYPE] = extraType
   itm[TBag.I_ICON] = icon
-  if not TBag.cata_400 and not isHeader and extraType == 0 and count > 0 then
-    itm[TBag.I_ITEMLINK] = Tokens.GetItemStringFromCurrencyIndex(index)
-  end
   return true
 end
 
@@ -153,25 +144,7 @@ end
 
 function Tokens.Button_OnEnter(self)
   GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-  if TBag.cata_400 then
-    GameTooltip:SetText(self.name, 1, 1, 1, 1)
-  elseif ( self.extraCurrencyType == 1 ) then
-    GameTooltip:SetText(ARENA_POINTS,
-                        HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b)
-    GameTooltip:AddLine(TOOLTIP_ARENA_POINTS, nil, nil, nil, 1)
-    GameTooltip:Show()
-  elseif ( self.extraCurrencyType == 2 ) then
-    GameTooltip:SetText(HONOR_POINTS,
-                        HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b)
-    GameTooltip:AddLine(TOOLTIP_HONOR_POINTS, nil, nil, nil, 1)
-    GameTooltip:Show()
-  elseif self.count_val > 0 then
-      local mainFrame = self:GetParent():GetParent()
-      local level = TBag:GetPlayerInfo(mainFrame.playerid,TBag.G_BASIC)[TBag.S_LEVEL] or
-                    UnitLevel("player")
-      local itemstring = self.itemstring..":"..level
-      GameTooltip:SetHyperlink(itemstring)
-  end
+  GameTooltip:SetText(self.name, 1, 1, 1, 1)
 end
 
 -- I really hate having to hook to do this but it would be a real mess

@@ -4,13 +4,8 @@ local _G = getfenv(0)
 local TBag = _G.TBag
 local L = TBag.LOCALE
 
-local mop_500 = select(4,GetBuildInfo()) >= 50000
 local GetTradeSkillCategoryFilter = GetTradeSkillCategoryFilter
 local SetTradeSkillCategoryFilter = SetTradeSkillCategoryFilter
-if not mop_500 then
-	GetTradeSkillCategoryFilter = GetTradeSkillSubClassFilter
-	SetTradeSkillCategoryFilter = SetTradeSkillSubClassFilter
-end
 
 -- Constants used throughout the addon
 TBag.S_TRADES  = "trades"
@@ -47,9 +42,6 @@ Professions.seconds = {
   "First Aid",
   "Archaeology",
 }
-if not TBag.cata_400 then
-  Professions.seconds[4] = nil -- Remove Archaeology
-end
 Professions.skills = {
   "Lockpicking",
   "Runeforging",
@@ -180,83 +172,61 @@ function Professions:GetSkillRank(trade)
   return skillRankReturn
 end
 
-if TBag.cata_400 then
-  function Professions:ScanAllTradeRanks()
-    local player = TBag:GetPlayer(TBag.PLAYERID)
-    local prof1,prof2,arch,fish,cook,firstAid = GetProfessions()
-    -- Grab the info for the first two professions and update them
-    -- saving the names so we can wipe everything else.
-    local prof1_name,prof2_name
-    if prof1 then
-      local rank, cache, _
-      prof1_name,_,rank = GetProfessionInfo(prof1)
-      prof1_name = RL[prof1_name]
-      cache = player[TBag.S_TRADES][prof1_name]
-      if cache ~= rank then
-        player[TBag.S_TRADES][prof1_name] = rank
-        TBagCfg["trades_changed"] = 1
-      end
-    end
-    if prof2 then
-      local rank, cache, _
-      prof2_name,_,rank = GetProfessionInfo(prof2)
-      prof2_name = RL[prof2_name]
-      cache = player[TBag.S_TRADES][prof2_name]
-      if cache ~= rank then
-        player[TBag.S_TRADES][prof2_name] = rank
-        TBagCfg["trades_changed"] = 1
-      end
-    end
-    -- wipe professions that we didn't see this time
-    for trade in pairs(player[TBag.S_TRADES]) do
-      if trade ~= prof1_name and trade ~= prof2_name then
-        player[TBag.S_TRADES][trade] = nil
-        TBagCfg["trades_changed"] = 1
-      end
-    end
-
-    -- Secondary skills
-    if arch then
-      local name,_,rank = GetProfessionInfo(arch)
-      player[TBag.S_SECOND][RL[name]] = rank
-    end
-    if fish then
-      local name,_,rank = GetProfessionInfo(fish)
-      player[TBag.S_SECOND][RL[name]] = rank
-    end
-    if cook then
-      local name,_,rank = GetProfessionInfo(cook)
-      player[TBag.S_SECOND][RL[name]] = rank
-    end
-    if firstAid then
-      local name,_,rank = GetProfessionInfo(firstAid)
-      player[TBag.S_SECOND][RL[name]] = rank
-    end
-
-    -- We don't do anything with other skills in Cata
-  end
-else
-  -- Pre-Cataclysm ScanAllTradeRanks
-  function Professions:ScanAllTradeRanks()
-    if scanningTrades then return end
-    local player = TBag:GetPlayer(TBag.PLAYERID)
-    player[TBag.S_TRADES] = player[TBag.S_TRADES] or {}
-    player[TBag.S_SECOND] = player[TBag.S_SECOND] or {}
-    for _,v in ipairs(self.trades) do
-      local cache = player[TBag.S_TRADES][v]
-      player[TBag.S_TRADES][v] = self:GetSkillRank(v)
-      if cache ~= player[TBag.S_TRADES][v] then
-        TBagCfg["trades_changed"] = 1
-      end
-    end
-    for _,v in ipairs(self.seconds) do
-      player[TBag.S_SECOND][v] = self:GetSkillRank(v)
-    end
-    for _,v in ipairs(self.skills) do
-      player[TBag.S_SKILLS][v] = self:GetSkillRank(v)
+function Professions:ScanAllTradeRanks()
+  local player = TBag:GetPlayer(TBag.PLAYERID)
+  local prof1,prof2,arch,fish,cook,firstAid = GetProfessions()
+  -- Grab the info for the first two professions and update them
+  -- saving the names so we can wipe everything else.
+  local prof1_name,prof2_name
+  if prof1 then
+    local rank, cache, _
+    prof1_name,_,rank = GetProfessionInfo(prof1)
+    prof1_name = RL[prof1_name]
+    cache = player[TBag.S_TRADES][prof1_name]
+    if cache ~= rank then
+      player[TBag.S_TRADES][prof1_name] = rank
+      TBagCfg["trades_changed"] = 1
     end
   end
+  if prof2 then
+    local rank, cache, _
+    prof2_name,_,rank = GetProfessionInfo(prof2)
+    prof2_name = RL[prof2_name]
+    cache = player[TBag.S_TRADES][prof2_name]
+    if cache ~= rank then
+      player[TBag.S_TRADES][prof2_name] = rank
+      TBagCfg["trades_changed"] = 1
+    end
+  end
+  -- wipe professions that we didn't see this time
+  for trade in pairs(player[TBag.S_TRADES]) do
+    if trade ~= prof1_name and trade ~= prof2_name then
+      player[TBag.S_TRADES][trade] = nil
+      TBagCfg["trades_changed"] = 1
+    end
+  end
+
+  -- Secondary skills
+  if arch then
+    local name,_,rank = GetProfessionInfo(arch)
+    player[TBag.S_SECOND][RL[name]] = rank
+  end
+  if fish then
+    local name,_,rank = GetProfessionInfo(fish)
+    player[TBag.S_SECOND][RL[name]] = rank
+  end
+  if cook then
+    local name,_,rank = GetProfessionInfo(cook)
+    player[TBag.S_SECOND][RL[name]] = rank
+  end
+  if firstAid then
+    local name,_,rank = GetProfessionInfo(firstAid)
+    player[TBag.S_SECOND][RL[name]] = rank
+  end
+
+  -- We don't do anything with other skills
 end
+
 
 local function trade_skill_tooltip_scan(i, j)
   local tt = TBag_tt
