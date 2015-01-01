@@ -229,7 +229,6 @@ L["BLACKWING_LAIR"] = true
 L["DARKMOON_FAIRE"] = true
 L["OGRI'LA"] = true
 L["MOLTEN_CORE"] = true
-L["ZUL_GURUB"] = true
 L["CONSORTIUM"] = true
 L["HALAA"] = true
 

@@ -185,7 +185,6 @@ L["BLACKWING_LAIR"] = "ЛОГОВО_КРЫЛА_ТЬМЫ"
 L["DARKMOON_FAIRE"] = "ЯРМАРКА_НОВОЛУНИЯ"
 L["OGRI'LA"] = "ОГРИ'ЛА"
 L["MOLTEN_CORE"] = "ОГНЕННЫЕ_НЕДРА"
-L["ZUL_GURUB"] = "ЗУЛ'ГУРУБ"
 L["CONSORTIUM"] = "КОНСОРЦИУМ"
 L["HALAA"] = "ХАЛАА"
 

@@ -252,22 +252,6 @@ local tests = {
   [21377] = L["TIMBERMAW"],
   [21383] = L["TIMBERMAW"],
 
-  -- Zul'Grub
-  [19858] = L["ZUL_GURUB"],
-  [19699] = L["ZUL_GURUB"],
-  [19708] = L["ZUL_GURUB"],
-  [19724] = L["ZUL_GURUB"],
-  [19717] = L["ZUL_GURUB"],
-  [19716] = L["ZUL_GURUB"],
-  [19719] = L["ZUL_GURUB"],
-  [19723] = L["ZUL_GURUB"],
-  [19720] = L["ZUL_GURUB"],
-  [19721] = L["ZUL_GURUB"],
-  [19718] = L["ZUL_GURUB"],
-  [19722] = L["ZUL_GURUB"],
-  [19722] = L["ZUL_GURUB"],
-  [22637] = L["ZUL_GURUB"],
-
   -- Ogri'la
   [32572] = L["OGRI'LA"],
   [32684] = L["OGRI'LA"],

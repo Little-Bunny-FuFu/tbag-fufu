@@ -1003,7 +1003,6 @@ function TBag:SetDefLayout(cfg, bagarr, row1offset, reset)
   self:SetCatBar(cfg, L["OGRI'LA"], 22, reset);
 
   self:SetCatBar(cfg, L["MOLTEN_CORE"], 21, reset);
-  self:SetCatBar(cfg, L["ZUL_GURUB"], 21, reset);
   self:SetCatBar(cfg, L["CONSORTIUM"], 21, reset);
   self:SetCatBar(cfg, L["HALAA"], 21, reset);
 

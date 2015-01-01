@@ -217,7 +217,6 @@ L["BLACKWING_LAIR"] = false
 L["DARKMOON_FAIRE"] = false
 L["OGRI'LA"] = false
 L["MOLTEN_CORE"] = false
-L["ZUL_GURUB"] = false
 L["CONSORTIUM"] = false
 L["HALAA"] = false
 
