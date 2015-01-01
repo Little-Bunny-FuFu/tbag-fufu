@@ -107,6 +107,11 @@ local tests = {
   [37816] = L["COSTUMES"],
   [21213] = L["COSTUMES"],
   [44792] = L["COSTUMES"],
+  [116856] = L["COSTUMES"],
+  [116888] = L["COSTUMES"],
+  [116891] = L["COSTUMES"],
+  [116889] = L["COSTUMES"],
+  [116890] = L["COSTUMES"],
 
   -- Fireworks
   [21570] = L["FIREWORKS"],

@@ -52,6 +52,7 @@ TBag.DefaultSearchList = {
   { L["COSTUMES"], L[""], L["Transforms your mount into something more festive"], L[""], L[""] },
   { L["COSTUMES"], L[""], L["Your mount will be more festive"], L[""], L[""] },
   { L["COSTUMES"], L[""], L["Blossoming Branch"], L[""], L[""] },
+  { L["COSTUMES"], L[""], L["Contender's Costume"], L[""], L[""] },
   { L["FIREWORKS"], L[""], L["Shoots a.*firework"], L["Consumable"], L[""] },
   { L["FIREWORKS"], L[""], L["Shoots a.*firework"], L["Miscellaneous"], L[""] },
   { L["FIREWORKS"], L[""], L["Place on the ground to launch .* rockets"], L[""], L[""] },
