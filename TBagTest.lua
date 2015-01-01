@@ -35,7 +35,6 @@ local tests = {
   -- Enchants
   [11643] = L["ENCHANTS"],
   [24276] = L["ENCHANTS"],
-  [29193] = L["ENCHANTS"],
   [18170] = L["ENCHANTS"],
   [19789] = L["ENCHANTS"],
   [29533] = L["ENCHANTS"],
