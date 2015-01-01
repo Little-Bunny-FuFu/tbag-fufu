@@ -56,7 +56,6 @@ L["Container"] = "Сумки"
 L["Miscellaneous"] = MISCELLANEOUS
 L["Projectile"] = "Боеприпасы"
 L["Quest"] = "Задания"
-L["Quiver"] = "Амуниция"
 L["Reagent"] = "Реагенты"
 L["Recipe"] = "Рецепты"
 L["Trade Goods"] = "Хозяйственные товары"
@@ -70,7 +69,6 @@ L["Junk"] = "Хлам"
 L["Explosives"] = "Взрывчатка"
 L["Devices"] = "Устройства"
 L["Parts"] = "Детали"
-L["Ammo Pouch"] = "Подсумок"
 L["Engineering Bag"] = "Сумка инженера"
 L["Gem Bag"] = "Сумка ювелира"
 L["Herb Bag"] = "Сумка травника"
@@ -119,7 +117,6 @@ L["ACCOUNTBOUND_%s"] = "УЧЁТНАЯЗАПИСЬ_%s"
 L["EQUIPPED_%s"] = "НА_ПЕРСОНАЖЕ_%s"
 
 -- Broad categories for item types
-L["PROJECTILE"] = "БОЕПРИПАСЫ"
 L["CONSUMABLE"] = "РАСХОДУЕМЫЕ"
 L["ACT_ON"] = "ДЕЙСТВИЕ_НА"
 L["ACT_OPEN"] = "ДЕЙСТВИЕ_ОКРЫТЬ"
@@ -241,9 +238,6 @@ L["MONK"] = false
   
 -- Short bag type names used for EMPTY_%s_SLOTS and IN_%s_BAG categories
 -- 3-4 characters is about right for these.
-L["QUIV"] = "АМУН"
-L["AMMO"] = "БОЕП"
-L["SOUL"] = "ОСК"
 L["ENG"] = "ИНЖ"
 L["GEM"] = "ЮВЛ"
 L["HERB"] = "ТРАВ"

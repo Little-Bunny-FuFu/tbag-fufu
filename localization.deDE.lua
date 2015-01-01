@@ -54,7 +54,6 @@ L["Container"] = "Beh\195\164lter"
 L["Miscellaneous"] = MISCELLANEOUS
 L["Projectile"] = "Projektil"
 L["Quest"] = "Quest"
-L["Quiver"] = INVTYPE_QUIVER
 L["Reagent"] = "Reagenz"
 L["Recipe"] = "Rezept"
 L["Trade Goods"] = "Handwerkswaren"
@@ -68,7 +67,6 @@ L["Junk"] = "Plunder"
 L["Explosives"] = "Sprengstoff"
 L["Devices"] = "Ger\195\164te"
 L["Parts"] = "Teile"
-L["Ammo Pouch"] = "K\195\182cher"
 L["Engineering Bag"] = "Ingenieurstasche"
 L["Gem Bag"] = "Edelsteintasche"
 L["Herb Bag"] = "Kr\195\164utertasche"
@@ -117,7 +115,6 @@ L["ACCOUNTBOUND_%s"] = "ACCOUNTGEBUNDEN_%s"
 L["EQUIPPED_%s"] = "ANGELEGT_%s"
 
 -- Broad categories for item types
-L["PROJECTILE"] = "PROJEKTIL"
 L["CONSUMABLE"] = "VERBRAUCHBAR"
 L["ACT_ON"] = "ACT_ON"
 L["ACT_OPEN"] = "ACT_OPEN"
@@ -239,9 +236,6 @@ L["MONK"] = "M\195\150NCH"
 
 -- Short bag type names used for EMPTY_%s_SLOTS and IN_%s_BAG categories
 -- 3-4 characters is about right for these.
-L["QUIV"] = "K\195\150CH"
-L["AMMO"] = "MUN"
-L["SOUL"] = "SEEL"
 L["ENG"] = "ING"
 L["GEM"] = "JUW"
 L["HERB"] = "KR\195\132U"

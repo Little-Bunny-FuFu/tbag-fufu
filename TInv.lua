@@ -253,20 +253,8 @@ function Inv:UpdateBagGfx()
   local cfg = self.cfg
   for _, bag in ipairs(self.bags) do
     local free, size = TBag:UpdateSlots(self.playerid, bag, cfg["show_bag_sizes"]);
-    local bagtype = TBag:GetBagType(self.playerid, bag);
-    -- Don't count ammo, quivers or keyring slots as empty slots
-    -- quivers are type 1, ammo type 2, soul type 4 and keyring 256
-    if (bagtype == nil or (type(bagtype) == "number" and  bit.band(263,bagtype) == 0)) then
-      totalfree = totalfree + free;
-      totalsize = totalsize + size;
-    end
-
-    -- Deal with old style string bag types.
-    if (bagtype == nil or (type(bagtpe) == "string" and
-        bagtype ~= L["AMMO"] and bagtype ~= L["SOUL"] and bagtype ~= L["KEYRING"])) then
-      totalfree = totalfree + free;
-      totalsize = totalsize + size;
-    end
+    totalfree = totalfree + free;
+    totalsize = totalsize + size;
 
     -- Update the textures as well
     TBag:GetBagFrameTexture(bag):SetTexture(

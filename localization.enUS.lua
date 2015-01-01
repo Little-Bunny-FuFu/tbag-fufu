@@ -100,7 +100,6 @@ L["Container"] = true
 L["Miscellaneous"] = true
 L["Projectile"] = true
 L["Quest"] = true
-L["Quiver"] = true
 L["Reagent"] = true
 L["Recipe"] = true
 L["Trade Goods"] = true
@@ -114,7 +113,6 @@ L["Junk"] = true
 L["Explosives"] = true
 L["Devices"] = true
 L["Parts"] = true
-L["Ammo Pouch"] = true
 L["Engineering Bag"] = true
 L["Gem Bag"] = true
 L["Herb Bag"] = true
@@ -163,7 +161,6 @@ L["ACCOUNTBOUND_%s"] = true
 L["EQUIPPED_%s"] = true
 
 -- Broad categories for item types
-L["PROJECTILE"] = true
 L["CONSUMABLE"] = true
 L["ACT_ON"] = true
 L["ACT_OPEN"] = true
@@ -285,9 +282,6 @@ L["MONK"] = true
 
 -- Short bag type names used for EMPTY_%s_SLOTS and IN_%s_BAG categories
 -- 3-4 characters is about right for these.
-L["QUIV"] = true
-L["AMMO"] = true
-L["SOUL"] = true
 L["ENG"] = true
 L["GEM"] = true
 L["HERB"] = true

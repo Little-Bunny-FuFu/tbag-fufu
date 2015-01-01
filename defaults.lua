@@ -142,8 +142,6 @@ TBag.DefaultSearchList = {
 
 -- Containers
   { L["BAG"], L[""], L[""], L["Container"], L[""] },
-  { L["BAG"], L[""], L[""], L["Quiver"], L[""] },
-  { L["PROJECTILE"], L[""], L[""], L["Projectile"], L[""] },
 
 
   { L["BOOK"], L[""], L["Codex: "], L["Recipe"], L[""] },

@@ -931,13 +931,6 @@ function TBag:SetDefLayout(cfg, bagarr, row1offset, reset)
   if (reset == 1) and (cfg) then cfg[self.CAT_BAR] = {}; end
 
 -- Eighth default line (top) - Empty and Act Ons
-  self:SetCatBar(cfg, string.format(L["EMPTY_%s_SLOTS"],L["AMMO"]), 32, reset);
-  self:SetCatBar(cfg, string.format(L["EMPTY_%s_SLOTS"],L["QUIV"]), 32, reset);
-  self:SetCatBar(cfg, string.format(L["IN_%s_BAG"],L["AMMO"]), 32, reset);
-  self:SetCatBar(cfg, string.format(L["IN_%s_BAG"],L["QUIV"]), 32, reset);
-  -- arrows and bullets that AREN'T in your shot bags
-  self:SetCatBar(cfg, L["PROJECTILE"], 32, reset);
-
   self:SetCatBar(cfg, L["MISC"], 31, reset);
   self:SetCatBar(cfg, L["UNKNOWN"], 31, reset);
 
@@ -1500,12 +1493,6 @@ end
 function TBag:GetBagTypeName(bagType)
   if (bagType == 0) then
     return L["BAG"];
-  elseif (bagType == 1) then
-    return L["QUIV"];
-  elseif (bagType == 2) then
-    return L["AMMO"];
-  elseif (bagType == 4) then
-    return L["SOUL"];
   elseif (bagType == 8) then
     return L["LTHR"];
   elseif (bagType == 16) then
@@ -2299,8 +2286,7 @@ function TBag:InsertItemInCompArr(ca,itm,id)
   local bagtype = self:GetBagType(self.PLAYERID, itm[self.I_BAG]);
   if (bagtype == nil or bagtype == 0) then
     local itmfam = 0;
-    if (itm[self.I_TYPE] ~= L["Container"] and
-        itm[self.I_TYPE] ~= L["Quiver"]) then
+    if (itm[self.I_TYPE] ~= L["Container"]) then
       itmfam = GetItemFamily(itm[self.I_ITEMLINK]);
     end
     -- It's possible to be receiving an item we've never seen before
@@ -3332,8 +3318,7 @@ function TBag:Stack(where, itmcache, sa, ca)
                 not self:GetCompSkip(itembag,itemslot)) then
                 local bagtype = self:GetBagType(self.PLAYERID, emptyitm[self.I_BAG]);
 		local itmfam = 0;
-		if (itemitm[self.I_TYPE] ~= L["Container"] and
-                    itemitm[self.I_TYPE] ~= L["Quiver"]) then
+		if (itemitm[self.I_TYPE] ~= L["Container"]) then
                   itmfam = GetItemFamily(itemitm[self.I_ITEMLINK]);
 		end
 

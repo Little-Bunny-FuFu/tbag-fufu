@@ -333,13 +333,6 @@ local tests = {
   [29143] = L["BAG"],
   [34106] = L["BAG"],
 
-  -- Projectiles
-  -- Obsolete as of Cata, ammo is gone
-  --[[
-  [31737] = L["PROJECTILE"],
-  [31735] = L["PROJECTILE"],
-  ]]
-
   -- Books
   [21993] = L["BOOK"],
   [16072] = L["BOOK"],
