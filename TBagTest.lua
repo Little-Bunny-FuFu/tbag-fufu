@@ -37,7 +37,6 @@ local tests = {
   [24276] = L["ENCHANTS"],
   [29193] = L["ENCHANTS"],
   [18170] = L["ENCHANTS"],
-  [29486] = L["ENCHANTS"],
   [19789] = L["ENCHANTS"],
   [29533] = L["ENCHANTS"],
   [38896] = L["ENCHANTS"],
@@ -199,7 +198,6 @@ local tests = {
   -- Mounts
   [33977] = L["MOUNT"],
   [32861] = L["MOUNT"],
-  [33189] = L["MOUNT"],
   [49288] = L["MOUNT"],
   [49289] = L["MOUNT"],
 
@@ -663,9 +661,7 @@ local tests = {
   [8985]  = L["GRAY_ITEMS"],
   [43233] = L["GRAY_ITEMS"],
   [20844] = L["GRAY_ITEMS"],
-  [22053] = L["GRAY_ITEMS"],
   [22054] = L["GRAY_ITEMS"],
-  [43232] = L["GRAY_ITEMS"],
   [6947]  = L["GRAY_ITEMS"],
   [6949]  = L["GRAY_ITEMS"],
   [6950]  = L["GRAY_ITEMS"],
@@ -674,14 +670,12 @@ local tests = {
   [8927]  = L["GRAY_ITEMS"],
   [8928]  = L["GRAY_ITEMS"],
   [21927] = L["GRAY_ITEMS"],
-  [43230] = L["GRAY_ITEMS"],
   [5237]  = L["GRAY_ITEMS"],
   [10918] = L["GRAY_ITEMS"],
   [10920] = L["GRAY_ITEMS"],
   [10921] = L["GRAY_ITEMS"],
   [10922] = L["GRAY_ITEMS"],
   [22055] = L["GRAY_ITEMS"],
-  [43234] = L["GRAY_ITEMS"],
   [43235] = L["GRAY_ITEMS"],
 }
 
