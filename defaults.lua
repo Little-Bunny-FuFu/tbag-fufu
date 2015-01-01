@@ -92,8 +92,6 @@ TBag.DefaultSearchList = {
   { L["DARKMOON_FAIRE"], L[""],  L["Glowing Scorpid Blood"], L["Miscellaneous"], L[""] },
   { L["DARKMOON_FAIRE"], L[""],  L["Property of the Darkmoon Faire."], L["Quest"], L[""] },
   { L["DARKMOON_FAIRE"], L[""],  L["Combine the %a+ through %a+ of %a+ to complete the set."], L["Quest"], L[""] },
-  { L["THORIUM_BROTHER"], L[""], L["Incendosaur Scale"], L["Quest"], L[""] },
-  { L["THORIUM_BROTHER"], L[""], L["Dark Iron Residue"], L["Quest"], L[""] },
   { L["TIMBERMAW"], L[""], L["Deadwood Headdress Feather"], L["Quest"], L[""] },
   { L["TIMBERMAW"], L[""], L["Winterfall Spirit Beads"], L["Quest"], L[""] },
   { L["ZUL_GURUB"], L[""], L["%a+ Coin"], L["Quest"], L[""] },

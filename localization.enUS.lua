@@ -216,7 +216,6 @@ L["MISC"] = true
 L["UNKNOWN"] = true
 
 -- Faction and Collectable Categories.
-L["THORIUM_BROTHER"] = true
 L["TIMBERMAW"] = true
 L["CENARION_EXPEDITION"] = true
 L["SPOREGGAR"] = true

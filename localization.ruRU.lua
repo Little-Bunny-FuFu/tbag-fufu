@@ -172,7 +172,6 @@ L["MISC"] = "РАЗНОЕ"
 L["UNKNOWN"] = "НЕИЗВЕСТНО"
 
 -- Faction and Collectable Categories.
-L["THORIUM_BROTHER"] = "БРАТСТВО_ТОРИЯ"
 L["TIMBERMAW"] = "ДРЕВОБРЮХИ"
 L["CENARION_EXPEDITION"] = "КЕНЕРАЙСКАЯ_ЭКСПЕДИЦИЯ"
 L["SPOREGGAR"] = "СПОРЕГГАР"

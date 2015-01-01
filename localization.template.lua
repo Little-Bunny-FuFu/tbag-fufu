@@ -204,7 +204,6 @@ L["MISC"] = false
 L["UNKNOWN"] = false
 
 -- Faction and Collectable Categories.
-L["THORIUM_BROTHER"] = false
 L["TIMBERMAW"] = false
 L["CENARION_EXPEDITION"] = false
 L["SPOREGGAR"] = false

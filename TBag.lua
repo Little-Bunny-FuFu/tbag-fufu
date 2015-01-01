@@ -969,7 +969,6 @@ function TBag:SetDefLayout(cfg, bagarr, row1offset, reset)
   self:SetCatBar(cfg, L["QUEST"], 28, reset);
   self:SetCatBar(cfg, string.format(L["SOULBOUND_%s"],L["OTHER"]), 28, reset);
 
-  self:SetCatBar(cfg, L["THORIUM_BROTHER"], 27, reset);
   self:SetCatBar(cfg, L["TIMBERMAW"], 27, reset);
   self:SetCatBar(cfg, L["KEY_QUEST"], 27, reset);
   self:SetCatBar(cfg, L["CENARION_EXPEDITION"], 27, reset);
