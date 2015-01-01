@@ -364,7 +364,7 @@ TBag.DefaultSearchList = {
   { L["FOOD"], L[""], L["Restores [%d,]+ health over [%d,]+ sec"], L["Consumable"], L[""] },
   { L["FOOD"], L[""], L["Restores [%d,]+ health over [%d,]+ sec"], L["Trade Goods"], L[""] },
   { L["ENERGY_RESTORE"], L[""], L["Thistle Tea"], L["Consumable"], L[""] },
-  { L["ENERGY_RESTORE"], L[""], L["[Rr]estores %d+ energy"], L[""], L[""] },
+  { L["ENERGY_RESTORE"], L[""], L["[Rr]estores %-?%d+ energy"], L[""], L[""] },
   { L["RAGE_RESTORE"], L[""], L["Rage Potion"], L["Consumable"], L[""] },
   { L["RAGE_RESTORE"], L[""], L["[Rr]estores %d+ rage"], L[""], L[""] },
   { L["COMBO_RESTORE"], L[""], L["Rejuvenation Potion"], L["Consumable"], L[""] },
