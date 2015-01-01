@@ -843,3 +843,4 @@ L["Unhatched Mr. Chilly"] = "Ungeschl\195\188pfter Herr Fr\195\182stelich"
 L["Frosty's Collar"] = "Frostis Halsband"
 L["Perpetual Purple Firework"] = "Unersch\195\182pfliches lila Feuerwerk"
 L["High%-Powered Bolt Gun"] = "Hochleistungsbolzenschusspistole"
+L["Wormhole Centrifuge"] = false

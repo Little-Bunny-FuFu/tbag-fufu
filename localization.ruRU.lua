@@ -843,3 +843,4 @@ L["Unhatched Mr. Chilly"] = "Мистер Холодок"
 L["Frosty's Collar"] = "Ошейник Морозца"
 L["Perpetual Purple Firework"] = "Нескончаемый лиловый фейерверк"
 L["High%-Powered Bolt Gun"] = "Высокомощный крепежный пистолет"
+L["Wormhole Centrifuge"] = false

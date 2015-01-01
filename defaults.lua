@@ -217,9 +217,10 @@ TBag.DefaultSearchList = {
   { L["EXPLOSIVES"], L[""], L["Goblin Fishing Pole"], L[""], L[""] },
   { L["FISHING"], L[""], L["Fishing"], L[""], L[""] },
   { L["FOOD"], L[""], L["Everlasting Underspore Frond"], L["Armor"], L[""] },
-  { L["ENGINEERING"], L[""], L["Ultrasafe Transporter:"], L["Armor"], L[""] },
-  { L["ENGINEERING"], L[""], L["Dimensional Ripper - "], L["Armor"], L[""] },
-  { L["ENGINEERING"], L[""], L["Wormhole Generator:"], L["Armor"], L[""] },
+  { L["ENGINEERING"], L[""], L["Ultrasafe Transporter:"], L["Trade Goods"], L["Devices"] },
+  { L["ENGINEERING"], L[""], L["Dimensional Ripper - "], L["Trade Goods"], L["Devices"] },
+  { L["ENGINEERING"], L[""], L["Wormhole Generator:"], L["Trade Goods"], L["Devices"] },
+  { L["ENGINEERING"], L[""], L["Wormhole Centrifuge"], L["Trade Goods"], L["Devices"] },
   { L["ENGINEERING"], L[""], L["Goblin Beam Welder"], L[""], L[""] },
 
   { string.format(L["EQUIPPED_%s"],L["TRINKET"]), L["EQUIPPED"],

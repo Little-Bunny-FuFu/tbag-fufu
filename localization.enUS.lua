@@ -887,3 +887,4 @@ L["Unhatched Mr. Chilly"] = true
 L["Frosty's Collar"] = true
 L["Perpetual Purple Firework"] = true
 L["High%-Powered Bolt Gun"] = true
+L["Wormhole Centrifuge"] = true

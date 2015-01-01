@@ -658,6 +658,7 @@ local tests = {
   [30542] = L["ENGINEERING"],
   [48933] = L["ENGINEERING"],
   [47828] = L["ENGINEERING"],
+  [112059] = L["ENGINEERING"],
 
   -- Rogue Poisons
   -- obsolete rogue poisons that are now all GRAY_ITEMS
