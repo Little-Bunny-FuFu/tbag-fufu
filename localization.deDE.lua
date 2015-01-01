@@ -69,7 +69,6 @@ L["Explosives"] = "Sprengstoff"
 L["Devices"] = "Ger\195\164te"
 L["Parts"] = "Teile"
 L["Ammo Pouch"] = "K\195\182cher"
-L["Soul Bag"] = "Seelentasche"
 L["Engineering Bag"] = "Ingenieurstasche"
 L["Gem Bag"] = "Edelsteintasche"
 L["Herb Bag"] = "Kr\195\164utertasche"
@@ -119,7 +118,6 @@ L["EQUIPPED_%s"] = "ANGELEGT_%s"
 
 -- Broad categories for item types
 L["PROJECTILE"] = "PROJEKTIL"
-L["SOULSHARD"] = "SEELENSPLITTER"
 L["CONSUMABLE"] = "VERBRAUCHBAR"
 L["ACT_ON"] = "ACT_ON"
 L["ACT_OPEN"] = "ACT_OPEN"
@@ -533,7 +531,6 @@ L["Recent Tag Timeout (minutes):"] = "K\195\188rzlich Markierungs Timeout (Minut
 L["Alt Key Auto-Pickup:"] = "Alternative Auto-Pickup Taste:"
 L["Alt Key Auto-Panel:"] = "Alternative Auto-Panel Taste:"
 L["Show Keyring Empty Slots (Enable Show above):"] = "Zeige leere Pl\195\164tze im Schl\195\188sselbund (Anzeige oben Aktivieren):"
-L["Show Soul Shard Count On Soul Bags:"] = "Zeige Seelensplitter Anzahl auf Seelentaschen:"
 
 -----------------------------------------------------------------------
 -- Unit Tests
@@ -741,7 +738,6 @@ L["Fish Oil"] = "Fisch\195\182l"
 L["Shiny Fish Scales"] = "Gl\195\164nzende Fischschuppen"
 L["Thieves' Tools"] = "Diebeswerkzeug"
 L[" Totem"] = "totem"
-L["Soul Shard"] = "Seelensplitter"
 L["Corpse Dust"] = "Leichenstaub"
 L["Target Dummy"] = "Zielattrappe"
 L["Elemental %a+"] = "Elementar%s?%a+"

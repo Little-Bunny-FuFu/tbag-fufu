@@ -56,7 +56,6 @@ function Inv:InitDefVals(reset)
   TBag:SetDef(cfg, "alt_panel", 1, reset, TBag.NumFunc, 0, 1);
 
   TBag:SetDef(cfg, "show_keyring_empty_slots", 0, reset, TBag.NumFunc, 0, 1);
-  TBag:SetDef(cfg, "show_soulshard_count", 1, reset, TBag.NumFunc, 0, 1);
 
   -- Colors
   TBag:SetColor(cfg, "bkgr_"..TBag.MAIN_BAR, 0.0, 0.2, 0.4, 0.4, reset);
@@ -272,22 +271,6 @@ function Inv:UpdateBagGfx()
     -- Update the textures as well
     TBag:GetBagFrameTexture(bag):SetTexture(
         TBag:GetBagTexture(self.playerid, bag));
-
-    if (bag > 0) then
-      -- Deal with the count of soulshards in a soulbag.
-      if (cfg["show_soulshard_count"] == 1) then
-        if (bagtype and type(bagtype) == "number" and bit.band(4,bagtype) ~= 0) then
-          SetItemButtonCount(TBag:GetBagFrame(bag), size - free);
-	-- Deal with old style string bagtypes.
-	elseif (bagtype and type(bagtype) == "string" and bagtype == L["SOUL"]) then
-          SetItemButtonCount(TBag:GetBagFrame(bag), size - free);
-        else
-          SetItemButtonCount(TBag:GetBagFrame(bag), 0);
-	end
-      else
-          SetItemButtonCount(TBag:GetBagFrame(bag), 0);
-      end
-    end
 
     TBag:UpdateBagColors(bag);
   end

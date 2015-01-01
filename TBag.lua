@@ -942,12 +942,8 @@ function TBag:SetDefLayout(cfg, bagarr, row1offset, reset)
   self:SetCatBar(cfg, string.format(L["EMPTY_%s_SLOTS"],L["QUIV"]), 32, reset);
   self:SetCatBar(cfg, string.format(L["IN_%s_BAG"],L["AMMO"]), 32, reset);
   self:SetCatBar(cfg, string.format(L["IN_%s_BAG"],L["QUIV"]), 32, reset);
-  self:SetCatBar(cfg, string.format(L["EMPTY_%s_SLOTS"],L["SOUL"]), 32, reset);
-  self:SetCatBar(cfg, string.format(L["IN_%s_BAG"],L["SOUL"]), 32, reset);
   -- arrows and bullets that AREN'T in your shot bags
   self:SetCatBar(cfg, L["PROJECTILE"], 32, reset);
-  -- soulshards that AREN'T in your soul bags
-  self:SetCatBar(cfg, L["SOULSHARD"], 32, reset);
 
   self:SetCatBar(cfg, L["MISC"], 31, reset);
   self:SetCatBar(cfg, L["UNKNOWN"], 31, reset);

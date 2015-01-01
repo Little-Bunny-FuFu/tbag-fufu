@@ -103,7 +103,6 @@ L["Explosives"] = false
 L["Devices"] = false
 L["Parts"] = false
 L["Ammo Pouch"] = false
-L["Soul Bag"] = false
 L["Engineering Bag"] = false
 L["Gem Bag"] = false
 L["Herb Bag"] = false
@@ -153,7 +152,6 @@ L["EQUIPPED_%s"] = false
 
 -- Broad categories for item types
 L["PROJECTILE"] = false
-L["SOULSHARD"] = false
 L["CONSUMABLE"] = false
 L["ACT_ON"] = false
 L["ACT_OPEN"] = false
@@ -567,7 +565,6 @@ L["Recent Tag Timeout (minutes):"] = false
 L["Alt Key Auto-Pickup:"] = false
 L["Alt Key Auto-Panel:"] = false
 L["Show Keyring Empty Slots (Enable Show above):"] = false
-L["Show Soul Shard Count On Soul Bags:"] = false
 
 -----------------------------------------------------------------------
 -- Unit Tests
@@ -775,7 +772,6 @@ L["Fish Oil"] = false
 L["Shiny Fish Scales"] = false
 L["Thieves' Tools"] = false
 L[" Totem"] = false
-L["Soul Shard"] = false
 L["Corpse Dust"] = false
 L["Target Dummy"] = false
 L["Elemental %a+"] = false

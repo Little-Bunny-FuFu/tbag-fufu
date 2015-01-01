@@ -71,7 +71,6 @@ L["Explosives"] = "Взрывчатка"
 L["Devices"] = "Устройства"
 L["Parts"] = "Детали"
 L["Ammo Pouch"] = "Подсумок"
-L["Soul Bag"] = "Сумка душ"
 L["Engineering Bag"] = "Сумка инженера"
 L["Gem Bag"] = "Сумка ювелира"
 L["Herb Bag"] = "Сумка травника"
@@ -121,7 +120,6 @@ L["EQUIPPED_%s"] = "НА_ПЕРСОНАЖЕ_%s"
 
 -- Broad categories for item types
 L["PROJECTILE"] = "БОЕПРИПАСЫ"
-L["SOULSHARD"] = "ОСКОЛОК_ДУШИ"
 L["CONSUMABLE"] = "РАСХОДУЕМЫЕ"
 L["ACT_ON"] = "ДЕЙСТВИЕ_НА"
 L["ACT_OPEN"] = "ДЕЙСТВИЕ_ОКРЫТЬ"
@@ -533,7 +531,6 @@ L["Recent Tag Timeout (minutes):"] = "Последнее время вараин
 L["Alt Key Auto-Pickup:"] = "Alt - автопогрузка:"
 L["Alt Key Auto-Panel:"] = "Alt - автопанель:"
 L["Show Keyring Empty Slots (Enable Show above):"] = "Показать свободные ячейки в повязке ключей (Включить, чтобы показать выше)"
-L["Show Soul Shard Count On Soul Bags:"] = "Показать количество осколков душ в сумке душ:"
 
 -----------------------------------------------------------------------
 -- Unit Tests 
@@ -741,7 +738,6 @@ L["Fish Oil"] = "Рыбий жир"
 L["Shiny Fish Scales"] = "Блестящая рыбья чешуя"
 L["Thieves' Tools"] = "Отмычки"
 L[" Totem"] = "[Тт]отем"
-L["Soul Shard"] = "Осколок души"
 L["Corpse Dust"] = "Прах"
 L["Target Dummy"] = "[Мм]анекен%-мишень"
 L["Elemental %a+"] = "Первородн.* %a+"
