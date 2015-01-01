@@ -612,7 +612,6 @@ L["Netherdust Pollen"] = "Пыльца хаотического пыльника
 L["Netherwing Crystal"] = "Кристалл Крыла Хаоса"
 L["Nethermine Cargo"] = "Груз копей Хаоса"
 L["Unidentified Plant Parts"] = "Неопознанные части растений"
-L["Coilfang Armaments"] = "Оружие Змеиного Зуба"
 L["Mature Spore Sac"] = "Мешочек зрелых спор"
 L["Bog Lord Tendril"] = "Усик болотника"
 L["Glowcap"] = "Огнешляпка"

@@ -103,7 +103,6 @@ TBag.DefaultSearchList = {
   { L["NETHERWING"], L[""], L["Netherwing Crystal"], L["Miscellaneous"], L[""]},
   { L["NETHERWING"], L[""], L["Nethermine Cargo"], L["Quest"], L[""]},
   { L["CENARION_EXPEDITION"], L[""], L["Unidentified Plant Parts"], L["Quest"], L[""]},
-  { L["CENARION_EXPEDITION"], L[""], L["Coilfang Armaments"], L["Quest"], L[""]},
   { L["SPOREGGAR"], L[""], L["Mature Spore Sac"], L["Quest"], L[""]},
   { L["SPOREGGAR"], L[""], L["Bog Lord Tendril"], L["Quest"], L[""]},
   { L["SPOREGGAR"], L[""], L["Glowcap"], L["Quest"], L[""]},

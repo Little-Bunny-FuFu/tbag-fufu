@@ -273,7 +273,6 @@ local tests = {
 
   -- Cenarion Expedition
   [24401] = L["CENARION_EXPEDITION"],
-  [24368] = L["CENARION_EXPEDITION"],
 
   -- Sporeggar
   [24290] = L["SPOREGGAR"],

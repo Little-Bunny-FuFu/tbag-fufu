@@ -656,7 +656,6 @@ L["Netherdust Pollen"] = true
 L["Netherwing Crystal"] = true
 L["Nethermine Cargo"] = true
 L["Unidentified Plant Parts"] = true
-L["Coilfang Armaments"] = true
 L["Mature Spore Sac"] = true
 L["Bog Lord Tendril"] = true
 L["Glowcap"] = true
