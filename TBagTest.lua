@@ -312,9 +312,6 @@ local tests = {
   [29735] = L["ALDOR"],
   [32897] = L["ALDOR"],
 
-  -- Sha'tar
-  [29434] = L["SHA'TAR"],
-
   -- Lower City
   [25719] = L["LOWER_CITY"],
 
