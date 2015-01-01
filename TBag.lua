@@ -562,7 +562,7 @@ end
 function TBag:GetItemName(itemlink)
   if itemlink and type(itemlink) == "string" then
     local name = itemlink:match("|h%[([^%]]+)%]|h")
-    return nam|e
+    return name
   end
   return ""
 end
