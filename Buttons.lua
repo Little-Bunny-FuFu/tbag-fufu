@@ -267,6 +267,13 @@ function ItemButton.Update(self)
     questTexture:Hide()
   end
 
+  if (itm[TBag.I_RARITY] and itm[TBag.I_RARITY] == LE_ITEM_QUALITY_POOR and
+      not itm[TBag.I_NOVALUE] and MerchantFrame:IsShown()) then
+    self.JunkIcon:Show()
+  else
+    self.JunkIcon:Hide()
+  end
+
   SetItemButtonCount(self, itm[TBag.I_COUNT])
 
   if mainFrame.edit_mode == 1 then
