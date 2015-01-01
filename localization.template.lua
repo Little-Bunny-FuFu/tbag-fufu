@@ -863,3 +863,4 @@ L["High%-Powered Bolt Gun"] = false
 L["Wormhole Centrifuge"] = false
 L["Aviana's Feather"] = false
 L["Sold by inscription vendors.*glyphs.*talent"] = false
+L["Moroes' Famous Polish"] = false

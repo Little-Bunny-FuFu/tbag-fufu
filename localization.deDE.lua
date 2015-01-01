@@ -829,3 +829,4 @@ L["High%-Powered Bolt Gun"] = "Hochleistungsbolzenschusspistole"
 L["Wormhole Centrifuge"] = "Wurmlochzentrifuge"
 L["Aviana's Feather"] = "Avianas Feder"
 L["Sold by inscription vendors.*glyphs.*talent"] = false
+L["Moroes' Famous Polish"] = false

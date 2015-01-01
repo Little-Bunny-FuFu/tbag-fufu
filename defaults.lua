@@ -77,6 +77,7 @@ TBag.DefaultSearchList = {
   { L["TOYS"], L[""], L["Copper Racer"], L[""], L[""] },
   { L["TOYS"], L[""], L["Use: Summons a stationary .* ride for"], L[""], L[""] },
   { L["TOYS"], L[""], L["Path of Cenarius"], L[""], L[""] },
+  { L["TOYS"], L[""], L["Moroes' Famous Polish"], L[""], L[""] },
 
   { L["CLASS_REAGENT"], L[""], L["Sold by inscription vendors.*glyphs.*talent"], L["Miscellaneous"], L["Reagent"] },
 
