@@ -214,7 +214,7 @@ function Hooks.ToggleAllBags()
       if not bagframe:GetChecked() then
         bagframe:SetChecked(true)
         TInvFrame.CACHE_REQ = TBag.REQ_MUST
-	inv_bag_toggled = true
+        inv_bag_toggled = true
       end
     end
   end
@@ -235,11 +235,11 @@ function Hooks.ToggleAllBags()
     for _, bag in ipairs(TBnkFrame.bags) do
       if TBnkFrame.cfg["show_Bag"..bag] ~= 1 then
         local bagframe = TBag:GetBagFrame(bag)
-	if bagframe:GetChecked() ~= inv_shown then
+        if bagframe:GetChecked() ~= inv_shown then
           bagframe:SetChecked(inv_shown)
           TBnkFrame.CACHE_REQ = TBag.REQ_MUST
-	  bnk_bag_toggled = true
-	end
+          bnk_bag_toggled = true
+        end
       end
     end
   end
@@ -271,12 +271,12 @@ function Hooks.ContainerFrameItemButton_OnModifiedClick(self, button, ...)
       if TradeFrame and TradeFrame:IsShown() then
         if alt_pickup  then
           local tradeslot = TradeFrame_GetAvailableSlot()
-	  if tradeslot then
+          if tradeslot then
             PickupContainerItem(itm[TBag.I_BAG], itm[TBag.I_SLOT])
-	    ClickTradeButton(tradeslot)
+            ClickTradeButton(tradeslot)
             ClearCursor()
-	    return
-	  end
+            return
+          end
         end
       elseif AuctionFrame and AuctionFrame:IsShown() then
         if alt_panel then
@@ -298,9 +298,9 @@ function Hooks.ContainerFrameItemButton_OnModifiedClick(self, button, ...)
         end
         if alt_pickup and PanelTemplates_GetSelectedTab(MailFrame) == 2 then
           PickupContainerItem(itm[TBag.I_BAG], itm[TBag.I_SLOT])
-	  ClickSendMailItemButton()
-	  ClearCursor()
-	  return
+          ClickSendMailItemButton()
+          ClearCursor()
+          return
         end
       end
     end
@@ -309,12 +309,14 @@ function Hooks.ContainerFrameItemButton_OnModifiedClick(self, button, ...)
     if itm[TBag.I_ITEMLINK] then
       if IsModifiedClick("CHATLINK") then
         local hl = TBag:MakeHyperlink(itm[TBag.I_ITEMLINK], itm[TBag.I_NAME],
-	                              itm[TBag.I_RARITY],TBag:GetPlayerInfo(mainFrame.playerid,TBag.G_BASIC)[TBag.S_LEVEL] or UnitLevel("player"),itm[TBag.I_LINKSUFFIX])
+                                      itm[TBag.I_RARITY],
+                                      TBag:GetPlayerInfo(mainFrame.playerid,TBag.G_BASIC)[TBag.S_LEVEL] or UnitLevel("player"),
+                                      itm[TBag.I_LINKSUFFIX])
         ChatEdit_InsertLink(hl)
-	return
+        return
       elseif IsModifiedClick("DRESSUP") then
         DressUpItemLink(itm[TBag.I_ITEMLINK])
-	return
+        return
       elseif IsModifiedClick("SPLITSTACK") then
         -- Can't split something in a non live frame
         return

@@ -33,30 +33,30 @@ local TBAG_MINMAX_WIDTH = 0.05;
 local TBAG_SPACER_WIDTH = 0.03;
 
 local TBAGOPT_LIST_FRAMES = {
-	"Text_1",
-	"Text_2",
-	"Text_3",
-	"Text_4",
-	"Text_5",
-	"Text_6",
-	"Text_7",
-	"Text_8",
-	"Slider_1",
-	"Slider_2",
-	"Slider_3",
-	"Slider_4",
-	"Edit_1",
-	"Edit_2",
-	"Edit_3",
-	"Edit_4",
-	"Edit_5",
-	"Button_1",
-	"Button_2",
-	"Button_3",
-	"Button_4",
-	"UpButton_1",
-	"DownButton_1"
-	};
+  "Text_1",
+  "Text_2",
+  "Text_3",
+  "Text_4",
+  "Text_5",
+  "Text_6",
+  "Text_7",
+  "Text_8",
+  "Slider_1",
+  "Slider_2",
+  "Slider_3",
+  "Slider_4",
+  "Edit_1",
+  "Edit_2",
+  "Edit_3",
+  "Edit_4",
+  "Edit_5",
+  "Button_1",
+  "Button_2",
+  "Button_3",
+  "Button_4",
+  "UpButton_1",
+  "DownButton_1"
+};
 
 
 function TBag.NilFunc()
@@ -288,119 +288,119 @@ end
 
 
 function TBag:EnableLine(frame, optsframename, lineheight, sliderheight, elements, y, x_start, available_width, fade )
-	local value, e, width_start, width;
-	local tmpframe, tmpframe_name;
-	local tmpframe_text, tmpframe_text2, tmpframe_text3;
-	local used_frames = {};
+  local value, e, width_start, width;
+  local tmpframe, tmpframe_name;
+  local tmpframe_text, tmpframe_text2, tmpframe_text3;
+  local used_frames = {};
 
-	self:PositionFrame( frame:GetName(), "TOPLEFT",
-		optsframename, "TOPLEFT",
-		x_start, 0-y,
-		available_width, lineheight );
-	y = y + lineheight;
-	frame:Show()
+  self:PositionFrame( frame:GetName(), "TOPLEFT",
+  optsframename, "TOPLEFT",
+  x_start, 0-y,
+  available_width, lineheight );
+  y = y + lineheight;
+  frame:Show()
 
-	if ((elements ~= nil) and (table.getn(elements) > 0)) then
-		width_start = 0;
-		for _, e in ipairs(elements) do
-			width = e["width"] * available_width;
+  if ((elements ~= nil) and (table.getn(elements) > 0)) then
+    width_start = 0;
+    for _, e in ipairs(elements) do
+      width = e["width"] * available_width;
 
-			tmpframe_name = frame:GetName().."_"..e["type"].."_"..e["ID"];
-			tmpframe = _G[tmpframe_name];
+      tmpframe_name = frame:GetName().."_"..e["type"].."_"..e["ID"];
+      tmpframe = _G[tmpframe_name];
 
-			tmpframe.change_value_func = e["func"];
-			tmpframe.func_param1 = e["param1"];
-			tmpframe.func_param2 = e["param2"];
-			tmpframe.func_param3 = e["param3"];
-			tmpframe.func_param4 = e["param4"];
+      tmpframe.change_value_func = e["func"];
+      tmpframe.func_param1 = e["param1"];
+      tmpframe.func_param2 = e["param2"];
+      tmpframe.func_param3 = e["param3"];
+      tmpframe.func_param4 = e["param4"];
 
-			if (e["type"] == "Slider") then
-				tmpframe_text = _G[tmpframe:GetName().."_disp_text"];
-				tmpframe:SetMinMaxValues(e["minValue"], e["maxValue"]);
-				tmpframe:SetValueStep(e["valueStep"]);
-				tmpframe:SetValue( e["defaultValue"](e["param1"], e["param2"], e["param3"], e["param4"]) );
-				tmpframe_text:SetText( tmpframe:GetValue() );
-				tmpframe_text:SetJustifyH("LEFT");
+      if (e["type"] == "Slider") then
+        tmpframe_text = _G[tmpframe:GetName().."_disp_text"];
+        tmpframe:SetMinMaxValues(e["minValue"], e["maxValue"]);
+        tmpframe:SetValueStep(e["valueStep"]);
+        tmpframe:SetValue( e["defaultValue"](e["param1"], e["param2"], e["param3"], e["param4"]) );
+        tmpframe_text:SetText( tmpframe:GetValue() );
+        tmpframe_text:SetJustifyH("LEFT");
 
-				self:PositionFrame( tmpframe_name, "TOPLEFT",
-					frame:GetName(), "TOPLEFT",
-					width_start+5, 0-((lineheight-sliderheight)/2),
-					(width-5)-30, sliderheight );
-				tmpframe:Show()
-				self:PositionFrame( tmpframe_text:GetName(), "LEFT",
-					tmpframe_name.."Thumb", "RIGHT",
-					-10, 0,
-					55, 20);
-				tmpframe_text:Show()
-			elseif (e["type"] == "Edit") then
-				tmpframe:SetMaxLetters(e["letters"]);
-				tmpframe:SetText( e["defaultValue"](e["param1"], e["param2"], e["param3"], e["param4"]) );
+        self:PositionFrame( tmpframe_name, "TOPLEFT",
+        frame:GetName(), "TOPLEFT",
+        width_start+5, 0-((lineheight-sliderheight)/2),
+        (width-5)-30, sliderheight );
+        tmpframe:Show()
+        self:PositionFrame( tmpframe_text:GetName(), "LEFT",
+        tmpframe_name.."Thumb", "RIGHT",
+        -10, 0,
+        55, 20);
+        tmpframe_text:Show()
+      elseif (e["type"] == "Edit") then
+        tmpframe:SetMaxLetters(e["letters"]);
+        tmpframe:SetText( e["defaultValue"](e["param1"], e["param2"], e["param3"], e["param4"]) );
 
-				self:PositionFrame( tmpframe_name, "TOPLEFT",
-					frame:GetName(), "TOPLEFT",
-					width_start+10, 0,
-					width, lineheight );
-				tmpframe:Show()
-			elseif (e["type"] == "Text") then
-				tmpframe:SetText(e["text"]);
-				if (e["align"] ~= nil) then
-					tmpframe:SetJustifyH(e["align"]);	-- valid values: LEFT, RIGHT,  CENTER?
-				else
-					tmpframe:SetJustifyH("LEFT");
-				end
-				if (e["alignv"] ~= nil) then
-					tmpframe:SetJustifyV(e["alignv"]);	-- valid values: TOP, BOTTOM,  CENTER?
-				else
-					tmpframe:SetJustifyV("CENTER");
-				end
-				if (e["color"] ~= nil) then
-					--tmpframe:SetVertexColor(e["color"][1], e["color"][2], e["color"][3], fade);
-					tmpframe:SetTextColor(e["color"][1], e["color"][2], e["color"][3]);
-				else
-					--tmpframe:SetVertexColor(1,1,0,fade);	-- yellow, default text
-					tmpframe:SetTextColor(1,1,0);	-- yellow, default text
-				end
+        self:PositionFrame( tmpframe_name, "TOPLEFT",
+        frame:GetName(), "TOPLEFT",
+        width_start+10, 0,
+        width, lineheight );
+        tmpframe:Show()
+      elseif (e["type"] == "Text") then
+        tmpframe:SetText(e["text"]);
+        if (e["align"] ~= nil) then
+          tmpframe:SetJustifyH(e["align"]); -- valid values: LEFT, RIGHT,  CENTER?
+        else
+          tmpframe:SetJustifyH("LEFT");
+        end
+        if (e["alignv"] ~= nil) then
+          tmpframe:SetJustifyV(e["alignv"]); -- valid values: TOP, BOTTOM,  CENTER?
+        else
+          tmpframe:SetJustifyV("CENTER");
+        end
+        if (e["color"] ~= nil) then
+          --tmpframe:SetVertexColor(e["color"][1], e["color"][2], e["color"][3], fade);
+          tmpframe:SetTextColor(e["color"][1], e["color"][2], e["color"][3]);
+        else
+          --tmpframe:SetVertexColor(1,1,0,fade); - yellow, default text
+          tmpframe:SetTextColor(1,1,0); -- yellow, default text
+        end
 
-				self:PositionFrame( tmpframe_name, "TOPLEFT",
-					frame:GetName(), "TOPLEFT",
-					width_start, 0,
-					width, lineheight );
-				tmpframe:Show()
-			elseif (e["type"] == "Button") then
-				tmpframe:SetText(e["text"]);
+        self:PositionFrame( tmpframe_name, "TOPLEFT",
+        frame:GetName(), "TOPLEFT",
+        width_start, 0,
+        width, lineheight );
+        tmpframe:Show()
+      elseif (e["type"] == "Button") then
+        tmpframe:SetText(e["text"]);
 
-				self:PositionFrame( tmpframe_name, "TOPLEFT",
-					frame:GetName(), "TOPLEFT",
-					width_start, 0,
-					width, lineheight );
-				tmpframe:Show()
-			elseif (e["type"] == "UpButton") then
-				self:PositionFrame( tmpframe_name, "TOPLEFT",
-					frame:GetName(), "TOPLEFT",
-					width_start, 0,
-					width, lineheight );
-				tmpframe:Show()
-			elseif (e["type"] == "DownButton") then
-				self:PositionFrame( tmpframe_name, "TOPLEFT",
-					frame:GetName(), "TOPLEFT",
-					width_start, 0,
-					width, lineheight );
-				tmpframe:Show()
-			end
+        self:PositionFrame( tmpframe_name, "TOPLEFT",
+        frame:GetName(), "TOPLEFT",
+        width_start, 0,
+        width, lineheight );
+        tmpframe:Show()
+      elseif (e["type"] == "UpButton") then
+        self:PositionFrame( tmpframe_name, "TOPLEFT",
+        frame:GetName(), "TOPLEFT",
+        width_start, 0,
+        width, lineheight );
+        tmpframe:Show()
+      elseif (e["type"] == "DownButton") then
+        self:PositionFrame( tmpframe_name, "TOPLEFT",
+        frame:GetName(), "TOPLEFT",
+        width_start, 0,
+        width, lineheight );
+        tmpframe:Show()
+      end
 
-			tmpframe:SetAlpha(fade);
-			used_frames[e["type"].."_"..e["ID"]] = 1;
+      tmpframe:SetAlpha(fade);
+      used_frames[e["type"].."_"..e["ID"]] = 1;
 
-			width_start = width_start + width;
-		end
-	end
+      width_start = width_start + width;
+    end
+  end
 
-    for _, value in ipairs(TBAGOPT_LIST_FRAMES) do
-      if ( used_frames[value] == nil ) then
-			tmpframe = _G[frame:GetName().."_"..value];
-			tmpframe:Hide();
-		end
-	end
+  for _, value in ipairs(TBAGOPT_LIST_FRAMES) do
+    if ( used_frames[value] == nil ) then
+      tmpframe = _G[frame:GetName().."_"..value];
+      tmpframe:Hide();
+    end
+  end
 
-	return y;
+  return y;
 end

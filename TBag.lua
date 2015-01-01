@@ -42,9 +42,9 @@ TBag.SORTBY_NORM = 1;
 TBag.SORTBY_REV = 2; -- reverses the name then sorts it:  ie:   "Potion Mana Major" vs "Major Mana Potion"
 TBag.SORTBY_MAX = 2;
 
-TBag.REQ_NONE = 0;	-- when items haven't changed, or only item counts
-TBag.REQ_PART = 1;	-- when items have changed location, but it's been sorted once and won't break if we don't sort again
-TBag.REQ_MUST = 2;	-- it's never been sorted, the window is in an unstable state, you MUST sort.
+TBag.REQ_NONE = 0; -- when items haven't changed, or only item counts
+TBag.REQ_PART = 1; -- when items have changed location, but it's been sorted once and won't break if we don't sort again
+TBag.REQ_MUST = 2; -- it's never been sorted, the window is in an unstable state, you MUST sort.
 
 -- String constants
 TBag.CAT_BAR = "catbar";
@@ -169,7 +169,7 @@ TBag.BAGMIN = REAGENTBANK_CONTAINER;
 TBag.BAGMAX = 11;
 TBag.MAX_REAGENTBANK_ITEMS = 98 -- has to be a constant since game can't tell us in time
 TBag.Inv_Bags = { BACKPACK_CONTAINER, 4, 3, 2, 1 };
-	
+
 TBag.Bnk_Bags = { BANK_CONTAINER, REAGENTBANK_CONTAINER, 5, 6, 7, 8, 9, 10, 11 };
 TBag.Body_Slots = {
   ["HeadSlot"] = 1,
@@ -461,8 +461,8 @@ function TBag:ClearItmCache(itmcache, bagarr)
           slottab[k] = nil;
         end
       else
-	-- Isn't a table so just nil it.  Some of the itmcache's
-	-- just store a single value for a slot.
+        -- Isn't a table so just nil it.  Some of the itmcache's
+        -- just store a single value for a slot.
         bagtab[slot] = nil;
       end
     end
@@ -1583,7 +1583,7 @@ function TBag:GetBagTexture(playerid, bag)
   else
     local itemlink = self:GetPlayerBagCfg(playerid, bag, self.I_ITEMLINK);
     if (itemlink) then
-	  texture = GetItemIcon(itemlink);
+      texture = GetItemIcon(itemlink);
     else
       texture = "interface\\paperdoll\\UI-PaperDoll-Slot-Bag";
     end
@@ -2144,7 +2144,7 @@ function TBag:UpdateHearth(tt, itemlink, playerid)
       if (ttleft) then        local line = ttleft:GetText();        if (line) then
           local sub,match = string.gsub(line, L["(Use: Returns you to )([^%.]*)(%.)"],repl,1);          if (match == 1) then
             ttleft:SetText(sub);
-	    tt:Show()
+            tt:Show()
             break;
           end
         end
@@ -2176,7 +2176,7 @@ function TBag:SetInventoryItem(tt, playerid, itemlink, bag, slot, suffix)
       if itemlink and itemlink ~= "" then
         local level = TBag:GetPlayerInfo(playerid,TBag.G_BASIC)[TBag.S_LEVEL] or
                     UnitLevel("player")
-				
+
         itemlink = itemlink..":"..level..(suffix and ":" or "")..(suffix or "")
       end
       tt:SetHyperlink(itemlink);
@@ -2385,10 +2385,10 @@ function TBag:UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, comparr,
           end
           local tooltip = nil;
 
-	  itm = self:CreateItm();
+          itm = self:CreateItm();
 
-	  id = nil; -- Clear our local id that we use to cache the id to avoid extra
-	            -- calls to TBag:GetItemID().
+          id = nil; -- Clear our local id that we use to cache the id to avoid extra
+                    -- calls to TBag:GetItemID().
           itm[self.I_ITEMLINK] = GetContainerItemLink(bag, slot);
           itm[self.I_BAG] = bag;
           itm[self.I_SLOT] = slot;
@@ -2398,7 +2398,7 @@ function TBag:UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, comparr,
           itm[self.I_NEWSTR] = itmcache[bag][slot][self.I_NEWSTR];
           itm[self.I_CAT] = itmcache[bag][slot][self.I_CAT];
           itm[self.I_KEYWORD] = itmcache[bag][slot][self.I_KEYWORD];
-	  itm[self.I_SOULBOUND] = itmcache[bag][slot][self.I_SOULBOUND];
+          itm[self.I_SOULBOUND] = itmcache[bag][slot][self.I_SOULBOUND];
           itm[self.I_CHARGES] = itmcache[bag][slot][self.I_CHARGES];
           itm[self.I_ACCTBOUND] = itmcache[bag][slot][self.I_ACCTBOUND];
           itm[self.I_LINKSUFFIX] = itmcache[bag][slot][self.I_LINKSUFFIX];
@@ -2435,13 +2435,13 @@ function TBag:UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, comparr,
 
             -- And always remove it from the stack skip list
             self:SetStackSkip(itm[self.I_BAG], itm[self.I_SLOT], nil);
-	    self:SetCompSkip(itm[self.I_BAG], itm[self.I_SLOT], nil);
+            self:SetCompSkip(itm[self.I_BAG], itm[self.I_SLOT], nil);
 
           end
 
 
           if (itm[self.I_BAR] == nil and
-	      (cfg["show_Bag"..bag] == 1 or TBag:GetBagFrame(bag):GetChecked())) then
+              (cfg["show_Bag"..bag] == 1 or TBag:GetBagFrame(bag):GetChecked())) then
             resort_mandatory = 1;
           end
 
@@ -2453,10 +2453,10 @@ function TBag:UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, comparr,
             if (itm[self.I_TIMESTAMP] ~= nil) then
               if (cfg["show_Bag"..bag] == 1 or TBag:GetBagFrame(bag):GetChecked()) then
                 resort_suggested = 1;
-	      end
+              end
               itm[self.I_TIMESTAMP] = time();
               itm[self.I_NEWSTR] = self.V_NEWON;
-	      self.FORCED_SHOW[self:BagSlotToString(itm[self.I_BAG],itm[self.I_SLOT])] = true
+              self.FORCED_SHOW[self:BagSlotToString(itm[self.I_BAG],itm[self.I_SLOT])] = true
             end
             if (not tooltip) then
               -- Haven't already made it so make it now.
@@ -2464,14 +2464,14 @@ function TBag:UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, comparr,
             end
             if (string.find(tooltip, L["Soulbound"])) then
               itm[self.I_SOULBOUND] = 1;
-	    else
+            else
               itm[self.I_SOULBOUND] = 0
             end
-	    if (string.find(tooltip, L["Account Bound"])) then
+            if (string.find(tooltip, L["Account Bound"])) then
               itm[self.I_ACCTBOUND] = true
-	    else
+            else
               itm[self.I_ACCTBOUND] = false
-	    end
+            end
             itm[self.I_CHARGES] = self:GetItmCharges(tooltip);
           else
             -- item has not changed, maybe the count did?
@@ -2491,37 +2491,36 @@ function TBag:UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, comparr,
           end
 
           -- wipe old keys first
-	  for k,_ in pairs(itmcache[bag][slot]) do
-	    itmcache[bag][slot][k] = nil;
-	  end
-	  -- copy the new data over
-	  for k,v in pairs(itm) do
+          for k,_ in pairs(itmcache[bag][slot]) do
+            itmcache[bag][slot][k] = nil;
+          end
+          -- copy the new data over
+          for k,v in pairs(itm) do
             itmcache[bag][slot][k] = v;
-	  end
+          end
 
-	  -- Put on the stack array if we need more to stack
-	  self:InsertStackArr(stackarr,itmcache[bag][slot],id);
+          -- Put on the stack array if we need more to stack
+          self:InsertStackArr(stackarr,itmcache[bag][slot],id);
 
-	  if (itm[self.I_ITEMLINK] ~= nil) then
-	    -- Items not in a special bag but that can go into one need to be
-	    -- added to the specitems table.
-	    self:InsertItemInCompArr(comparr,itmcache[bag][slot],id);
-	  else
-	    -- Empty slots in special bags need to be added to the
-	    -- compress arg.
-	    self:InsertEmptyInCompArr(comparr,itmcache[bag][slot]);
-	  end
+          if (itm[self.I_ITEMLINK] ~= nil) then
+            -- Items not in a special bag but that can go into one need to be
+            -- added to the specitems table.
+            self:InsertItemInCompArr(comparr,itmcache[bag][slot],id);
+          else
+            -- Empty slots in special bags need to be added to the
+            -- compress arg.
+            self:InsertEmptyInCompArr(comparr,itmcache[bag][slot]);
+          end
         end
       else
         -- size = 0, make sure you wipe the cache entry
         if (table.getn(itmcache[bag]) ~= 0) then
           resort_mandatory = 1;
         end
-	for k,_ in pairs(itmcache[bag]) do
+        for k,_ in pairs(itmcache[bag]) do
           itmcache[bag][k] = nil;
-	end
+        end
       end
---    end
   end
 
 --  UpdateAddOnMemoryUsage();
@@ -2573,7 +2572,7 @@ function TBag:SortItmCache(cfg, playerid, itmcache, baritm, bagarr)
       if (size > 0) then
 --        self:PrintDEBUG("Show bag "..bag);
         for slot = 1, size do
-	  if next(itmcache[bag][slot]) then
+          if next(itmcache[bag][slot]) then
             itmcache[bag][slot] = self:PickBar(cfg, playerid,
               itmcache[bag][slot], trade1, trade2);
 
@@ -2662,7 +2661,7 @@ function TBag:PickBar(cfg, playerid, itm, trade1, trade2)
       if (type(bagtype) == "number") then
         itm[self.I_CAT] = string.format(L["IN_%s_BAG"],self:GetBagTypeName(bagtype));
       else
-	-- Support for old style string bag types.
+        -- Support for old style string bag types.
         itm[self.I_CAT] = string.format(L["IN_%s_BAG"],bagtype);
       end
 
@@ -3137,8 +3136,8 @@ function TBag:LayoutWindow(frame)
             "BOTTOMRIGHT", framename, "BOTTOMRIGHT",
             0-cur_x-cur_width,
             cur_y,
-	    frame:FrameX(calc_dat[iBar.."_width"]),
-	    frame:FrameY(calc_dat["height"]));
+            frame:FrameX(calc_dat[iBar.."_width"]),
+            frame:FrameY(calc_dat["height"]));
 
           cur_x = cur_x + frame:FrameX(calc_dat[iBar.."_width"]);
 
@@ -3147,7 +3146,7 @@ function TBag:LayoutWindow(frame)
 
           TBag:AssignButtonsToFrame(frame,(barnum+iBar), framename.."_bar_"..(barnum+iBar),
             calc_dat[iBar.."_width"], calc_dat["height"] );
-	    barframe[iBar]:Show();
+            barframe[iBar]:Show();
         else
           barframe[iBar]:Hide();
         end
@@ -3306,22 +3305,22 @@ function TBag:Stack(where, itmcache, sa, ca)
       if (epts[empty]) then
         local emptyitm = epts[empty]
         local emptybag = emptyitm[self.I_BAG];
-	local emptyslot = emptyitm[self.I_SLOT]
+        local emptyslot = emptyitm[self.I_SLOT]
         -- Is it really empty.
-	if (emptyitm[self.I_ITEMLINK] == nil) then
+        if (emptyitm[self.I_ITEMLINK] == nil) then
           for item = 1, items_size do
             if (itms[item]) then
               local itemitm = itms[item];
               local itembag = itemitm[self.I_BAG];
-	      local itemslot = itemitm[self.I_SLOT];
+              local itemslot = itemitm[self.I_SLOT];
               if (itemitm[self.I_ITEMLINK] and
-		not self:GetCompSkip(emptybag,emptyslot) and
+                not self:GetCompSkip(emptybag,emptyslot) and
                 not self:GetCompSkip(itembag,itemslot)) then
                 local bagtype = self:GetBagType(self.PLAYERID, emptyitm[self.I_BAG]);
-		local itmfam = 0;
-		if (itemitm[self.I_TYPE] ~= L["Container"]) then
+                local itmfam = 0;
+                if (itemitm[self.I_TYPE] ~= L["Container"]) then
                   itmfam = GetItemFamily(itemitm[self.I_ITEMLINK]);
-		end
+                end
 
                 -- Does the item go into this bag type?
                 if (bagtype and itmfam and bit.band(bagtype,itmfam) ~= 0) then
@@ -3452,16 +3451,16 @@ local function ItemMover__main(instructions)
           ClearCursor();
           if (inst.count and inst.count > 0) then
             SplitContainerItem(inst.from_bag,inst.from_slot,inst.count);
-	  else
+          else
             PickupContainerItem(inst.from_bag,inst.from_slot);
-	    TBag:SetStackSkip(inst.from_bag,inst.from_slot,nil);
-	    TBag:SetCompSkip(inst.from_bag,inst.from_slot,nil);
+            TBag:SetStackSkip(inst.from_bag,inst.from_slot,nil);
+            TBag:SetCompSkip(inst.from_bag,inst.from_slot,nil);
           end
           PickupContainerItem(inst.to_bag,inst.to_slot);
-	  TBag:SetStackSkip(inst.to_bag,inst.to_slot,nil);
-	  TBag:SetCompSkip(inst.to_bag,inst.to_slot,nil);
-	  ClearCursor();
-	  table.remove(instructions,index);
+          TBag:SetStackSkip(inst.to_bag,inst.to_slot,nil);
+          TBag:SetCompSkip(inst.to_bag,inst.to_slot,nil);
+          ClearCursor();
+          table.remove(instructions,index);
         end
       end
     else

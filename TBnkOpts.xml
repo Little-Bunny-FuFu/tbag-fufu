@@ -254,7 +254,7 @@
           </OnLoad>
           <OnClick>
             TBag:AssignCats(TBnkFrame.cfg, 1);
-	    TBag:BuildBarClassList(TBnkFrame.BC_LIST, TBnkFrame.cfg);
+            TBag:BuildBarClassList(TBnkFrame.BC_LIST, TBnkFrame.cfg);
           </OnClick>
         </Scripts>
       </Button>

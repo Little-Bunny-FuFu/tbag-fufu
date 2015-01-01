@@ -19,7 +19,7 @@ function ItemButton:OnEnter()
   local bar, bag, slot = itm[TBag.I_BAR], itm[TBag.I_BAG], itm[TBag.I_SLOT]
   local cat, link = itm[TBag.I_CAT], itm[TBag.I_ITEMLINK]
   local charges = itm[TBag.I_CHARGES]
-	local suffix = itm[TBag.I_LINKSUFFIX]
+  local suffix = itm[TBag.I_LINKSUFFIX]
   local pet = link and link:sub(1,10) == "battlepet:"
 
   if mainFrame.edit_selected == "" then
@@ -305,7 +305,7 @@ function ItemButton.Update(self)
       frame_stock:Hide()
       if mainFrame.hilight_new == 1 then
         -- We're hilighting new items and the item isn't new
-	-- or we would be in the above if statement not this else.
+        -- or we would be in the above if statement not this else.
         self:SetAlpha(0.25)
       else
           self:SetAlpha(1)
@@ -469,7 +469,7 @@ function BagButton:OnEnter()
     GameTooltip:Show()
     return
   elseif mainFrame.playerid == TBag.PLAYERID and
-	 GameTooltip:SetInventoryItem("player", ContainerIDToInventoryID(bag)) then
+    GameTooltip:SetInventoryItem("player", ContainerIDToInventoryID(bag)) then
     GameTooltip:Show()
     return
   else
@@ -564,7 +564,9 @@ function BagButton:OnClick(button,down,drag)
   if IsModifiedClick("CHATLINK") then
     local hyperlink = TBag:MakeHyperlink(itm[TBag.I_ITEMLINK], itm[TBag.I_NAME],
                                          itm[TBag.I_RARITY],
-					 TBag:GetPlayerInfo(mainFrame.playerid,TBag.G_BASIC)[TBag.S_LEVEL] or UnitLevel("player"),itm[TBag.I_LINKSUFFIX])
+                                         TBag:GetPlayerInfo(mainFrame.playerid,
+                                         TBag.G_BASIC)[TBag.S_LEVEL] or UnitLevel("player"),
+                                         itm[TBag.I_LINKSUFFIX])
     if hyperlink and ChatEdit_InsertLink(hyperlink) then
       self:SetChecked(not self:GetChecked())
       return

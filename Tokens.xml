@@ -31,7 +31,7 @@
       <OnLoad>
         local name = self:GetName()
         self.icon = _G[name.."Icon"]
-	self.count = _G[name.."Count"]
+        self.count = _G[name.."Count"]
       </OnLoad>
       <OnEnter>
         TBag.Tokens.Button_OnEnter(self)

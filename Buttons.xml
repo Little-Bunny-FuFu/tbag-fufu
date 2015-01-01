@@ -6,7 +6,7 @@
       <Size><AbsDimension x="40" y="40"/></Size>
       <Scripts>
         <OnLoad>
-  	  self:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+          self:RegisterForClicks("LeftButtonUp", "RightButtonUp")
         </OnLoad>
         <OnClick>
           TBag.ItemButton.OnClick(self, button, down);
@@ -15,7 +15,7 @@
           TBag.ItemButton.OnEnter(self, motion);
         </OnEnter>
         <OnLeave>
- 	  TBag.ItemButton.OnLeave(self, motion);
+          TBag.ItemButton.OnLeave(self, motion);
         </OnLeave>
       </Scripts>
     </Button>
@@ -94,7 +94,7 @@
       <Model name="$parentItemAnim" inherits="ItemAnimTemplate" setAllPoints="true">
         <Scripts>
           <OnEvent>
-	    TBag.BagButton.ItemAnimOnEvent(self,event,...)
+            TBag.BagButton.ItemAnimOnEvent(self,event,...)
           </OnEvent>
         </Scripts>
       </Model>

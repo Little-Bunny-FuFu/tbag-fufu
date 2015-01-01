@@ -71,8 +71,8 @@
       </OnEscapePressed>
       <OnEnterPressed>
         if (self:GetText() ~= "") then
-	  TBag:DoSearch(self:GetText());
-	end
+          TBag:DoSearch(self:GetText());
+        end
         self:ClearFocus();
       </OnEnterPressed>
       <OnEditFocusLost>

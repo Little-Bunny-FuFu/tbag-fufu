@@ -14,4 +14,4 @@ fi
 
 (cd ..; zip -r ~/Desktop/$zipfile TBag -x TBag/\*~ TBag/\*.swp TBag/.DS_Store TBag/dev \
                                   TBag/dev/\* TBag/dist.sh TBag/scrape-wowhead.perl \
-				  *.svn* )
+                                  *.svn* )

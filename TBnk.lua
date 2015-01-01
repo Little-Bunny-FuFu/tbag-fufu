@@ -14,7 +14,7 @@ BINDING_NAME_TBNK_TOGGLE = L["Toggle Bank Window"];
 
 -- Constants
 TBnk_SHOWITEMDEBUGINFO = 0;
-local TBnk_WIPECONFIGONLOAD = 0;	-- for debugging, test it out on a new config every load
+local TBnk_WIPECONFIGONLOAD = 0; -- for debugging, test it out on a new config every load
 
 
 ------------------------

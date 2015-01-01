@@ -834,7 +834,7 @@ function Inv.RightClickMenu_populate(self, level)
           local this = self or _G.this
           TInvFrame.edit_selected = (this.value);
           TInvFrame.edit_hilight = (this.value);
-	  TInvFrame:UpdateWindow();
+          TInvFrame:UpdateWindow();
         end
       };
       UIDropDownMenu_AddButton(info, level);
@@ -894,7 +894,7 @@ function Inv.RightClickMenu_populate(self, level)
         ["func"] = function(self)
           local this = self or _G.this
           TBag:SetGrpDef(TInvFrame.cfg, TBag.G_BAR_HIDE, this.value[TBag.I_BAR], this.value["value"], 1);
-	  TBnkFrame:UpdateWindow();
+          TBnkFrame:UpdateWindow();
       end,
     ["checked"] = checked
     };
@@ -925,7 +925,7 @@ function Inv.RightClickMenu_populate(self, level)
         ["func"] = function(self)
             local this = self or _G.this
             TBag:SetGrpDef(TInvFrame.cfg, TBag.G_USE_NEW, this.value[TBag.I_BAR], this.value["value"], 1);
-	    TInvFrame:UpdateWindow(TBag.REQ_MUST);
+            TInvFrame:UpdateWindow(TBag.REQ_MUST);
           end,
         ["checked"] = checked
         };
@@ -1119,8 +1119,8 @@ function Inv.RightClickMenu_populate(self, level)
                     TInvFrame.cfg["frameButtonSize"], TInvFrame.cfg["count_font"],
                       TInvFrame.cfg["count_font_x"], TInvFrame.cfg["count_font_y"],
                       TInvFrame.cfg["scale"] = TBag:NicePlacement(this.value);
-		    TInvFrame:CalcButtonSize(TInvFrame.cfg["frameButtonSize"], TInvFrame.cfg["framePad"]);
-		    TInvFrame:UpdateWindow(TBag.REQ_MUST);
+                      TInvFrame:CalcButtonSize(TInvFrame.cfg["frameButtonSize"], TInvFrame.cfg["framePad"]);
+                      TInvFrame:UpdateWindow(TBag.REQ_MUST);
                   end
                 end
               };
@@ -1178,7 +1178,7 @@ function Inv.RightClickMenu_populate(self, level)
             info["checked"] = 1;
           end
           UIDropDownMenu_AddButton(info, level);
-	elseif (UIDROPDOWNMENU_MENU_VALUE["opt"] == "hide_frames") then
+        elseif (UIDROPDOWNMENU_MENU_VALUE["opt"] == "hide_frames") then
           info = {
             ["text"] = L["Hide Player Dropdown"];
             ["func"] = TInvFrame.Toggle_UserDropdown;
@@ -1272,7 +1272,7 @@ function Inv.RightClickMenu_populate(self, level)
           info = {
             ["text"] = L["Hide Tokens"];
             ["func"] = TInvFrame.Toggle_Token;
-  	    ["keepShownOnClick"] = 1;
+            ["keepShownOnClick"] = 1;
             };
           if (TInvFrame.cfg["show_tokens"] == 0) then
             info["checked"] = 1;
@@ -1287,8 +1287,8 @@ function Inv.RightClickMenu_populate(self, level)
             info["checked"] = 1;
           end
           UIDropDownMenu_AddButton(info, level);
-	elseif (UIDROPDOWNMENU_MENU_VALUE["opt"] == "select_character") then
-	  TInvFrame.UserDropdown_Initialize(self, level);
+        elseif (UIDROPDOWNMENU_MENU_VALUE["opt"] == "select_character") then
+          TInvFrame.UserDropdown_Initialize(self, level);
         end
       end
     end

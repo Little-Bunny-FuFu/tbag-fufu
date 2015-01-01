@@ -19,25 +19,25 @@ TINV_OPTS_SCROLLBARBUTTONHEIGHT = 16;
 -- Height of some default controls
 TINV_OPTS_CONTROL_SLIDER_HEIGHT = 17;
 
-TINV_OPTS_SCROLL_LINES = 25;	-- max number of lines inside the scroll
+TINV_OPTS_SCROLL_LINES = 25; -- max number of lines inside the scroll
 
 TINVOPT_FRAME_HEIGHT = (TINVOPT_FRAME_LINE_HEIGHT*(TINV_OPTS_SCROLL_LINES+1)) +
-	(TINVOPT_FRAME_BORDER*2) +
-	TINVOPT_FRAME_BOTTOMPADDING;
+                       (TINVOPT_FRAME_BORDER*2) +
+                       TINVOPT_FRAME_BOTTOMPADDING;
 
 TInv_Opts_CurrentPosition = 1;
 TInv_Config_MaxScroll = 1;
 
 
 function TInv_Opts_ControlValueChanged(this,v)
-	if ( (TINVOPT_UPDATE_HAPPENING == 0) and (this.change_value_func ~= nil) ) then
-		local step = this.GetValueStep and this:GetValueStep() or nil
-		if v and step and  step > 0 then
-			v = math.ceil(v / step) * step
-		end
-		this.change_value_func(v, this.func_param1, this.func_param2, this.func_param3, this.func_param4);
-	end
-	return v
+  if ( (TINVOPT_UPDATE_HAPPENING == 0) and (this.change_value_func ~= nil) ) then
+    local step = this.GetValueStep and this:GetValueStep() or nil
+    if v and step and  step > 0 then
+      v = math.ceil(v / step) * step
+    end
+    this.change_value_func(v, this.func_param1, this.func_param2, this.func_param3, this.func_param4);
+  end
+  return v
 end
 
 
@@ -93,69 +93,69 @@ function TInvOpt_CreateCfgOpt()
 end
 
 function TInv_Options_InitWindow()
-	TInvOpt_CreateCfgOpt();
+  TInvOpt_CreateCfgOpt();
 
-	TInv_Config_MaxScroll = math.max( 1, (table.getn(TInv_CfgOpt)-TINV_OPTS_SCROLL_LINES)+2 );
+  TInv_Config_MaxScroll = math.max( 1, (table.getn(TInv_CfgOpt)-TINV_OPTS_SCROLL_LINES)+2 );
 
-	TBag:PositionFrame( TInv_OptsFrame_ScrollBar:GetName(), "TOPRIGHT",
-		TInv_OptsFrame:GetName(), "TOPRIGHT",
-		0-(TINVOPT_FRAME_BORDER),
-		0-(TINVOPT_FRAME_BORDER+TINV_OPTS_SCROLLBARBUTTONHEIGHT),
-		TINV_OPTS_SCROLLBARBUTTONWIDTH,
-		TINVOPT_FRAME_HEIGHT -( (TINVOPT_FRAME_BORDER*2) + (TINV_OPTS_SCROLLBARBUTTONHEIGHT*2) ) );
-	--Print(" config options size: "..table.getn(TInv_CfgOpt) );
-	--Print(" TINV_OPTS_SCROLL_LINES: "..TINV_OPTS_SCROLL_LINES );
-	--Print(" Scroll bar max value set to: "..max_scroll );
-	TInv_OptsFrame_ScrollBar:SetMinMaxValues(1, TInv_Config_MaxScroll);
-	TInv_OptsFrame_ScrollBar:SetValueStep(0.1);
-	TInv_OptsFrame_ScrollBar:SetValue(1);
+  TBag:PositionFrame( TInv_OptsFrame_ScrollBar:GetName(), "TOPRIGHT",
+  TInv_OptsFrame:GetName(), "TOPRIGHT",
+  0-(TINVOPT_FRAME_BORDER),
+  0-(TINVOPT_FRAME_BORDER+TINV_OPTS_SCROLLBARBUTTONHEIGHT),
+  TINV_OPTS_SCROLLBARBUTTONWIDTH,
+  TINVOPT_FRAME_HEIGHT -( (TINVOPT_FRAME_BORDER*2) + (TINV_OPTS_SCROLLBARBUTTONHEIGHT*2) ) );
+  --Print(" config options size: "..table.getn(TInv_CfgOpt) );
+  --Print(" TINV_OPTS_SCROLL_LINES: "..TINV_OPTS_SCROLL_LINES );
+  --Print(" Scroll bar max value set to: "..max_scroll );
+  TInv_OptsFrame_ScrollBar:SetMinMaxValues(1, TInv_Config_MaxScroll);
+  TInv_OptsFrame_ScrollBar:SetValueStep(0.1);
+  TInv_OptsFrame_ScrollBar:SetValue(1);
 
-	TInv_OptsFrame:SetWidth( TINVOPT_FRAME_WIDTH );
-	TInv_OptsFrame:SetHeight( TINVOPT_FRAME_HEIGHT );
+  TInv_OptsFrame:SetWidth( TINVOPT_FRAME_WIDTH );
+  TInv_OptsFrame:SetHeight( TINVOPT_FRAME_HEIGHT );
 
-	TInv_OptsFrame:SetBackdropColor(
-	  TBag:GetColor(TInvFrame.cfg, "bkgr_"..TBag.MAIN_BAR)
-	);
-	TInv_OptsFrame:SetBackdropBorderColor(
-	  TBag:GetColor(TInvFrame.cfg, "brdr_"..TBag.MAIN_BAR)
-	);
+  TInv_OptsFrame:SetBackdropColor(
+  TBag:GetColor(TInvFrame.cfg, "bkgr_"..TBag.MAIN_BAR)
+  );
+  TInv_OptsFrame:SetBackdropBorderColor(
+  TBag:GetColor(TInvFrame.cfg, "brdr_"..TBag.MAIN_BAR)
+  );
 
-	TInv_Options_UpdateWindow();
+  TInv_Options_UpdateWindow();
 end
 
 function TInv_Options_UpdateWindow()
-	TINVOPT_UPDATE_HAPPENING = 1;
+  TINVOPT_UPDATE_HAPPENING = 1;
 
-	if (TInv_Opts_CurrentPosition > TInv_Config_MaxScroll) then
-		TInv_Opts_CurrentPosition = TInv_Config_MaxScroll;
-	end
+  if (TInv_Opts_CurrentPosition > TInv_Config_MaxScroll) then
+    TInv_Opts_CurrentPosition = TInv_Config_MaxScroll;
+  end
 
-	local y, x_start, x_width;
-	local current_opt = math.floor(TInv_Opts_CurrentPosition);
-	local fade = 1 - (TInv_Opts_CurrentPosition - current_opt);
-	local use_fade;
-	local i;
-	local shift_y = (TInv_Opts_CurrentPosition - current_opt) * TINVOPT_FRAME_LINE_HEIGHT;
+  local y, x_start, x_width;
+  local current_opt = math.floor(TInv_Opts_CurrentPosition);
+  local fade = 1 - (TInv_Opts_CurrentPosition - current_opt);
+  local use_fade;
+  local i;
+  local shift_y = (TInv_Opts_CurrentPosition - current_opt) * TINVOPT_FRAME_LINE_HEIGHT;
 
-	x_start = TINVOPT_FRAME_BORDER;
-	x_width = TINVOPT_FRAME_WIDTH -( (TINVOPT_FRAME_BORDER*3) + TINV_OPTS_SCROLLBARBUTTONWIDTH );
-	y = TINVOPT_FRAME_BORDER + TINVOPT_FRAME_LINE_HEIGHT - shift_y;
+  x_start = TINVOPT_FRAME_BORDER;
+  x_width = TINVOPT_FRAME_WIDTH -( (TINVOPT_FRAME_BORDER*3) + TINV_OPTS_SCROLLBARBUTTONWIDTH );
+  y = TINVOPT_FRAME_BORDER + TINVOPT_FRAME_LINE_HEIGHT - shift_y;
 
-	for i = 0, TINV_OPTS_SCROLL_LINES-1 do
-		if (i==0) then
-			use_fade = fade;
-		elseif (i==TINV_OPTS_SCROLL_LINES-1) then
-			use_fade = 1-fade;
-		else
-			use_fade = 1;
-		end
-		y = TBag:EnableLine(
-		_G["TInv_OptsFrame_Line_"..i+1], "TInv_OptsFrame",
-          TINVOPT_FRAME_LINE_HEIGHT, TINV_OPTS_CONTROL_SLIDER_HEIGHT,
-          TInv_CfgOpt[i+current_opt], y, x_start, x_width, use_fade );
-	end
+  for i = 0, TINV_OPTS_SCROLL_LINES-1 do
+    if (i==0) then
+      use_fade = fade;
+    elseif (i==TINV_OPTS_SCROLL_LINES-1) then
+      use_fade = 1-fade;
+    else
+      use_fade = 1;
+    end
+    y = TBag:EnableLine(
+    _G["TInv_OptsFrame_Line_"..i+1], "TInv_OptsFrame",
+    TINVOPT_FRAME_LINE_HEIGHT, TINV_OPTS_CONTROL_SLIDER_HEIGHT,
+    TInv_CfgOpt[i+current_opt], y, x_start, x_width, use_fade );
+  end
 
-	TINVOPT_UPDATE_HAPPENING = 0;
+  TINVOPT_UPDATE_HAPPENING = 0;
 end
 
 function TInv_Opts_Scroll_Update()

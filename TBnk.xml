@@ -90,11 +90,11 @@
           </OnClick>
           <OnEnter>
             if (TBag.SrchText) then
-            GameTooltip_AddNewbieTip(self, TBag.LOCALE["Clear Search"], 1.0, 1.0, 1.0, TBag.LOCALE["Stop highlighting search results."]);
+              GameTooltip_AddNewbieTip(self, TBag.LOCALE["Clear Search"], 1.0, 1.0, 1.0, TBag.LOCALE["Stop highlighting search results."]);
             elseif (TBnkFrame.hilight_new == 0) then
-	    GameTooltip_AddNewbieTip(self, TBag.LOCALE["Highlight New"], 1.0, 1.0, 1.0, TBag.LOCALE["Highlight items marked as new."]);
+              GameTooltip_AddNewbieTip(self, TBag.LOCALE["Highlight New"], 1.0, 1.0, 1.0, TBag.LOCALE["Highlight items marked as new."]);
             else
-	    GameTooltip_AddNewbieTip(self, TBag.LOCALE["Normal"], 1.0, 1.0, 1.0, TBag.LOCALE["Stop highlighting new items."]);
+              GameTooltip_AddNewbieTip(self, TBag.LOCALE["Normal"], 1.0, 1.0, 1.0, TBag.LOCALE["Stop highlighting new items."]);
             end
           </OnEnter>
           <OnLeave>
@@ -121,7 +121,7 @@
             TBnkFrame.Button_ChangeEditMode_OnClick(self, button, down);
           </OnClick>
           <OnEnter>
-		  GameTooltip_AddNewbieTip(self, TBag.LOCALE["Toggle Edit Mode"], 1.0, 1.0, 1.0, TBag.LOCALE["Select this option to move classes of items into different 'bars' (the red numbers)."]);
+            GameTooltip_AddNewbieTip(self, TBag.LOCALE["Toggle Edit Mode"], 1.0, 1.0, 1.0, TBag.LOCALE["Select this option to move classes of items into different 'bars' (the red numbers)."]);
           </OnEnter>
           <OnLeave>
             GameTooltip:Hide();
@@ -147,7 +147,7 @@
             TBnkFrame.Button_Reload_OnClick(self, button, down);
           </OnClick>
           <OnEnter>
-		  GameTooltip_AddNewbieTip(self, TBag.LOCALE["Reload and Sort"], 1.0, 1.0, 1.0, TBag.LOCALE["Reloads your items and sorts them."]);
+            GameTooltip_AddNewbieTip(self, TBag.LOCALE["Reload and Sort"], 1.0, 1.0, 1.0, TBag.LOCALE["Reloads your items and sorts them."]);
           </OnEnter>
           <OnLeave>
             GameTooltip:Hide();
@@ -173,7 +173,7 @@
             TBnkFrame.Button_DepositReagent_OnClick(self, button, down);
           </OnClick>
           <OnEnter>
-		  GameTooltip_AddNewbieTip(self, REAGENTBANK_DEPOSIT, 1.0, 1.0, 1.0, TBag.LOCALE["Deposits all Reagents in your bag."]);
+            GameTooltip_AddNewbieTip(self, REAGENTBANK_DEPOSIT, 1.0, 1.0, 1.0, TBag.LOCALE["Deposits all Reagents in your bag."]);
           </OnEnter>
           <OnLeave>
             GameTooltip:Hide();

@@ -191,7 +191,7 @@
           <OnLoad>
             local this = self or _G.this     
             this:SetText(TBag.LOCALE["Reset"]);
-	  </OnLoad>
+          </OnLoad>
           <OnClick>
             TBagCfg["Inv"] = {};
             TInv_init(1);
@@ -213,7 +213,7 @@
           <OnLoad>
             local this = self or _G.this     
             this:SetText(TBag.LOCALE["Close"]);
-	  </OnLoad>
+          </OnLoad>
           <OnClick>
             TInv_OptsFrame:Hide();
           </OnClick>
@@ -232,7 +232,7 @@
           <OnLoad>
             local this = self or _G.this     
             this:SetText(TBag.LOCALE["Add New Cat"]);
-	  </OnLoad>
+          </OnLoad>
           <OnClick>
             TInvOpts_AddCat();
           </OnClick>
@@ -251,7 +251,7 @@
           <OnLoad>
             local this = self or _G.this     
             this:SetText(TBag.LOCALE["Assign Cats"]);
-	  </OnLoad>
+          </OnLoad>
           <OnClick>
             TBag:AssignCats(TInvFrame.cfg, 1);
             TBag:BuildBarClassList(TInvFrame.BC_LIST, TInvFrame.cfg);
