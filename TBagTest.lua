@@ -198,6 +198,7 @@ local tests = {
   [32861] = L["MOUNT"],
   [49288] = L["MOUNT"],
   [49289] = L["MOUNT"],
+  [119093] = L["MOUNT"],
 
   -- AQ
   [20864] = L["AHN_QIRAJ"],

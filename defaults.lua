@@ -63,6 +63,7 @@ TBag.DefaultSearchList = {
   { L["FIREWORKS"], L[""], L["Perpetual Purple Firework"], L[""], L[""] }, -- still here for old trinket
   { L["MOUNT"], L[""], L["Requires %a+ Riding"], L[""], L[""] },
   { L["MOUNT"], L[""], L["Summons and dismisses a rideable"], L[""], L[""] },
+  { L["MOUNT"], L[""], L["Aviana's Feather"], L[""], L[""] },
   { L["TOYS"], L[""], L["Direbrew's Remote"], L[""], L[""] },
   { L["TOYS"], L[""], L["Snowball"], L[""], L[""] },
   { L["TOYS"], L[""], L["Paper Flying Machine Kit"], L[""], L[""] },

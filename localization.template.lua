@@ -878,3 +878,4 @@ L["Frosty's Collar"] = false
 L["Perpetual Purple Firework"] = false
 L["High%-Powered Bolt Gun"] = false
 L["Wormhole Centrifuge"] = false
+L["Aviana's Feather"] = false
