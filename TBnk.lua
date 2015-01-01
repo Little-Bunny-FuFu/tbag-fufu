@@ -1389,8 +1389,6 @@ function Bank:UpdateWindow(resort_req)
   local stackarr = TBag:CreateStackArr();
   local comparr = TBag:CreateCompArr();
 
-  -- Always set the class cats for this player's class
-  TBag:SetClassCats(self.cfg, self.playerid, 1);
   local cache_req = TBag:UpdateItmCache(self.cfg, self.playerid, TBnkItm[self.playerid], self.bags, stackarr, comparr, self.atbank);
   if resort_req == TBag.REQ_PART then
     resort_req = resort_req + self.CACHE_REQ

@@ -119,8 +119,6 @@ L["%s_CREATED"] = "%s_СОЗДАНО"
 L["SOULBOUND_%s"] = "ИМЕННОЕ_%s"
 L["ACCOUNTBOUND_%s"] = "УЧЁТНАЯЗАПИСЬ_%s"
 L["EQUIPPED_%s"] = "НА_ПЕРСОНАЖЕ_%s"
-L["%s_TOOL"] = "%s_ИНСТРУМЕНТ"
-L["%s_REAGENT"] = "%s_РЕАГЕНТ"
 
 -- Broad categories for item types
 L["PROJECTILE"] = "БОЕПРИПАСЫ"
@@ -249,8 +247,6 @@ L["WARRIOR"] = "ВОИН"
 L["HUNTER"] = "ОХОТНИК"
 L["DEATHKNIGHT"] = "РЫЦАРЬ_СМЕРТИ"
 L["MONK"] = false
-L["CLASS_TOOL"] = "КЛАССОВАЯ_ВЕЩЬ"
-L["CLASS_REAGENT"] = "КЛАССОВЫЙ_РЕАГЕНТ"
   
 -- Short bag type names used for EMPTY_%s_SLOTS and IN_%s_BAG categories
 -- 3-4 characters is about right for these.

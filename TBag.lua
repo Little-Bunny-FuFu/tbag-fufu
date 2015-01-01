@@ -1123,7 +1123,6 @@ function TBag:SetDefLayout(cfg, bagarr, row1offset, reset)
 
   self:SetCatBar(cfg, L["FISHING"], 11, reset);
   self:SetCatBar(cfg, L["TRADE_TOOL"], 11, reset);
-  self:SetCatBar(cfg, L["CLASS_TOOL"], 11, reset);
 
   self:SetCatBar(cfg, string.format(L["EQUIPPED_%s"],L["RELIC"]), 10, reset);
   self:SetCatBar(cfg, string.format(L["EQUIPPED_%s"],L["RING"]), 10, reset);
@@ -1155,7 +1154,6 @@ function TBag:SetDefLayout(cfg, bagarr, row1offset, reset)
 
   self:SetCatBar(cfg, L["BUFF"], 6, reset);
 
-  self:SetCatBar(cfg, L["CLASS_REAGENT"], 5, reset);
   self:SetCatBar(cfg, L["DUMMY"], 5, reset);
   self:SetCatBar(cfg, L["KEY_OPEN"], 5, reset);
 
@@ -1316,9 +1314,6 @@ function TBag:InitDefVals(cfg, bagarr, row1offset, reset)
     cfg["itemoverride_loaddefaults"] = 0;
   end
 
-  -- Put in a default class cat, in case we reset
-  self:SetClassCats(cfg, self.PLAYERID, reset);
-
   -- default sort views / default "allow new items in bar" settings
   if (reset ~= 1) then
     self:SetGrpDef(cfg, self.G_BAR_SORT, 16, self.SORTBY_REV, reset, self.NumFunc, self.SORTBY_MIN, self.SORTBY_MAX);
@@ -1352,49 +1347,6 @@ function TBag:AssignCats(cfg, reset)
       self:SetCatBar(cfg, value[1], 1, reset);
     end
   end
-end
-
-function TBag:SetCatForClass(c, cat)
-  c[L["WARLOCK"]] = cat;
-  c[L["ROGUE"]] = cat;
-  c[L["DRUID"]] = cat;
-  c[L["MAGE"]] = cat;
-  c[L["PALADIN"]] = cat;
-  c[L["PRIEST"]] = cat;
-  c[L["SHAMAN"]] = cat;
-  c[L["WARRIOR"]] = cat;
-  c[L["HUNTER"]] = cat;
-  c[L["DEATHKNIGHT"]] = cat;
-end
-
-function TBag:SetClassCats(cfg, playerid, reset)
-  local c = {};
-  local group = TBagInfo[playerid][self.G_BASIC];
-  local class;
-
-  if (group) and (group[self.S_CLASS]) then
-    class = L[self:Cat(group[self.S_CLASS])];
-  else
-    class = "";
-  end
-
-  self:SetCatForClass(c, L["REAGENT"])
-  c[class] = L["CLASS_REAGENT"];
-
-  self:SetCatBar(cfg, string.format(L["%s_REAGENT"],L["WARLOCK"]), c[L["WARLOCK"]], reset);
-  self:SetCatBar(cfg, string.format(L["%s_REAGENT"],L["ROGUE"]), c[L["ROGUE"]], reset);
-
-  self:SetCatBar(cfg, string.format(L["%s_REAGENT"],L["DRUID"]), c[L["DRUID"]], reset);
-  self:SetCatBar(cfg, string.format(L["%s_REAGENT"],L["MAGE"]), c[L["MAGE"]], reset);
-  self:SetCatBar(cfg, string.format(L["%s_REAGENT"],L["PALADIN"]), c[L["PALADIN"]], reset);
-  self:SetCatBar(cfg, string.format(L["%s_REAGENT"],L["PRIEST"]), c[L["PRIEST"]], reset);
-  self:SetCatBar(cfg, string.format(L["%s_REAGENT"],L["SHAMAN"]), c[L["SHAMAN"]], reset);
-  self:SetCatBar(cfg, string.format(L["%s_REAGENT"],L["DEATHKNIGHT"]), c[L["DEATHKNIGHT"]], reset);
-
-  c[class] = L["CLASS_TOOL"];
-
-  self:SetCatBar(cfg, string.format(L["%s_TOOL"],L["ROGUE"]), c[L["ROGUE"]], reset);
-  self:SetCatBar(cfg, string.format(L["%s_TOOL"],L["SHAMAN"]), c[L["SHAMAN"]], reset);
 end
 
 function TBag:PrintCachedCharacters()

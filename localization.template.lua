@@ -151,8 +151,6 @@ L["%s_CREATED"] = false
 L["SOULBOUND_%s"] = false
 L["ACCOUNTBOUND_%s"] = false
 L["EQUIPPED_%s"] = false
-L["%s_TOOL"] = false
-L["%s_REAGENT"] = false
 
 -- Broad categories for item types
 L["PROJECTILE"] = false
@@ -281,8 +279,6 @@ L["WARRIOR"] = false
 L["HUNTER"] = false
 L["DEATHKNIGHT"] = false
 L["MONK"] = false
-L["CLASS_TOOL"] = false
-L["CLASS_REAGENT"] = false
 
 -- Short bag type names used for EMPTY_%s_SLOTS and IN_%s_BAG categories
 -- 3-4 characters is about right for these.

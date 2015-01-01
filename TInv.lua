@@ -1362,9 +1362,6 @@ function Inv:UpdateWindow(resort_req)
   end
   TBagCfg["trades_changed"] = nil;
 
-  -- Always set the class cats for this player's class
-  TBag:SetClassCats(self.cfg, self.playerid, 1);
-
   -- Setup stackarr and comparr
   local stackarr = TBag:CreateStackArr();
   local comparr = TBag:CreateCompArr();
