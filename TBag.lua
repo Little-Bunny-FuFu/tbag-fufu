@@ -1020,7 +1020,6 @@ function TBag:SetDefLayout(cfg, bagarr, row1offset, reset)
   self:SetCatBar(cfg, L["TAILORING"], 19, reset);
   self:SetCatBar(cfg, L["INSCRIPTION"], 19, reset);
 
-  self:SetCatBar(cfg, L["RELIC"], 18, reset);
   self:SetCatBar(cfg, L["RING"], 18, reset);
   self:SetCatBar(cfg, L["TRINKET"], 18, reset);
 
@@ -1066,7 +1065,6 @@ function TBag:SetDefLayout(cfg, bagarr, row1offset, reset)
   self:SetCatBar(cfg, L["FIRST_AID"], 15, reset);
 
   self:SetCatBar(cfg, L["COOKING"], 14, reset);
-  self:SetCatBar(cfg, string.format(L["SOULBOUND_%s"],L["RELIC"]), 14, reset);
   self:SetCatBar(cfg, string.format(L["SOULBOUND_%s"],L["RING"]), 14, reset);
   self:SetCatBar(cfg, string.format(L["SOULBOUND_%s"],L["TRINKET"]), 14, reset);
 
@@ -1086,7 +1084,6 @@ function TBag:SetDefLayout(cfg, bagarr, row1offset, reset)
   self:SetCatBar(cfg, string.format(L["SOULBOUND_%s"],L["ARMOR"]), 13, reset);
   self:SetCatBar(cfg, string.format(L["SOULBOUND_%s"],L["WEAPON"]), 13, reset);
 
-  self:SetCatBar(cfg, string.format(L["ACCOUNTBOUND_%s"],L["RELIC"]), 14, reset);
   self:SetCatBar(cfg, string.format(L["ACCOUNTBOUND_%s"],L["RING"]), 14, reset);
   self:SetCatBar(cfg, string.format(L["ACCOUNTBOUND_%s"],L["TRINKET"]), 14, reset);
 
@@ -1119,7 +1116,6 @@ function TBag:SetDefLayout(cfg, bagarr, row1offset, reset)
   self:SetCatBar(cfg, L["FISHING"], 11, reset);
   self:SetCatBar(cfg, L["TRADE_TOOL"], 11, reset);
 
-  self:SetCatBar(cfg, string.format(L["EQUIPPED_%s"],L["RELIC"]), 10, reset);
   self:SetCatBar(cfg, string.format(L["EQUIPPED_%s"],L["RING"]), 10, reset);
   self:SetCatBar(cfg, string.format(L["EQUIPPED_%s"],L["TRINKET"]), 10, reset);
   self:SetCatBar(cfg, string.format(L["EQUIPPED_%s"],L["OTHER"]), 10, reset);

@@ -126,7 +126,6 @@ L["Leatherworking Bag"] = true
 -- Slots
 L["Finger"] = true
 L["Trinket"] = true
-L["Relic"] = true
 
 L["Soulbound"] = true
 L["Account Bound"] = true
@@ -267,7 +266,6 @@ L["10_WAIST"] = true
 L["11_LEGS"] = true
 L["12_FEET"] = true
 L["13_OFFHAND"] = true
-L["RELIC"] = true
 L["RING"] = true
 L["TRINKET"] = true
 L["ARMOR"] = true

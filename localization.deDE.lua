@@ -80,7 +80,6 @@ L["Leatherworking Bag"] = "Lederertasche"
 -- Slots
 L["Finger"] = INVTYPE_FINGER
 L["Trinket"] = INVTYPE_TRINKET
-L["Relic"] = INVTYPE_RELIC
 
 L["Soulbound"] = ITEM_SOULBOUND
 L["Account Bound"] = ITEM_ACCOUNTBOUND
@@ -221,7 +220,6 @@ L["10_WAIST"] = "10_TAILLE"
 L["11_LEGS"] = "11_BEINE"
 L["12_FEET"] = "12_F\195\156\195\159E"
 L["13_OFFHAND"] = "13_SCHILDHAND"
-L["RELIC"] = "RELIKT"
 L["RING"] = "RING"
 L["TRINKET"] = "SCHMUCK"
 L["ARMOR"] = "R\195\156STUNG"

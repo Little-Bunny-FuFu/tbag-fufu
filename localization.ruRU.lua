@@ -82,7 +82,6 @@ L["Leatherworking Bag"] = "Сумка кожевника"
 -- Slots
 L["Finger"] = INVTYPE_FINGER
 L["Trinket"] = INVTYPE_TRINKET
-L["Relic"] = INVTYPE_RELIC
 
 L["Soulbound"] = ITEM_SOULBOUND
 L["Account Bound"] = ITEM_ACCOUNTBOUND
@@ -223,7 +222,6 @@ L["10_WAIST"] = "10_ПОЯС"
 L["11_LEGS"] = "11_НОГИ"
 L["12_FEET"] = "12_СТУПНИ"
 L["13_OFFHAND"] = "13_ЛЕВАЯ_РУКА"
-L["RELIC"] = "РЕЛИКВИЯ"
 L["RING"] = "ПАЛЕЦ"
 L["TRINKET"] = "АКСЕССУАР"
 L["ARMOR"] = "ДОСПЕХИ"

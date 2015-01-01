@@ -114,7 +114,6 @@ L["Leatherworking Bag"] = false
 -- Slots
 L["Finger"] = INVTYPE_FINGER
 L["Trinket"] = INVTYPE_TRINKET
-L["Relic"] = INVTYPE_RELIC
 
 L["Soulbound"] = ITEM_SOULBOUND
 L["Account Bound"] = ITEM_ACCOUNTBOUND
@@ -255,7 +254,6 @@ L["10_WAIST"] = false
 L["11_LEGS"] = false
 L["12_FEET"] = false
 L["13_OFFHAND"] = false
-L["RELIC"] = false
 L["RING"] = false
 L["TRINKET"] = false
 L["ARMOR"] = false
