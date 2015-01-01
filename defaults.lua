@@ -403,6 +403,7 @@ TBag.DefaultSearchList = {
   { L["MANA_RESTORE"], L[""], L["Mana Potion"], L["Consumable"], L[""] },
   { L["MANA_RESTORE"], L[""], L["[Rr]estores [%d,]+ to [%d,]+ mana"], L[""], L[""] },
   { L["MANA_RESTORE"], L[""], L["[Rr]estores [%d,]+ mana%."], L[""], L[""] },
+  { L["MANA_RESTORE"], L[""], L["Puts the imbiber in .* where they can restore up to [%d,]+ mana"], L["Consumable"], L[""] },
   { L["HEALTH_RESTORE"], L[""], L["Healing Potion"], L["Consumable"], L[""] },
   { L["HEALTH_RESTORE"], L[""], L["[Rr]estores [%d,]+ health"], L[""], L[""] },
   { L["HEALTH_RESTORE"], L[""], L["[Rr]estores [%d,]+ to [%d,]+ health"], L[""], L[""] },

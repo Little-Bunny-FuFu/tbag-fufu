@@ -745,6 +745,7 @@ L["Dreamless Sleep"] = false
 L["[Rr]estores [%d,]+ to [%d,]+ mana and health"] = false
 L["Mana Potion"] = false
 L["[Rr]estores [%d,]+ to [%d,]+ mana"] = false
+L["Puts the imbiber in .* where they can restore up to [%d,]+ mana"] = false
 L["Healing Potion"] = false
 L["[Rr]estores [%d,]+ to [%d,]+ health"] = false
 L["Place a %a+ stone statue"] = false

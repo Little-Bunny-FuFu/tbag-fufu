@@ -711,6 +711,7 @@ L["Dreamless Sleep"] = "traumlosen Schlafs"
 L["[Rr]estores [%d,]+ to [%d,]+ mana and health"] = "[Ss]tellt %d+ bis %d+ Mana und Gesundheit"
 L["Mana Potion"] = "Manatrank"
 L["[Rr]estores [%d,]+ to [%d,]+ mana"] = "[Ss]tellt %d+ bis %d+ Mana wieder her%."
+L["Puts the imbiber in .* where they can restore up to [%d,]+ mana"] = false
 L["Healing Potion"] = "Heiltrank"
 L["[Rr]estores [%d,]+ to [%d,]+ health"] = "[Ss]tellt %d+ bis %d+ Gesundheit wieder her%."
 L["Place a %a+ stone statue"] = "Stellt eine %a+ Steinstatue"
