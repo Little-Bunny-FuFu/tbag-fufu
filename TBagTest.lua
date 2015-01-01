@@ -70,7 +70,6 @@ local tests = {
   [22235] = L["MINIPET"],
 
   -- Combat Pets
-  [23767] = L["COMBATPETS"],
   [31666] = L["COMBATPETS"],
   [22728] = L["COMBATPETS"],
   [22729] = L["SCHEMATIC"], -- Patern for the Steam Tonk Controller
@@ -90,9 +89,7 @@ local tests = {
   [13353] = L["13_OFFHAND"],
 
   -- Costumes
-  [35275] = L["COSTUMES"],
   [31337] = L["COSTUMES"],
-  [17712] = L["COSTUMES"],
   [20410] = L["COSTUMES"],
   [20409] = L["COSTUMES"],
   [20399] = L["COSTUMES"],
@@ -101,15 +98,11 @@ local tests = {
   [20413] = L["COSTUMES"],
   [20411] = L["COSTUMES"],
   [20414] = L["COSTUMES"],
-  [33079] = L["COSTUMES"],
   [34068] = L["COSTUMES"],
   [18258] = L["COSTUMES"],
   [37816] = L["COSTUMES"],
   [21213] = L["COSTUMES"],
-  [43499] = L["COSTUMES"],
-  [44719] = L["COSTUMES"],
   [44792] = L["COSTUMES"],
-  [49704] = L["COSTUMES"],
 
   -- Fireworks
   [21570] = L["FIREWORKS"],
@@ -138,13 +131,8 @@ local tests = {
   [9317] = L["FIREWORKS"],
   [19026] = L["FIREWORKS"],
   [9315] = L["FIREWORKS"],
-  [23714] = L["FIREWORKS"], -- it's actually the old trinket that converts to the new non-trinket
+  [23714] = L["FIREWORKS"], -- it's actually the old trinket that converts to the new non-trinket (that's now under TOYS)
   [21747] = L["FIREWORKS"],
-  [49703] = L["FIREWORKS"],
-
-  -- Consumables
-  [33927] = L["CONSUMABLE"],
-  [33219] = L["CONSUMABLE"],
 
   -- Toys, various non-equipable items that have no real purpose
   [34686] = L["TOYS"],
@@ -172,7 +160,7 @@ local tests = {
   [22218] = L["TOYS"],
   [34191] = L["TOYS"],
   [34684] = L["TOYS"],
-  [44849] = L["TOYS"],
+  [54437] = L["TOYS"],
   [22206] = L["13_OFFHAND"], -- Similar effect but equipable.
   [38233] = L["TOYS"],
   [34498] = L["TOYS"],
@@ -194,6 +182,16 @@ local tests = {
   [46780] = L["TOYS"],
   [38578] = L["TOYS"],
   [46709] = L["TOYS"],
+  [17712] = L["TOYS"],
+  [33219] = L["TOYS"],
+  [33927] = L["TOYS"],
+  [35275] = L["TOYS"],
+  [43499] = L["TOYS"],
+  [49703] = L["TOYS"],
+  [49704] = L["TOYS"],
+  [44719] = L["TOYS"],
+  [23767] = L["TOYS"],
+  [33079] = L["TOYS"],
 
   -- Mounts
   [33977] = L["MOUNT"],
