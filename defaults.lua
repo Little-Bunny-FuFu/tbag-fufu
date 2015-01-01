@@ -425,6 +425,7 @@ TBag.DefaultSearchList = {
   { L["BUFF"], L[""], L["Use: Absorbs "], L["Consumable"], L[""] },
   { L["BUFF"], L[""], L["Use: Regenerate "], L["Consumable"], L[""] },
   { L["BUFF"], L[""], L["Use: While applied to target weapon"], L[""], L[""] },
+  { L["BUFF"], L[""], L["Use: Applies .* oil to your weapon"], L[""], L[""] },
   { L["BUFF"], L[""], L[" Sharpening Stone"], L[""], L[""] },
   { L["BUFF"], L[""], L[" Weightstone"], L[""], L[""] },
   { L["BUFF"], L[""], L["Mistletoe"], L["Miscellaneous"], L[""] },

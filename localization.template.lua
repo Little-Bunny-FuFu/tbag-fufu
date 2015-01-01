@@ -762,6 +762,7 @@ L["Use: Increases "] = false
 L["Use: Absorbs "] = false
 L["Use: Regenerate "] = false
 L["Use: While applied to target weapon"] = false
+L["Use: Applies .* oil to your weapon"] = false
 L[" Sharpening Stone"] = false
 L[" Weightstone"] = false
 L["Mistletoe"] = false

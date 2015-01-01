@@ -772,6 +772,7 @@ L["Use: Increases "] = true
 L["Use: Absorbs "] = true
 L["Use: Regenerate "] = true
 L["Use: While applied to target weapon"] = true
+L["Use: Applies .* oil to your weapon"] = true
 L[" Sharpening Stone"] = true
 L[" Weightstone"] = true
 L["Mistletoe"] = true

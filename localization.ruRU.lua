@@ -728,6 +728,7 @@ L["Use: Increases "] = "Использование: Увелич[ениват]+ 
 L["Use: Absorbs "] = "Использование: Поглащ[ениват]+ "
 L["Use: Regenerate "] = "Использование: Восполнен[яениват]+ "
 L["Use: While applied to target weapon"] = "Использование: При применении к выбранному оружию"
+L["Use: Applies .* oil to your weapon"] = false
 L[" Sharpening Stone"] = " Точило"
 L[" Weightstone"] = "[Гг]рузик"
 L["Mistletoe"] = "Омела"
