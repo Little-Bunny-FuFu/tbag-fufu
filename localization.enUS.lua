@@ -220,7 +220,6 @@ L["THORIUM_BROTHER"] = true
 L["TIMBERMAW"] = true
 L["CENARION_EXPEDITION"] = true
 L["SPOREGGAR"] = true
-L["ARGENT_DAWN"] = true
 L["ALDOR"] = true
 L["SCRYER"] = true
 L["SHA'TAR"] = true

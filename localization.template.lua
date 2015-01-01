@@ -208,7 +208,6 @@ L["THORIUM_BROTHER"] = false
 L["TIMBERMAW"] = false
 L["CENARION_EXPEDITION"] = false
 L["SPOREGGAR"] = false
-L["ARGENT_DAWN"] = false
 L["ALDOR"] = false
 L["SCRYER"] = false
 L["SHA'TAR"] = false

@@ -204,34 +204,12 @@ local tests = {
   [20864] = L["AHN_QIRAJ"],
   [21685] = L["TRINKET"], -- similar name shouldn't match the rule though
   [19431] = L["TRINKET"], -- similar name shouldn't match the rule though
-  [20864] = L["AHN_QIRAJ"],
   [20873] = L["AHN_QIRAJ"],
-  [29390] = L["RELIC"], -- Druid idols shouldn't match
+  [29390] = L["GRAY_ITEMS"], -- Druid idols shouldn't match
   [20888] = L["AHN_QIRAJ"],
   [20884] = L["AHN_QIRAJ"],
   [20885] = L["AHN_QIRAJ"],
   [20889] = L["AHN_QIRAJ"],
-
-  -- Argent Dawn
-  [22526] = L["ARGENT_DAWN"],
-  [22527] = L["ARGENT_DAWN"],
-  [22525] = L["ARGENT_DAWN"],
-  [22528] = L["ARGENT_DAWN"],
-  [22529] = L["ARGENT_DAWN"],
-  [22524] = L["ARGENT_DAWN"],
-  [22523] = L["ARGENT_DAWN"],
-  [12844] = L["ARGENT_DAWN"],
-  -- [18171] = L["ARGENT_DAWN"], -- Not sure what to do on these two
-  -- [18170] = L["ARGENT_DAWN"], -- they match enchants too
-  [13370] = L["ARGENT_DAWN"],
-  [13357] = L["ARGENT_DAWN"],
-  [13356] = L["ARGENT_DAWN"],
-  [13354] = L["ARGENT_DAWN"],
-  [13320] = L["ARGENT_DAWN"],
-  [13320] = L["ARGENT_DAWN"],
-  [12843] = L["ARGENT_DAWN"],
-  [12841] = L["ARGENT_DAWN"],
-  [12840] = L["ARGENT_DAWN"],
 
   -- Cenarion Circle
   [20801] = L["CENARION_CIRCLE"],

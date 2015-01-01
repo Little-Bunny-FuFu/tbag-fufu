@@ -991,7 +991,6 @@ function TBag:SetDefLayout(cfg, bagarr, row1offset, reset)
   self:SetCatBar(cfg, L["RECIPE_OTHER"], 25, reset);
 
 -- Sixth default line - Collectibles
-  self:SetCatBar(cfg, L["ARGENT_DAWN"], 24, reset);
   self:SetCatBar(cfg, L["ALDOR"], 24, reset);
   self:SetCatBar(cfg, L["SCRYER"], 24, reset);
   self:SetCatBar(cfg, L["SHA'TAR"], 24, reset);
