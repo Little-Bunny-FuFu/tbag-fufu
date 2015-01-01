@@ -267,6 +267,7 @@ L["WARRIOR"] = false
 L["HUNTER"] = false
 L["DEATHKNIGHT"] = false
 L["MONK"] = false
+L["CLASS_REAGENT"] = false
 
 -- Short bag type names used for EMPTY_%s_SLOTS and IN_%s_BAG categories
 -- 3-4 characters is about right for these.
@@ -861,3 +862,4 @@ L["Perpetual Purple Firework"] = false
 L["High%-Powered Bolt Gun"] = false
 L["Wormhole Centrifuge"] = false
 L["Aviana's Feather"] = false
+L["Sold by inscription vendors.*glyphs.*talent"] = false

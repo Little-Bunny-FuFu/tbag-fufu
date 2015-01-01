@@ -1128,6 +1128,7 @@ function TBag:SetDefLayout(cfg, bagarr, row1offset, reset)
 
   self:SetCatBar(cfg, L["BUFF"], 6, reset);
 
+  self:SetCatBar(cfg, L["CLASS_REAGENT"], 5, reset);
   self:SetCatBar(cfg, L["DUMMY"], 5, reset);
   self:SetCatBar(cfg, L["KEY_OPEN"], 5, reset);
 

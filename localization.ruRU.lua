@@ -235,7 +235,8 @@ L["WARRIOR"] = "ВОИН"
 L["HUNTER"] = "ОХОТНИК"
 L["DEATHKNIGHT"] = "РЫЦАРЬ_СМЕРТИ"
 L["MONK"] = false
-  
+L["CLASS_REAGENT"] = "КЛАССОВЫЙ_РЕАГЕНТ"
+
 -- Short bag type names used for EMPTY_%s_SLOTS and IN_%s_BAG categories
 -- 3-4 characters is about right for these.
 L["ENG"] = "ИНЖ"
@@ -827,3 +828,4 @@ L["Perpetual Purple Firework"] = "Нескончаемый лиловый фей
 L["High%-Powered Bolt Gun"] = "Высокомощный крепежный пистолет"
 L["Wormhole Centrifuge"] = false
 L["Aviana's Feather"] = false
+L["Sold by inscription vendors.*glyphs.*talent"] = false

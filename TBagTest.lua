@@ -48,6 +48,11 @@ local tests = {
   [6948] = L["HEARTH"],
   [19254] = L["MISC"], -- Has Hearthstone in the tooltip, but isn't one.
 
+  -- Class Reagents
+  [64670] = L["CLASS_REAGENT"],
+  [63388] = L["CLASS_REAGENT"],
+  [79249] = L["CLASS_REAGENT"],
+
   -- Minipets
   [4401] = L["MINIPET"],
   [8492] = L["MINIPET"],

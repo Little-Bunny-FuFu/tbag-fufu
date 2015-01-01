@@ -78,6 +78,7 @@ TBag.DefaultSearchList = {
   { L["TOYS"], L[""], L["Use: Summons a stationary .* ride for"], L[""], L[""] },
   { L["TOYS"], L[""], L["Path of Cenarius"], L[""], L[""] },
 
+  { L["CLASS_REAGENT"], L[""], L["Sold by inscription vendors.*glyphs.*talent"], L["Miscellaneous"], L["Reagent"] },
 
   { L["AHN_QIRAJ"], L[""], L["%a+ Scarab"], L["Quest"], L[""] },
   { L["AHN_QIRAJ"], L[""], L["%a+ Idol"], L["Quest"], L[""] },
