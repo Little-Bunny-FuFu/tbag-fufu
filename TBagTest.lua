@@ -521,6 +521,7 @@ local tests = {
   [20390] = L["COMBO"],
   [21537] = L["COMBO"],
   [20516] = L["COMBO"],
+  [113509] = L["COMBO"],
   [13893] = L["FOOD"],
   [35285] = L["FOOD"],
   [28111] = L["FOOD"],
@@ -539,6 +540,8 @@ local tests = {
   [22829] = L["HEALTH_RESTORE"],
   [32905] = L["HEALTH_RESTORE"],
   [25883] = L["HEALTH_RESTORE"],
+  [109223] = L["HEALTH_RESTORE"],
+  [117415] = L["HEALTH_RESTORE"],
 
   -- Combat Buffs
   [6452] = L["CURE"],
