@@ -221,7 +221,6 @@ L["CENARION_EXPEDITION"] = true
 L["SPOREGGAR"] = true
 L["ALDOR"] = true
 L["SCRYER"] = true
-L["SHA'TAR"] = true
 L["LOWER_CITY"] = true
 L["AHN_QIRAJ"] = true
 L["NETHERWING"] = true

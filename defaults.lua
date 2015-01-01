@@ -128,7 +128,6 @@ TBag.DefaultSearchList = {
   { L["ALDOR"], L[""], L["Fel Armament"], L["Quest"], L[""]},
   { L["ALDOR"], L[""], L["Holy Dust"], L["Consumable"], L[""]},
   { L["ALDOR"], L[""], L["Mark of the Illidari"], L["Miscellaneous"], L[""]},
-  { L["SHA'TAR"], L[""], L["Badge of Justice"], L[""], L[""]},
   { L["LOWER_CITY"], L[""], L["Arakkoa Feather"], L["Quest"], L[""]},
 
   { string.format(L["EQUIPPED_%s"],L["TRINKET"]), L["EQUIPPED"],

@@ -209,7 +209,6 @@ L["CENARION_EXPEDITION"] = false
 L["SPOREGGAR"] = false
 L["ALDOR"] = false
 L["SCRYER"] = false
-L["SHA'TAR"] = false
 L["LOWER_CITY"] = false
 L["AHN_QIRAJ"] = false
 L["NETHERWING"] = false
