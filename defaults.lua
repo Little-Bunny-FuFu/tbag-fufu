@@ -431,36 +431,6 @@ TBag.DefaultSearchList = {
   { L["KEY_OPEN"], L[""], L[" Key"], L["Trade Goods"], L[""] },
   { L["KEY_QUEST"], L[""], L[" Key"], L["Key"], L[""] },
 
--- Reagents
-  { L["CLASS_REAGENT"], L[""], L["Light Feather"], L["Miscellaneous"], L["Reagent"] },
-
-  { string.format(L["%s_REAGENT"],L["WARLOCK"]), L[""],
-    L["Infernal Stone"], L["Miscellaneous"], L["Reagent"] },
-  { string.format(L["%s_REAGENT"],L["WARLOCK"]), L[""],
-    L["Demonic Figurine"], L["Miscellaneous"], L["Reagent"] },
-
-  { string.format(L["%s_REAGENT"],L["DRUID"]), L[""],
-    L[" Seed"], L["Miscellaneous"], L["Reagent"] },
-  { string.format(L["%s_REAGENT"],L["DRUID"]), L[""],
-    L["Wild "], L["Miscellaneous"], L["Reagent"] },
-  { string.format(L["%s_REAGENT"],L["MAGE"]), L[""],
-    L["Arcane Powder"], L["Miscellaneous"], L["Reagent"] },
-  { string.format(L["%s_REAGENT"],L["MAGE"]), L[""],
-    L["Rune of "], L["Miscellaneous"], L["Reagent"] },
-  { string.format(L["%s_REAGENT"],L["PALADIN"]), L[""],
-    L["Symbol of"], L["Miscellaneous"], L["Reagent"] },
-  { string.format(L["%s_REAGENT"],L["PRIEST"]), L[""],
-    L[" Candle"], L["Miscellaneous"], L["Reagent"] },
-  { string.format(L["%s_REAGENT"],L["SHAMAN"]), L[""], L["Ankh"], L["Reagent"], L["Reagent"] },
-  { string.format(L["%s_REAGENT"],L["SHAMAN"]), L[""], L["Fish Oil"], L[""], L[""] },
-  { string.format(L["%s_REAGENT"],L["SHAMAN"]), L[""], L["Shiny Fish Scales"], L[""], L[""] },
-  { string.format(L["%s_REAGENT"],L["DEATHKNIGHT"]), L[""], L["Corpse Dust"], L[""], L[""] },
-  { string.format(L["%s_REAGENT"],L["ROGUE"]), L[""], L["Coats a weapon with poison that lasts for"], L[""], L[""] },
-
-  { string.format(L["%s_TOOL"],L["ROGUE"]), L[""], L["Thieves' Tools"], L[""], L[""] },
-  { string.format(L["%s_TOOL"],L["SHAMAN"]), L[""],
-    L[" Totem"], L["Miscellaneous"], L["Reagent"] },
-  { L["SOULSHARD"], L[""], L["Soul Shard"], L["Miscellaneous"], L["Reagent"] },
 
   { L["DUMMY"], L[""], L["Target Dummy"], L["Trade Goods"], L[""] },
 

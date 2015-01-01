@@ -578,7 +578,7 @@ local tests = {
   -- Reagents
   -- most of these used to be reagents for class spells that
   -- have been made obsolete and converted to gray items.
-  [17056] = L["CLASS_REAGENT"],
+  [17056] = L["LEATHERWORKING"],
   [5565] = L["GRAY_ITEMS"],
   [22147] = L["GRAY_ITEMS"],
   [17037] = L["GRAY_ITEMS"],
@@ -592,12 +592,12 @@ local tests = {
   [17058] = L["GRAY_ITEMS"],
   [17057] = L["GRAY_ITEMS"],
   [37201] = L["GRAY_ITEMS"],
-  [5060] = string.format(L["%s_TOOL"],L["ROGUE"]),
-  [5178] = string.format(L["%s_TOOL"],L["SHAMAN"]),
-  [5175] = string.format(L["%s_TOOL"],L["SHAMAN"]),
-  [5176] = string.format(L["%s_TOOL"],L["SHAMAN"]),
-  [5177] = string.format(L["%s_TOOL"],L["SHAMAN"]),
-  [6265] = L["SOULSHARD"],
+  [5060] = L["MISC"],
+  [5178] = L["MISC"],
+  [5175] = L["MISC"],
+  [5176] = L["MISC"],
+  [5177] = L["MISC"],
+  [6265] = L["MISC"],
   [4392] = L["DUMMY"],
 
   [7068] = L["REAGENT"],
