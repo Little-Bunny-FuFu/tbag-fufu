@@ -420,7 +420,6 @@ local tests = {
   [39340] = L["INSCRIPTION"],
 
   -- Various equipment items
-  [33508] = L["RELIC"],
   [28757] = L["RING"],
   [33972] = L["01_HEAD"],
   [31749] = L["02_NECK"],
