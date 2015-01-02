@@ -880,3 +880,4 @@ L["Garrison Blueprint"] = true
 L["[Aa]rchaeology"] = true
 L["digsite"] = true
 L["Use: Dig through the salvage"] = true
+L["item appropriate for your loot specialization"] = true

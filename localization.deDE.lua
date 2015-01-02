@@ -836,3 +836,4 @@ L["Garrison Blueprint"] = false
 L["[Aa]rchaeology"] = false
 L["digsite"] = false
 L["Use: Dig through the salvage"] = false
+L["item appropriate for your loot specialization"] = false
