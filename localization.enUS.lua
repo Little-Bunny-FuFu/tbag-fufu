@@ -131,7 +131,6 @@ L["Account Bound"] = true
 -- BAG DISPLAY NAMES
 -----------------------------------------------------------------------
 
-L["Keyring"] = true
 L["Bank"] = true
 L["Backpack"] = true
 L["First Bag"] = true
@@ -295,7 +294,6 @@ L["TACKLE"] = true
 L["REAGENT"] = false
 
 -- Bag Position Names, also used for EMPTY_%s_SLOTS and IN_%s_BAG categories
-L["KEYRING"] = true
 L["BANK"] = true
 L["BACKPACK"] = true
 L["BAG1"] = true
@@ -571,7 +569,6 @@ L["New Tag Timeout (minutes):"] = true
 L["Recent Tag Timeout (minutes):"] = true
 L["Alt Key Auto-Pickup:"] = true
 L["Alt Key Auto-Panel:"] = true
-L["Show Keyring Empty Slots (Enable Show above):"] = true
 
 -----------------------------------------------------------------------
 -- Unit Tests

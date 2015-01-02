@@ -283,9 +283,8 @@ function TBag:Init()
     TTknItm[self.PLAYERID] = {};
   end
 
-  -- Force the KEYRING_CONTAINER frame's id to the proper value.
+  -- Force the frame with negative ids to the proper value.
   -- Can't set frames to negative values from XML. :(
-  _G[self:GetDummyBagFrameName(KEYRING_CONTAINER)]:SetID(KEYRING_CONTAINER);
   _G[self:GetDummyBagFrameName(BANK_CONTAINER)]:SetID(BANK_CONTAINER);
   _G[self:GetDummyBagFrameName(REAGENTBANK_CONTAINER)]:SetID(REAGENTBANK_CONTAINER);
 
@@ -629,8 +628,6 @@ function TBag:PutItemInBag(bag)
   if not CursorHasItem() then return end
   if bag == BACKPACK_CONTAINER then
     return PutItemInBackpack()
-  elseif bag == KEYRING_CONTAINER then
-    return PutKeyInKeyRing()
   elseif bag == BANK_CONTAINER then
     return PutItemInBank()
   elseif bag == REAGENTBANK_CONTAINER then
@@ -958,8 +955,6 @@ function TBag:SetDefLayout(cfg, bagarr, row1offset, reset)
   self:SetCatBar(cfg, L["CENARION_EXPEDITION"], 27, reset);
   self:SetCatBar(cfg, L["SPOREGGAR"], 27, reset);
 
-  self:SetCatBar(cfg, string.format(L["IN_%s_BAG"],L["KEYRING"]), 26, reset);
-  self:SetCatBar(cfg, string.format(L["EMPTY_%s_SLOTS"],L["KEYRING"]), 26, reset);
   self:SetCatBar(cfg, L["PVP"], 26, reset);
 
   self:SetCatBar(cfg, L["ENCHANTS"], 25, reset);
@@ -1276,7 +1271,7 @@ function TBag:InitDefVals(cfg, bagarr, row1offset, reset)
 
   local bag, idx;
   for idx, bag in ipairs(bagarr) do
-    if (bag == KEYRING_CONTAINER) then
+    if (bag == REAGENTBANK_CONTAINER) then
       self:SetDef(cfg, "show_Bag"..bag, 0, reset, self.NumFunc, 0, 1);
     else
       self:SetDef(cfg, "show_Bag"..bag, 1, reset, self.NumFunc, 0, 1);
@@ -1457,7 +1452,6 @@ end
 -- Used for options strings
 function TBag:GetBagDispName(bag)
   if ( bag < self.BAGMIN ) or ( bag > self.BAGMAX ) then return ""; end
-  if (bag == KEYRING_CONTAINER) then return KEYRING; end
   if (bag == BANK_CONTAINER) then return L["Bank"]; end
   if (bag == REAGENTBANK_CONTAINER) then return REAGENT_BANK; end
   if (bag == BACKPACK_CONTAINER) then return L["Backpack"]; end
@@ -1477,7 +1471,6 @@ end
 -- Used for EMPTY_X_SLOTS
 function TBag:GetBagPosName(bag)
   if ( bag < self.BAGMIN ) or ( bag > self.BAGMAX ) then return ""; end
-  if (bag == KEYRING_CONTAINER) then return L["KEYRING"]; end
   if (bag == BANK_CONTAINER) then return L["BANK"]; end
   if (bag == REAGENTBANK_CONTAINER) then return L["REAGENTBANK"]; end
   if (bag == BACKPACK_CONTAINER) then return L["BACKPACK"]; end
@@ -1507,8 +1500,6 @@ function TBag:GetBagTypeName(bagType)
     return L["ENCH"];
   elseif (bagType == 128) then
     return L["ENG"];
-  elseif (bagType == 256) then
-    return L["KEYRING"];
   elseif (bagType == 512) then
     return L["GEM"];
   elseif (bagType == 1024) then
@@ -1547,11 +1538,8 @@ function TBag:GetBagType(playerid, bag)
     self:SetPlayerBagCfg(playerid, bag, self.I_RARITY, quality);
     _,type = GetContainerNumFreeSlots(bag);
 
-    -- GetContainerNumFreeSlots doesn't return the bag type for the KEYRING or
-    -- the REAGENTBANK.
-    if (bag == KEYRING_CONTAINER) then
-      type = 256;
-    elseif (bag == REAGENTBANK_CONTAINER) then
+    -- GetContainerNumFreeSlots doesn't return the bag type for the REAGENTBANK.
+    if (bag == REAGENTBANK_CONTAINER) then
       type = 2048; -- This is an unused id and we're squating on it since the
                    -- reagent bank doesn't have a real id
     end
@@ -1584,8 +1572,6 @@ function TBag:GetBagTexture(playerid, bag)
     texture = "Interface\\Icons\\INV_Box_03";
   elseif (bag == REAGENTBANK_CONTAINER) then
     texture = "Interface\\Icons\\INV_Misc_Bag_SatchelofCenarius.blp";
-  elseif (bag == KEYRING_CONTAINER) then
-    texture = "Interface\\ContainerFrame\\KeyRing-Bag-Icon";
   else
     local itemlink = self:GetPlayerBagCfg(playerid, bag, self.I_ITEMLINK);
     if (itemlink) then
@@ -1600,9 +1586,7 @@ end
 
 
 function TBag:GetBagFrameName(bag)
-  if (bag == KEYRING_CONTAINER) then
-    return "TInvingButton";
-  elseif (bag == BANK_CONTAINER) then
+  if (bag == BANK_CONTAINER) then
     return "TBnkFrameBagBank";
   elseif (bag == REAGENTBANK_CONTAINER) then
     return "TBnkFrameBagReagent";
@@ -1618,9 +1602,7 @@ function TBag:GetBagFrameName(bag)
 end
 
 function TBag:GetDummyBagFrameName(bag)
-  if (bag == KEYRING_CONTAINER) then
-    return "TInvainerFrame13";
-  elseif (bag == BACKPACK_CONTAINER) then
+  if (bag == BACKPACK_CONTAINER) then
     return "TInvainerFrame12";
   elseif (bag == BANK_CONTAINER) then
     return "TBnkainerFrame4";
@@ -1640,9 +1622,7 @@ function TBag:GetBagItemButtonName(bag, slot)
 end
 
 function TBag:GetBagIdxName(bag)
-  if (bag == KEYRING_CONTAINER) then
-    return "KeyRing";
-  elseif (bag == BANK_CONTAINER) then
+  if (bag == BANK_CONTAINER) then
     return "Bank";
   elseif (bag == REAGENTBANK_CONTAINER) then
     return "ReagentBank";
@@ -1775,16 +1755,12 @@ function TBag:GetSlotInfo(playerid, bag)
   -- Refresh the cache if we are the current player, or at a bank
   if (playerid == self.PLAYERID) then
     if (TBnkFrame.atbank == 1) or self:Member(self.Inv_Bags, bag) then
-      if (bag == KEYRING_CONTAINER) then
-        size = GetKeyRingSize(KEYRING_CONTAINER);
-      else
-        size = GetContainerNumSlots(bag);
-        if bag == REAGENTBANK_CONTAINER and not IsReagentBankUnlocked() then
-          -- Game always shows the full size of the ReagentBank even if not unlocked
-          size = 0
-        end
---      self:Print("b="..bag..", size="..size);
+      size = GetContainerNumSlots(bag);
+      if bag == REAGENTBANK_CONTAINER and not IsReagentBankUnlocked() then
+        -- Game always shows the full size of the ReagentBank even if not unlocked
+        size = 0
       end
+--    self:Print("b="..bag..", size="..size);
       for i=1, size do
         local _
         _, item = GetContainerItemInfo(bag, i);
@@ -2115,9 +2091,7 @@ end
 
 function TBag:GetInvSlotID(bag, slot)
   local id;
-  if (bag == KEYRING_CONTAINER) then
-    id = KeyRingButtonIDToInvSlotID(slot);
-  elseif (bag == BANK_CONTAINER) then
+  if (bag == BANK_CONTAINER) then
     id = BankButtonIDToInvSlotID(slot);
   elseif (bag == REAGENTBANK_CONTAINER) then
     id = ReagentBankButtonIDToInvSlotID(slot);
@@ -2172,7 +2146,7 @@ function TBag:SetInventoryItem(tt, playerid, itemlink, bag, slot, suffix)
   if (playerid == self.PLAYERID) then
     -- Inventory and being at the bank is always safe
     if (self:Member(self.Inv_Bags, bag) or TBnkFrame.atbank == 1) then
-      if (bag == KEYRING_CONTAINER) or (bag == BANK_CONTAINER) or (bag == REAGENTBANK_CONTAINER) then
+      if (bag == BANK_CONTAINER) or (bag == REAGENTBANK_CONTAINER) then
         hasCooldown, repairCost = tt:SetInventoryItem("player", self:GetInvSlotID(bag, slot));
       else
         hasCooldown, repairCost = tt:SetBagItem(bag, slot);
@@ -2590,12 +2564,7 @@ function TBag:SortItmCache(cfg, playerid, itmcache, baritm, bagarr)
             itmcache[bag][slot] = self:PickBar(cfg, playerid,
               itmcache[bag][slot], trade1, trade2);
 
-            -- An ugly special case check for Keyring slots
-            if ( (itmcache[bag][slot][self.I_ITEMLINK])
-              or (cfg["show_keyring_empty_slots"] ~= 0)
-              or (bag ~= KEYRING_CONTAINER) ) then
-              table.insert( baritm[ itmcache[bag][slot][self.I_BAR] ], itmcache[bag][slot]);
-            end
+            table.insert( baritm[ itmcache[bag][slot][self.I_BAR] ], itmcache[bag][slot]);
           end
         end
       end

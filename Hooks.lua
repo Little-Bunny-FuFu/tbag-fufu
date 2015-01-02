@@ -17,7 +17,6 @@ Hooks.funcs = {
   "OpenBackpack",
   "CloseBackpack",
   "ToggleBackpack",
-  "ToggleKeyRing",
   "ToggleAllBags",
   "ContainerFrameItemButton_OnModifiedClick",
 }
@@ -197,11 +196,6 @@ function Hooks.ToggleBackpack()
   Hooks.ToggleBag(BACKPACK_CONTAINER)
 end
 
-function Hooks.ToggleKeyRing()
-  TBag:PrintDEBUG("event: ToggleKeyRing()")
-  Hooks.ToggleBag(KEYRING_CONTAINER)
-end
-
 function Hooks.ToggleAllBags()
   TBag:PrintDEBUG("event: OpenAllBags()")
   local inv_bag_toggled  = false
@@ -209,7 +203,7 @@ function Hooks.ToggleAllBags()
   local bnk_bag_toggled = false
 
   for _,bag in ipairs(TInvFrame.bags) do
-    if bag ~= KEYRING_CONTAINER and TInvFrame.cfg["show_Bag"..bag] ~= 1 then
+    if TInvFrame.cfg["show_Bag"..bag] ~= 1 then
       local bagframe = TBag:GetBagFrame(bag)
       if not bagframe:GetChecked() then
         bagframe:SetChecked(true)

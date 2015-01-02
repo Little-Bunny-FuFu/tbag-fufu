@@ -85,7 +85,6 @@ L["Account Bound"] = ITEM_ACCOUNTBOUND
 -- BAG DISPLAY NAMES
 -----------------------------------------------------------------------
 
-L["Keyring"] = KEYRING
 L["Bank"] = "Bank"
 L["Backpack"] = "Rucksack"
 L["First Bag"] = "Erste Tasche"
@@ -249,7 +248,6 @@ L["TACKLE"] = "SPINN"
 L["REAGENT"] = false
 
 -- Bag Position Names, also used for EMPTY_%s_SLOTS and IN_%s_BAG categories
-L["KEYRING"] = "SCHL\195\156SSELBUND"
 L["BANK"] = "BANK"
 L["BACKPACK"] = "RUCKSACK"
 L["BAG1"] = "TASCHE1"
@@ -527,7 +525,6 @@ L["New Tag Timeout (minutes):"] = "Neu Markierungs Timeout (Minuten):"
 L["Recent Tag Timeout (minutes):"] = "K\195\188rzlich Markierungs Timeout (Minuten):"
 L["Alt Key Auto-Pickup:"] = "Alternative Auto-Pickup Taste:"
 L["Alt Key Auto-Panel:"] = "Alternative Auto-Panel Taste:"
-L["Show Keyring Empty Slots (Enable Show above):"] = "Zeige leere Pl\195\164tze im Schl\195\188sselbund (Anzeige oben Aktivieren):"
 
 -----------------------------------------------------------------------
 -- Unit Tests

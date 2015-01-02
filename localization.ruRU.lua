@@ -87,7 +87,6 @@ L["Account Bound"] = ITEM_ACCOUNTBOUND
 -- BAG DISPLAY NAMES 
 -----------------------------------------------------------------------
 
-L["Keyring"] = KEYRING
 L["Bank"] = "Банк"
 L["Backpack"] = "Рюкзак"
 L["First Bag"] = "Первая сумка"
@@ -251,7 +250,6 @@ L["TACKLE"] = false
 L["REAGENT"] = false
 
 -- Bag Position Names, also used for EMPTY_%s_SLOTS and IN_%s_BAG categories
-L["KEYRING"] = "КЛЮЧИ"
 L["BANK"] = "БАНК"
 L["BACKPACK"] = "РЮКЗАК"
 L["BAG1"] = "СУМКА1"
@@ -527,7 +525,6 @@ L["New Tag Timeout (minutes):"] = "Время нового варианта (м�
 L["Recent Tag Timeout (minutes):"] = "Последнее время вараинта (минуты):"
 L["Alt Key Auto-Pickup:"] = "Alt - автопогрузка:"
 L["Alt Key Auto-Panel:"] = "Alt - автопанель:"
-L["Show Keyring Empty Slots (Enable Show above):"] = "Показать свободные ячейки в повязке ключей (Включить, чтобы показать выше)"
 
 -----------------------------------------------------------------------
 -- Unit Tests 
