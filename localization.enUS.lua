@@ -235,7 +235,6 @@ L["ENGINEERING"] = true
 L["JEWELCRAFTING"] = true
 L["LEATHERWORKING"] = true
 L["MINING"] = true
-L["POISONS"] = true
 L["TAILORING"] = true
 L["INSCRIPTION"] = true
 L["FIRST_AID"] = true

@@ -223,7 +223,6 @@ L["ENGINEERING"] = false
 L["JEWELCRAFTING"] = false
 L["LEATHERWORKING"] = false
 L["MINING"] = false
-L["POISONS"] = false
 L["TAILORING"] = false
 L["INSCRIPTION"] = false
 L["FIRST_AID"] = false

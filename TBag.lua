@@ -997,7 +997,6 @@ function TBag:SetDefLayout(cfg, bagarr, row1offset, reset)
   self:SetCatBar(cfg, L["JEWELCRAFTING"], 19, reset);
   self:SetCatBar(cfg, L["LEATHERWORKING"], 19, reset);
   self:SetCatBar(cfg, L["MINING"], 19, reset);
-  self:SetCatBar(cfg, L["POISONS"], 19, reset);
   self:SetCatBar(cfg, L["TAILORING"], 19, reset);
   self:SetCatBar(cfg, L["INSCRIPTION"], 19, reset);
 
