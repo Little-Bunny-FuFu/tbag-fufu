@@ -14,6 +14,7 @@ TBag.DefaultSearchList = {
   { L["ACT_ON"], L[""], L["This Item Begins a Quest"], L[""], L[""] },
   { L["ACT_OPEN"], L[""], L["<Right Click to Open>"], L[""], L[""] },
   { L["ACT_OPEN"], L[""], L[" Lockbox"], L["Miscellaneous"], L[""] },
+  { L["ACT_OPEN"], L[""], L["Use: Dig through the salvage"], L[""], L[""] },
   { L["PVP"], L[""], L["Mark of Honor Hold"], L["Consumable"], L[""] },
   { L["PVP"], L[""], L["Mark of Thrallmar"], L["Consumable"], L[""] },
   { L["PVP"], L[""], L["Halaa Battle Token"], L["Miscellaneous"], L[""] },

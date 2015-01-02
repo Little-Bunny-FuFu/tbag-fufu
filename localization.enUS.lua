@@ -879,3 +879,4 @@ L["Spirit of Shinri"] = true
 L["Garrison Blueprint"] = true
 L["[Aa]rchaeology"] = true
 L["digsite"] = true
+L["Use: Dig through the salvage"] = true

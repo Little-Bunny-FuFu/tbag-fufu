@@ -25,6 +25,9 @@ local tests = {
   -- Note we can't test the Right click to open rule because it's
   -- added only for items actually in your inventory.
   [5759] = L["ACT_OPEN"],
+  [114120] = L["ACT_OPEN"],
+  [114119] = L["ACT_OPEN"],
+  [114116] = L["ACT_OPEN"],
 
   -- PVP Items
   [24579] = L["PVP"],
@@ -364,6 +367,7 @@ local tests = {
   [111812] = L["BLUEPRINTS"],
   [109256] = L["BLUEPRINTS"],
   [111996] = L["BLUEPRINTS"],
+  [111957] = L["BLUEPRINTS"],
   [112020] = L["QUEST"], -- quest item named Garrison Blueprints but it isn't
   [111619] = L["QUEST"], -- ditto
 
