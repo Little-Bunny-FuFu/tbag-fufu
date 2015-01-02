@@ -966,6 +966,7 @@ function TBag:SetDefLayout(cfg, bagarr, row1offset, reset)
   self:SetCatBar(cfg, L["PATTERN"], 25, reset);
   self:SetCatBar(cfg, L["PLANS"], 25, reset);
   self:SetCatBar(cfg, L["SCHEMATIC"], 25, reset);
+  self:SetCatBar(cfg, L["BLUEPRINTS"], 25, reset);
   self:SetCatBar(cfg, L["RECIPE_OTHER"], 25, reset);
 
 -- Sixth default line - Collectibles

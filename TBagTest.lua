@@ -360,6 +360,12 @@ local tests = {
   [25731] = L["PATTERN"],
   [12827] = L["PLANS"],
   [23887] = L["SCHEMATIC"],
+  [118215] = L["BLUEPRINTS"],
+  [111812] = L["BLUEPRINTS"],
+  [109256] = L["BLUEPRINTS"],
+  [111996] = L["BLUEPRINTS"],
+  [112020] = L["QUEST"], -- quest item named Garrison Blueprints but it isn't
+  [111619] = L["QUEST"], -- ditto
 
   -- Trade Tools
   [7005] = L["TRADE_TOOL"],

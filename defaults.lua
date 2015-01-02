@@ -158,6 +158,7 @@ TBag.DefaultSearchList = {
   { L["PATTERN"], L[""], L["Pattern: "], L["Recipe"], L[""] },
   { L["PLANS"], L[""], L["Plans: "], L["Recipe"], L[""] },
   { L["SCHEMATIC"], L[""], L["Schematic: "], L["Recipe"], L[""] },
+  { L["BLUEPRINTS"], L[""], L["Garrison Blueprint"], L["Miscellaneous"], L[""] },
   { L["RECIPE_OTHER"], L[""], L[""], L["Recipe"], L[""] },
 
 -- Equipment
