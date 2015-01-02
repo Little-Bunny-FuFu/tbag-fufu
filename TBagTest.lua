@@ -25,6 +25,7 @@ local tests = {
   -- Note we can't test the Right click to open rule because it's
   -- added only for items actually in your inventory.
   [5759] = L["ACT_OPEN"],
+  -- Garrison Salvage Yard containers
   [114120] = L["ACT_OPEN"],
   [114119] = L["ACT_OPEN"],
   [114116] = L["ACT_OPEN"],
