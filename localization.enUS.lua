@@ -241,6 +241,7 @@ L["INSCRIPTION"] = true
 L["FIRST_AID"] = true
 L["COOKING"] = true
 L["FISHING"] = true
+L["ARCHAEOLOGY"] = true
 L["RUNEFORGING"] = true
 L["TRADE_TOOL"] = true
 
@@ -877,3 +878,5 @@ L["Moroes' Famous Polish"] = true
 L["Contender's Costume"] = true
 L["Spirit of Shinri"] = true
 L["Garrison Blueprint"] = true
+L["[Aa]rchaeology"] = true
+L["digsite"] = true

@@ -197,6 +197,7 @@ L["INSCRIPTION"] = "НАЧЕРТАНИЕ"
 L["FIRST_AID"] = "ПЕРВАЯ_ПОМОЩЬ"
 L["COOKING"] = "КУЛИНАРИЯ"
 L["FISHING"] = "РЫБНАЯ_ЛОВЛЯ"
+L["ARCHAEOLOGY"] = false
 L["RUNEFORGING"] = "ГРАВИРОВАНИЕ"
 L["TRADE_TOOL"] = "ТОРГ_ИНСТРУМЕНТ"
 
@@ -833,3 +834,5 @@ L["Moroes' Famous Polish"] = false
 L["Contender's Costume"] = false
 L["Spirit of Shinri"] = false
 L["Garrison Blueprint"] = false
+L["[Aa]rchaeology"] = false
+L["digsite"] = false

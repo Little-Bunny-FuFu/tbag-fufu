@@ -955,6 +955,7 @@ function TBag:SetDefLayout(cfg, bagarr, row1offset, reset)
   self:SetCatBar(cfg, L["CENARION_EXPEDITION"], 27, reset);
   self:SetCatBar(cfg, L["SPOREGGAR"], 27, reset);
 
+  self:SetCatBar(cfg, L["ARCHAEOLOGY"], 26, reset);
   self:SetCatBar(cfg, L["PVP"], 26, reset);
 
   self:SetCatBar(cfg, L["ENCHANTS"], 25, reset);

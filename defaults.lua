@@ -434,6 +434,8 @@ TBag.DefaultSearchList = {
   { L["LEATHERWORKING"], L["LEATHERWORKING"], L[""], L[""], L[""]},
   { L["MINING"], L["MINING"], L[""], L[""], L[""] },
   { L["TAILORING"], L["TAILORING"], L[""], L[""], L[""]},
+  { L["ARCHAEOLOGY"], L[""], L["[Aa]rchaeology"], L[""], L[""] },
+  { L["ARCHAEOLOGY"], L[""], L["digsite"], L[""], L[""] },
 
   { L["REAGENT"], L[""], L[""], L["Reagent"], L[""] },
   { L["TRADE_GOODS"], L[""], L[""], L["Trade Goods"], L[""] },

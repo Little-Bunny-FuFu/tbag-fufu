@@ -229,6 +229,7 @@ L["INSCRIPTION"] = false
 L["FIRST_AID"] = false
 L["COOKING"] = false
 L["FISHING"] = false
+L["ARCHAEOLOGY"] = false
 L["RUNEFORGING"] = false
 L["TRADE_TOOL"] = false
 
@@ -867,3 +868,5 @@ L["Moroes' Famous Polish"] = false
 L["Contender's Costume"] = false
 L["Spirit of Shinri"] = false
 L["Garrison Blueprint"] = false
+L["[Aa]rchaeology"] = false
+L["digsite"] = false
