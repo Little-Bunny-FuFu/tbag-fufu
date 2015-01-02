@@ -1,3 +1,63 @@
+* 201501??-r5??-Shefki
+  Work in progress alpha, writing the changelog so people can
+  see what's been do far.
+
+  Note: This version contains a number of sorting changes the following
+  commands are advised after backing up any modified sorting rules you have.
+  /tinv resetsorts
+  /tbnk resetsorts
+- Fix bag highlights.
+- Fix tracked currencies being show for a character that has no currencies in
+  in some circumstances due to a Blizzard bug.
+- Add Reagent Bank support (resorting the bank will move items into the
+  reagent bank if they can be placed there).
+- Fix quality of items not showing correctly for items that have a chance to
+  roll at a higher quality.
+- Remove class specific REAGENT and TOOLS categories
+- Fix potions, foods and drinks not sorting into the correct categories, due
+  to Blizzard adding commas to the health/mana numbers.
+- Properly categorize channeled mana options as MANA_RESTORE.
+- Fix some old temporary weapon enchants not sorting into BUFF category.
+- Items that when learned go into the toy box are not included in the TOYS
+  category.  This means some items that were in COMBATPETS, COSTUMES and
+  FIREWORKS are in TOYS now.
+- Fix categorization of Crimson Steer Energy drink due to bugged tooltip in
+  game.
+- Fix sorting of engineering portal device and add the WoD one.
+- Add Aviana's Feather to the MOUNT category.
+- Include the fish specific baints for WoD in FISHING.
+- Remove the ARGENT_DAWN category.
+- Remove the CENARION_CIRCLE category.
+- Remove the THORIUM_BROTHER category.
+- Remove the ZUL_GURUB category.
+- Remove the SHA'TAR category.
+- Remove categorization rule for Coilfang Armaments.
+- Remove categorization rule for Salt Shacker.
+- Remove categorization rules for obsolete inks and parchments.
+- Remove RELIC category.
+- Update DARKMOON_CATEGORY for the new faire.
+- Gray items that a vendor will pay for now display a gold icon in the upper
+  left corner when at a vendor.
+- Remove all Soul Shard support.
+- Remove a bunch of compataiblity with old versions of WoW.
+- Remove all ammo, quivers and projectile supports including the various
+  categories.
+- Put the reagents for talent/glyph changes in CLASS_REAGENT category.
+- Add Moroes' Famous Polish to the TOYS category.
+- Add the Day of the Dead costumes to the COSTUMES category.
+- Add CRAFTINGREAGENT keyword which will match all items that have the
+  light blue "Crafting Reagent" text in the tooltip.
+- Remove support for the keyring.
+- Add Spirit of Shinri to the MOUNT category.
+- Add a BLUEPRINTS category for Garrison Blueprints to go in.
+- Add an ARCHAEOLOGY category.
+- Remove the POISONS category.
+- Add salvage bags/crates to the ACT_OPEN category.
+- Add items that create equipmenet (e.g. items from Timeless Isle and
+  Garrison Missions) to the ACT_OPEN category.
+- Add a number of pet items to MINIPET category.
+- Move "Windfeather Plume" from BUFF to MOUNT category.
+
 * 20141014-r444-Shefki
 - Bump TOC for 6.0
 - Fix the blue  hue over the buttons in 6.0
