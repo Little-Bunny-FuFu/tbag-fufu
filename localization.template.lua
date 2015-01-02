@@ -864,3 +864,4 @@ L["Aviana's Feather"] = false
 L["Sold by inscription vendors.*glyphs.*talent"] = false
 L["Moroes' Famous Polish"] = false
 L["Contender's Costume"] = false
+L["Spirit of Shinri"] = false
