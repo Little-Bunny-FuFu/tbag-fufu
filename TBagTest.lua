@@ -47,6 +47,12 @@ local tests = {
   -- Hearthstones
   [6948] = L["HEARTH"],
   [19254] = L["MISC"], -- Has Hearthstone in the tooltip, but isn't one.
+  -- Blizzard has a game called Hearthstone so now of course a bunch of
+  -- references to it are now in WoW leading to items that arent' hearthstones
+  -- in the name/tooltip.
+  [118475] = L["CONSUMABLE"],
+  [119210] = L["TOYS"],
+  [119212] = L["TOYS"],
 
   -- Class Reagents
   [64670] = L["CLASS_REAGENT"],
