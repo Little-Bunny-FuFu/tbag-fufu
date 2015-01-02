@@ -71,6 +71,7 @@ TBag.DefaultSearchList = {
   { L["MOUNT"], L[""], L["Summons and dismisses a rideable"], L[""], L[""] },
   { L["MOUNT"], L[""], L["Aviana's Feather"], L[""], L[""] },
   { L["MOUNT"], L[""], L["Spirit of Shinri"], L[""], L[""] },
+  { L["MOUNT"], L[""], L["Windfeather Plume"], L[""], L[""] },
   { L["TOYS"], L[""], L["Direbrew's Remote"], L[""], L[""] },
   { L["TOYS"], L[""], L["Snowball"], L[""], L[""] },
   { L["TOYS"], L[""], L["Paper Flying Machine Kit"], L[""], L[""] },

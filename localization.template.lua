@@ -876,3 +876,4 @@ L["Use: Dress up your Perky Pug"] = false
 L["Marked Flawless Battle%-Stone"] = false
 L["Flawless Battle%-Training Stone"] = false
 L["Battle Pet Bandage"] = false
+L["Windfeather Plume"] = false
