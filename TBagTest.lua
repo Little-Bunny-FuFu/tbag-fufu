@@ -428,6 +428,7 @@ local tests = {
   [110292] = L["FISHING"],
   [110290] = L["FISHING"],
   [110294] = L["FISHING"],
+  [85500]  = L["FISHING"],
 
   -- Inscription
   [43125] = L["INSCRIPTION"],
