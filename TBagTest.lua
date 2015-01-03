@@ -81,6 +81,39 @@ local tests = {
   [63388] = L["CLASS_REAGENT"],
   [79249] = L["CLASS_REAGENT"],
 
+  -- Followers
+  -- Actual items that teach followers
+  [114825] = L["FOLLOWERS"],
+  [119248] = L["FOLLOWERS"],
+  [114826] = L["FOLLOWERS"],
+  -- Things that look like followers but aren't
+  [92427] = L["CONSUMABLE"],
+  [92051] = L["CONSUMABLE"],
+  [92436] = L["CONSUMABLE"],
+  [18628] = L["ACT_ON"],
+  [3668]  = L["QUEST"],
+  -- Follower weapons
+  [120302] = L["FOLLOWERS"],
+  [114128] = L["FOLLOWERS"],
+  [114129] = L["FOLLOWERS"],
+  [114131] = L["FOLLOWERS"],
+  [114616] = L["FOLLOWERS"],
+  [114081] = L["FOLLOWERS"],
+  [114131] = L["FOLLOWERS"],
+  [120313] = L["FOLLOWERS"],
+  -- Follower Armor
+  [120301] = L["FOLLOWERS"],
+  [114745] = L["FOLLOWERS"],
+  [114808] = L["FOLLOWERS"],
+  [114822] = L["FOLLOWERS"],
+  [114807] = L["FOLLOWERS"],
+  [114806] = L["FOLLOWERS"],
+  [114746] = L["FOLLOWERS"],
+  -- Follower Ability/Trait items
+  [118354] = L["FOLLOWERS"],
+  [118475] = L["FOLLOWERS"],
+  [118474] = L["FOLLOWERS"],
+
   -- Minipets
   [4401] = L["MINIPET"],
   [8492] = L["MINIPET"],

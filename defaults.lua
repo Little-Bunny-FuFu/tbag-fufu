@@ -91,6 +91,12 @@ TBag.DefaultSearchList = {
 
   { L["CLASS_REAGENT"], L[""], L["Sold by inscription vendors.*glyphs.*talent"], L["Miscellaneous"], L["Reagent"] },
 
+  { L["FOLLOWERS"], L[""], L["\nContract: "], L[""], L[""] },
+  { L["FOLLOWERS"], L[""], L["follower %a+ enhancement"], L[""], L[""] },
+  { L["FOLLOWERS"], L[""], L["Use: Upgrade a follower's"], L[""], L[""] },
+  { L["FOLLOWERS"], L[""], L["Use: Equip a follower with"], L[""], L[""] },
+  { L["FOLLOWERS"], L[""], L["Use: Reroll the abilities and traits on a follower"], L[""], L[""] },
+  { L["FOLLOWERS"], L[""], L["Use: Teaches a follower the"], L[""], L[""] },
   { L["AHN_QIRAJ"], L[""], L["%a+ Scarab"], L["Quest"], L[""] },
   { L["AHN_QIRAJ"], L[""], L["%a+ Idol"], L["Quest"], L[""] },
   { L["AHN_QIRAJ"], L[""], L["Qiraji %a+ %a+"], L["Quest"], L[""] },
