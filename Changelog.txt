@@ -1,7 +1,4 @@
-* 201501??-r5??-Shefki
-  Work in progress alpha, writing the changelog so people can
-  see what's been do far.
-
+* 20150103-r504-Shefki
   Note: This version contains a number of sorting changes the following
   commands are advised after backing up any modified sorting rules you have.
   /tinv resetsorts
@@ -57,6 +54,7 @@
   Garrison Missions) to the ACT_OPEN category.
 - Add a number of pet items to MINIPET category.
 - Move "Windfeather Plume" from BUFF to MOUNT category.
+- Add a FOLLOWERS category.
 
 * 20141014-r444-Shefki
 - Bump TOC for 6.0
