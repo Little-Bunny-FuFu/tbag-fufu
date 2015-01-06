@@ -248,7 +248,8 @@ sub parse_data {
 	my $section_id = shift;
 	my $content = shift;
 
-  my ($contain_data) = $content =~ /^new Listview\(\{template:\s+'$template',\s+id:\s+'$section_id'.*?data:\s+\[(.*?)\]\}\)\;$/m;
+  my ($data_variable) = $content =~ /^new Listview\(\{template:\s+'$template',\s+id:\s+'$section_id'.*?data:\s+(.*?)\}\)\;$/m;
+  my ($contain_data) = $content =~ /var $data_variable\s*=\s*\[(.*?)\]\;$/m;
   return $contain_data;
 }
 
