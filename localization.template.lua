@@ -282,6 +282,7 @@ L["PET"] = false
 L["INSC"] = false
 L["TACKLE"] = false
 L["REAGENT"] = false
+L["FRIDGE"] = false
 
 -- Bag Position Names, also used for EMPTY_%s_SLOTS and IN_%s_BAG categories
 L["BANK"] = false

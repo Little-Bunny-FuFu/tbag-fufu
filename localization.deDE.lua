@@ -248,6 +248,7 @@ L["PET"] = "PET"
 L["INSC"] = "INSCH"
 L["TACKLE"] = "SPINN"
 L["REAGENT"] = false
+L["FRIDGE"] = false
 
 -- Bag Position Names, also used for EMPTY_%s_SLOTS and IN_%s_BAG categories
 L["BANK"] = "BANK"
