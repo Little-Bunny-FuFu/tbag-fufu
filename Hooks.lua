@@ -329,7 +329,7 @@ function Hooks.MerchantFrame_OnHide(...)
 end
 
 function Hooks.MerchantFrame_OnShow(...)
-  TInvFrame:UpdateWindow(TBag.REQ_MUST)
-  TBnkFrame:UpdateWindow(TBag.REQ_MUST)
+  TInvFrame:UpdateWindow()
+  TBnkFrame:UpdateWindow()
 end
 MerchantFrame:HookScript("OnShow", Hooks.MerchantFrame_OnShow)
