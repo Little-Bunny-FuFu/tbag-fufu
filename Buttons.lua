@@ -21,6 +21,7 @@ function ItemButton:OnEnter()
   local charges = itm[TBag.I_CHARGES]
   local suffix = itm[TBag.I_LINKSUFFIX]
   local pet = link and link:sub(1,10) == "battlepet:"
+  local isLive = TBag:IsLive(mainFrame)
 
   if mainFrame.edit_selected == "" then
     mainFrame.edit_hilight = cat
@@ -48,20 +49,22 @@ function ItemButton:OnEnter()
   end
 
   -- Set charges if remote viewing, Blizzard's code does it otherwise.
-  if charges and not TBag:IsLive(mainFrame) then
+  if charges and not isLive then
     GameTooltip:AddLine(string.format(L["%d |4Charge:Charges;"], tonumber(charges)),
                         255,255,255,1)
     GameTooltip:Show()
   end
 
-  if InRepairMode() and (repairCost and repairCost > 0) then
-    GameTooltip:AddLine(TEXT(REPAIR_COST), 1, 1, 1)
-    SetTooltipMoney(GameTooltip, repairCost)
-    GameTooltip:Show()
-  elseif MerchantFrame:IsVisible() then
-    ShowContainerSellCursor(bag, slot)
-  elseif self.readable then
-    ShowInspectCursor()
+  if isLive then
+    if InRepairMode() and (repairCost and repairCost > 0) then
+      GameTooltip:AddLine(TEXT(REPAIR_COST), 1, 1, 1)
+      SetTooltipMoney(GameTooltip, repairCost)
+      GameTooltip:Show()
+    elseif MerchantFrame:IsVisible() then
+      ShowContainerSellCursor(bag, slot)
+    elseif itm[TBag.I_READABLE] then
+      ShowInspectCursor()
+    end
   end
 
   if IsModifiedClick("COMPAREITEMS") then

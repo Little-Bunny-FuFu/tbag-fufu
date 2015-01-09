@@ -85,6 +85,7 @@ TBag.I_LINKSUFFIX = "ls"
 -- rf has been used
 --TBag.I_REFORGE   = "rf";
 TBag.I_NOVALUE = "nv";
+TBag.I_READABLE = "rd";
 TBag.I_CRAFTINGREAGENT = "cr";
 
 -- Quest item info
@@ -2397,7 +2398,7 @@ function TBag:UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, comparr,
 
             local stacksize;
             _, itm[self.I_TYPE], itm[self.I_SUBTYPE], _, _, stacksize = self:GetItemInfo(itm[self.I_ITEMLINK]);
-            _, itm[self.I_COUNT], _, itm[self.I_RARITY], _, _, _, itm[self.I_NOVALUE] = GetContainerItemInfo(bag, slot);
+            _, itm[self.I_COUNT], _, itm[self.I_RARITY], itm[self.I_READABLE], _, _, itm[self.I_NOVALUE] = GetContainerItemInfo(bag, slot);
             if (stacksize) then
               itm[self.I_NEED] = stacksize - itm[self.I_COUNT];
             else
