@@ -538,7 +538,7 @@ end
 function TBag:GetItemID(itemlink)
   if itemlink and type(itemlink) == "string" then
     local a,b,c,d,e,f,g,h,i,j =
-          itemlink:match("item:(%d+):(%d+):(%d+):(%d+):(%d+):(%d+):(%-?%d+):(%-?%d+):?(%d*):?([^|]*)")
+          itemlink:match("item:(%d*):(%d*):(%d*):(%d*):(%d*):(%d*):(%-?%d*):(%-?%d*):?(%d*):?([^|]*)")
     if a then
       local itemstring = string.join(":","item",a,b,c,d,e,f,g,h)
       return a, itemstring, j
@@ -1032,7 +1032,7 @@ function TBag:SetDefLayout(cfg, bagarr, row1offset, reset)
   self:SetCatBar(cfg, string.format(L["IN_%s_BAG"],L["LTHR"]), 16, reset);
   self:SetCatBar(cfg, string.format(L["IN_%s_BAG"],L["INSC"]), 16, reset);
   self:SetCatBar(cfg, string.format(L["IN_%s_BAG"],L["TACKLE"]), 16, reset);
-  self:SetCatBar(cfg, string.format(L["IN_%s_BAG"],L["REAGENT"]), 16, reset);
+  self:SetCatBar(cfg, string.format(L["IN_%s_BAG"],L["REAG"]), 16, reset);
   self:SetCatBar(cfg, string.format(L["IN_%s_BAG"],L["FRIDGE"]), 16, reset);
   self:SetCatBar(cfg, string.format(L["IN_%s_BAG"],L["UNKNOWN"]), 16, reset);
   self:SetCatBar(cfg, string.format(L["EMPTY_%s_SLOTS"],L["ENCH"]), 16, reset);
@@ -1043,7 +1043,7 @@ function TBag:SetDefLayout(cfg, bagarr, row1offset, reset)
   self:SetCatBar(cfg, string.format(L["EMPTY_%s_SLOTS"],L["LTHR"]), 16, reset);
   self:SetCatBar(cfg, string.format(L["EMPTY_%s_SLOTS"],L["INSC"]), 16, reset);
   self:SetCatBar(cfg, string.format(L["EMPTY_%s_SLOTS"],L["TACKLE"]), 16, reset);
-  self:SetCatBar(cfg, string.format(L["EMPTY_%s_SLOTS"],L["REAGENT"]), 16, reset);
+  self:SetCatBar(cfg, string.format(L["EMPTY_%s_SLOTS"],L["REAG"]), 16, reset);
   self:SetCatBar(cfg, string.format(L["EMPTY_%s_SLOTS"],L["FRIDGE"]), 16, reset);
   self:SetCatBar(cfg, string.format(L["EMPTY_%s_SLOTS"],L["UNKNOWN"]), 16, reset);
 
@@ -1512,7 +1512,7 @@ function TBag:GetBagTypeName(bagType)
   elseif (bagType == 4096) then
     return L["PET"];
   elseif (bagType == 2048) then
-    return L["REAGENT"];
+    return L["REAG"];
   elseif (bagType == 32768) then
     return L["TACKLE"];
   elseif (bagType == 65536) then

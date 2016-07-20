@@ -1,4 +1,4 @@
-﻿-- $Id: localization.ruRU.lua 340 2009-11-14 12:33:14Z by Brialius(260) and dRonix(340)$
+-- $Id: localization.ruRU.lua 340 2009-11-14 12:33:14Z by Brialius(260) and dRonix(340)$
 
 -- Russian translation for 260 maintained by Brialius <denis.bel@gmail.com>.
 -- Russian translation for 340 made by dRonix <dronixster@gmail.com>.
@@ -249,7 +249,7 @@ L["LTHR"] = "КОЖВ"
 L["PET"] = "ПИТ"
 L["INSC"] = "НАЧР"
 L["TACKLE"] = false
-L["REAGENT"] = false
+L["REAG"] = false
 L["FRIDGE"] = false
 
 -- Bag Position Names, also used for EMPTY_%s_SLOTS and IN_%s_BAG categories

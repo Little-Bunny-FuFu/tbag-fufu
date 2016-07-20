@@ -202,7 +202,7 @@ function ItemButton.UpdateCooldown(self, itm, mainFrame)
   if itm[TBag.I_ITEMLINK] and TBag:IsLive(mainFrame) then
     start, duration, enable = GetContainerItemCooldown(itm[TBag.I_BAG], itm[TBag.I_SLOT])
   end
-  CooldownFrame_SetTimer(cooldownFrame, start, duration, enable)
+  CooldownFrame_Set(cooldownFrame, start, duration, enable)
   cooldownFrame:SetScale(TBag.COOLDOWN_SCALE)
 end
 

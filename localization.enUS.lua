@@ -293,7 +293,7 @@ L["LTHR"] = true
 L["PET"] = true
 L["INSC"] = true
 L["TACKLE"] = true
-L["REAGENT"] = true
+L["REAG"] = true
 L["FRIDGE"] = true
 
 -- Bag Position Names, also used for EMPTY_%s_SLOTS and IN_%s_BAG categories
