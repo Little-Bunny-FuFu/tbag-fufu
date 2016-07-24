@@ -544,7 +544,7 @@ function TBag:GetItemID(itemlink)
       return a, itemstring, j
     end
     a,b,c,d,e,f,g =
-          itemlink:match("battlepet:(%d+):(%d+):(%d+):(%d+):(%d+):(%d+):(%d+)")
+          itemlink:match("battlepet:(%d*):(%d*):(%d*):(%d*):(%d*):(%d*):(%d*)")
     if a then
       local itemstring = string.join(":","battlepet",a,b,c,d,e,f,g)
       return -1, itemstring, nil, a

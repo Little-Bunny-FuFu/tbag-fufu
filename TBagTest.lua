@@ -72,9 +72,11 @@ local tests = {
   -- Blizzard has a game called Hearthstone so now of course a bunch of
   -- references to it are now in WoW leading to items that arent' hearthstones
   -- in the name/tooltip.
+  [110560] = L["HEARTH"],
   [118475] = L["CONSUMABLE"],
   [119210] = L["TOYS"],
   [119212] = L["TOYS"],
+  [140192] = L["HEARTH"]
 
   -- Class Reagents
   [64670] = L["CLASS_REAGENT"],
@@ -121,10 +123,10 @@ local tests = {
   [35223] = L["MINIPET"],
   [22200] = L["MINIPET"],
   [37431] = L["MINIPET"],
-  [37460] = L["MINIPET"],
-  [44820] = L["MINIPET"],
+  [37460] = L["TOYS"],
   [43626] = L["MINIPET"],
   [44721] = L["MINIPET"],
+  [44820] = L["TOYS"],
   [39898] = L["MINIPET"],
   [39899] = L["MINIPET"],
   [39896] = L["MINIPET"],
@@ -180,11 +182,11 @@ local tests = {
   [37816] = L["COSTUMES"],
   [21213] = L["COSTUMES"],
   [44792] = L["COSTUMES"],
-  [116856] = L["COSTUMES"],
-  [116888] = L["COSTUMES"],
-  [116891] = L["COSTUMES"],
-  [116889] = L["COSTUMES"],
-  [116890] = L["COSTUMES"],
+  [116856] = L["TOYS"],
+  [116888] = L["TOYS"],
+  [116891] = L["TOYS"],
+  [116889] = L["TOYS"],
+  [116890] = L["TOYS"],
 
   -- Fireworks
   [21570] = L["FIREWORKS"],
@@ -290,9 +292,9 @@ local tests = {
   [32861] = L["MOUNT"],
   [49288] = L["MOUNT"],
   [49289] = L["MOUNT"],
-  [119093] = L["MOUNT"],
-  [113543] = L["MOUNT"],
   [104287] = L["MOUNT"],
+  [113543] = L["TOYS"],
+  [119093] = L["TOYS"],
 
   -- AQ
   [20864] = L["AHN_QIRAJ"],
@@ -557,7 +559,7 @@ local tests = {
   [21537] = L["COMBO"],
   [20516] = L["COMBO"],
   [113509] = L["COMBO"],
-  [118935] = L["COMBO"],
+  [118935] = L["TOYS"],
   [13893] = L["FOOD"],
   [35285] = L["FOOD"],
   [28111] = L["FOOD"],
@@ -690,13 +692,13 @@ local tests = {
   [22449] = L["ENCHANTING"],
   [22202] = L["BLACKSMITHING"], -- Similar to enchanting but shouldn't match
   [22203] = L["BLACKSMITHING"], -- ditto
-  [18986] = L["ENGINEERING"],
+  [18986] = L["TOYS"],
   [30544] = L["ENGINEERING"],
-  [18984] = L["ENGINEERING"],
+  [18984] = L["TOYS"],
   [30542] = L["ENGINEERING"],
-  [48933] = L["ENGINEERING"],
+  [48933] = L["TOYS"],
   [47828] = L["ENGINEERING"],
-  [112059] = L["ENGINEERING"],
+  [112059] = L["TOYS"],
   [63128]  = L["ARCHAEOLOGY"],
   [64397]  = L["ARCHAEOLOGY"],
   [63127]  = L["ARCHAEOLOGY"],

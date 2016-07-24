@@ -32,7 +32,6 @@ TBag.DefaultSearchList = {
   { L["MINIPET"], L[""], L["Use: Teaches you how to summon a?n?d? ?d?i?s?m?i?s?s? ?this companion."], L[""], L[""] },
   { L["MINIPET"], L[""], L["a targeted Companion Pet's size for"], L[""], L[""] },
   { L["MINIPET"], L[""], L["Silver Shafted Arrow"], L[""], L[""] },
-  { L["MINIPET"], L[""], L["Pet Leash"], L[""], L[""] },
   { L["MINIPET"], L[""], L["Use: Play fetch with most Companion Pets"], L[""], L[""] },
   { L["MINIPET"], L[""], L["Happy Pet Snack"], L[""], L[""] },
   { L["MINIPET"], L[""], L["Nurtured Penguin Egg"], L[""], L[""] },
@@ -59,7 +58,6 @@ TBag.DefaultSearchList = {
   { L["COSTUMES"], L[""], L["Transforms your mount into something more festive"], L[""], L[""] },
   { L["COSTUMES"], L[""], L["Your mount will be more festive"], L[""], L[""] },
   { L["COSTUMES"], L[""], L["Blossoming Branch"], L[""], L[""] },
-  { L["COSTUMES"], L[""], L["Contender's Costume"], L[""], L[""] },
   { L["FIREWORKS"], L[""], L["Shoots a.*firework"], L["Consumable"], L[""] },
   { L["FIREWORKS"], L[""], L["Shoots a.*firework"], L["Miscellaneous"], L[""] },
   { L["FIREWORKS"], L[""], L["Place on the ground to launch .* rockets"], L[""], L[""] },
@@ -69,8 +67,6 @@ TBag.DefaultSearchList = {
   { L["FIREWORKS"], L[""], L["Perpetual Purple Firework"], L[""], L[""] }, -- still here for old trinket
   { L["MOUNT"], L[""], L["Requires %a+ Riding"], L[""], L[""] },
   { L["MOUNT"], L[""], L["Summons and dismisses a rideable"], L[""], L[""] },
-  { L["MOUNT"], L[""], L["Aviana's Feather"], L[""], L[""] },
-  { L["MOUNT"], L[""], L["Spirit of Shinri"], L[""], L[""] },
   { L["MOUNT"], L[""], L["Windfeather Plume"], L[""], L[""] },
   { L["TOYS"], L[""], L["Direbrew's Remote"], L[""], L[""] },
   { L["TOYS"], L[""], L["Snowball"], L[""], L[""] },
@@ -87,7 +83,6 @@ TBag.DefaultSearchList = {
   { L["TOYS"], L[""], L["Copper Racer"], L[""], L[""] },
   { L["TOYS"], L[""], L["Use: Summons a stationary .* ride for"], L[""], L[""] },
   { L["TOYS"], L[""], L["Path of Cenarius"], L[""], L[""] },
-  { L["TOYS"], L[""], L["Moroes' Famous Polish"], L[""], L[""] },
 
   { L["CLASS_REAGENT"], L[""], L["Sold by inscription vendors.*glyphs.*talent"], L["Miscellaneous"], L["Reagent"] },
 
@@ -199,9 +194,6 @@ TBag.DefaultSearchList = {
   { L["EXPLOSIVES"], L[""], L["Goblin Fishing Pole"], L[""], L[""] },
   { L["FISHING"], L[""], L["[Ff]ishing"], L[""], L[""] },
   { L["FOOD"], L[""], L["Everlasting Underspore Frond"], L["Armor"], L[""] },
-  { L["ENGINEERING"], L[""], L["Ultrasafe Transporter:"], L["Trade Goods"], L["Devices"] },
-  { L["ENGINEERING"], L[""], L["Dimensional Ripper - "], L["Trade Goods"], L["Devices"] },
-  { L["ENGINEERING"], L[""], L["Wormhole Generator:"], L["Trade Goods"], L["Devices"] },
   { L["ENGINEERING"], L[""], L["Wormhole Centrifuge"], L["Trade Goods"], L["Devices"] },
   { L["ENGINEERING"], L[""], L["Goblin Beam Welder"], L[""], L[""] },
 
