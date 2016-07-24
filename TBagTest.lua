@@ -63,8 +63,8 @@ local tests = {
   [38896] = L["ENCHANTS"],
 
   -- Glyphs
-  [43673] = L["GLYPHS"],
-  [40912] = L["GLYPHS"],
+  [43673] = L["GREY_ITEMS"],
+  [40912] = L["GREY_ITEMS"],
 
   -- Hearthstones
   [6948] = L["HEARTH"],
@@ -76,12 +76,12 @@ local tests = {
   [118475] = L["CONSUMABLE"],
   [119210] = L["TOYS"],
   [119212] = L["TOYS"],
-  [140192] = L["HEARTH"]
+  [140192] = L["HEARTH"],
 
   -- Class Reagents
   [64670] = L["CLASS_REAGENT"],
   [63388] = L["CLASS_REAGENT"],
-  [79249] = L["CLASS_REAGENT"],
+  [79249] = L["GREY_ITEMS"],
 
   -- Followers
   -- Actual items that teach followers
@@ -464,7 +464,7 @@ local tests = {
   [110292] = L["FISHING"],
   [110290] = L["FISHING"],
   [110294] = L["FISHING"],
-  [85500]  = L["FISHING"],
+  [85500]  = L["TOYS"],
 
   -- Inscription
   [43125] = L["INSCRIPTION"],
