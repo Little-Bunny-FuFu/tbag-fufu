@@ -4,8 +4,8 @@ local _G = getfenv(0)
 local TBag = _G.TBag
 local L = TBag.LOCALE
 
-local GetTradeSkillCategoryFilter = GetTradeSkillCategoryFilter
-local SetTradeSkillCategoryFilter = SetTradeSkillCategoryFilter
+local GetTradeSkillCategoryFilter = C_TradeSkillUI.GetCategories
+local SetTradeSkillCategoryFilter = C_TradeSkillUI.SetRecipeCategoryFilter
 
 -- Constants used throughout the addon
 TBag.S_TRADES  = "trades"
@@ -255,7 +255,7 @@ local function add_craft(created, reagent, tradeskillName, i)
   if not craftItemLink then return end
   TBag:SetItemLink(created, craftItemLink)
 
-  for j = 1, GetTradeSkillNumReagents(i) do
+  for j = 1, C_TradeSkillUI.GetRecipeNumReagents(i) do
     local reagentItemLink = trade_skill_tooltip_scan(i, j)
     if reagentItemLink then
       Professions:SetReagentLink(reagent, craftItemLink, tradeskillName, reagentItemLink)
@@ -285,7 +285,7 @@ end
 
 function Professions.ScanRecipes()
   -- Get the name of the tradeskill and reverse it to enUS
-  local tradeskillName = RL[GetTradeSkillLine()]
+  local tradeskillName = RL[C_TradeSkillUI.GetTradeSkillLine()]
 
   if tradeskillName then
     -- Then save to the global item cache

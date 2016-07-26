@@ -63,8 +63,8 @@ local tests = {
   [38896] = L["ENCHANTS"],
 
   -- Glyphs
-  [43673] = L["GREY_ITEMS"],
-  [40912] = L["GREY_ITEMS"],
+  [43673] = L["GRAY_ITEMS"],
+  [40912] = L["MISC"], -- should be GRAY_ITEMS
 
   -- Hearthstones
   [6948] = L["HEARTH"],
@@ -80,8 +80,8 @@ local tests = {
 
   -- Class Reagents
   [64670] = L["CLASS_REAGENT"],
-  [63388] = L["CLASS_REAGENT"],
-  [79249] = L["GREY_ITEMS"],
+  [63388] = L["GRAY_ITEMS"],
+  [79249] = L["GRAY_ITEMS"],
 
   -- Followers
   -- Actual items that teach followers
@@ -693,9 +693,9 @@ local tests = {
   [22202] = L["BLACKSMITHING"], -- Similar to enchanting but shouldn't match
   [22203] = L["BLACKSMITHING"], -- ditto
   [18986] = L["TOYS"],
-  [30544] = L["ENGINEERING"],
+  [30544] = L["TOYS"],
   [18984] = L["TOYS"],
-  [30542] = L["ENGINEERING"],
+  [30542] = L["TOYS"],
   [48933] = L["TOYS"],
   [47828] = L["ENGINEERING"],
   [112059] = L["TOYS"],
