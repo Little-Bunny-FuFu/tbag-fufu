@@ -1133,7 +1133,6 @@ function TBag:SetDefLayout(cfg, bagarr, row1offset, reset)
 
   self:SetCatBar(cfg, L["CLASS_REAGENT"], 5, reset);
   self:SetCatBar(cfg, L["DUMMY"], 5, reset);
-  self:SetCatBar(cfg, L["KEY_OPEN"], 5, reset);
 
 -- First default line - In Combat Stocks
   self:SetCatBar(cfg, L["BANDAGE"], 4+row1offset, reset);
@@ -2215,8 +2214,7 @@ function TBag:MakeToolTipStr(playerid, itemlink, bag, slot, mailitem, attach, su
   elseif (itemlink) and (mailitem) and (attach) then
     tt:SetInboxItem(mailitem, attach);
   elseif (itemlink) then
-    local level = TBag:GetPlayerInfo(playerid,TBag.G_BASIC)[TBag.S_LEVEL] or
-                  UnitLevel("player")
+    local level = UnitLevel("player")
     itemlink = itemlink..":"..level..(suffix and ":" or "")..(suffix and suffix or "")
     tt:SetHyperlink(itemlink);
   end
@@ -2816,7 +2814,7 @@ function TBag:ScanEquipped()
       dbag[self.I_NAME],_,dbag[self.I_RARITY] = GetItemInfo(dbag[self.I_ITEMLINK]);
       dbag[self.I_COUNT] = 1;
 
-      local tooltip = self:MakeToolTipStr(playerid, dbag[self.I_ITEMLINK], slot);
+      local tooltip = self:MakeToolTipStr(playerid, dbag[self.I_ITEMLINK], nil, nil, idx, slot);
       dbag[self.I_CHARGES] = self:GetItmCharges(tooltip);
     end
   end

@@ -156,6 +156,7 @@ L["ACT_SELL"] = false
 L["BAG"] = false
 L["GRAY_ITEMS"] = false
 L["QUEST"] = false
+L["KEY_QUEST"] = false
 L["ENCHANTS"] = false
 L["GLYPHS"] = false
 L["BOOK"] = false

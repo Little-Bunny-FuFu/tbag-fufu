@@ -168,6 +168,7 @@ L["ACT_SELL"] = true
 L["BAG"] = true
 L["GRAY_ITEMS"] = true
 L["QUEST"] = true
+L["KEY_QUEST"] = true
 L["ENCHANTS"] = true
 L["GLYPHS"] = true
 L["BOOK"] = true
