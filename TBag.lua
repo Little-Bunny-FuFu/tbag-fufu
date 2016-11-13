@@ -523,7 +523,7 @@ end
 function TBag:GetItemInfo(itemid)
   if itemid then
     if tostring(itemid):sub(1,10) ~= "battlepet:" then
-      local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, invTexture = GetItemInfo(itemid);
+      local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, iconFileDataID = GetItemInfo(itemid);
       return itemName, itemType, itemSubType, itemRarity, itemLink, itemStackCount;
     else
       local _,species,_,quality = strsplit(":", itemid)
@@ -976,9 +976,11 @@ function TBag:SetDefLayout(cfg, bagarr, row1offset, reset)
   self:SetCatBar(cfg, L["ALDOR"], 24, reset);
   self:SetCatBar(cfg, L["SCRYER"], 24, reset);
   self:SetCatBar(cfg, L["LOWER_CITY"], 24, reset);
+  self:SetCatBar(cfg, L["ARTIFACTPOWER"], 24, reset);
 
   self:SetCatBar(cfg, L["AHN_QIRAJ"], 23, reset);
   self:SetCatBar(cfg, L["NETHERWING"], 23, reset);
+  self:SetCatBar(cfg, L["ARTIFACTRELIC"], 23, reset);
 
   self:SetCatBar(cfg, L["BLACKWING_LAIR"], 22, reset);
   self:SetCatBar(cfg, L["DARKMOON_FAIRE"], 22, reset);
@@ -3534,21 +3536,4 @@ function TBag:FixMenuFrameLevels()
       end
     end
   end
-end
-
--- Shit to bypass FluidFrames (Hook), very inefficient but FF works in this way.
--- Original version borrowed from EngBags 1.25 and then the current hooksecurefunc
--- method from sag_ich_nicht.
-if (FluidFrames ~= nil) then
-  hooksecurefunc(FluidFrames, "InitTempDraggableFrames",
-    function()
-      local titleRegion = TInvFrame:GetTitleRegion();
-      if (titleRegion ~= nil) then
-        titleRegion:ClearAllPoints();
-      end
-      titleRegion = TBnkFrame:GetTitleRegion();
-      if (titleRegion ~= nil) then
-        titleRegion:ClearAllPoints();
-      end
-    end)
 end

@@ -162,6 +162,8 @@ L["CURE"] = "HEILUNG"
 L["EXPLOSIVES"] = "EXPLOSIV"
 L["HEARTH"] = "RUHE"
 L["MISC"] = "VERSCHIEDENES"
+L["ARTIFACTPOWER"] = "ARTEFAKTMACHT"
+L["ARTIFACTRELIC"] = "ARTEFAKTRELIKT"
 L["UNKNOWN"] = "UNBEKANNT"
 
 -- Faction and Collectable Categories.
@@ -851,3 +853,7 @@ L["Use: Upgrade a follower's"] = "Benutzen: Wertet die .* eines Anh\195\164ngers
 L["Use: Equip a follower with"] = "Benutzen: R\195\188stet einen Anh\195\164nger mit"
 L["Use: Reroll the abilities and traits on a follower"] = "Benutzen: W\195\188rfelt die F\195\164higkeiten und Eigenschaften eines Anh\195\164ngers neu aus"
 L["Use: Teaches a follower the"] = "L\195\164sst einen Anh\195\164nger die"
+L["Naval Equipment"] = "Marineausstattung"
+L["Champion Equipment"] = "Championausr\195\188stung"
+L["Artifact Relic"] = "Artefaktrelikt"
+L["Artifact Power"] = "Artefaktmacht"

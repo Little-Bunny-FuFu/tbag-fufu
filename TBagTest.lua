@@ -64,7 +64,7 @@ local tests = {
 
   -- Glyphs
   [43673] = L["GRAY_ITEMS"],
-  [40912] = L["MISC"], -- should be GRAY_ITEMS
+  [40912] = L["GRAY_ITEMS"],
 
   -- Hearthstones
   [6948] = L["HEARTH"],
@@ -115,6 +115,8 @@ local tests = {
   [118354] = L["FOLLOWERS"],
   [118475] = L["FOLLOWERS"],
   [118474] = L["FOLLOWERS"],
+  [127882] = L["FOLLOWERS"],
+  [140582] = L["FOLLOWERS"],
 
   -- Minipets
   [4401] = L["MINIPET"],
@@ -403,6 +405,10 @@ local tests = {
 
   -- Lower City
   [25719] = L["LOWER_CITY"],
+
+  -- Artifact
+  [143701] = L["ARTIFACTRELIC"],
+  [140176] = L["ARTIFACTPOWER"],
 
   -- Trinket
   [28830] = L["TRINKET"],

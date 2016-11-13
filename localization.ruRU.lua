@@ -164,6 +164,8 @@ L["CURE"] = "ЛЕЧЕНИЕ"
 L["EXPLOSIVES"] = "ВЗРЫВЧАТКА"
 L["HEARTH"] = "ЗДОРОВЬЕ"
 L["MISC"] = "РАЗНОЕ"
+L["ARTIFACTPOWER"] = false
+L["ARTIFACTRELIC"] = false
 L["UNKNOWN"] = "НЕИЗВЕСТНО"
 
 -- Faction and Collectable Categories.
@@ -851,3 +853,7 @@ L["Use: Upgrade a follower's"] = false
 L["Use: Equip a follower with"] = false
 L["Use: Reroll the abilities and traits on a follower"] = false
 L["Use: Teaches a follower the"] = false
+L["Naval Equipment"] = false
+L["Champion Equipment"] = false
+L["Artifact Relic"] = false
+L["Artifact Power"] = false

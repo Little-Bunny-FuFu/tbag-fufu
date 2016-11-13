@@ -208,6 +208,8 @@ L["CURE"] = true
 L["EXPLOSIVES"] = true
 L["HEARTH"] = true
 L["MISC"] = true
+L["ARTIFACTPOWER"] = true
+L["ARTIFACTRELIC"] = true
 L["UNKNOWN"] = true
 
 -- Faction and Collectable Categories.
@@ -895,3 +897,7 @@ L["Use: Upgrade a follower's"] = true
 L["Use: Equip a follower with"] = true
 L["Use: Reroll the abilities and traits on a follower"] = true
 L["Use: Teaches a follower the"] = true
+L["Naval Equipment"] = true
+L["Champion Equipment"] = true
+L["Artifact Relic"] = true
+L["Artifact Power"] = true

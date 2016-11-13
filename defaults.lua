@@ -95,6 +95,8 @@ TBag.DefaultSearchList = {
   { L["FOLLOWERS"], L[""], L["Use: Equip a follower with"], L[""], L[""] },
   { L["FOLLOWERS"], L[""], L["Use: Reroll the abilities and traits on a follower"], L[""], L[""] },
   { L["FOLLOWERS"], L[""], L["Use: Teaches a follower the"], L[""], L[""] },
+  { L["FOLLOWERS"], L[""], L["Naval Equipment"], L[""], L[""] },
+  { L["FOLLOWERS"], L[""], L["Champion Equipment"], L[""], L[""] },
   { L["AHN_QIRAJ"], L[""], L["%a+ Scarab"], L["Quest"], L[""] },
   { L["AHN_QIRAJ"], L[""], L["%a+ Idol"], L["Quest"], L[""] },
   { L["AHN_QIRAJ"], L[""], L["Qiraji %a+ %a+"], L["Quest"], L[""] },
@@ -140,6 +142,8 @@ TBag.DefaultSearchList = {
   { L["ALDOR"], L[""], L["Holy Dust"], L["Consumable"], L[""]},
   { L["ALDOR"], L[""], L["Mark of the Illidari"], L["Miscellaneous"], L[""]},
   { L["LOWER_CITY"], L[""], L["Arakkoa Feather"], L["Quest"], L[""]},
+  { L["ARTIFACTRELIC"], L[""], L["Artifact Relic"], L[""], L[""]},
+  { L["ARTIFACTPOWER"], L[""], L["Artifact Power"], L[""], L[""]},
 
   { string.format(L["EQUIPPED_%s"],L["TRINKET"]), L["EQUIPPED"],
     L["Trinket"], L["Quest"], L[""] },
