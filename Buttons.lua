@@ -515,7 +515,7 @@ function BagButton:OnClick(button,down,drag)
   if (bag == REAGENTBANK_CONTAINER and not TBag:IsReagentBankUnlocked(mainFrame.playerid)) then
     self:SetChecked(not self:GetChecked())
     if mainFrame.atbank == 1 then
-      PlaySound("igMainMenuOption")
+      PlaySound(PlaySoundKitID and "igMainMenuOption" or SOUNDKIT.IG_MAINMENU_OPTION)
       StaticPopup_Show("CONFIRM_BUY_REAGENTBANK_TAB")
       mainFrame:UpdateBagGfx()
     end
@@ -529,7 +529,7 @@ function BagButton:OnClick(button,down,drag)
     -- Needed to make the CONFIRM_BUY_BANK_SLOT popup work right
     BankFrame.nextSlotCost = GetBankSlotCost(numSlots)
     if mainFrame.atbank == 1 then
-      PlaySound("igMainMenuOption")
+      PlaySound(PlaySoundKitID and "igMainMenuOption" or SOUNDKIT.IG_MAINMENU_OPTION)
       StaticPopup_Show("CONFIRM_BUY_BANK_SLOT")
       mainFrame:UpdateBagGfx()
     end
@@ -624,7 +624,7 @@ end
 function ColumnsButton:OnClick(button, down)
   local mainFrame = self:GetParent()
 
-  PlaySound("igMainMenuOptioncheckBoxOn")
+  PlaySound(PlaySoundKitID and "igMainMenuOptioncheckBoxOn" or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
   if self:GetText() == L["<++>"] then
     mainFrame:IncreaseColumns()
   else

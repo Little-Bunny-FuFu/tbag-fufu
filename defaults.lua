@@ -46,6 +46,7 @@ TBag.DefaultSearchList = {
   { L["MINIPET"], L[""], L["Marked Flawless Battle%-Stone"], L[""], L[""] },
   { L["MINIPET"], L[""], L["Flawless Battle%-Training Stone"], L[""], L[""] },
   { L["MINIPET"], L[""], L["Battle Pet Bandage"], L[""], L[""] },
+  { L["MINIPET"], L[""], L["Battle%-Training Stone"], L[""], L[""] },
   { L["COMBATPETS"], L[""], L["Summons a .* that will protect you for"], L["Consumable"], L[""] },
   { L["COMBATPETS"], L[""], L["Creates a .* that will fight for you"], L[""], L[""] },
   { L["COMBATPETS"], L[""], L["Tonk Controller"], L[""], L["Explosives and Devices"] },

@@ -301,7 +301,7 @@ end
 
 
 function Bank.Button_HighlightToggle_OnClick(self)
-  PlaySound("igMainMenuOptionCheckBoxOn");
+  PlaySound(PlaySoundKitID and "igMainMenuOptioncheckBoxOn" or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
   if (TBag.SrchText) then
     TBag:ClearSearch();
     if (GameTooltip:GetOwner() == TBnk_Button_HighlightToggle) then
@@ -331,7 +331,7 @@ function Bank.Button_HighlightToggle_OnClick(self)
 end
 
 function Bank.Button_ChangeEditMode_OnClick()
-  PlaySound("igMainMenuOptionCheckBoxOn");
+  PlaySound(PlaySoundKitID and "igMainMenuOptioncheckBoxOn" or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
   if (TBnkFrame.edit_mode == 0) then
     TBnkFrame.edit_mode = 1;
   else
@@ -367,7 +367,7 @@ function Bank.Button_DepositReagent_OnClick()
 end
 
 function Bank.Button_MoveLockToggle_OnClick(self)
-  PlaySound("igMainMenuOptionCheckBoxOn");
+  PlaySound(PlaySoundKitID and "igMainMenuOptioncheckBoxOn" or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
   if (TBnkFrame.cfg["moveLock"] == 0) then
     TBnkFrame.cfg["moveLock"] = 1;
     TBnkLockNorm:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Unlocked-Up");

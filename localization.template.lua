@@ -890,3 +890,4 @@ L["Naval Equipment"] = false
 L["Champion Equipment"] = false
 L["Artifact Relic"] = false
 L["Artifact Power"] = false
+L["Battle%-Training Stone"] = false

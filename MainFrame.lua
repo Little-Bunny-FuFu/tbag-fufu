@@ -93,7 +93,7 @@ function MainFrame:OnMouseDown(button)
 end
 
 function MainFrame:OnHide()
-  PlaySound("igBackPackClose")
+  PlaySound(PlaySoundKitID and "igBackPackClose" or SOUNDKIT.IG_BACKPACK_CLOSE)
   self:DragStop()
 
   -- Unhighlight any bags that are still highlighted.
@@ -116,7 +116,7 @@ function MainFrame:OnHide()
 end
 
 function MainFrame:OnShow()
-  PlaySound("igBackPackOpen")
+  PlaySound(PlaySoundKitID and "igBackPackOpen" or SOUNDKIT.IG_BACKPACK_OPEN)
 
   -- Always default to the current player
   self:SetPlayer(TBag.PLAYERID)

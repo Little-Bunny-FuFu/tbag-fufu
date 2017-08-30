@@ -901,3 +901,4 @@ L["Naval Equipment"] = true
 L["Champion Equipment"] = true
 L["Artifact Relic"] = true
 L["Artifact Power"] = true
+L["Battle%-Training Stone"] = true

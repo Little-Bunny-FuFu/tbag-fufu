@@ -266,7 +266,7 @@ function Inv:UpdateBagGfx()
 end
 
 function Inv.Button_HighlightToggle_OnClick(self)
-  PlaySound("igMainMenuOptionCheckBoxOn");
+  PlaySound(PlaySoundKitID and "igMainMenuOptioncheckBoxOn" or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
   if (TBag.SrchText) then
     TBag:ClearSearch();
     if (GameTooltip:GetOwner() == TInv_Button_HighlightToggle) then
@@ -296,7 +296,7 @@ function Inv.Button_HighlightToggle_OnClick(self)
 end
 
 function Inv.Button_ChangeEditMode_OnClick()
-  PlaySound("igMainMenuOptionCheckBoxOn");
+  PlaySound(PlaySoundKitID and "igMainMenuOptioncheckBoxOn" or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
   if (TInvFrame.edit_mode == 0) then
     TInvFrame.edit_mode = 1;
   else
@@ -328,7 +328,7 @@ function Inv.Button_ShowBank_OnClick()
 end
 
 function Inv.Button_MoveLockToggle_OnClick(self)
-  PlaySound("igMainMenuOptionCheckBoxOn");
+  PlaySound(PlaySoundKitID and "igMainMenuOptioncheckBoxOn" or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
   if (TInvFrame.cfg["moveLock"] == 0) then
     TInvFrame.cfg["moveLock"] = 1;
     TInvLockNorm:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Unlocked-Up");
