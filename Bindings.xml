@@ -3,7 +3,7 @@
   <Binding name="TFuINV_TOGGLE" header="TFuBag" category="ADDONS">
     TFuInvFrame:Toggle();
   </Binding>
-  <Binding name="TFuBNK_TOGGLE" header="TFuBag" category="ADDONS">
+  <Binding name="TFuBNK_TOGGLE" category="ADDONS">
     TFuBnkFrame:Toggle();
   </Binding>
 </Bindings>

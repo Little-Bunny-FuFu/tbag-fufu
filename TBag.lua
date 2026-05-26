@@ -2195,12 +2195,10 @@ function TFuBag:MakeToolTipStr(playerid, itemlink, bag, slot, mailitem, attach, 
   end
 
   if (not tt) then
-    tt = CreateFrame("GameTooltip","TFuBag_tt");
-    -- Allow tooltip set methods to dynamically add new lines based on these
-    tt:AddFontStrings(
-      tt:CreateFontString("$parentTextLeft1", nil, "GameTooltipText"),
-      tt:CreateFontString("$parentTextRight1", nil, "GameTooltipText")
-    );
+    -- 12.0: inherit GameTooltipTemplate so the Set* item methods (SetBagItem,
+    -- SetInventoryItem, ...) exist on this scanning tooltip. The manual
+    -- AddFontStrings is then unnecessary (the template provides the lines).
+    tt = CreateFrame("GameTooltip","TFuBag_tt", nil, "GameTooltipTemplate");
   end
   tt:SetOwner(UIParent, "ANCHOR_NONE");  -- this makes sure that tooltip.valid = true
   tt:ClearLines();

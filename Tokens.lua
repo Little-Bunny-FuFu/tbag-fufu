@@ -9,12 +9,8 @@ function Tokens.GetItemStringFromCurrencyIndex(index)
   local tt = TFuBag_tt
 
   if (not tt) then
-    tt = CreateFrame("GameTooltip","TFuBag_tt")
-    -- Allow tooltip set methods to dynamically add new lines based on these
-    tt:AddFontStrings(
-      tt:CreateFontString("$parentTextLeft1", nil, "GameTooltipText"),
-      tt:CreateFontString("$parentTextRight1", nil, "GameTooltipText")
-    )
+    -- 12.0: inherit GameTooltipTemplate so the Set* methods exist (see TBag.lua).
+    tt = CreateFrame("GameTooltip","TFuBag_tt", nil, "GameTooltipTemplate")
   end
   tt:SetOwner(UIParent, "ANCHOR_NONE")  -- this makes sure that tooltip.valid = true
   tt:ClearLines()
