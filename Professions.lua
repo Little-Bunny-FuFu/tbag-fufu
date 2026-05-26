@@ -4,9 +4,6 @@ local _G = getfenv(0)
 local TFuBag = _G.TFuBag
 local L = TFuBag.LOCALE
 
-local GetTradeSkillCategoryFilter = C_TradeSkillUI.GetCategories
-local SetTradeSkillCategoryFilter = C_TradeSkillUI.SetRecipeCategoryFilter
-
 -- Constants used throughout the addon
 TFuBag.S_TRADES  = "trades"
 TFuBag.S_SECOND  = "second"
@@ -22,12 +19,12 @@ local Professions = TFuBag.Professions
 -- Current DB Version
 Professions.DB_VERSION = 2
 
--- 12.0: the recipe/reagent keyword scan (ScanRecipes) is built on the old
--- GetTradeSkill*/SetTradeSkill*/TradeSkillOnlyShowMakeable frame API, which was
--- removed. Gated off until rewritten against C_TradeSkillUI. While off the
--- created/reagent caches just stay empty and the keyword consumers
--- (MakeTradeCreationKeywords / MakeTradeReagentKeywords) iterate nothing.
-Professions.RECIPE_SCAN_ENABLED = false
+-- 12.0: recipe/reagent keyword scan rewritten against C_TradeSkillUI (the old
+-- GetTradeSkill*/SetTradeSkill* frame API it used was removed). Set false to
+-- disable the TRADE_SKILL_SHOW scan; the keyword consumers
+-- (MakeTradeCreationKeywords / MakeTradeReagentKeywords) then just iterate an
+-- empty cache and add no profession keywords.
+Professions.RECIPE_SCAN_ENABLED = true
 
 -- Trade type breakdowns
 Professions.trades = {
@@ -72,30 +69,6 @@ function TFuBag:SetItemLink(arr, itemlink)
   local itemid = TFuBag:GetItemID(itemlink)
   if itemid ~= "" then
     arr[itemid] = 1
-  end
-end
-
-function Professions:SetReagentLink(arr, itemlink, trade, reagentlink)
-  local itemid = TFuBag:GetItemID(itemlink)
-  local reagentid = TFuBag:GetItemID(reagentlink)
-
-  -- Allow enchant links.  They'll differ in the table by being
-  -- prefixed by enchant: rather than just being a numeric id.
-  if (itemid == "") then
-    local enchantlink = itemlink:match("(enchant:%d+)[:|]")
-    if enchantlink then
-      itemid = enchantlink
-    end
-  end
-
-  if itemid ~= "" and reagentid ~= "" and trade ~= "" then
-    if not arr then
-      arr = {}
-      arr[TFuBag.S_VERSION] = self.DB_VERSION
-    end
-    arr[reagentid] = arr[reagentid] or {}
-    arr[reagentid][trade] = arr[reagentid][trade] or {}
-    arr[reagentid][trade][itemid] = 1
   end
 end
 
@@ -235,122 +208,62 @@ function Professions:ScanAllTradeRanks()
 end
 
 
-local function trade_skill_tooltip_scan(i, j)
-  local tt = TFuBag_tt
-
-  if (not tt) then
-    tt = CreateFrame("GameTooltip","TFuBag_tt")
-    -- Allow tooltip set methods to dynamically add new lines based on these
-    tt:AddFontStrings(
-      tt:CreateFontString("$parentTextLeft1", nil, "GameTooltipText"),
-      tt:CreateFontString("$parentTextRight1", nil, "GameTooltipText")
-    )
-  end
-  tt:SetOwner(UIParent, "ANCHOR_NONE")  -- this makes sure that tooltip.valid = true
-  tt:ClearLines()
-
-  tt:SetTradeSkillItem(i, j)
-  local _,link = tt:GetItem()
-  return link
-end
-
-local function add_craft(created, reagent, tradeskillName, i)
-  -- Note we can't use GetTradeSkillItemLink() or GetTradeSkillReagentItemLink()
-  -- because it will return nil if the item is already cached.  We can use the
-  -- tooltip because it'll give us enough of the link to get what we want.
-  local craftItemLink = trade_skill_tooltip_scan(i)
-  if not craftItemLink then return end
-  TFuBag:SetItemLink(created, craftItemLink)
-
-  for j = 1, C_TradeSkillUI.GetRecipeNumReagents(i) do
-    local reagentItemLink = trade_skill_tooltip_scan(i, j)
-    if reagentItemLink then
-      Professions:SetReagentLink(reagent, craftItemLink, tradeskillName, reagentItemLink)
-    end
-  end
-end
-
-local function get_count(...)
-  return select('#', ...)
-end
-
-local function process_skill_line(i, numTradeSkills, created, reagent, tradeskillName)
-  local craftName, craftType, numAvailable, isExpanded = GetTradeSkillInfo(i)
-  if craftType == "header" or craftType == "subheader" then
-    if not isExpanded then
-      ExpandTradeSkillSubClass(i)
-      local skillsUnderHeader = GetNumTradeSkills() - numTradeSkills
-      for j = i+1, i+skillsUnderHeader do
-        process_skill_line(j, numTradeSkills+skillsUnderHeader, created, reagent, tradeskillName)
-      end
-      CollapseTradeSkillSubClass(i)
-    end
-  else
-    add_craft(created, reagent, tradeskillName, i)
-  end
-end
-
 function Professions.ScanRecipes()
-  -- 12.0: gated off — the old GetTradeSkill* frame API below is gone. See
-  -- Professions.RECIPE_SCAN_ENABLED above.
   if not Professions.RECIPE_SCAN_ENABLED then return end
 
-  -- Get the name of the tradeskill and reverse it to enUS
-  local tradeskillName = RL[C_TradeSkillUI.GetTradeSkillLine()]
+  -- 12.0 rewrite: walk the open profession's recipes via C_TradeSkillUI (the old
+  -- GetTradeSkill* window-scrape API is gone) and record, keyed by English
+  -- profession name: every item the profession creates (created cache) and every
+  -- item used as a Basic reagent (reagent cache). The cache shape is unchanged so
+  -- MakeTradeCreationKeywords / MakeTradeReagentKeywords stay untouched. Keys are
+  -- tostring(itemID) to match TFuBag:GetItemID(), which returns the id as a string.
+  local info = C_TradeSkillUI.GetBaseProfessionInfo()
+  if not info then return end
+  -- GetBaseProfessionInfo().professionName is the base name (e.g. "Tailoring"),
+  -- which RL reverses to English. If that ever maps to an expansion-specific name
+  -- instead, fall back to the skill line's parentProfessionName (the canonical
+  -- base-name field, per C_TradeSkillUI.GetProfessionInfoBySkillLineID).
+  local tradeskillName = RL[info.professionName]
+  if not tradeskillName and info.professionID then
+    local lineInfo = C_TradeSkillUI.GetProfessionInfoBySkillLineID(info.professionID)
+    if lineInfo and lineInfo.parentProfessionName then
+      tradeskillName = RL[lineInfo.parentProfessionName]
+    end
+  end
+  if not tradeskillName then return end
 
-  if tradeskillName then
-    -- Then save to the global item cache
-    local created = Professions:GetTradeCreated(tradeskillName)
-    local reagent = Professions:GetReagents()
+  local created = Professions:GetTradeCreated(tradeskillName)
+  local reagent = Professions:GetReagents()
 
-    -- Save the current filters
-    local numInvFilters = get_count(GetTradeSkillInvSlots())
-    local numSubClasses = get_count(GetTradeSkillSubClasses())
-    local saveInvFilter, saveClassFilter, saveMakeable
-    for i = 0, numInvFilters do
-      if GetTradeSkillInvSlotFilter(i) then
-        saveInvFilter = i
-        break
+  -- GetAllRecipeIDs ignores UI search/category filters; GetFilteredRecipeIDs is
+  -- the documented fallback if the former is ever absent.
+  local recipeIDs = (C_TradeSkillUI.GetAllRecipeIDs and C_TradeSkillUI.GetAllRecipeIDs())
+                    or C_TradeSkillUI.GetFilteredRecipeIDs()
+  if not recipeIDs then return end
+
+  for _, recipeID in ipairs(recipeIDs) do
+    local ri = C_TradeSkillUI.GetRecipeInfo(recipeID)
+    if ri and ri.learned then
+      local schematic = C_TradeSkillUI.GetRecipeSchematic(recipeID, false)
+      local outputID = schematic and schematic.outputItemID
+      if outputID then
+        local createdKey = tostring(outputID)
+        created[createdKey] = 1
+
+        for _, slot in ipairs(schematic.reagentSlotSchematics) do
+          if slot.reagentType == Enum.CraftingReagentType.Basic then
+            for _, r in ipairs(slot.reagents) do
+              if r.itemID then
+                local reagentKey = tostring(r.itemID)
+                reagent[reagentKey] = reagent[reagentKey] or {}
+                reagent[reagentKey][tradeskillName] = reagent[reagentKey][tradeskillName] or {}
+                reagent[reagentKey][tradeskillName][createdKey] = 1
+              end
+            end
+          end
+        end
       end
     end
-    for i = 0, numSubClasses do
-      if GetTradeSkillCategoryFilter(i) then
-        saveClassFilter = i
-        break
-      end
-    end
-    local saveNameFilter = GetTradeSkillItemNameFilter()
-    local saveMinLevel, saveMaxLevel = GetTradeSkillItemLevelFilter()
-
-    -- Wipe the current filters
-    SetTradeSkillInvSlotFilter(0, 1, 1)
-    SetTradeSkillCategoryFilter(0, 1, 1)
-    SetTradeSkillItemLevelFilter(0, 0)
-    SetTradeSkillItemNameFilter("")
-
-    -- Detect if the OnlyShowMakeable flag was set based on the number of
-    -- trade skills we get.  Since there's no query function for this we
-    -- have to guess if it's there.
-    local origNumTradeSkills = GetNumTradeSkills()
-    TradeSkillOnlyShowMakeable(false)
-    local numTradeSkills = GetNumTradeSkills()
-    if numTradeSkills > origNumTradeSkills then
-      saveMakeable = true
-    else
-      saveMakeable = false
-    end
-
-    -- Iterate the trade skills
-    for i = 1, numTradeSkills do
-      process_skill_line(i, numTradeSkills, created, reagent, tradeskillName)
-    end
-
-    -- Restore the saved filters
-    SetTradeSkillItemNameFilter(saveNameFilter or "")
-    SetTradeSkillItemLevelFilter(saveMinLevel, saveMaxLevel)
-    SetTradeSkillInvSlotFilter(saveInvFilter, 1, 1)
-    SetTradeSkillCategoryFilter(saveClassFilter, 1, 1)
-    TradeSkillOnlyShowMakeable(saveMakeable)
   end
 end
 
