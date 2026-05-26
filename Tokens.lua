@@ -162,5 +162,9 @@ function Tokens.Enable()
   hooksecurefunc("BackpackTokenFrame_Update",Tokens.Hook)
 end
 
-TokenFramePopupBackpackCheckBoxText:SetText(L["Show on TBag"])
+-- TokenFramePopupBackpackCheckBoxText is gone in 12.0 (currency UI reworked);
+-- guard so this load-scope line doesn't error. Token integration TBD in revival.
+if TokenFramePopupBackpackCheckBoxText then
+  TokenFramePopupBackpackCheckBoxText:SetText(L["Show on TBag"])
+end
 TOKEN_SHOW_ON_BACKPACK = L["Checking this option will allow you to track this currency type in TBag for this character.\n\nYou can also Shift-click a currency to add or remove it from being tracked in TBag."]

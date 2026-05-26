@@ -21,7 +21,7 @@
     </Size>
   </Frame>
 
-  <Frame name="TFuBag_BarFrameTemplate" toplevel="false" frameStrata="MEDIUM" movable="false" enableMouse="false" hidden="true" virtual="true">
+  <Frame name="TFuBag_BarFrameTemplate" inherits="BackdropTemplate" toplevel="false" frameStrata="MEDIUM" movable="false" enableMouse="false" hidden="true" virtual="true">
     <Size><AbsDimension x="200" y="46"/></Size>
     <Anchors>
       <Anchor point="BOTTOMRIGHT">
@@ -31,17 +31,19 @@
       </Anchor>
     </Anchors>
 
-    <Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
-      <EdgeSize>
-        <AbsValue val="4"/>
-      </EdgeSize>
-      <TileSize>
-        <AbsValue val="4"/>
-      </TileSize>
-      <BackgroundInsets>
-        <AbsInset left="2" right="2" top="2" bottom="2"/>
-      </BackgroundInsets>
-    </Backdrop>
+    <!-- Inline <Backdrop> was removed from XML in 9.0; set it via the 12.0
+         BackdropTemplate mixin instead. inherit="append" keeps the template's
+         own OnLoad (mixin setup) running first. -->
+    <Scripts>
+      <OnLoad inherit="append">
+        self:SetBackdrop({
+          bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+          edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+          tile = true, tileSize = 4, edgeSize = 4,
+          insets = { left = 2, right = 2, top = 2, bottom = 2 },
+        })
+      </OnLoad>
+    </Scripts>
   </Frame>
 
   <Frame name="TFuBag_UserDropdownTemplate" inherits="UIDropDownMenuTemplate" enableMouse="true" virtual="true">

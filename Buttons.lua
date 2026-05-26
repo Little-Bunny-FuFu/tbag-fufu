@@ -428,12 +428,16 @@ function BagButton:OnLoad()
 
   -- Stock frame from ItemButtonTemplate is used here for
   -- the counts on the bag.  Adjust it to center the numbers.
-  local stock = _G[self:GetName().."Stock"]
-  stock:SetFont("Fonts\\ARIALN.TTF", 18, "OUTLINE")
-  stock:SetJustifyH("CENTER")
-  stock:ClearAllPoints()
-  stock:SetAllPoints()
-  stock:Show()
+  -- The old ItemButtonTemplate "$parentStock" fontstring is gone in 12.0; fall
+  -- back to the modern Count element and no-op if neither exists.
+  local stock = _G[self:GetName().."Stock"] or _G[self:GetName().."Count"] or self.Count
+  if stock then
+    stock:SetFont("Fonts\\ARIALN.TTF", 18, "OUTLINE")
+    stock:SetJustifyH("CENTER")
+    stock:ClearAllPoints()
+    stock:SetAllPoints()
+    stock:Show()
+  end
 end
 
 function BagButton:OnEnter()

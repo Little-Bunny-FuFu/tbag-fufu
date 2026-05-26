@@ -7,11 +7,11 @@ local self = TFuBag
 
 TFuBag.VERSION = '@project-version@'
 if TFuBag.VERSION  == "\64project-version\64" then
-  local rev = '$Rev$'
-  local date = '$Date$'
-  local dev = '-Alpha'
-  local short_date = string.gsub(string.sub(date, string.find(date, '%d+-%d+-%d+')),'-','')
-  TFuBag.VERSION = short_date..'-r'..string.sub(rev, string.find(rev, '%d+'))..dev..'-Shefki'
+  -- Unpackaged source build: the old SVN $Date$/$Rev$ keywords are no longer
+  -- substituted in this git fork, so parsing them errored (string.find -> nil
+  -- -> string.sub bad argument), aborting the whole TBag.lua chunk at load.
+  -- Use a static dev version instead.
+  TFuBag.VERSION = "fufu-dev"
 end
 
 
