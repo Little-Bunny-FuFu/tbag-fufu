@@ -21,6 +21,7 @@ if C then
   PickupContainerItem      = C.PickupContainerItem
   SplitContainerItem       = C.SplitContainerItem
   UseContainerItem         = C.UseContainerItem
+  ContainerIDToInventoryID = C.ContainerIDToInventoryID
 
   -- 8.0+: GetContainerItemInfo returns a ContainerItemInfo struct instead of
   -- positional values. Re-expose the Legion positional order TBag reads.
