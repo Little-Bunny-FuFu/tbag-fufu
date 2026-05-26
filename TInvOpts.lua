@@ -35,7 +35,19 @@ function TFuInv_Opts_ControlValueChanged(this,v)
     if v and step and  step > 0 then
       v = math.ceil(v / step) * step
     end
-    this.change_value_func(v, this.func_param1, this.func_param2, this.func_param3, this.func_param4);
+    -- Debounce the (heavy) change handler so dragging/clicking the slider does
+    -- not run a full UpdateWindow on every step (which hangs the game). Coalesce
+    -- rapid changes and apply once, shortly after the value stops moving. The
+    -- token ensures only the most recently scheduled call runs (trailing edge).
+    -- The live value text still updates every step (set by the OnValueChanged).
+    this.tfu_pending_value = v
+    local token = (this.tfu_change_token or 0) + 1
+    this.tfu_change_token = token
+    C_Timer.After(0.1, function()
+      if this.tfu_change_token == token then
+        this.change_value_func(this.tfu_pending_value, this.func_param1, this.func_param2, this.func_param3, this.func_param4);
+      end
+    end)
   end
   return v
 end

@@ -318,6 +318,10 @@ function TFuBag:EnableLine(frame, optsframename, lineheight, sliderheight, eleme
         tmpframe_text = _G[tmpframe:GetName().."_disp_text"];
         tmpframe:SetMinMaxValues(e["minValue"], e["maxValue"]);
         tmpframe:SetValueStep(e["valueStep"]);
+        -- Snap drags to the step. Without this, dragging fires OnValueChanged on
+        -- every pixel (each doing a full UpdateWindow -> hang), the thumb desyncs
+        -- from the stepped value, and binary (0/1) sliders rest at fractions.
+        tmpframe:SetObeyStepOnDrag(true);
         tmpframe:SetValue( e["defaultValue"](e["param1"], e["param2"], e["param3"], e["param4"]) );
         tmpframe_text:SetText( tmpframe:GetValue() );
         tmpframe_text:SetJustifyH("LEFT");
