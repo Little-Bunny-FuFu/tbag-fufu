@@ -349,9 +349,12 @@ function TFuBag:EnableLine(frame, optsframename, lineheight, sliderheight, eleme
           tmpframe:SetJustifyH("LEFT");
         end
         if (e["alignv"] ~= nil) then
-          tmpframe:SetJustifyV(e["alignv"]); -- valid values: TOP, BOTTOM,  CENTER?
+          local alignv = e["alignv"]
+          -- 12.0: SetJustifyV rejects "CENTER" (vertical justify uses MIDDLE).
+          if alignv == "CENTER" then alignv = "MIDDLE" end
+          tmpframe:SetJustifyV(alignv); -- valid values: TOP, BOTTOM, MIDDLE
         else
-          tmpframe:SetJustifyV("CENTER");
+          tmpframe:SetJustifyV("MIDDLE");
         end
         if (e["color"] ~= nil) then
           --tmpframe:SetVertexColor(e["color"][1], e["color"][2], e["color"][3], fade);
