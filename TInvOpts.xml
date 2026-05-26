@@ -2,22 +2,19 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
   <Script file="TInvOpts.lua"/>
 
-  <Slider name="TFuInv_SliderTemplate" orientation="HORIZONTAL" virtual="true" enableMouse="true">
+  <Slider name="TFuInv_SliderTemplate" orientation="HORIZONTAL" virtual="true" enableMouse="true" inherits="BackdropTemplate">
     <Size>
       <AbsDimension x="128" y="17"/>
     </Size>
-    <Backdrop bgFile="Interface\Buttons\UI-SliderBar-Background" edgeFile="Interface\Buttons\UI-SliderBar-Border" tile="true">
-      <EdgeSize>
-        <AbsValue val="8"/>
-      </EdgeSize>
-      <TileSize>
-        <AbsValue val="8"/>
-      </TileSize>
-      <BackgroundInsets>
-        <AbsInset left="3" right="3" top="6" bottom="6"/>
-      </BackgroundInsets>
-    </Backdrop>
     <Scripts>
+      <OnLoad inherit="append">
+        self:SetBackdrop({
+          bgFile = "Interface\\Buttons\\UI-SliderBar-Background",
+          edgeFile = "Interface\\Buttons\\UI-SliderBar-Border",
+          tile = true, tileSize = 8, edgeSize = 8,
+          insets = { left = 3, right = 3, top = 6, bottom = 6 },
+        })
+      </OnLoad>
       <OnEnter>
         local this = self or _G.this     
         if ( this.tooltipText ) then
@@ -120,7 +117,7 @@
     </Frames>
   </Frame>
 
-  <Frame name="TFuInv_OptsFrame" toplevel="true" frameStrata="MEDIUM" movable="true" enableMouse="true" hidden="true" parent="UIParent">
+  <Frame name="TFuInv_OptsFrame" toplevel="true" frameStrata="MEDIUM" movable="true" enableMouse="true" hidden="true" parent="UIParent" inherits="BackdropTemplate">
     <Size><AbsDimension x="800" y="500"/></Size>
     <Anchors>
       <Anchor point="CENTER">
@@ -129,18 +126,6 @@
         </Offset>
       </Anchor>
     </Anchors>
-
-    <Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
-      <EdgeSize>
-        <AbsValue val="8"/>
-      </EdgeSize>
-      <TileSize>
-        <AbsValue val="8"/>
-      </TileSize>
-      <BackgroundInsets>
-        <AbsInset left="2" right="2" top="2" bottom="2"/>
-      </BackgroundInsets>
-    </Backdrop>
 
     <Frames>
       <Slider name="TFuInv_OptsFrame_ScrollBar" inherits="UIPanelScrollBarTemplate">
@@ -262,8 +247,16 @@
     </Frames>
 
     <Scripts>
+      <OnLoad inherit="append">
+        self:SetBackdrop({
+          bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+          edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+          tile = true, tileSize = 8, edgeSize = 8,
+          insets = { left = 2, right = 2, top = 2, bottom = 2 },
+        })
+      </OnLoad>
       <OnMouseDown>
-        local this = self or _G.this     
+        local this = self or _G.this
         local arg1 = button or _G.arg1
         if ( arg1 == "LeftButton" ) then
           if (not this.isMoving) then

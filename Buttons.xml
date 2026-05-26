@@ -89,7 +89,7 @@
        selector keeps its visuals while staying a CheckButton (the code relies
        on Get/SetChecked). ItemAnimTemplate is also gone; keep the Model as a
        placeholder (only ItemAnimOnEvent references it, no load-time use). -->
-  <CheckButton name="TFuBag_BagButtonTemplate" virtual="true">
+  <CheckButton name="TFuBag_BagButtonTemplate" mixin="ItemButtonMixin" virtual="true">
     <Size><AbsDimension x="37" y="37"/></Size>
     <Layers>
       <Layer level="BORDER">

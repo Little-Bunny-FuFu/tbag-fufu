@@ -159,7 +159,11 @@ end
 -- Turn on the hook, we have to delay doing this until variables
 -- are loaded to avoid problems.
 function Tokens.Enable()
-  hooksecurefunc("BackpackTokenFrame_Update",Tokens.Hook)
+  -- BackpackTokenFrame_Update is removed in 12.0 (currency UI reworked); only
+  -- hook it if it still exists so Enable() doesn't error.
+  if type(BackpackTokenFrame_Update) == "function" then
+    hooksecurefunc("BackpackTokenFrame_Update",Tokens.Hook)
+  end
 end
 
 -- TokenFramePopupBackpackCheckBoxText is gone in 12.0 (currency UI reworked);

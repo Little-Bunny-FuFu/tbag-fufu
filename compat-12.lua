@@ -41,8 +41,8 @@ end
 
 -- MAX_CONTAINER_ITEMS (removed Blizzard global) was used as the fallback
 -- bag-size cap in GetBagMaxItems / CreateDummyBag; restore it generously
--- (the largest carried bag is currently ~38 slots).
-MAX_CONTAINER_ITEMS = MAX_CONTAINER_ITEMS or 40
+-- (50 matches the working TBag-Inventory-Only reference port's hardcoded cap).
+MAX_CONTAINER_ITEMS = MAX_CONTAINER_ITEMS or 50
 
 -- ---------------------------------------------------------------------------
 -- AddOn API -> C_AddOns (11.0).
@@ -100,3 +100,10 @@ if not GetBankSlotCost               then function GetBankSlotCost() return 0 en
 if not DepositReagentBank            then function DepositReagentBank() end end
 if not BankButtonIDToInvSlotID       then function BankButtonIDToInvSlotID() return 0 end end
 if not ReagentBankButtonIDToInvSlotID then function ReagentBankButtonIDToInvSlotID() return 0 end end
+
+-- Bag-slot count globals the bank/inventory loops iterate (changed/removed in
+-- 12.0). Fallbacks keep `for i=1,NUM_*` loops from erroring on nil. CloseBankFrame
+-- (called from MainFrame.lua) is stubbed only if Blizzard removed the global.
+NUM_BAG_SLOTS    = NUM_BAG_SLOTS    or NUM_TOTAL_EQUIPPED_BAG_SLOTS or 4
+NUM_BANKBAGSLOTS = NUM_BANKBAGSLOTS or 0
+if not CloseBankFrame then function CloseBankFrame() end end
