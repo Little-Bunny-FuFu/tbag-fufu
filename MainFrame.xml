@@ -28,6 +28,10 @@
           tile = true, tileSize = 4, edgeSize = 4,
           insets = { left = 2, right = 2, top = 2, bottom = 2 },
         })
+        -- Keep the window fully on-screen: prevents dragging it off the edge
+        -- (where WoW reverts the un-placed off-screen drop back to the pre-move
+        -- position) and prevents losing the window.
+        self:SetClampedToScreen(true)
         table.insert(UISpecialFrames, self:GetName())
       </OnLoad>
       <OnShow>
