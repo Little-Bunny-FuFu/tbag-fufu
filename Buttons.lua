@@ -652,7 +652,7 @@ function ColumnsButton:OnEnter()
   end
 
   GameTooltip:SetOwner(self, "ANCHOR_LEFT")
-  GameTooltip_AddNewbieTip(self, normal, 1.0, 1.0, 1.0, newbie)
+  TFuBag.NewbieTip(self, normal, 1.0, 1.0, 1.0, newbie)
 end
 
 function ColumnsButton:OnLeave()

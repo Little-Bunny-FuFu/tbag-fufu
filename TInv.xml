@@ -41,10 +41,10 @@
           </OnClick>
           <OnEnter>
             if (TFuInvFrame.cfg["moveLock"] == 0) then
-              GameTooltip_AddNewbieTip(self, TFuBag.LOCALE["Unlock Window"], 1.0, 1.0, 1.0,
+              TFuBag.NewbieTip(self, TFuBag.LOCALE["Unlock Window"], 1.0, 1.0, 1.0,
                                        TFuBag.LOCALE["Allow window to be moved by dragging it."]);
             else
-              GameTooltip_AddNewbieTip(self, TFuBag.LOCALE["Lock Window"], 1.0, 1.0, 1.0,
+              TFuBag.NewbieTip(self, TFuBag.LOCALE["Lock Window"], 1.0, 1.0, 1.0,
                                        TFuBag.LOCALE["Prevent window from being moved by dragging it."]);
             end
           </OnEnter>
@@ -89,11 +89,11 @@
           </OnClick>
           <OnEnter>
             if (TFuBag.SrchText) then
-              GameTooltip_AddNewbieTip(self, TFuBag.LOCALE["Clear Search"], 1.0, 1.0, 1.0, TFuBag.LOCALE["Stop highlighting search results."]);
+              TFuBag.NewbieTip(self, TFuBag.LOCALE["Clear Search"], 1.0, 1.0, 1.0, TFuBag.LOCALE["Stop highlighting search results."]);
             elseif (TFuInvFrame.hilight_new == 0) then
-              GameTooltip_AddNewbieTip(self, TFuBag.LOCALE["Highlight New"], 1.0, 1.0, 1.0, TFuBag.LOCALE["Highlight items marked as new."]);
+              TFuBag.NewbieTip(self, TFuBag.LOCALE["Highlight New"], 1.0, 1.0, 1.0, TFuBag.LOCALE["Highlight items marked as new."]);
             else
-              GameTooltip_AddNewbieTip(self, TFuBag.LOCALE["Normal"], 1.0, 1.0, 1.0, TFuBag.LOCALE["Stop highlighting new items."]);
+              TFuBag.NewbieTip(self, TFuBag.LOCALE["Normal"], 1.0, 1.0, 1.0, TFuBag.LOCALE["Stop highlighting new items."]);
             end
           </OnEnter>
           <OnLeave>
@@ -120,7 +120,7 @@
             TFuInvFrame.Button_ChangeEditMode_OnClick(self, button, down);
           </OnClick>
           <OnEnter>
-            GameTooltip_AddNewbieTip(self, TFuBag.LOCALE["Toggle Edit Mode"], 1.0, 1.0, 1.0, TFuBag.LOCALE["Select this option to move classes of items into different 'bars' (the red numbers)."]);
+            TFuBag.NewbieTip(self, TFuBag.LOCALE["Toggle Edit Mode"], 1.0, 1.0, 1.0, TFuBag.LOCALE["Select this option to move classes of items into different 'bars' (the red numbers)."]);
           </OnEnter>
           <OnLeave>
             GameTooltip:Hide();
@@ -147,7 +147,7 @@
             TFuInvFrame.Button_ShowBank_OnClick(self, button, down);
           </OnClick>
           <OnEnter>
-            GameTooltip_AddNewbieTip(self, TFuBag.LOCALE["Toggle Bank"], 1.0, 1.0, 1.0, TFuBag.LOCALE["Displays bank contents in a view-only mode.  You may select another player's bank to view from the dropdown."]);
+            TFuBag.NewbieTip(self, TFuBag.LOCALE["Toggle Bank"], 1.0, 1.0, 1.0, TFuBag.LOCALE["Displays bank contents in a view-only mode.  You may select another player's bank to view from the dropdown."]);
           </OnEnter>
           <OnLeave>
             GameTooltip:Hide();
@@ -173,7 +173,7 @@
             TFuInvFrame.Button_Reload_OnClick(self, button, down);
           </OnClick>
           <OnEnter>
-            GameTooltip_AddNewbieTip(self, TFuBag.LOCALE["Reload and Sort"], 1.0, 1.0, 1.0, TFuBag.LOCALE["Reloads your items and sorts them."]);
+            TFuBag.NewbieTip(self, TFuBag.LOCALE["Reload and Sort"], 1.0, 1.0, 1.0, TFuBag.LOCALE["Reloads your items and sorts them."]);
           </OnEnter>
           <OnLeave>
             GameTooltip:Hide();

@@ -271,10 +271,10 @@ function Inv.Button_HighlightToggle_OnClick(self)
     TFuBag:ClearSearch();
     if (GameTooltip:GetOwner() == TFuInv_Button_HighlightToggle) then
       if (TFuInvFrame.highlight_new == 1) then
-        GameTooltip_AddNewbieTip(self, L["Normal"], 1.0, 1.0, 1.0,
+        TFuBag.NewbieTip(self, L["Normal"], 1.0, 1.0, 1.0,
                                  L["Stop highlighting new items."]);
       else
-        GameTooltip_AddNewbieTip(self, L["Highlight New"], 1.0, 1.0, 1.0,
+        TFuBag.NewbieTip(self, L["Highlight New"], 1.0, 1.0, 1.0,
                                  L["Highlight items marked as new."]);
       end
     end
@@ -282,13 +282,13 @@ function Inv.Button_HighlightToggle_OnClick(self)
   elseif (TFuInvFrame.hilight_new == 0) then
     TFuInvFrame.hilight_new = 1;
     if (GameTooltip:GetOwner() == TFuInv_Button_HighlightToggle) then
-      GameTooltip_AddNewbieTip(self, L["Normal"], 1.0, 1.0, 1.0,
+      TFuBag.NewbieTip(self, L["Normal"], 1.0, 1.0, 1.0,
                                L["Stop highlighting new items."]);
     end
   else
     TFuInvFrame.hilight_new = 0;
     if (GameTooltip:GetOwner() == TFuInv_Button_HighlightToggle) then
-      GameTooltip_AddNewbieTip(self, L["Highlight New"], 1.0, 1.0, 1.0,
+      TFuBag.NewbieTip(self, L["Highlight New"], 1.0, 1.0, 1.0,
                                L["Highlight items marked as new."]);
     end
   end
@@ -334,7 +334,7 @@ function Inv.Button_MoveLockToggle_OnClick(self)
     TFuInvLockNorm:SetTexture("Interface\\AddOns\\tbag-fufu\\images\\LockButton-Unlocked-Up");
     TFuInvLockPush:SetTexture("Interface\\AddOns\\tbag-fufu\\images\\LockButton-Unlocked-Down");
     if (GameTooltip:GetOwner() == TFuInv_Button_MoveLockToggle) then
-      GameTooltip_AddNewbieTip(self, L["Lock Window"], 1.0, 1.0, 1.0,
+      TFuBag.NewbieTip(self, L["Lock Window"], 1.0, 1.0, 1.0,
                                L["Prevent window from being moved by dragging it."]);
     end
   else
@@ -342,7 +342,7 @@ function Inv.Button_MoveLockToggle_OnClick(self)
     TFuInvLockNorm:SetTexture("Interface\\AddOns\\tbag-fufu\\images\\LockButton-Locked-Up");
     TFuInvLockPush:SetTexture("Interface\\AddOns\\tbag-fufu\\images\\LockButton-Locked-Down");
     if (GameTooltip:GetOwner() == TFuInv_Button_MoveLockToggle) then
-      GameTooltip_AddNewbieTip(self, L["Unlock Window"], 1.0, 1.0, 1.0,
+      TFuBag.NewbieTip(self, L["Unlock Window"], 1.0, 1.0, 1.0,
                                L["Allow window to be moved by dragging it."]);
     end
   end

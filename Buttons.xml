@@ -212,10 +212,10 @@
       </OnClick>
       <OnEnter>
         if self:GetParent().cfg.moveLock == 0 then
-          GameTooltip_AddNewbieTip(self, TFuBag.LOCALE["Unlock Window"], 1.0, 1.0, 1.0,
+          TFuBag.NewbieTip(self, TFuBag.LOCALE["Unlock Window"], 1.0, 1.0, 1.0,
             TFuBag.LOCALE["Allow window to be moved by dragging it."])
         else
-          GameTooltip_AddNewbieTip(self, TFuBag.LOCALE["Lock Window"], 1.0, 1.0, 1.0,
+          TFuBag.NewbieTip(self, TFuBag.LOCALE["Lock Window"], 1.0, 1.0, 1.0,
             TFuBag.LOCALE["Prevent window from being moved by dragging it."])
         end
       </OnEnter>

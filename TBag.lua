@@ -17,6 +17,20 @@ end
 
 BINDING_HEADER_TFuBag = "TBag-fufu";
 
+-- 12.0: GameTooltip_AddNewbieTip is now a no-op stub (Blizzard kept the symbol
+-- only for Glue support), so every button OnEnter that relied on it silently
+-- showed nothing. Fork-local replacement with the SAME (frame, normal, r,g,b,
+-- newbie) arg order, so the call sites are a pure rename. Shows the title in the
+-- given color with the description wrapped beneath it.
+function TFuBag.NewbieTip(frame, normal, r, g, b, newbie)
+  GameTooltip:SetOwner(frame, "ANCHOR_RIGHT");
+  GameTooltip:SetText(normal, r, g, b);
+  if newbie then
+    GameTooltip:AddLine(newbie, 1, 1, 1, true);
+  end
+  GameTooltip:Show();
+end
+
 -----------------------------------------------------------------------
 -- General Constants
 -----------------------------------------------------------------------
