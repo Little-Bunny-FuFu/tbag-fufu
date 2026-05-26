@@ -20,7 +20,10 @@
       </Scripts>
     </Button>
 
-    <Button name="TFuBag_ItemButtonTemplate" inherits="ContainerFrameItemButtonTemplate" hidden="true" virtual="true">
+    <!-- 12.0: declare as the ItemButton intrinsic (not <Button inherits=...>) so
+         the intrinsic's children (IconTexture/Count/Stock/NormalTexture) get their
+         $parent global names; a plain <Button> only partially instantiates them. -->
+    <ItemButton name="TFuBag_ItemButtonTemplate" inherits="ContainerFrameItemButtonTemplate" hidden="true" virtual="true">
       <Size><AbsDimension x="40" y="40"/></Size>
       <Frames>
         <Button name="$parent_EditButton" inherits="TFuBag_EditButtonTemplate"/>
@@ -57,7 +60,7 @@
         TFuBag.ItemButton.OnLeave(self, motion);
       </OnLeave>
     </Scripts>
-  </Button>
+  </ItemButton>
 
   <!-- 12.0: old ItemButtonTemplate is now the "ItemButton" intrinsic; use it directly. -->
   <ItemButton name="TFuBag_BarButtonTemplate" hidden="true" virtual="true">
