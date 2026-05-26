@@ -83,7 +83,27 @@
     </Scripts>
   </ItemButton>
 
-  <CheckButton name="TFuBag_BagButtonTemplate" inherits="ItemButtonTemplate" virtual="true">
+  <!-- 12.0: ItemButtonTemplate is now the "ItemButton" intrinsic, which a
+       CheckButton cannot inherit. Replicate the item-button children (icon /
+       count / stock / normaltexture, mirroring the intrinsic) so the bag
+       selector keeps its visuals while staying a CheckButton (the code relies
+       on Get/SetChecked). ItemAnimTemplate is also gone; keep the Model as a
+       placeholder (only ItemAnimOnEvent references it, no load-time use). -->
+  <CheckButton name="TFuBag_BagButtonTemplate" virtual="true">
+    <Size><AbsDimension x="37" y="37"/></Size>
+    <Layers>
+      <Layer level="BORDER">
+        <Texture name="$parentIconTexture" parentKey="icon" setAllPoints="true"/>
+      </Layer>
+      <Layer level="ARTWORK">
+        <FontString name="$parentCount" inherits="NumberFontNormal" justifyH="RIGHT" hidden="true" parentKey="Count">
+          <Anchors><Anchor point="BOTTOMRIGHT" x="-5" y="2"/></Anchors>
+        </FontString>
+        <FontString name="$parentStock" parentKey="Stock" inherits="NumberFontNormalYellow" justifyH="LEFT" hidden="true">
+          <Anchors><Anchor point="TOPLEFT" x="0" y="-2"/></Anchors>
+        </FontString>
+      </Layer>
+    </Layers>
     <Frames>
       <Frame name="$parentSpotlight" setAllPoints="true">
         <Layers>
@@ -92,7 +112,7 @@
           </Layer>
         </Layers>
       </Frame>
-      <Model name="$parentItemAnim" inherits="ItemAnimTemplate" setAllPoints="true">
+      <Model name="$parentItemAnim" setAllPoints="true">
         <Scripts>
           <OnEvent>
             TFuBag.BagButton.ItemAnimOnEvent(self,event,...)
@@ -100,6 +120,10 @@
         </Scripts>
       </Model>
     </Frames>
+    <NormalTexture name="$parentNormalTexture" parentKey="NormalTexture" file="Interface\Buttons\UI-Quickslot2">
+      <Size><AbsDimension x="64" y="64"/></Size>
+      <Anchors><Anchor point="CENTER" x="0" y="-1"/></Anchors>
+    </NormalTexture>
     <CheckedTexture alphaMode="ADD" file="Interface\Buttons\CheckButtonHilight"/>
     <Scripts>
       <OnLoad>
