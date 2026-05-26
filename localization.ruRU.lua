@@ -11,9 +11,9 @@
 
 if GetLocale() ~= "ruRU" then return end
 
-TBag.LOCALES.ruRU = {}
-TBag.LOCALES.current = TBag.LOCALES.ruRU
-local L = TBag.LOCALE
+TFuBag.LOCALES.ruRU = {}
+TFuBag.LOCALES.current = TFuBag.LOCALES.ruRU
+local L = TFuBag.LOCALE
 
 L[""] = ""  -- Needed to preserve nil returns
 
@@ -360,7 +360,7 @@ L["tests"] = "tests"
 L["getcat"] = "getcat"
 
 -- /tbnk help text
-L["TBnk Commands:"] = "TBnk команды сумок банка"
+L["TFuBnk Commands:"] = "TFuBnk команды сумок банка"
 L[" /tbnk show  -- open window"] = " /tbnk show -- открыть окно"
 L[" /tbnk hide  -- hide window"] = " /tbnk hide -- скрыть окно"
 L[" /tbnk update  -- refresh the window"] = " /tbnk update -- обновить окно"
@@ -373,7 +373,7 @@ L[" /tbnk printchars -- prints a list of all the chars with cached info"] = " /t
 L[" /tbnk deletechar CHAR SERVER -- clears all cached info for character "] = " /tbnk deletechar ПЕРСОНАЖ СЕРВЕР -- удалить данные об персонаже"
 
 -- /tinv help text
-L["TInv Commands:"] = "TInv команды сумок(не банка)"
+L["TFuInv Commands:"] = "TFuInv команды сумок(не банка)"
 L[" /tinv show  -- open window"] = " /tbnv show -- открыть окно"
 L[" /tinv hide  -- hide window"] = " /tinv hide -- скрыть окно"
 L[" /tinv update  -- refresh the window"] = " /tinv update -- обновить окно"

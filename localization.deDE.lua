@@ -9,9 +9,9 @@
 
 if GetLocale() ~= "deDE" then return end
 
-TBag.LOCALES.deDE = {}
-TBag.LOCALES.current = TBag.LOCALES.deDE
-local L = TBag.LOCALE
+TFuBag.LOCALES.deDE = {}
+TFuBag.LOCALES.current = TFuBag.LOCALES.deDE
+local L = TFuBag.LOCALE
 
 L[""] = ""  -- Needed to preserve nil returns
 
@@ -360,7 +360,7 @@ L["tests"] = "tests"
 L["getcat"] = "getcat"
 
 -- /tbnk help text
-L["TBnk Commands:"] = "TBnk Kommandos"
+L["TFuBnk Commands:"] = "TFuBnk Kommandos"
 L[" /tbnk show  -- open window"] = " /tbnk show  -- \195\150ffne Fenster"
 L[" /tbnk hide  -- hide window"] = " /tbnk hide  -- Verstecke Fenster"
 L[" /tbnk update  -- refresh the window"] = " /tbnk update  -- Fenster neu laden"
@@ -373,7 +373,7 @@ L[" /tbnk printchars -- prints a list of all the chars with cached info"] = " /t
 L[" /tbnk deletechar CHAR SERVER -- clears all cached info for character "] = " /tbnk deletechar CHAR SERVER -- L\195\182scht die gespeicherten Daten f\195\188r den gew\195\164hlten Charakter "
 
 -- /tinv help text
-L["TInv Commands:"] = "TInv Kommandos:"
+L["TFuInv Commands:"] = "TFuInv Kommandos:"
 L[" /tinv show  -- open window"] = " /tinv show  -- \195\150ffne Fenster"
 L[" /tinv hide  -- hide window"] = " /tinv hide  -- Verstecke Fenster"
 L[" /tinv update  -- refresh the window"] = " /tinv update  -- Fenster neu laden"

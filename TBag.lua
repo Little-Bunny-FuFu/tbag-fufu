@@ -1,136 +1,136 @@
 -- $Id$
 
 local _G = getfenv(0)
-local TBag = _G.TBag
-local self = TBag
+local TFuBag = _G.TFuBag
+local self = TFuBag
 
 
-TBag.VERSION = '@project-version@'
-if TBag.VERSION  == "\64project-version\64" then
+TFuBag.VERSION = '@project-version@'
+if TFuBag.VERSION  == "\64project-version\64" then
   local rev = '$Rev$'
   local date = '$Date$'
   local dev = '-Alpha'
   local short_date = string.gsub(string.sub(date, string.find(date, '%d+-%d+-%d+')),'-','')
-  TBag.VERSION = short_date..'-r'..string.sub(rev, string.find(rev, '%d+'))..dev..'-Shefki'
+  TFuBag.VERSION = short_date..'-r'..string.sub(rev, string.find(rev, '%d+'))..dev..'-Shefki'
 end
 
 
-BINDING_HEADER_TBag = "TBag";
+BINDING_HEADER_TFuBag = "TFuBag";
 
 -----------------------------------------------------------------------
 -- General Constants
 -----------------------------------------------------------------------
 
-TBag.DEBUGMESSAGES = 0
+TFuBag.DEBUGMESSAGES = 0
 
 -- View switching
-TBag.PLAYERID = "";
-TBag.REALM = GetRealmName();
+TFuBag.PLAYERID = "";
+TFuBag.REALM = GetRealmName();
 
 -- Main mapping array
-TBag.BUTTONS = {};
+TFuBag.BUTTONS = {};
 
 -- GFX settings
-TBag.BAR_MAX = 32;
-TBag.MAIN_BAR = 0;
+TFuBag.BAR_MAX = 32;
+TFuBag.MAIN_BAR = 0;
 
-TBag.USERDD_WIDTH = 90;
+TFuBag.USERDD_WIDTH = 90;
 
-TBag.SORTBY_MIN = 0;
-TBag.SORTBY_NONE = 0;
-TBag.SORTBY_NORM = 1;
-TBag.SORTBY_REV = 2; -- reverses the name then sorts it:  ie:   "Potion Mana Major" vs "Major Mana Potion"
-TBag.SORTBY_MAX = 2;
+TFuBag.SORTBY_MIN = 0;
+TFuBag.SORTBY_NONE = 0;
+TFuBag.SORTBY_NORM = 1;
+TFuBag.SORTBY_REV = 2; -- reverses the name then sorts it:  ie:   "Potion Mana Major" vs "Major Mana Potion"
+TFuBag.SORTBY_MAX = 2;
 
-TBag.REQ_NONE = 0; -- when items haven't changed, or only item counts
-TBag.REQ_PART = 1; -- when items have changed location, but it's been sorted once and won't break if we don't sort again
-TBag.REQ_MUST = 2; -- it's never been sorted, the window is in an unstable state, you MUST sort.
+TFuBag.REQ_NONE = 0; -- when items haven't changed, or only item counts
+TFuBag.REQ_PART = 1; -- when items have changed location, but it's been sorted once and won't break if we don't sort again
+TFuBag.REQ_MUST = 2; -- it's never been sorted, the window is in an unstable state, you MUST sort.
 
 -- String constants
-TBag.CAT_BAR = "catbar";
-TBag.COLORS = "colors";
-TBag.CONTAINERS = "containers";
+TFuBag.CAT_BAR = "catbar";
+TFuBag.COLORS = "colors";
+TFuBag.CONTAINERS = "containers";
 
 -- Groups
-TBag.G_BAR_SORT = "bar_sort";
-TBag.G_USE_NEW  = "use_new";
-TBag.G_BAR_HIDE = "bar_hide";
+TFuBag.G_BAR_SORT = "bar_sort";
+TFuBag.G_USE_NEW  = "use_new";
+TFuBag.G_BAR_HIDE = "bar_hide";
 
 -- Used for indexing - MUST BE DISTINCT
-TBag.I_BAG       = "b";
-TBag.I_SLOT      = "s";
-TBag.I_BAGTYPE   = "bt";
-TBag.I_BAGFREE   = "bf";
-TBag.I_BAGSIZE   = "bz";
+TFuBag.I_BAG       = "b";
+TFuBag.I_SLOT      = "s";
+TFuBag.I_BAGTYPE   = "bt";
+TFuBag.I_BAGFREE   = "bf";
+TFuBag.I_BAGSIZE   = "bz";
 
-TBag.I_CAT       = "c";
-TBag.I_KEYWORD   = "k";
-TBag.I_BAR       = "r";
+TFuBag.I_CAT       = "c";
+TFuBag.I_KEYWORD   = "k";
+TFuBag.I_BAR       = "r";
 
-TBag.I_ITEMLINK  = "il";
-TBag.I_ITEMID    = "id";
-TBag.I_NAME      = "in";
-TBag.I_TYPE      = "it";
-TBag.I_SUBTYPE   = "is";
+TFuBag.I_ITEMLINK  = "il";
+TFuBag.I_ITEMID    = "id";
+TFuBag.I_NAME      = "in";
+TFuBag.I_TYPE      = "it";
+TFuBag.I_SUBTYPE   = "is";
 
-TBag.I_RARITY    = "ir";
-TBag.I_COUNT     = "ic";
-TBag.I_NEED      = "sn";
-TBag.I_SOULBOUND = "sb";
-TBag.I_ACCTBOUND = "ab";
-TBag.I_CHARGES         = "ch";
-TBag.I_LINKSUFFIX = "ls"
+TFuBag.I_RARITY    = "ir";
+TFuBag.I_COUNT     = "ic";
+TFuBag.I_NEED      = "sn";
+TFuBag.I_SOULBOUND = "sb";
+TFuBag.I_ACCTBOUND = "ab";
+TFuBag.I_CHARGES         = "ch";
+TFuBag.I_LINKSUFFIX = "ls"
 -- Reforging was removed in 6.0,
 -- entry left here commented out to remember that
 -- rf has been used
---TBag.I_REFORGE   = "rf";
-TBag.I_NOVALUE = "nv";
-TBag.I_READABLE = "rd";
-TBag.I_CRAFTINGREAGENT = "cr";
+--TFuBag.I_REFORGE   = "rf";
+TFuBag.I_NOVALUE = "nv";
+TFuBag.I_READABLE = "rd";
+TFuBag.I_CRAFTINGREAGENT = "cr";
 
 -- Quest item info
-TBag.I_QUEST_ITEM = "qi";
-TBag.I_QUEST_ID = "qd";
-TBag.I_QUEST_ACTIVE = "qa";
+TFuBag.I_QUEST_ITEM = "qi";
+TFuBag.I_QUEST_ID = "qd";
+TFuBag.I_QUEST_ACTIVE = "qa";
 
 -- Tokens
-TBag.I_HEADER = "hd";
-TBag.I_EXPAND = "ex";
-TBag.I_UNUSED = "un";
-TBag.I_WATCH  = "wa";
-TBag.I_ICON   = "io";
+TFuBag.I_HEADER = "hd";
+TFuBag.I_EXPAND = "ex";
+TFuBag.I_UNUSED = "un";
+TFuBag.I_WATCH  = "wa";
+TFuBag.I_ICON   = "io";
 
 
 -- Used in the item compression routines
-TBag.COMP_EMPTY = "e";
-TBag.COMP_ITEM = "i";
+TFuBag.COMP_EMPTY = "e";
+TFuBag.COMP_ITEM = "i";
 
 -- Used in the New mechanism
-TBag.I_TIMESTAMP = "ts";
-TBag.I_NEWSTR    = "nw";
-TBag.V_NEWON     = "newY";
-TBag.V_NEWOFF    = "newN";
-TBag.V_NEWPLUS   = "newP";
-TBag.V_NEWMINUS  = "newM";
+TFuBag.I_TIMESTAMP = "ts";
+TFuBag.I_NEWSTR    = "nw";
+TFuBag.V_NEWON     = "newY";
+TFuBag.V_NEWOFF    = "newN";
+TFuBag.V_NEWPLUS   = "newP";
+TFuBag.V_NEWMINUS  = "newM";
 
 -- Used to track slots that can't be hidden until the next resort
-TBag.FORCED_SHOW = {}
+TFuBag.FORCED_SHOW = {}
 
-TBag.STACK_BNK = 1;
-TBag.STACK_INV = 2;
+TFuBag.STACK_BNK = 1;
+TFuBag.STACK_INV = 2;
 
 -- Local graphics settings
-TBag.PAD_BOTTOM_EDIT = 30;
-TBag.PAD_BOTTOM_NORM = 30;
-TBag.PAD_BOTTOM_SEARCH = 30;
-TBag.PAD_BOTTOM_SPACER = 5;
-TBag.PAD_TOP_GFX = 63;
-TBag.PAD_TOP_NORM = 25;
-TBag.BORDER = 2;
+TFuBag.PAD_BOTTOM_EDIT = 30;
+TFuBag.PAD_BOTTOM_NORM = 30;
+TFuBag.PAD_BOTTOM_SEARCH = 30;
+TFuBag.PAD_BOTTOM_SPACER = 5;
+TFuBag.PAD_TOP_GFX = 63;
+TFuBag.PAD_TOP_NORM = 25;
+TFuBag.BORDER = 2;
 
-TBag.COOLDOWN_SCALE = 0.8;
+TFuBag.COOLDOWN_SCALE = 0.8;
 
-TBag.DBC = {  -- Default Bag Colors
+TFuBag.DBC = {  -- Default Bag Colors
   { ["r"] = 1, ["g"] = 1, ["b"] = 1, ["a"] = 1 },
   { ["r"] = 1, ["g"] = 0, ["b"] = 0, ["a"] = 1 },
   { ["r"] = 0, ["g"] = 1, ["b"] = 0, ["a"] = 1 },
@@ -142,38 +142,38 @@ TBag.DBC = {  -- Default Bag Colors
   { ["r"] = 0.4, ["g"] = 0.8, ["b"] = 1, ["a"] = 1 }
 };
 
-TBag.C_CAT  = "ffcc55ee";
-TBag.C_BAR  = "ffff3366";
-TBag.C_INST = "ff00ff7f";
+TFuBag.C_CAT  = "ffcc55ee";
+TFuBag.C_BAR  = "ffff3366";
+TFuBag.C_INST = "ff00ff7f";
 
-TBag.SCP  = "|cffcc33ccTBag: |r";
+TFuBag.SCP  = "|cffcc33ccTBag: |r";
 
 -- Assorted player info constants
-TBag.S_MONEY     = "money";
-TBag.S_BANKSLOTS = "bankS";
-TBag.S_BANKFULL  = "bankF";
-TBag.S_EQUIPPED  = "equip";
+TFuBag.S_MONEY     = "money";
+TFuBag.S_BANKSLOTS = "bankS";
+TFuBag.S_BANKFULL  = "bankF";
+TFuBag.S_EQUIPPED  = "equip";
 
-TBag.G_BASIC     = "basic";
-TBag.S_CLASS     = "class";
-TBag.S_HEARTH    = "hearth";
-TBag.S_LEVEL     = "level";
-TBag.S_FACTION   = "faction";
+TFuBag.G_BASIC     = "basic";
+TFuBag.S_CLASS     = "class";
+TFuBag.S_HEARTH    = "hearth";
+TFuBag.S_LEVEL     = "level";
+TFuBag.S_FACTION   = "faction";
 
 -- Localization Support
-local L = TBag.LOCALE;
+local L = TFuBag.LOCALE;
 
 -----------------------------------------------------------------------
 -- Main Bag and Item arrays
 -----------------------------------------------------------------------
 
-TBag.BAGMIN = REAGENTBANK_CONTAINER;
-TBag.BAGMAX = 11;
-TBag.MAX_REAGENTBANK_ITEMS = 98 -- has to be a constant since game can't tell us in time
-TBag.Inv_Bags = { BACKPACK_CONTAINER, 4, 3, 2, 1 };
+TFuBag.BAGMIN = REAGENTBANK_CONTAINER;
+TFuBag.BAGMAX = 11;
+TFuBag.MAX_REAGENTBANK_ITEMS = 98 -- has to be a constant since game can't tell us in time
+TFuBag.Inv_Bags = { BACKPACK_CONTAINER, 4, 3, 2, 1 };
 
-TBag.Bnk_Bags = { BANK_CONTAINER, REAGENTBANK_CONTAINER, 5, 6, 7, 8, 9, 10, 11 };
-TBag.Body_Slots = {
+TFuBag.Bnk_Bags = { BANK_CONTAINER, REAGENTBANK_CONTAINER, 5, 6, 7, 8, 9, 10, 11 };
+TFuBag.Body_Slots = {
   ["HeadSlot"] = 1,
   ["NeckSlot"] = 2,
   ["ShoulderSlot"] = 3,
@@ -194,7 +194,7 @@ TBag.Body_Slots = {
   ["TabardSlot"] = 19
 };
 
-TBag.D_BAG = 69;    -- A dummy bag number for search format
+TFuBag.D_BAG = 69;    -- A dummy bag number for search format
 
 --[[ New data layout:
 
@@ -204,84 +204,84 @@ TBag.D_BAG = 69;    -- A dummy bag number for search format
   itmcache[ bag ][ slot ]
     - Contains all the data we collect from the items in the bags.
     - We collect this data before sorting!
-  bar_positions[ bar_number ][ position ] = { [TBag.I_BAG]=bag, [TBag.I_SLOT]=slot }
+  bar_positions[ bar_number ][ position ] = { [TFuBag.I_BAG]=bag, [TFuBag.I_SLOT]=slot }
     - Contains the final locations in my window after sorting
-  TBag.BUTTONS[ frame_name ] = itmcache[bag][slot]
+  TFuBag.BUTTONS[ frame_name ] = itmcache[bag][slot]
 
   stackarr[itemid] = { table of itms ]
     -- has the entry to the itemcach in an array for each itemid.
 
-  comparr = { [TBag.COMP_EMPTY] = { empties }, [TBag.COMP_ITEM] = { items } }
+  comparr = { [TFuBag.COMP_EMPTY] = { empties }, [TFuBag.COMP_ITEM] = { items } }
     -- Contains two arrays.  One containing all the itm entries for empty
     -- slots in special bags and one contain all the itm entries for items
     -- that can go into one of those slots.
 --]]
 
-function TBag:Init()
+function TFuBag:Init()
   local bag;
 
   -- Set up the main arrays
-  if (TBagCfg == nil) then
-    TBagCfg = {};
-    TBagCfg["Bnk"] = {};
-    TBagCfg["Inv"] = {};
+  if (TFuBagCfg == nil) then
+    TFuBagCfg = {};
+    TFuBagCfg["Bnk"] = {};
+    TFuBagCfg["Inv"] = {};
   end
-  self:RefreshCreations(TBagCfg);
-  self:RefreshReagents(TBagCfg);
+  self:RefreshCreations(TFuBagCfg);
+  self:RefreshReagents(TFuBagCfg);
 
-  if (TBagInfo == nil) then
-    TBagInfo = {};
+  if (TFuBagInfo == nil) then
+    TFuBagInfo = {};
   end
-  if (TInvItm == nil) then
-    TInvItm = {};
+  if (TFuInvItm == nil) then
+    TFuInvItm = {};
   end
-  if (TBnkItm == nil) then
-    TBnkItm = {};
+  if (TFuBnkItm == nil) then
+    TFuBnkItm = {};
   end
-  if (TContItm == nil) then
-    TContItm = {};
+  if (TFuContItm == nil) then
+    TFuContItm = {};
   end
-  if (TBodyItm == nil) then
-    TBodyItm = {};
+  if (TFuBodyItm == nil) then
+    TFuBodyItm = {};
   end
-  if (TMailItm == nil or TMailItm[self.S_VERSION] ~= 1) then
-    TMailItm = {};
-    TMailItm[self.S_VERSION] = 1;
+  if (TFuMailItm == nil or TFuMailItm[self.S_VERSION] ~= 1) then
+    TFuMailItm = {};
+    TFuMailItm[self.S_VERSION] = 1;
   end
-  if (TTknItm == nil) then
-    TTknItm = {};
+  if (TFuTknItm == nil) then
+    TFuTknItm = {};
   end
 
   -- Set up the main player arrays
   self.PLAYERID = UnitName("player").."|"..self.REALM;
 
-  if (TBagInfo[self.PLAYERID] == nil) then
+  if (TFuBagInfo[self.PLAYERID] == nil) then
     self:InitPlayerInfo(self.PLAYERID);
   end
-  if (TInvItm[self.PLAYERID] == nil) then
-    TInvItm[self.PLAYERID] = {};
-    self:ClearItmCache(TInvItm[self.PLAYERID], self.Inv_Bags);
+  if (TFuInvItm[self.PLAYERID] == nil) then
+    TFuInvItm[self.PLAYERID] = {};
+    self:ClearItmCache(TFuInvItm[self.PLAYERID], self.Inv_Bags);
   end
-  if (TBnkItm[self.PLAYERID] == nil) then
-    TBnkItm[self.PLAYERID] = {};
-    self:ClearItmCache(TBnkItm[self.PLAYERID], self.Bnk_Bags);
+  if (TFuBnkItm[self.PLAYERID] == nil) then
+    TFuBnkItm[self.PLAYERID] = {};
+    self:ClearItmCache(TFuBnkItm[self.PLAYERID], self.Bnk_Bags);
   end
-  if (TContItm[self.PLAYERID] == nil) then
-    TContItm[self.PLAYERID] = {};
-    TContItm[self.PLAYERID][self.D_BAG] = {};
-    self:ClearItmCache(TContItm[self.PLAYERID][self.D_BAG], self.Inv_Bags);
-    self:ClearItmCache(TContItm[self.PLAYERID][self.D_BAG], self.Bnk_Bags);
+  if (TFuContItm[self.PLAYERID] == nil) then
+    TFuContItm[self.PLAYERID] = {};
+    TFuContItm[self.PLAYERID][self.D_BAG] = {};
+    self:ClearItmCache(TFuContItm[self.PLAYERID][self.D_BAG], self.Inv_Bags);
+    self:ClearItmCache(TFuContItm[self.PLAYERID][self.D_BAG], self.Bnk_Bags);
   end
-  if (TBodyItm[self.PLAYERID] == nil) then
-    TBodyItm[self.PLAYERID] = {};
-    TBodyItm[self.PLAYERID][self.D_BAG] = {};
-    self:ClearItmCache(TBodyItm[self.PLAYERID][self.D_BAG], self.Body_Slots);
+  if (TFuBodyItm[self.PLAYERID] == nil) then
+    TFuBodyItm[self.PLAYERID] = {};
+    TFuBodyItm[self.PLAYERID][self.D_BAG] = {};
+    self:ClearItmCache(TFuBodyItm[self.PLAYERID][self.D_BAG], self.Body_Slots);
   end
-  if (TMailItm[self.PLAYERID] == nil) then
-    TMailItm[self.PLAYERID] = {};
+  if (TFuMailItm[self.PLAYERID] == nil) then
+    TFuMailItm[self.PLAYERID] = {};
   end
-  if (TTknItm[self.PLAYERID] == nil) then
-    TTknItm[self.PLAYERID] = {};
+  if (TFuTknItm[self.PLAYERID] == nil) then
+    TFuTknItm[self.PLAYERID] = {};
   end
 
   -- Force the frame with negative ids to the proper value.
@@ -291,7 +291,7 @@ function TBag:Init()
 
   -- Initialize any player related info
   local group,_;
-  group = TBagInfo[self.PLAYERID][self.G_BASIC];
+  group = TFuBagInfo[self.PLAYERID][self.G_BASIC];
   _, group[self.S_CLASS] = UnitClass("player");
   group[self.S_HEARTH] = GetBindLocation();
 
@@ -306,13 +306,13 @@ end
 -- UTILITY Funcs
 -----------------------------------------------------------------------
 
-function TBag:PrintDEBUG(msg,r,g,b,frame,id,unknown4th)
+function TFuBag:PrintDEBUG(msg,r,g,b,frame,id,unknown4th)
   if ((self.DEBUGMESSAGES) == 1) then
     self:Print(msg,r,g,b,frame,id,unknown4th)
   end
 end
 
-function TBag:Print(msg,r,g,b,frame,id,unknown4th)
+function TFuBag:Print(msg,r,g,b,frame,id,unknown4th)
   if (not r) then r = 1.0; end
   if (not g) then g = 1.0; end
   if (not b) then b = 0.0; end
@@ -335,7 +335,7 @@ function TBag:Print(msg,r,g,b,frame,id,unknown4th)
   end
 end
 
-function TBag:ReverseString(strtorev,toggle)
+function TFuBag:ReverseString(strtorev,toggle)
   local out = "", s1, s2;
 
   s2 = strtorev;
@@ -357,7 +357,7 @@ function TBag:ReverseString(strtorev,toggle)
   return(out);
 end
 
-function TBag:GetSafeVal(arr, idx, val)
+function TFuBag:GetSafeVal(arr, idx, val)
   if (arr == nil) then
     return val;
   elseif (arr[idx] == nil) then
@@ -367,39 +367,39 @@ function TBag:GetSafeVal(arr, idx, val)
   end
 end
 
-function TBag:InitPlayerInfo(playerid)
-  TBagInfo[playerid] = {};
-  TBagInfo[playerid][self.S_TRADES] = {};
-  TBagInfo[playerid][self.S_SECOND] = {};
-  TBagInfo[playerid][self.S_SKILLS] = {};
+function TFuBag:InitPlayerInfo(playerid)
+  TFuBagInfo[playerid] = {};
+  TFuBagInfo[playerid][self.S_TRADES] = {};
+  TFuBagInfo[playerid][self.S_SECOND] = {};
+  TFuBagInfo[playerid][self.S_SKILLS] = {};
 
-  TBagInfo[playerid][self.G_BASIC] = {};
+  TFuBagInfo[playerid][self.G_BASIC] = {};
 end
 
-function TBag:GetPlayer(playerid)
-  if (TBagInfo[playerid] == nil) then
+function TFuBag:GetPlayer(playerid)
+  if (TFuBagInfo[playerid] == nil) then
     self:InitPlayerInfo(playerid);
   end
-  return TBagInfo[playerid];
+  return TFuBagInfo[playerid];
 end
 
-function TBag:GetPlayerInfo(playerid, name)
+function TFuBag:GetPlayerInfo(playerid, name)
   return self:GetPlayer(playerid)[name];
 end
 
-function TBag:SetPlayerInfo(playerid, name, val)
+function TFuBag:SetPlayerInfo(playerid, name, val)
   self:GetPlayer(playerid)[name] = val;
 end
 
-function TBag:GetPlayerBag(playerid, bag)
-  if (TContItm[playerid] == nil) then
-    TContItm[playerid] = {};
+function TFuBag:GetPlayerBag(playerid, bag)
+  if (TFuContItm[playerid] == nil) then
+    TFuContItm[playerid] = {};
   end
-  if (TContItm[playerid][self.D_BAG] == nil) then
-    TContItm[playerid][self.D_BAG] = {};
+  if (TFuContItm[playerid][self.D_BAG] == nil) then
+    TFuContItm[playerid][self.D_BAG] = {};
   end
 
-  local bags = TContItm[playerid][self.D_BAG];
+  local bags = TFuContItm[playerid][self.D_BAG];
   if (bags[bag] == nil) then
     bags[bag] = {
       [self.I_BAGFREE] = 0,
@@ -415,16 +415,16 @@ function TBag:GetPlayerBag(playerid, bag)
   return bags[bag];
 end
 
-function TBag:GetPlayerBagCfg(playerid, bag, name)
+function TFuBag:GetPlayerBagCfg(playerid, bag, name)
   return self:GetPlayerBag(playerid, bag)[name];
 end
 
-function TBag:SetPlayerBagCfg(playerid, bag, name, val)
+function TFuBag:SetPlayerBagCfg(playerid, bag, name, val)
 --  self:Print(playerid..", bag ="..bag..", name ="..name);
   self:GetPlayerBag(playerid, bag)[name] = val;
 end
 
-function TBag:IsReagentBankUnlocked(playerid)
+function TFuBag:IsReagentBankUnlocked(playerid)
   if (playerid == self.PLAYERID) then
     return IsReagentBankUnlocked(playerid)
   else
@@ -433,7 +433,7 @@ function TBag:IsReagentBankUnlocked(playerid)
   end
 end
 
-function TBag:SplitStr(strtosplit,splitchar)
+function TFuBag:SplitStr(strtosplit,splitchar)
   if (strtosplit) then
     local str1 = strtosplit;
     local str2 = "";
@@ -450,7 +450,7 @@ function TBag:SplitStr(strtosplit,splitchar)
   end
 end
 
-function TBag:ClearItmCache(itmcache, bagarr)
+function TFuBag:ClearItmCache(itmcache, bagarr)
   local bag;
 
   for _, bag in pairs(bagarr) do
@@ -472,7 +472,7 @@ function TBag:ClearItmCache(itmcache, bagarr)
   return itmcache;
 end
 
-function TBag:CreateDummyBag(bag, template)
+function TFuBag:CreateDummyBag(bag, template)
   local dbag = _G[self:GetDummyBagFrameName(bag)];
 
   if (dbag) then
@@ -491,7 +491,7 @@ function TBag:CreateDummyBag(bag, template)
   end
 end
 
-function TBag:CreateFrame(type, name, parent, template, num, append)
+function TFuBag:CreateFrame(type, name, parent, template, num, append)
   local idx;
   local level = parent:GetFrameLevel() + 1
   if (num) then
@@ -513,14 +513,14 @@ function TBag:CreateFrame(type, name, parent, template, num, append)
   end
 end
 
-function TBag:ResetNew(itm)
+function TFuBag:ResetNew(itm)
   if (itm) then
     itm[self.I_TIMESTAMP] = 1;
     itm[self.I_NEWSTR] = self.V_NEWOFF;
   end
 end
 
-function TBag:GetItemInfo(itemid)
+function TFuBag:GetItemInfo(itemid)
   if itemid then
     if tostring(itemid):sub(1,10) ~= "battlepet:" then
       local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, iconFileDataID = GetItemInfo(itemid);
@@ -535,7 +535,7 @@ function TBag:GetItemInfo(itemid)
   end
 end
 
-function TBag:GetItemID(itemlink)
+function TFuBag:GetItemID(itemlink)
   if itemlink and type(itemlink) == "string" then
     local a,b,c,d,e,f,g,h,i,j =
           itemlink:match("item:(%d*):(%d*):(%d*):(%d*):(%d*):(%d*):(%-?%d*):(%-?%d*):?(%d*):?([^|]*)")
@@ -554,7 +554,7 @@ function TBag:GetItemID(itemlink)
   return "", ""
 end
 
-function TBag:GetItemName(itemlink)
+function TFuBag:GetItemName(itemlink)
   if itemlink and type(itemlink) == "string" then
     local name = itemlink:match("|h%[([^%]]+)%]|h")
     return name
@@ -562,45 +562,45 @@ function TBag:GetItemName(itemlink)
   return ""
 end
 
-function TBag:CleanConfig()
-  TBagCfg["Body"] = nil;
-  TBagCfg["TInv_RegisterHooks"] = nil;
-  TBagCfg["Inv"]["show_top_gfx"] = nil;
-  TBagCfg["Inv"]["show_blizzard_frames"] = nil;
-  TBagCfg["Inv"]["show_top_graphics"] = nil;
-  TBagCfg["Bnk"]["show_top_gfx"] = nil;
-  TBagCfg["Bnk"]["show_top_graphics"] = nil;
-  TBagCfg["Bnk"]["show_blizzard_frames"] = nil;
-  TBagCfg[TBag.S_SKILLS] = nil;
-  TBagCfg[TBag.S_TRADES] = nil;
-  TBagCfg[TBag.S_SECOND] = nil;
-  for player,_ in pairs(TBagInfo) do
-    TBagInfo[player]["spell"] = nil;
-    TBagInfo[player]["combat"] = nil;
-    TBagInfo[player]["xp"] = nil;
-    TBagInfo[player]["resist"] = nil;
-    TBagInfo[player]["range"] = nil;
-    TBagInfo[player]["melee"] = nil;
-    TBagInfo[player]["stat"] = nil;
-    TBagInfo[player]["pvp"] = nil;
+function TFuBag:CleanConfig()
+  TFuBagCfg["Body"] = nil;
+  TFuBagCfg["TFuInv_RegisterHooks"] = nil;
+  TFuBagCfg["Inv"]["show_top_gfx"] = nil;
+  TFuBagCfg["Inv"]["show_blizzard_frames"] = nil;
+  TFuBagCfg["Inv"]["show_top_graphics"] = nil;
+  TFuBagCfg["Bnk"]["show_top_gfx"] = nil;
+  TFuBagCfg["Bnk"]["show_top_graphics"] = nil;
+  TFuBagCfg["Bnk"]["show_blizzard_frames"] = nil;
+  TFuBagCfg[TFuBag.S_SKILLS] = nil;
+  TFuBagCfg[TFuBag.S_TRADES] = nil;
+  TFuBagCfg[TFuBag.S_SECOND] = nil;
+  for player,_ in pairs(TFuBagInfo) do
+    TFuBagInfo[player]["spell"] = nil;
+    TFuBagInfo[player]["combat"] = nil;
+    TFuBagInfo[player]["xp"] = nil;
+    TFuBagInfo[player]["resist"] = nil;
+    TFuBagInfo[player]["range"] = nil;
+    TFuBagInfo[player]["melee"] = nil;
+    TFuBagInfo[player]["stat"] = nil;
+    TFuBagInfo[player]["pvp"] = nil;
   end
 end
 
-function TBag:BagSlotToString(bag,slot)
+function TFuBag:BagSlotToString(bag,slot)
   return bag..":"..slot
 end
 
-function TBag:StringToBagSlot(string)
+function TFuBag:StringToBagSlot(string)
   local bag,slot = strsplit(':',string)
   return tonumber(bag),tonumber(slot)
 end
 
-function TBag:EscapeNL(str)
+function TFuBag:EscapeNL(str)
   str = string.gsub(str, "\n", "\\n");
   return str
 end
 
-function TBag:UnEscapeNL(str)
+function TFuBag:UnEscapeNL(str)
   str = string.gsub(str, "\\n", "\n");
   return str
 end
@@ -625,7 +625,7 @@ local function PutItemInBank(reagent)
   end
 end
 
-function TBag:PutItemInBag(bag)
+function TFuBag:PutItemInBag(bag)
   if not CursorHasItem() then return end
   if bag == BACKPACK_CONTAINER then
     return PutItemInBackpack()
@@ -638,7 +638,7 @@ function TBag:PutItemInBag(bag)
   end
 end
 
-function TBag:IsLive(frame)
+function TFuBag:IsLive(frame)
   if frame.playerid ~= self.PLAYERID then
     return false
   end
@@ -653,14 +653,14 @@ end
 -- Searching
 -----------------------------------------------------------------------
 
-TBag.SrchText = nil;
+TFuBag.SrchText = nil;
 local SrchResults = {};
 local SC_NONE   = "|cffff1111";
 local SC_PLAYER = "|cff11ccee";
 local SC_TOTAL  = "|cffeeff11";
 local SC_WHITE  = "|cffffffff";
 
-function TBag:PlacePrep(playername,place)
+function TFuBag:PlacePrep(playername,place)
   if (place == "body") then
     return string.format(" on %s's %s",playername,place);
   elseif (place == "container") then
@@ -670,19 +670,19 @@ function TBag:PlacePrep(playername,place)
   end
 end
 
-function TBag:AddSearchResult(itm, playername, place, playerid)
+function TFuBag:AddSearchResult(itm, playername, place, playerid)
   -- Strip the unique id
   local itemstring = string.gsub(itm[self.I_ITEMLINK],
     "(item:%d+:%d+:%d+:%d+:%d+:%d+:%-?%d+):%-?%d+","%1:0",1);
   local count = itm[self.I_COUNT];
   local level = UnitLevel("player")
   if itm[self.I_ACCTBOUND] then
-    level = TBag:GetPlayerInfo(playerid,TBag.G_BASIC)[TBag.S_LEVEL]
+    level = TFuBag:GetPlayerInfo(playerid,TFuBag.G_BASIC)[TFuBag.S_LEVEL]
   end
   local itemlink = self:MakeHyperlink(itemstring,itm[self.I_NAME],itm[self.I_RARITY],level,itm[self.I_LINKSUFFIX]);
 
   if (itemlink) then
-    self:PrintDEBUG("TBag:AddSearchResult "..count.." "..itemlink
+    self:PrintDEBUG("TFuBag:AddSearchResult "..count.." "..itemlink
       ..self:PlacePrep(playername,place));
 
     -- First see if this result has been added before
@@ -700,7 +700,7 @@ function TBag:AddSearchResult(itm, playername, place, playerid)
   end
 end
 
-function TBag:GatherSearchResults(itmcache, place)
+function TFuBag:GatherSearchResults(itmcache, place)
   local playername, realm
 
   for playerid, bagarr in pairs(itmcache) do
@@ -708,7 +708,7 @@ function TBag:GatherSearchResults(itmcache, place)
 
     -- Only include results from this realm
     if (realm == self.REALM) then
-      self:PrintDEBUG("TBag:GatherSearchResults for "..playername.."'s "..place);
+      self:PrintDEBUG("TFuBag:GatherSearchResults for "..playername.."'s "..place);
       for _, slotarr in pairs(bagarr) do
         for _, itm in pairs(slotarr) do
           -- Exclude empty slots
@@ -724,7 +724,7 @@ function TBag:GatherSearchResults(itmcache, place)
   end
 end
 
-function TBag:JustifyStr(str, width, color)
+function TFuBag:JustifyStr(str, width, color)
   local length = strlen(tostring(str));
   local result = "";
   while (length < width) do
@@ -734,7 +734,7 @@ function TBag:JustifyStr(str, width, color)
   return result..color..str.."|r";
 end
 
-function TBag:DisplaySearchResult(aResult, itemlink)
+function TFuBag:DisplaySearchResult(aResult, itemlink)
   local chatframe = DEFAULT_CHAT_FRAME;
   local total = 0;
   local lines = 0;
@@ -767,7 +767,7 @@ function TBag:DisplaySearchResult(aResult, itemlink)
   end
 end
 
-function TBag:DoSearch(srch)
+function TFuBag:DoSearch(srch)
   SrchResults = {};
 
   if (srch) then
@@ -776,12 +776,12 @@ function TBag:DoSearch(srch)
     self.SrchText = string.lower(srch);
 
     -- Gather all the search info
-    self:GatherSearchResults(TInvItm, L["bags"]);
-    self:GatherSearchResults(TBnkItm, L["bank"]);
-    self:GatherSearchResults(TContItm, L["container"]);
-    self:GatherSearchResults(TBodyItm, L["body"]);
-    self:GatherSearchResults(TMailItm, L["mail"]);
-    self:GatherSearchResults(TTknItm, L["tokens"]);
+    self:GatherSearchResults(TFuInvItm, L["bags"]);
+    self:GatherSearchResults(TFuBnkItm, L["bank"]);
+    self:GatherSearchResults(TFuContItm, L["container"]);
+    self:GatherSearchResults(TFuBodyItm, L["body"]);
+    self:GatherSearchResults(TFuMailItm, L["mail"]);
+    self:GatherSearchResults(TFuTknItm, L["tokens"]);
 
     -- Sort it alphabetically
     table.sort(SrchResults);
@@ -803,25 +803,25 @@ function TBag:DoSearch(srch)
       DEFAULT_CHAT_FRAME:AddMessage(self.SCP..SC_NONE..string.format(L["No results|r for %q"],srch));
     end
 
-    TInvFrame:UpdateWindow();
-    TBnkFrame:UpdateWindow();
+    TFuInvFrame:UpdateWindow();
+    TFuBnkFrame:UpdateWindow();
   end
 end
 
-function TBag:ClearSearch()
+function TFuBag:ClearSearch()
   if (self.SrchText) then
     self.SrchText = nil;
-    TInvFrame:UpdateWindow();
-    TBnkFrame:UpdateWindow();
+    TFuInvFrame:UpdateWindow();
+    TFuBnkFrame:UpdateWindow();
   end
-  TInv_SearchBox:SetText(SEARCH);
+  TFuInv_SearchBox:SetText(SEARCH);
 end
 
 -----------------------------------------------------------------------
 -- Configuration
 -----------------------------------------------------------------------
 
-function TBag:SetDef(cfg, var, defval, reset, cleanfunc, param1, param2)
+function TFuBag:SetDef(cfg, var, defval, reset, cleanfunc, param1, param2)
   if (reset == nil) then
     reset = 1;
   end
@@ -837,7 +837,7 @@ function TBag:SetDef(cfg, var, defval, reset, cleanfunc, param1, param2)
   end
 end
 
-function TBag:SetGrpDef(cfg, grp, var, defval, reset, cleanfunc, param1, param2)
+function TFuBag:SetGrpDef(cfg, grp, var, defval, reset, cleanfunc, param1, param2)
   if (reset == nil) then
     reset = 1;
   end
@@ -857,7 +857,7 @@ function TBag:SetGrpDef(cfg, grp, var, defval, reset, cleanfunc, param1, param2)
   end
 end
 
-function TBag:GetGrp(cfg, grp, var)
+function TFuBag:GetGrp(cfg, grp, var)
   if (cfg) and (grp) then
     if (cfg[grp] == nil) then
       cfg[grp] = {};
@@ -867,7 +867,7 @@ function TBag:GetGrp(cfg, grp, var)
   end
 end
 
-function TBag.NumFunc(value, lowest, highest)
+function TFuBag.NumFunc(value, lowest, highest)
   if (value == nil) then return nil; end
 
   if (type(value) ~= "number") then
@@ -884,7 +884,7 @@ function TBag.NumFunc(value, lowest, highest)
   return value;
 end
 
-function TBag.StrFunc(value, choices_array)
+function TFuBag.StrFunc(value, choices_array)
   local found = 0;
 
   if (value == nil) then
@@ -904,7 +904,7 @@ function TBag.StrFunc(value, choices_array)
   end
 end
 
-function TBag:NicePlacement(buttonsize)
+function TFuBag:NicePlacement(buttonsize)
   if (buttonsize > 46) then
     return 50, 16, 4, 3, 1.0;
   elseif (buttonsize > 44) then
@@ -925,7 +925,7 @@ function TBag:NicePlacement(buttonsize)
 end
 
 -- default bar locations for items
-function TBag:SetDefLayout(cfg, bagarr, row1offset, reset)
+function TFuBag:SetDefLayout(cfg, bagarr, row1offset, reset)
   -- wipe the array if we are resetting
   if (reset == 1) and (cfg) then cfg[self.CAT_BAR] = {}; end
 
@@ -1158,7 +1158,7 @@ end
 local BKGR_A = 0.4;
 local BRDR_A = 0.5;
 
-function TBag:SetDefColors(cfg, reset)
+function TFuBag:SetDefColors(cfg, reset)
   self:SetColor(cfg, "newitem", 0.9, 0.9, 0.25, 1.0, reset);
   self:SetColor(cfg, "recentitem", 0.0, 1.0, 0.4, 1.0, reset);
 
@@ -1217,13 +1217,13 @@ function TBag:SetDefColors(cfg, reset)
   self:SetColor(cfg, "brdr_28", 0.8, 0.3, 0.9, BRDR_A, reset);
 end
 
-function TBag:ResetSorts(cfg)
+function TFuBag:ResetSorts(cfg)
   cfg["item_overrides"] = {};
   cfg["item_search_list"] = self.DefaultSearchList;
 end
 
 -- set reset to 1 to restore all default values
-function TBag:InitDefVals(cfg, bagarr, row1offset, reset)
+function TFuBag:InitDefVals(cfg, bagarr, row1offset, reset)
   local i, key, value;
 
   self:SetDef(cfg, "moveLock", 1, reset, self.NumFunc, 0,1);
@@ -1317,7 +1317,7 @@ function TBag:InitDefVals(cfg, bagarr, row1offset, reset)
   self:AssignCats(cfg, reset);
 end
 
-function TBag:AssignCats(cfg, reset)
+function TFuBag:AssignCats(cfg, reset)
   -- find matching categories that are not assigned
   for _ ,value in ipairs(cfg["item_search_list"]) do
     if (self:GetCat(cfg, value[1]) == nil) then
@@ -1328,28 +1328,28 @@ function TBag:AssignCats(cfg, reset)
   end
 end
 
-function TBag:PrintCachedCharacters()
+function TFuBag:PrintCachedCharacters()
   DEFAULT_CHAT_FRAME:AddMessage(self.SCP..L["Character data cached for:"], 1, 1, 1);
-  for key, value in pairs(TInvItm) do
+  for key, value in pairs(TFuInvItm) do
     local player,realm = strsplit("|",key)
     DEFAULT_CHAT_FRAME:AddMessage(player.." "..realm);
   end
 end
 
-function TBag:DeleteCachedCharacter(char,realm)
+function TFuBag:DeleteCachedCharacter(char,realm)
   local playerid = char.."|"..realm;
   local found = 0;
-  if (TInvItm[playerid]) then
+  if (TFuInvItm[playerid]) then
     found = 1;
   end
-  TInvItm[playerid] = nil;
-  TBnkItm[playerid] = nil;
-  TContItm[playerid] = nil;
-  TBodyItm[playerid] = nil;
-  TMailItm[playerid] = nil;
-  TTknItm[playerid] = nil;
-  TBagInfo[playerid] = nil;
-  if (found == 1 and TInvItm[playerid] == nil) then
+  TFuInvItm[playerid] = nil;
+  TFuBnkItm[playerid] = nil;
+  TFuContItm[playerid] = nil;
+  TFuBodyItm[playerid] = nil;
+  TFuMailItm[playerid] = nil;
+  TFuTknItm[playerid] = nil;
+  TFuBagInfo[playerid] = nil;
+  if (found == 1 and TFuInvItm[playerid] == nil) then
     DEFAULT_CHAT_FRAME:AddMessage(self.SCP..
        string.format(L["Removed cache for %q"],playerid),
        1, 1, 1);
@@ -1360,7 +1360,7 @@ function TBag:DeleteCachedCharacter(char,realm)
   end
 end
 
-function TBag:SetFrameAnchor (frame,cfg,y,x)
+function TFuBag:SetFrameAnchor (frame,cfg,y,x)
     -- Set the config
     cfg["frameYRelativeTo"] = y;
     cfg["frameXRelativeTo"] = x;
@@ -1377,13 +1377,13 @@ end
 -- Categories and Bars
 -----------------------------------------------------------------------
 
-function TBag:Cat(str)
+function TFuBag:Cat(str)
   -- Uppercase, and replace spaces
   local cat = string.upper(str);
   return string.gsub(cat, " ", "_");
 end
 
-function TBag:SetCatBar(cfg, cat, bar, reset)
+function TFuBag:SetCatBar(cfg, cat, bar, reset)
   if ((cfg ~= nil) and (cat ~= nil)) then
     if (cfg[self.CAT_BAR] == nil) then
       cfg[self.CAT_BAR] = {};
@@ -1396,7 +1396,7 @@ function TBag:SetCatBar(cfg, cat, bar, reset)
   end
 end
 
-function TBag:GetCatBar(cfg)
+function TFuBag:GetCatBar(cfg)
   if (cfg ~= nil) then
     if (cfg[self.CAT_BAR] == nil) then
       cfg[self.CAT_BAR] = {};
@@ -1405,7 +1405,7 @@ function TBag:GetCatBar(cfg)
   end
 end
 
-function TBag:GetCat(cfg, bar)
+function TFuBag:GetCat(cfg, bar)
   if (cfg ~= nil) then
     if (cfg[self.CAT_BAR] == nil) then
       cfg[self.CAT_BAR] = {};
@@ -1415,7 +1415,7 @@ function TBag:GetCat(cfg, bar)
   end
 end
 
-function TBag:PositionFrame(frameName, childAttachPoint, parentFrameName, parentAttachPoint, xoffset, yoffset, width, height)
+function TFuBag:PositionFrame(frameName, childAttachPoint, parentFrameName, parentAttachPoint, xoffset, yoffset, width, height)
   local frame = _G[frameName];
 
   if (frame) then
@@ -1430,7 +1430,7 @@ function TBag:PositionFrame(frameName, childAttachPoint, parentFrameName, parent
 end
 
 
-function TBag:BuildBarClassList(bclist, cfg)
+function TFuBag:BuildBarClassList(bclist, cfg)
   local bar, barclass;
   local key, val;
 
@@ -1456,7 +1456,7 @@ function TBag:BuildBarClassList(bclist, cfg)
 end
 
 -- Used for options strings
-function TBag:GetBagDispName(bag)
+function TFuBag:GetBagDispName(bag)
   if ( bag < self.BAGMIN ) or ( bag > self.BAGMAX ) then return ""; end
   if (bag == BANK_CONTAINER) then return L["Bank"]; end
   if (bag == REAGENTBANK_CONTAINER) then return REAGENT_BANK; end
@@ -1475,7 +1475,7 @@ function TBag:GetBagDispName(bag)
 end
 
 -- Used for EMPTY_X_SLOTS
-function TBag:GetBagPosName(bag)
+function TFuBag:GetBagPosName(bag)
   if ( bag < self.BAGMIN ) or ( bag > self.BAGMAX ) then return ""; end
   if (bag == BANK_CONTAINER) then return L["BANK"]; end
   if (bag == REAGENTBANK_CONTAINER) then return L["REAGENTBANK"]; end
@@ -1493,7 +1493,7 @@ function TBag:GetBagPosName(bag)
   if (bag == 11) then return L["BBAG7"]; end
 end
 
-function TBag:GetBagTypeName(bagType)
+function TFuBag:GetBagTypeName(bagType)
   if (bagType == 0) then
     return L["BAG"];
   elseif (bagType == 8) then
@@ -1525,14 +1525,14 @@ end
 
 -- Used for EMPTY_X_SLOTS and IN_X_BAG
 -- Redo this using system calls to the actual frame
-function TBag:GetBagType(playerid, bag)
+function TFuBag:GetBagType(playerid, bag)
   local type = 0;
   local _;
 
   if ( bag < self.BAGMIN ) or ( bag > self.BAGMAX ) then return nil; end
 
   -- get the live info if we are the current player, and at the bank
-  if (playerid == self.PLAYERID and (TBnkFrame.atbank == 1 or self:Member(TBag.Inv_Bags, bag))) then
+  if (playerid == self.PLAYERID and (TFuBnkFrame.atbank == 1 or self:Member(TFuBag.Inv_Bags, bag))) then
     local itemlink,id,name,itemType,subType,quality;
     if (bag > BACKPACK_CONTAINER) then
       itemlink = GetInventoryItemLink("player", ContainerIDToInventoryID(bag));
@@ -1569,7 +1569,7 @@ function TBag:GetBagType(playerid, bag)
 end
 
 
-function TBag:GetBagTexture(playerid, bag)
+function TFuBag:GetBagTexture(playerid, bag)
   local texture;
 
 
@@ -1593,43 +1593,43 @@ function TBag:GetBagTexture(playerid, bag)
 end
 
 
-function TBag:GetBagFrameName(bag)
+function TFuBag:GetBagFrameName(bag)
   if (bag == BANK_CONTAINER) then
-    return "TBnkFrameBagBank";
+    return "TFuBnkFrameBagBank";
   elseif (bag == REAGENTBANK_CONTAINER) then
-    return "TBnkFrameBagReagent";
+    return "TFuBnkFrameBagReagent";
   elseif (bag == BACKPACK_CONTAINER) then
-    return "TInvMenuBarBackpackButton";
+    return "TFuInvMenuBarBackpackButton";
   elseif self:Member(self.Inv_Bags, bag) then
-    return "TInvacterBag"..(bag-1).."Slot";
+    return "TFuInvacterBag"..(bag-1).."Slot";
   elseif self:Member(self.Bnk_Bags, bag) then
-    return "TBnkFrameBag"..(bag-4);
+    return "TFuBnkFrameBag"..(bag-4);
   else
     return "INVALID";
   end
 end
 
-function TBag:GetDummyBagFrameName(bag)
+function TFuBag:GetDummyBagFrameName(bag)
   if (bag == BACKPACK_CONTAINER) then
-    return "TInvainerFrame12";
+    return "TFuInvainerFrame12";
   elseif (bag == BANK_CONTAINER) then
-    return "TBnkainerFrame4";
+    return "TFuBnkainerFrame4";
   elseif (bag == REAGENTBANK_CONTAINER) then
-    return "TBnkainerFrame3";
+    return "TFuBnkainerFrame3";
   elseif self:Member(self.Inv_Bags, bag) then
-    return "TInvainerFrame"..(bag);
+    return "TFuInvainerFrame"..(bag);
   elseif self:Member(self.Bnk_Bags, bag) then
-    return "TBnkainerFrame"..(bag);
+    return "TFuBnkainerFrame"..(bag);
   else
     return "INVALID";
   end
 end
 
-function TBag:GetBagItemButtonName(bag, slot)
+function TFuBag:GetBagItemButtonName(bag, slot)
   return self:GetDummyBagFrameName(bag).."Item"..slot;
 end
 
-function TBag:GetBagIdxName(bag)
+function TFuBag:GetBagIdxName(bag)
   if (bag == BANK_CONTAINER) then
     return "Bank";
   elseif (bag == REAGENTBANK_CONTAINER) then
@@ -1639,12 +1639,12 @@ function TBag:GetBagIdxName(bag)
   end
 end
 
-function TBag:GetBagNumName(bag)
+function TFuBag:GetBagNumName(bag)
   -- Use the stock frame for the counts on the bag buttons
   return self:GetBagFrameName(bag).."Stock"
 end
 
-function TBag:GetBagFrameTexture(bag)
+function TFuBag:GetBagFrameTexture(bag)
   if (bag >= self.BAGMIN) and (bag <= self.BAGMAX) then
     return _G[self:GetBagFrameName(bag).."IconTexture"];
   else
@@ -1652,7 +1652,7 @@ function TBag:GetBagFrameTexture(bag)
   end
 end
 
-function TBag:GetBagFrameSpotlight(bag)
+function TFuBag:GetBagFrameSpotlight(bag)
   if (bag >= self.BAGMIN) and (bag <= self.BAGMAX) then
     return _G[self:GetBagFrameName(bag).."SpotlightTexture"];
   else
@@ -1660,7 +1660,7 @@ function TBag:GetBagFrameSpotlight(bag)
   end
 end
 
---function TBag:GetBagFrameHighlight(bag)
+--function TFuBag:GetBagFrameHighlight(bag)
 --  if (bag >= self.BAGMIN) and (bag <= self.BAGMAX) then
 --    return _G[self:GetBagFrameName(bag).."HighlightFrameTexture"];
 --  else
@@ -1669,7 +1669,7 @@ end
 --end
 
 
-function TBag:GetBagFrame(bag)
+function TFuBag:GetBagFrame(bag)
   if (bag >= self.BAGMIN) and (bag <= self.BAGMAX) then
     return _G[self:GetBagFrameName(bag)];
   else
@@ -1677,20 +1677,20 @@ function TBag:GetBagFrame(bag)
   end
 end
 
-function TBag:GetBagNumFrame(bag)
+function TFuBag:GetBagNumFrame(bag)
   return _G[self:GetBagNumName(bag)];
 end
 
-function TBag:GetBagMaxItems(bag)
+function TFuBag:GetBagMaxItems(bag)
   if bag == REAGENTBANK_CONTAINER then
     return self.MAX_REAGENTBANK_ITEMS
   end
   return MAX_CONTAINER_ITEMS
 end
 
-function TBag:MakeHyperlink(itemstring,name,quality,level,suffix)
+function TFuBag:MakeHyperlink(itemstring,name,quality,level,suffix)
   local itemlink;
-  -- First try to generate the itemlink off TBag's cached data.
+  -- First try to generate the itemlink off TFuBag's cached data.
   -- If we don't have the info to do it then fall back on GetItemInfo().
   -- GetItemInfo() can still fail but it's better than nothing.
   if (name) and (itemstring) and (quality) then
@@ -1717,7 +1717,7 @@ function TBag:MakeHyperlink(itemstring,name,quality,level,suffix)
 end
 
 
-function TBag:SetRarityColor(rarity, name)
+function TFuBag:SetRarityColor(rarity, name)
   local bkgr = _G[name.."_bkgr"];
   local normal = _G[name.."NormalTexture"];
   if (rarity) then
@@ -1731,7 +1731,7 @@ function TBag:SetRarityColor(rarity, name)
   end
 end
 
-function TBag:MakeEven(bkgr, bf)
+function TFuBag:MakeEven(bkgr, bf)
   bkgr = math.floor(bkgr);
   if ((bkgr - bf)/2) ~= ((bkgr - bf)/2) then
     bkgr = bkgr-1;
@@ -1739,7 +1739,7 @@ function TBag:MakeEven(bkgr, bf)
   return bkgr;
 end
 
-function TBag:Member(arr, ele)
+function TFuBag:Member(arr, ele)
   local val;
   if (arr) then
     for _, val in ipairs(arr) do
@@ -1755,14 +1755,14 @@ end
 -- Bag Counts
 -----------------------------------------------------------------------
 
-function TBag:GetSlotInfo(playerid, bag)
+function TFuBag:GetSlotInfo(playerid, bag)
   local size = 0;
   local free = 0;
   local item;
 
   -- Refresh the cache if we are the current player, or at a bank
   if (playerid == self.PLAYERID) then
-    if (TBnkFrame.atbank == 1) or self:Member(self.Inv_Bags, bag) then
+    if (TFuBnkFrame.atbank == 1) or self:Member(self.Inv_Bags, bag) then
       size = GetContainerNumSlots(bag);
       if bag == REAGENTBANK_CONTAINER and not IsReagentBankUnlocked() then
         -- Game always shows the full size of the ReagentBank even if not unlocked
@@ -1792,9 +1792,9 @@ function TBag:GetSlotInfo(playerid, bag)
 end
 
 
-function TBag:GetNumBankSlots(playerid)
+function TFuBag:GetNumBankSlots(playerid)
   local numSlots, full = GetNumBankSlots();
-  if (playerid == self.PLAYERID) and (TBnkFrame.atbank == 1) then
+  if (playerid == self.PLAYERID) and (TFuBnkFrame.atbank == 1) then
     self:SetPlayerInfo(playerid, self.S_BANKSLOTS, numSlots);
     if (full) then
       self:SetPlayerInfo(playerid, self.S_BANKFULL, 1);
@@ -1815,7 +1815,7 @@ function TBag:GetNumBankSlots(playerid)
   return numSlots, full;
 end
 
-function TBag:GetMoney(playerid)
+function TFuBag:GetMoney(playerid)
   local money;
   if (playerid == self.PLAYERID) then
     money = GetMoney();
@@ -1830,7 +1830,7 @@ function TBag:GetMoney(playerid)
   return money;
 end
 
-function TBag:MakeFreeString(free, size, showsize)
+function TFuBag:MakeFreeString(free, size, showsize)
   if (size <= 0) then return ""; end
   if (showsize == 1) then
     return tostring(free).."|n"..tostring(size);
@@ -1839,7 +1839,7 @@ function TBag:MakeFreeString(free, size, showsize)
   end
 end
 
-function TBag:SetFreeStr(obj, free, size, showsize)
+function TFuBag:SetFreeStr(obj, free, size, showsize)
   obj:SetText(self:MakeFreeString(free, size, showsize));
   if (size <= 0) then
     obj:SetTextColor(1,1,1,1);
@@ -1853,9 +1853,9 @@ function TBag:SetFreeStr(obj, free, size, showsize)
   end
 end
 
-function TBag:UpdateSlots(playerid, bag, showsize)
+function TFuBag:UpdateSlots(playerid, bag, showsize)
   local free, size = self:GetSlotInfo(playerid, bag);
---  self:Print(playerid..", b="..bag..", "..free.."/"..size..", AT="..TBnkFrame.atbank);
+--  self:Print(playerid..", b="..bag..", "..free.."/"..size..", AT="..TFuBnkFrame.atbank);
 
   self:SetFreeStr(self:GetBagNumFrame(bag), free, size, showsize);
 
@@ -1867,7 +1867,7 @@ end
 -- Colors
 -----------------------------------------------------------------------
 
-function TBag:ColorArr(r, g, b, a)
+function TFuBag:ColorArr(r, g, b, a)
   local c = {};
   c["r"] = r;
   c["g"] = g;
@@ -1876,7 +1876,7 @@ function TBag:ColorArr(r, g, b, a)
   return c;
 end
 
-function TBag:SplitColor(c)
+function TFuBag:SplitColor(c)
   local r, g, b, a;
   r = self:GetSafeVal(c, "r", 0);
   g = self:GetSafeVal(c, "g", 0);
@@ -1886,7 +1886,7 @@ function TBag:SplitColor(c)
 end
 
 
-function TBag:SetColor(cfg, colorname, r, g, b, a, reset)
+function TFuBag:SetColor(cfg, colorname, r, g, b, a, reset)
   if ((cfg ~= nil) and (colorname ~= nil)) then
     if (cfg[self.COLORS] == nil) then
       cfg[self.COLORS] = {};
@@ -1901,7 +1901,7 @@ function TBag:SetColor(cfg, colorname, r, g, b, a, reset)
   end
 end
 
-function TBag:GetColor(cfg, colorname)
+function TFuBag:GetColor(cfg, colorname)
   if ((cfg ~= nil) and (colorname ~= nil)) then
     if (cfg[self.COLORS] == nil) then
       cfg[self.COLORS] = {};
@@ -1913,21 +1913,21 @@ function TBag:GetColor(cfg, colorname)
 end
 
 
-function TBag:ColorFrame(cfg, barframe, bar)
+function TFuBag:ColorFrame(cfg, barframe, bar)
   local r, g, b, a = self:GetColor(cfg, "bkgr_"..bar)
   barframe:SetBackdropColor(r, g, b, a);
   r, g, b, a = self:GetColor(cfg, "brdr_"..bar)
   barframe:SetBackdropBorderColor(r, g, b, a);
 end
 
-function TBag:ColorFont(cfg, stock, font, colorname)
+function TFuBag:ColorFont(cfg, stock, font, colorname)
   local r, g, b, a = self:GetColor(cfg, colorname)
 
   stock:SetTextColor(r, g, b);
   font:SetVertexColor(r, g, b, a);
 end
 
-function TBag.SetColorFunc(prev)
+function TFuBag.SetColorFunc(prev)
   local r, g, b, opacity
 
   if prev then
@@ -1940,13 +1940,13 @@ function TBag.SetColorFunc(prev)
   local value = UIDROPDOWNMENU_MENU_VALUE
   if value then
     if r and g and b and opacity then
-      TBag:SetColor(value.cfg, value.colorname, r, g, b, opacity, 1)
+      TFuBag:SetColor(value.cfg, value.colorname, r, g, b, opacity, 1)
       value.updatefunc()
     end
   end
 end
 
-function TBag:MakeColorPickerInfo(cfg, colorkind, bar, titletext, updatefunc)
+function TFuBag:MakeColorPickerInfo(cfg, colorkind, bar, titletext, updatefunc)
   local r, g, b, a = self:GetColor(cfg, colorkind..bar);
   return {
       ["text"] = titletext,
@@ -1961,13 +1961,13 @@ function TBag:MakeColorPickerInfo(cfg, colorkind, bar, titletext, updatefunc)
         [self.I_BAR] = bar, ["colorname"] = colorkind..bar, ["cfg"] = cfg,
         ["updatefunc"] = updatefunc
       },
-      ["swatchFunc"] = TBag.SetColorFunc,
-      ["cancelFunc"] = TBag.SetColorFunc,
-      ["opacityFunc"] = TBag.SetColorFunc
+      ["swatchFunc"] = TFuBag.SetColorFunc,
+      ["cancelFunc"] = TFuBag.SetColorFunc,
+      ["opacityFunc"] = TFuBag.SetColorFunc
   };
 end
 
-function TBag:ResetBarColors(cfg)
+function TFuBag:ResetBarColors(cfg)
   local r, g, b, a = self:GetColor(cfg, "bkgr_"..self.MAIN_BAR);
   local rr, rg, rb, ra = self:GetColor(cfg, "brdr_"..self.MAIN_BAR);
 
@@ -1977,23 +1977,23 @@ function TBag:ResetBarColors(cfg)
   end
 end
 
-function TBag:UpdateBagColors(bag)
+function TFuBag:UpdateBagColors(bag)
   local r, g, b, a = self:GetColor(self:GetCfgFromBag(bag), "bag_"..bag);
   self:GetBagFrame(bag):GetCheckedTexture():SetVertexColor(r, g, b, a);
 end
 
-function TBag:GetCfgFromBag(bag)
+function TFuBag:GetCfgFromBag(bag)
   -- Find the right config
   if (self:Member(self.Inv_Bags, bag)) then
-    return TBagCfg["Inv"];
+    return TFuBagCfg["Inv"];
   elseif (self:Member(self.Bnk_Bags, bag)) then
-    return TBagCfg["Bnk"];
+    return TFuBagCfg["Bnk"];
   else
     return nil;
   end
 end
 
-function TBag:UpdateButtonHighlights()
+function TFuBag:UpdateButtonHighlights()
   local isopen = {};
   local r = {};
   local g = {};
@@ -2004,9 +2004,9 @@ function TBag:UpdateButtonHighlights()
   local cfg;
 
   -- First check all the bag open states, and highlight their colors
-  for _, bag in ipairs(TBag.Inv_Bags) do
+  for _, bag in ipairs(TFuBag.Inv_Bags) do
     isopen[bag] = IsBagOpen(bag);
-    r[bag], g[bag], b[bag], a[bag] = self:GetColor(TInvFrame.cfg, "bag_"..bag);
+    r[bag], g[bag], b[bag], a[bag] = self:GetColor(TFuInvFrame.cfg, "bag_"..bag);
 
 --    texture = self:GetBagFrameHighlight(bag);
 --    texture:SetVertexColor(r[bag], g[bag], b[bag], a[bag]);
@@ -2016,9 +2016,9 @@ function TBag:UpdateButtonHighlights()
 --      texture:Hide();
 --    end
   end
-  for _, bag in ipairs(TBag.Bnk_Bags) do
+  for _, bag in ipairs(TFuBag.Bnk_Bags) do
     isopen[bag] = IsBagOpen(bag);
-    r[bag], g[bag], b[bag], a[bag] = self:GetColor(TBnkFrame.cfg, "bag_"..bag);
+    r[bag], g[bag], b[bag], a[bag] = self:GetColor(TFuBnkFrame.cfg, "bag_"..bag);
 
 --    texture = self:GetBagFrameHighlight(bag);
 --    texture:SetVertexColor(r[bag], g[bag], b[bag], a[bag]);
@@ -2048,7 +2048,7 @@ function TBag:UpdateButtonHighlights()
   end
 end
 
-function TBag:MakeColorMenu(cfg, updatefunc, level, bagarr)
+function TFuBag:MakeColorMenu(cfg, updatefunc, level, bagarr)
   local info, bag;
 
   info = self:MakeColorPickerInfo(cfg, "bkgr_",
@@ -2086,7 +2086,7 @@ end
 -- Tooltip
 -----------------------------------------------------------------------
 
-function TBag:GetItmFromFrame(butitmmap, frm)
+function TFuBag:GetItmFromFrame(butitmmap, frm)
   if frm and type(frm) == "table" then
     if (butitmmap[frm:GetName()] ~= nil) then
       return butitmmap[frm:GetName()];
@@ -2097,7 +2097,7 @@ function TBag:GetItmFromFrame(butitmmap, frm)
   return nil;
 end
 
-function TBag:GetInvSlotID(bag, slot)
+function TFuBag:GetInvSlotID(bag, slot)
   local id;
   if (bag == BANK_CONTAINER) then
     id = BankButtonIDToInvSlotID(slot);
@@ -2107,11 +2107,11 @@ function TBag:GetInvSlotID(bag, slot)
     id = 100*bag + slot;  -- ???
   end
 
---  self:Print("TBag:GetInvSlotID = "..id.." for "..bag..", "..slot);
+--  self:Print("TFuBag:GetInvSlotID = "..id.." for "..bag..", "..slot);
   return id;
 end
 
-function TBag:UpdateHearth(tt, itemlink, playerid)
+function TFuBag:UpdateHearth(tt, itemlink, playerid)
   -- Make sure we're looking at a hearthstone on another player if not
   -- we end up doing nothing.  Ruby Slippers count as a hearthstone
   -- as well.
@@ -2119,8 +2119,8 @@ function TBag:UpdateHearth(tt, itemlink, playerid)
       (string.match(itemlink,"item:6948:") or
       string.match(itemlink,"item:28585:"))) then
     local hearth;
-    if (TBagInfo[playerid] and TBagInfo[playerid][self.G_BASIC]) then
-      hearth = TBagInfo[playerid][self.G_BASIC][self.S_HEARTH];
+    if (TFuBagInfo[playerid] and TFuBagInfo[playerid][self.G_BASIC]) then
+      hearth = TFuBagInfo[playerid][self.G_BASIC][self.S_HEARTH];
     end
     if (not hearth) then
       hearth = L["<home location>"];
@@ -2141,7 +2141,7 @@ function TBag:UpdateHearth(tt, itemlink, playerid)
   end
 end
 
-function TBag:SetInventoryItem(tt, playerid, itemlink, bag, slot, suffix)
+function TFuBag:SetInventoryItem(tt, playerid, itemlink, bag, slot, suffix)
   local hasCooldown, repairCost;
 
   if itemlink and itemlink:sub(1,10) == "battlepet:" then
@@ -2153,7 +2153,7 @@ function TBag:SetInventoryItem(tt, playerid, itemlink, bag, slot, suffix)
   -- If we are the current player, it might be safe to set inventory directly
   if (playerid == self.PLAYERID) then
     -- Inventory and being at the bank is always safe
-    if (self:Member(self.Inv_Bags, bag) or TBnkFrame.atbank == 1) then
+    if (self:Member(self.Inv_Bags, bag) or TFuBnkFrame.atbank == 1) then
       if (bag == BANK_CONTAINER) or (bag == REAGENTBANK_CONTAINER) then
         hasCooldown, repairCost = tt:SetInventoryItem("player", self:GetInvSlotID(bag, slot));
       else
@@ -2162,7 +2162,7 @@ function TBag:SetInventoryItem(tt, playerid, itemlink, bag, slot, suffix)
     else
       -- otherwise, just set a link.  Not as good, but safe
       if itemlink and itemlink ~= "" then
-        local level = TBag:GetPlayerInfo(playerid,TBag.G_BASIC)[TBag.S_LEVEL] or
+        local level = TFuBag:GetPlayerInfo(playerid,TFuBag.G_BASIC)[TFuBag.S_LEVEL] or
                     UnitLevel("player")
 
         itemlink = itemlink..":"..level..(suffix and ":" or "")..(suffix or "")
@@ -2173,7 +2173,7 @@ function TBag:SetInventoryItem(tt, playerid, itemlink, bag, slot, suffix)
   else
     -- Always just set links for other players
     if itemlink and itemlink ~= "" then
-      local level = TBag:GetPlayerInfo(playerid,TBag.G_BASIC)[TBag.S_LEVEL] or
+      local level = TFuBag:GetPlayerInfo(playerid,TFuBag.G_BASIC)[TFuBag.S_LEVEL] or
                     UnitLevel("player")
       itemlink = itemlink..":"..level..(suffix and ":" or "")..(suffix or "")
     end
@@ -2184,9 +2184,9 @@ function TBag:SetInventoryItem(tt, playerid, itemlink, bag, slot, suffix)
   return hasCooldown, repairCost;
 end
 
-function TBag:MakeToolTipStr(playerid, itemlink, bag, slot, mailitem, attach, suffix)
-  local ttname = "TBag_tt";
-  local tt = TBag_tt
+function TFuBag:MakeToolTipStr(playerid, itemlink, bag, slot, mailitem, attach, suffix)
+  local ttname = "TFuBag_tt";
+  local tt = TFuBag_tt
   local tooltip = "";
   local hasCooldown, repairCost;
 
@@ -2195,7 +2195,7 @@ function TBag:MakeToolTipStr(playerid, itemlink, bag, slot, mailitem, attach, su
   end
 
   if (not tt) then
-    tt = CreateFrame("GameTooltip","TBag_tt");
+    tt = CreateFrame("GameTooltip","TFuBag_tt");
     -- Allow tooltip set methods to dynamically add new lines based on these
     tt:AddFontStrings(
       tt:CreateFontString("$parentTextLeft1", nil, "GameTooltipText"),
@@ -2239,7 +2239,7 @@ end
 -- Main Sorting
 -----------------------------------------------------------------------
 
-function TBag:MakeEmptySlot(itm)
+function TFuBag:MakeEmptySlot(itm)
   if (itm) then
     itm[self.I_NAME] = L["Empty Slot"];
     itm[self.I_ITEMID] = nil;
@@ -2251,7 +2251,7 @@ function TBag:MakeEmptySlot(itm)
   end
 end
 
-function TBag:InsertEmptyInCompArr(ca,itm)
+function TFuBag:InsertEmptyInCompArr(ca,itm)
   if (itm == nil or type(itm) ~= "table" or ca == nil) then
     return;
   end
@@ -2264,7 +2264,7 @@ function TBag:InsertEmptyInCompArr(ca,itm)
   end
 end
 
-function TBag:InsertItemInCompArr(ca,itm,id)
+function TFuBag:InsertItemInCompArr(ca,itm,id)
   if (itm == nil or type(itm) ~= "table" or ca == nil) then
     return;
   end
@@ -2287,7 +2287,7 @@ function TBag:InsertItemInCompArr(ca,itm,id)
   end
 end
 
-function TBag:InsertStackArr(stackarr,itm,id)
+function TFuBag:InsertStackArr(stackarr,itm,id)
   if (itm == nil or type(itm) ~= "table" or stackarr == nil) then
     return;
   end
@@ -2304,7 +2304,7 @@ end
 
 local Itm = {};
 
-function TBag:CreateItm()
+function TFuBag:CreateItm()
   local itm = Itm;
 
   for k,_ in pairs(itm) do
@@ -2314,13 +2314,13 @@ function TBag:CreateItm()
   return Itm;
 end
 
-function TBag:GetItmCharges(tooltip)
+function TFuBag:GetItmCharges(tooltip)
   return string.match(tooltip, L["(%d+) Charges?"]);
 end
 
-function TBag:UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, comparr, atbank)
+function TFuBag:UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, comparr, atbank)
 --  UpdateAddOnMemoryUsage();
---  self:PrintDEBUG('UpdateItmCache Start Memory = '..tostring(GetAddOnMemoryUsage("TBag")));
+--  self:PrintDEBUG('UpdateItmCache Start Memory = '..tostring(GetAddOnMemoryUsage("TFuBag")));
   local bag, slot;  -- used as "for loop" counters
   local itm;    -- entry that will be written to the cache
   local id;
@@ -2355,7 +2355,7 @@ function TBag:UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, comparr,
       _, size = self:GetSlotInfo(playerid, bag);
 
       -- If a bag decreases in size wipe the keys for the
-      -- slots, TBag:ClearItmCache() can't do this for us
+      -- slots, TFuBag:ClearItmCache() can't do this for us
       -- becuase it doesn't know enough to do it.
       if (size < #itmcache[bag]) then
         resort_mandatory = 1
@@ -2375,7 +2375,7 @@ function TBag:UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, comparr,
           itm = self:CreateItm();
 
           id = nil; -- Clear our local id that we use to cache the id to avoid extra
-                    -- calls to TBag:GetItemID().
+                    -- calls to TFuBag:GetItemID().
           itm[self.I_ITEMLINK] = GetContainerItemLink(bag, slot);
           itm[self.I_BAG] = bag;
           itm[self.I_SLOT] = slot;
@@ -2428,7 +2428,7 @@ function TBag:UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, comparr,
 
 
           if (itm[self.I_BAR] == nil and
-              (cfg["show_Bag"..bag] == 1 or TBag:GetBagFrame(bag):GetChecked())) then
+              (cfg["show_Bag"..bag] == 1 or TFuBag:GetBagFrame(bag):GetChecked())) then
             resort_mandatory = 1;
           end
 
@@ -2438,7 +2438,7 @@ function TBag:UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, comparr,
           if (itm[self.I_ITEMLINK] ~= itmcache[bag][slot][self.I_ITEMLINK]) then
             -- the item changed
             if (itm[self.I_TIMESTAMP] ~= nil) then
-              if (cfg["show_Bag"..bag] == 1 or TBag:GetBagFrame(bag):GetChecked()) then
+              if (cfg["show_Bag"..bag] == 1 or TFuBag:GetBagFrame(bag):GetChecked()) then
                 resort_suggested = 1;
               end
               itm[self.I_TIMESTAMP] = time();
@@ -2519,7 +2519,7 @@ function TBag:UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, comparr,
   end
 
 --  UpdateAddOnMemoryUsage();
---  self:PrintDEBUG('UpdateItmCache End Memory = '..tostring(GetAddOnMemoryUsage("TBag")));
+--  self:PrintDEBUG('UpdateItmCache End Memory = '..tostring(GetAddOnMemoryUsage("TFuBag")));
   if (resort_mandatory == 1) then
     return self.REQ_MUST;
   elseif (resort_suggested == 1) then
@@ -2530,9 +2530,9 @@ function TBag:UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, comparr,
 end
 
 
-function TBag:SortItmCache(cfg, playerid, itmcache, baritm, bagarr)
+function TFuBag:SortItmCache(cfg, playerid, itmcache, baritm, bagarr)
 --  UpdateAddOnMemoryUsage();
---  self:PrintDEBUG('SortItmCache Start Memory = '..tostring(GetAddOnMemoryUsage("TBag")));
+--  self:PrintDEBUG('SortItmCache Start Memory = '..tostring(GetAddOnMemoryUsage("TFuBag")));
 
   local i;
   local bag, slot;  -- variables used in outer loop
@@ -2557,12 +2557,12 @@ function TBag:SortItmCache(cfg, playerid, itmcache, baritm, bagarr)
   end
 
   for _, bag in ipairs(bagarr) do
---    self:PrintDEBUG("TBag:MakeBarItm: bag ="..bag);
+--    self:PrintDEBUG("TFuBag:MakeBarItm: bag ="..bag);
     if itmcache[bag] == nil then
       return baritm;
     end
 
-    if (cfg["show_Bag"..bag] == 1 or TBag:GetBagFrame(bag):GetChecked()) then
+    if (cfg["show_Bag"..bag] == 1 or TFuBag:GetBagFrame(bag):GetChecked()) then
       size = table.getn(itmcache[bag]);
       if (size > 0) then
 --        self:PrintDEBUG("Show bag "..bag);
@@ -2591,25 +2591,25 @@ function TBag:SortItmCache(cfg, playerid, itmcache, baritm, bagarr)
     if (toggle==1 or toggle==2) then
       table.sort(baritm[barnum],
         function(a,b) return
-          a[TBag.I_CAT]..
-          TBag:ReverseString(a[TBag.I_NAME],toggle)..
-          string.format("%04s",a[TBag.I_COUNT])..string.format("%02s",a[TBag.I_SLOT])
+          a[TFuBag.I_CAT]..
+          TFuBag:ReverseString(a[TFuBag.I_NAME],toggle)..
+          string.format("%04s",a[TFuBag.I_COUNT])..string.format("%02s",a[TFuBag.I_SLOT])
 
           >
-          b[TBag.I_CAT]..
-          TBag:ReverseString(b[TBag.I_NAME],toggle)..
-          string.format("%04s",b[TBag.I_COUNT])..string.format("%02s",b[TBag.I_SLOT])
+          b[TFuBag.I_CAT]..
+          TFuBag:ReverseString(b[TFuBag.I_NAME],toggle)..
+          string.format("%04s",b[TFuBag.I_COUNT])..string.format("%02s",b[TFuBag.I_SLOT])
         end
       );
     end
   end
 --  UpdateAddOnMemoryUsage();
---  self:PrintDEBUG('SortItmCache End Memory = '..tostring(GetAddOnMemoryUsage("TBag")));
+--  self:PrintDEBUG('SortItmCache End Memory = '..tostring(GetAddOnMemoryUsage("TFuBag")));
   return baritm;
 end
 
 
-function TBag:SetBarFromClass(cfg, itm)
+function TFuBag:SetBarFromClass(cfg, itm)
   itm[self.I_BAR] = self:GetCat(cfg, itm[self.I_CAT]);
   while ((itm[self.I_BAR] ~= nil) and type(itm[self.I_BAR]) ~= "number") do
     itm[self.I_BAR] = self:GetCat(cfg, itm[self.I_BAR]);
@@ -2618,7 +2618,7 @@ function TBag:SetBarFromClass(cfg, itm)
 end
 
 
-function TBag:PickBar(cfg, playerid, itm, trade1, trade2)
+function TFuBag:PickBar(cfg, playerid, itm, trade1, trade2)
   local bagtype = self:GetBagType(playerid, itm[self.I_BAG]);
   if (itm[self.I_ITEMLINK] == nil) then
     if (bagtype and type(bagtype) == "number" and bagtype > 0) then
@@ -2790,7 +2790,7 @@ function TBag:PickBar(cfg, playerid, itm, trade1, trade2)
 end
 
 
-function TBag:ScanEquipped()
+function TFuBag:ScanEquipped()
   local itemLink;
 
 --  self:Print( "Scanning Equipment: ");
@@ -2799,14 +2799,14 @@ function TBag:ScanEquipped()
     self:SetPlayerInfo(self.PLAYERID, self.S_EQUIPPED, {});
   end
 
-  -- Arrange by itemlink (for equipped) and player (for TBody)
+  -- Arrange by itemlink (for equipped) and player (for TFuBody)
   for key, value in pairs(self.Body_Slots) do
 --    self:Print("Equipped ID="..GetInventorySlotInfo(key).." for "..key);
     local slot = GetInventorySlotInfo(key);
     itemLink = GetInventoryItemLink("player", slot);
 
-    TBodyItm[self.PLAYERID][self.D_BAG][value] = {};
-    local dbag = TBodyItm[self.PLAYERID][self.D_BAG][value];
+    TFuBodyItm[self.PLAYERID][self.D_BAG][value] = {};
+    local dbag = TFuBodyItm[self.PLAYERID][self.D_BAG][value];
     if (itemLink) then
       self:SetItemLink(self:GetPlayerInfo(self.PLAYERID, self.S_EQUIPPED), itemLink);
 
@@ -2823,21 +2823,21 @@ function TBag:ScanEquipped()
 end
 
 
-function TBag:ScanMail()
+function TFuBag:ScanMail()
   local itemLink, idx;
 
 --  self:Print( "Scanning Mail: ");
 
-  -- Arrange by player (for TMail)
-  TMailItm[self.PLAYERID] = {};
+  -- Arrange by player (for TFuMail)
+  TFuMailItm[self.PLAYERID] = {};
   for idx = 1, GetInboxNumItems() do
     local _,_,_,_,_,_,_,itemCount,_,_,_,_,_ = GetInboxHeaderInfo(idx);
     -- Only scan mail with attachments.
     if (itemCount) then
-      TMailItm[self.PLAYERID][idx] = {};
+      TFuMailItm[self.PLAYERID][idx] = {};
       for slot = 1, itemCount do
-        TMailItm[self.PLAYERID][idx][slot] = {};
-        local itm = TMailItm[self.PLAYERID][idx][slot];
+        TFuMailItm[self.PLAYERID][idx][slot] = {};
+        local itm = TFuMailItm[self.PLAYERID][idx][slot];
         local name, itemTexture, count, quality, canUse = GetInboxItem(idx,slot);
         local _,itemlink = self:GetItemID(GetInboxItemLink(idx,slot));
         if itemlink and itemlink:sub(1,11)  == "item:82800:" then
@@ -2873,7 +2873,7 @@ end
 -- Main Display
 -----------------------------------------------------------------------
 
-function TBag:CalcBarLayout(calc_dat, baritm, barnum, numbars, colmax, edit_mode)
+function TFuBag:CalcBarLayout(calc_dat, baritm, barnum, numbars, colmax, edit_mode)
   local iBar;
 
   -- First set the total bar sizes
@@ -2937,11 +2937,11 @@ end
 -- barnum == current bar
 -- frame == name of background frame to be relative to
 -- width/height == max number of buttons to place into frame
-function TBag:AssignButtonsToFrame(mainFrame, barnum, frame, width, height)
+function TFuBag:AssignButtonsToFrame(mainFrame, barnum, frame, width, height)
   local cur_x, cur_y = 0, 0
 
   for position, itm in pairs(mainFrame.BARITM[barnum]) do
-    local buttonname = TBag:GetBagItemButtonName(itm[TBag.I_BAG], itm[TBag.I_SLOT])
+    local buttonname = TFuBag:GetBagItemButtonName(itm[TFuBag.I_BAG], itm[TFuBag.I_SLOT])
 
     self:PositionFrame(buttonname, "BOTTOMRIGHT", frame, "BOTTOMRIGHT",
       0-mainFrame:FrameX(cur_x)+mainFrame.BF_X_PAD,
@@ -2991,14 +2991,14 @@ function TBag:AssignButtonsToFrame(mainFrame, barnum, frame, width, height)
   end
 end
 
-function TBag:GetBarY(bar_x)
+function TFuBag:GetBarY(bar_x)
   return math.floor(self.BAR_MAX / bar_x);
 end
 
 -- fx = Tqqq_FrameX
 -- sx = Tqqq_SpaceX
 
-function TBag:LayoutWindow(frame)
+function TFuBag:LayoutWindow(frame)
   local framename = frame:GetName()
   local cfg = frame.cfg
   local baritm = frame.BARITM
@@ -3017,34 +3017,34 @@ function TBag:LayoutWindow(frame)
       + frame:SpaceX(bar_x-1) + frame:PoolX(bar_x+1) + (2 * self.BORDER);
   local width_in_between;
 
-  if (framename == "TInvFrame") then
-    if (TInv_SearchBox:IsVisible() or TInvFrame_Total:IsVisible() or
-        TInvacterBag3Slot:IsVisible() or TInvFrame_MoneyFrame:IsVisible()) then
+  if (framename == "TFuInvFrame") then
+    if (TFuInv_SearchBox:IsVisible() or TFuInvFrame_Total:IsVisible() or
+        TFuInvacterBag3Slot:IsVisible() or TFuInvFrame_MoneyFrame:IsVisible()) then
         PAD_BOTTOM = PAD_BOTTOM + self.PAD_BOTTOM_NORM;
     end
     if (edit_mode == 1) then
       PAD_BOTTOM = PAD_BOTTOM + self.PAD_BOTTOM_EDIT;
     end
      -- If we need the extra row...  add it in.
-    if ((TInv_SearchBox:IsVisible()
-        and (TInvFrame_Total:IsVisible() or TInvacterBag3Slot:IsVisible())) or
-        TInvFrame_MoneyFrame:IsVisible() and TInvFrame_TokenFrame:IsVisible()) then
+    if ((TFuInv_SearchBox:IsVisible()
+        and (TFuInvFrame_Total:IsVisible() or TFuInvacterBag3Slot:IsVisible())) or
+        TFuInvFrame_MoneyFrame:IsVisible() and TFuInvFrame_TokenFrame:IsVisible()) then
       PAD_BOTTOM = PAD_BOTTOM + self.PAD_BOTTOM_SEARCH;
     end
     if (PAD_BOTTOM > 0) then
       -- If there's anything at the bottom add the spacer
       PAD_BOTTOM = PAD_BOTTOM + self.PAD_BOTTOM_SPACER;
     end
-    if (TInv_UserDropdown:IsVisible() or TInv_Button_HighlightToggle:IsVisible() or
-        TInv_Button_ChangeEditMode:IsVisible() or TInv_Button_ShowBank:IsVisible() or
-        TInv_Button_Reload:IsVisible() or TInv_Button_Close:IsVisible() or
-        TInv_Button_MoveLockToggle:IsVisible()) then
+    if (TFuInv_UserDropdown:IsVisible() or TFuInv_Button_HighlightToggle:IsVisible() or
+        TFuInv_Button_ChangeEditMode:IsVisible() or TFuInv_Button_ShowBank:IsVisible() or
+        TFuInv_Button_Reload:IsVisible() or TFuInv_Button_Close:IsVisible() or
+        TFuInv_Button_MoveLockToggle:IsVisible()) then
        PAD_TOP = self.PAD_TOP_NORM;
      end
  else
-    -- TBnkFrame
-    if (TBnkFrame_Total:IsVisible() or TBnkFrameBagBank:IsVisible() or
-        TBnkFrame_MoneyFrame:IsVisible() or TBnkFrame_TokenFrame:IsVisible()) then
+    -- TFuBnkFrame
+    if (TFuBnkFrame_Total:IsVisible() or TFuBnkFrameBagBank:IsVisible() or
+        TFuBnkFrame_MoneyFrame:IsVisible() or TFuBnkFrame_TokenFrame:IsVisible()) then
       PAD_BOTTOM = PAD_BOTTOM + self.PAD_BOTTOM_NORM;
     end
     if (edit_mode == 1) then
@@ -3053,17 +3053,17 @@ function TBag:LayoutWindow(frame)
 
     -- Do we need an extra row
     local bags_row = 0;
-    if (TBnkFrameBagBank:IsVisible()) then
+    if (TFuBnkFrameBagBank:IsVisible()) then
       bags_row = bags_row + 5;
     end
-    if (TBnkFrame_Total:IsVisible()) then
+    if (TFuBnkFrame_Total:IsVisible()) then
       bags_row = bags_row + 1;
     end
-    if TBnkFrame_MoneyFrame:IsVisible() or TBnkFrame_TokenFrame:IsVisible() then
+    if TFuBnkFrame_MoneyFrame:IsVisible() or TFuBnkFrame_TokenFrame:IsVisible() then
       bags_row = bags_row + 4;
     end
     if (cfg["maxColumns"] <= bags_row or
-       (TBnkFrame_MoneyFrame:IsVisible() and TBnkFrame_TokenFrame:IsVisible())) then
+       (TFuBnkFrame_MoneyFrame:IsVisible() and TFuBnkFrame_TokenFrame:IsVisible())) then
       PAD_BOTTOM = PAD_BOTTOM + self.PAD_BOTTOM_NORM;
     end
 
@@ -3072,10 +3072,10 @@ function TBag:LayoutWindow(frame)
       PAD_BOTTOM = PAD_BOTTOM + self.PAD_BOTTOM_SPACER;
     end
 
-    if (TBnk_UserDropdown:IsVisible() or TBnk_Button_HighlightToggle:IsVisible() or
-        TBnk_Button_ChangeEditMode:IsVisible() or
-        TBnk_Button_Reload:IsVisible() or TBnk_Button_DepositReagent:IsVisible() or
-        TBnk_Button_Close:IsVisible() or TBnk_Button_MoveLockToggle:IsVisible()) then
+    if (TFuBnk_UserDropdown:IsVisible() or TFuBnk_Button_HighlightToggle:IsVisible() or
+        TFuBnk_Button_ChangeEditMode:IsVisible() or
+        TFuBnk_Button_Reload:IsVisible() or TFuBnk_Button_DepositReagent:IsVisible() or
+        TFuBnk_Button_Close:IsVisible() or TFuBnk_Button_MoveLockToggle:IsVisible()) then
       PAD_TOP = self.PAD_TOP_NORM;
     end
   end
@@ -3138,7 +3138,7 @@ function TBag:LayoutWindow(frame)
           -- Color the frame and assign buttons
           self:ColorFrame(cfg, barframe[iBar], (barnum+iBar));
 
-          TBag:AssignButtonsToFrame(frame,(barnum+iBar), framename.."_bar_"..(barnum+iBar),
+          TFuBag:AssignButtonsToFrame(frame,(barnum+iBar), framename.."_bar_"..(barnum+iBar),
             calc_dat[iBar.."_width"], calc_dat["height"] );
             barframe[iBar]:Show();
         else
@@ -3175,7 +3175,7 @@ end
 
 local StackArr = {};
 
-function TBag:CreateStackArr()
+function TFuBag:CreateStackArr()
   local sa = StackArr;
 
   for k,_ in pairs(sa) do
@@ -3187,7 +3187,7 @@ end
 
 local CompArr = { [self.COMP_EMPTY] = {}, [self.COMP_ITEM] = {} };
 
-function TBag:CreateCompArr()
+function TFuBag:CreateCompArr()
   local ca = CompArr;
 
   local epts = ca[self.COMP_EMPTY];
@@ -3204,7 +3204,7 @@ function TBag:CreateCompArr()
   return CompArr;
 end
 
-TBag.ISSTACKING = {
+TFuBag.ISSTACKING = {
   [self.STACK_BNK] = nil,
   [self.STACK_INV] = nil,
 };
@@ -3215,16 +3215,16 @@ end
 
 -- sa = stackarr, shortened to make the code manageable
 -- ca = comparr
-function TBag:Stack(where, itmcache, sa, ca)
+function TFuBag:Stack(where, itmcache, sa, ca)
 --  UpdateAddOnMemoryUsage();
---  TBag:PrintDEBUG('Stack Start Memory = '..tostring(GetAddOnMemoryUsage("TBag")));
+--  TFuBag:PrintDEBUG('Stack Start Memory = '..tostring(GetAddOnMemoryUsage("TFuBag")));
 
   -- Defer the stack if the cursor has an item on it.
   if GetCursorInfo() then return false end
 
 
   -- Set the mutex
-  TBag.ISSTACKING[where] = 1;
+  TFuBag.ISSTACKING[where] = 1;
 
   -- Iterate the list of items that can be stacked
   for itemid,itms in pairs(sa) do
@@ -3233,12 +3233,12 @@ function TBag:Stack(where, itmcache, sa, ca)
     -- precedence to items in special bags.
     table.sort(itms,
       function(a,b)
-        if (a[TBag.I_COUNT] == b[TBag.I_COUNT]) then
+        if (a[TFuBag.I_COUNT] == b[TFuBag.I_COUNT]) then
           -- We only ever stack when on the current player so this is ok.
-          return (TBag:GetBagType(TBag.PLAYERID,a[TBag.I_BAG]) or 0) >
-                 (TBag:GetBagType(TBag.PLAYERID,b[TBag.I_BAG]) or 0)
+          return (TFuBag:GetBagType(TFuBag.PLAYERID,a[TFuBag.I_BAG]) or 0) >
+                 (TFuBag:GetBagType(TFuBag.PLAYERID,b[TFuBag.I_BAG]) or 0)
         else
-          return a[TBag.I_COUNT] > b[TBag.I_COUNT];
+          return a[TFuBag.I_COUNT] > b[TFuBag.I_COUNT];
         end
       end);
 
@@ -3337,31 +3337,31 @@ function TBag:Stack(where, itmcache, sa, ca)
       end
     end
 
-    -- TBag.ISSTACKING gets cleared by the item mover coroutine for us.
+    -- TFuBag.ISSTACKING gets cleared by the item mover coroutine for us.
     -- Has to stay on until coroutine finishes otherwise we end up with
     -- the stack and compress fighting each other.
   end
 
 --  UpdateAddOnMemoryUsage();
---  TBag:PrintDEBUG('Stack End Memory = '..tostring(GetAddOnMemoryUsage("TBag")));
+--  TFuBag:PrintDEBUG('Stack End Memory = '..tostring(GetAddOnMemoryUsage("TFuBag")));
   return true
 end
 
-TBag.STACKSKIP = {};
-TBag.STACKSPLIT = nil;
+TFuBag.STACKSKIP = {};
+TFuBag.STACKSPLIT = nil;
 
-function TBag:ClearStackSkip(bagarr)
+function TFuBag:ClearStackSkip(bagarr)
   self:ClearItmCache(self.STACKSKIP, bagarr);
 end
 
-function TBag:GetStackSkip(bag, slot)
+function TFuBag:GetStackSkip(bag, slot)
   if (self.STACKSKIP[bag] == nil) then
     self.STACKSKIP[bag] = {};
   end
   return self.STACKSKIP[bag][slot];
 end
 
-function TBag:SetStackSkip(bag, slot, val)
+function TFuBag:SetStackSkip(bag, slot, val)
   if (self.STACKSKIP[bag] == nil) then
     self.STACKSKIP[bag] = {};
   end
@@ -3372,13 +3372,13 @@ function TBag:SetStackSkip(bag, slot, val)
 --  end
 end
 
-TBag.COMPSKIP = {};
+TFuBag.COMPSKIP = {};
 
-function TBag:ClearCompSkip(bagarr)
+function TFuBag:ClearCompSkip(bagarr)
   self:ClearItmCache(self.COMPSKIP, bagarr);
 end
 
-function TBag:GetCompSkip(bag, slot)
+function TFuBag:GetCompSkip(bag, slot)
   if (self.COMPSKIP[bag] == nil) then
     self.COMPSKIP[bag] = {};
   end
@@ -3392,34 +3392,34 @@ function self:SetCompSkip(bag, slot, val)
   self.COMPSKIP[bag][slot] = val;
 end
 
-function TBag.SplitContainerItem(bag, slot, split)
+function TFuBag.SplitContainerItem(bag, slot, split)
   -- Put this slot on the black list
-  TBag:SetStackSkip(bag, slot, 1);
+  TFuBag:SetStackSkip(bag, slot, 1);
 
-  TBag.STACKSPLIT = 1;
+  TFuBag.STACKSPLIT = 1;
 end
 
-hooksecurefunc('SplitContainerItem', TBag.SplitContainerItem);
+hooksecurefunc('SplitContainerItem', TFuBag.SplitContainerItem);
 
-function TBag.PickupContainerItem(bag, slot)
+function TFuBag.PickupContainerItem(bag, slot)
   -- Only skip a slot if we have just manually split
-  if (TBag.STACKSPLIT) then
-    TBag:SetStackSkip(bag, slot, 1);
+  if (TFuBag.STACKSPLIT) then
+    TFuBag:SetStackSkip(bag, slot, 1);
   end
-  TBag:SetCompSkip(bag, slot, 1);
-  TBag.STACKSPLIT = nil;
+  TFuBag:SetCompSkip(bag, slot, 1);
+  TFuBag.STACKSPLIT = nil;
 end
 
-hooksecurefunc('PickupContainerItem', TBag.PickupContainerItem);
+hooksecurefunc('PickupContainerItem', TFuBag.PickupContainerItem);
 
 -- array to hold the instructions
--- don't edit this directly use TBag:ItemMover.
+-- don't edit this directly use TFuBag:ItemMover.
 local ItemMover__instructions = {};
 
 -- Insert a move instruction into the list to do.
 -- If count is not > 0 then it will just pickup everything
 -- in bag1, slot1 otherwise it will split count off.
-function TBag:ItemMover(bag1, slot1, bag2, slot2, count)
+function TFuBag:ItemMover(bag1, slot1, bag2, slot2, count)
   local inst = {
     ["from_bag"]  = bag1,
     ["from_slot"] = slot1,
@@ -3449,20 +3449,20 @@ local function ItemMover__main(instructions)
             SplitContainerItem(inst.from_bag,inst.from_slot,inst.count);
           else
             PickupContainerItem(inst.from_bag,inst.from_slot);
-            TBag:SetStackSkip(inst.from_bag,inst.from_slot,nil);
-            TBag:SetCompSkip(inst.from_bag,inst.from_slot,nil);
+            TFuBag:SetStackSkip(inst.from_bag,inst.from_slot,nil);
+            TFuBag:SetCompSkip(inst.from_bag,inst.from_slot,nil);
           end
           PickupContainerItem(inst.to_bag,inst.to_slot);
-          TBag:SetStackSkip(inst.to_bag,inst.to_slot,nil);
-          TBag:SetCompSkip(inst.to_bag,inst.to_slot,nil);
+          TFuBag:SetStackSkip(inst.to_bag,inst.to_slot,nil);
+          TFuBag:SetCompSkip(inst.to_bag,inst.to_slot,nil);
           ClearCursor();
           table.remove(instructions,index);
         end
       end
     else
       -- Done stacking
-      TBag.ISSTACKING[TBag.STACK_BNK] = nil;
-      TBag.ISSTACKING[TBag.STACK_INV] = nil;
+      TFuBag.ISSTACKING[TFuBag.STACK_BNK] = nil;
+      TFuBag.ISSTACKING[TFuBag.STACK_INV] = nil;
     end
     instructions = coroutine.yield(instructions);
   end
@@ -3479,7 +3479,7 @@ local function ItemMover_Resume()
   end
 end
 
-function TBag:OnUpdate()
+function TFuBag:OnUpdate()
   ItemMover_Resume();
 end
 
@@ -3488,7 +3488,7 @@ end
 -- Inits and Events
 -----------------------------------------------------------------------
 
-function TBag:UserDropdown_Init(onclickfunc, TItm, curplayer, selRealm,level)
+function TFuBag:UserDropdown_Init(onclickfunc, TItm, curplayer, selRealm,level)
   local info;
   local users = {};
 
@@ -3520,7 +3520,7 @@ end
 -- parent window which is the background.  As a result they appear grayed out
 -- and unclickable.  This iterates the frames and sets them to their proper frame
 -- level.
-function TBag:FixMenuFrameLevels()
+function TFuBag:FixMenuFrameLevels()
   for l=1,UIDROPDOWNMENU_MAXLEVELS do
     for b=1,UIDROPDOWNMENU_MAXBUTTONS do
       local button = _G["DropDownList"..l.."Button"..b]

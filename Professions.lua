@@ -1,23 +1,23 @@
 -- $Id$
 
 local _G = getfenv(0)
-local TBag = _G.TBag
-local L = TBag.LOCALE
+local TFuBag = _G.TFuBag
+local L = TFuBag.LOCALE
 
 local GetTradeSkillCategoryFilter = C_TradeSkillUI.GetCategories
 local SetTradeSkillCategoryFilter = C_TradeSkillUI.SetRecipeCategoryFilter
 
 -- Constants used throughout the addon
-TBag.S_TRADES  = "trades"
-TBag.S_SECOND  = "second"
-TBag.S_SKILLS  = "skills"
-TBag.S_CREATED = "created"
-TBag.S_REAGENT = "reagent"
-TBag.S_UPDATE  = "update_reference"
-TBag.S_VERSION = "version"
+TFuBag.S_TRADES  = "trades"
+TFuBag.S_SECOND  = "second"
+TFuBag.S_SKILLS  = "skills"
+TFuBag.S_CREATED = "created"
+TFuBag.S_REAGENT = "reagent"
+TFuBag.S_UPDATE  = "update_reference"
+TFuBag.S_VERSION = "version"
 
-TBag.Professions = {}
-local Professions = TBag.Professions
+TFuBag.Professions = {}
+local Professions = TFuBag.Professions
 
 -- Current DB Version
 Professions.DB_VERSION = 2
@@ -61,16 +61,16 @@ for _,v in pairs(Professions.skills) do
 end
 
 
-function TBag:SetItemLink(arr, itemlink)
-  local itemid = TBag:GetItemID(itemlink)
+function TFuBag:SetItemLink(arr, itemlink)
+  local itemid = TFuBag:GetItemID(itemlink)
   if itemid ~= "" then
     arr[itemid] = 1
   end
 end
 
 function Professions:SetReagentLink(arr, itemlink, trade, reagentlink)
-  local itemid = TBag:GetItemID(itemlink)
-  local reagentid = TBag:GetItemID(reagentlink)
+  local itemid = TFuBag:GetItemID(itemlink)
+  local reagentid = TFuBag:GetItemID(reagentlink)
 
   -- Allow enchant links.  They'll differ in the table by being
   -- prefixed by enchant: rather than just being a numeric id.
@@ -84,7 +84,7 @@ function Professions:SetReagentLink(arr, itemlink, trade, reagentlink)
   if itemid ~= "" and reagentid ~= "" and trade ~= "" then
     if not arr then
       arr = {}
-      arr[TBag.S_VERSION] = self.DB_VERSION
+      arr[TFuBag.S_VERSION] = self.DB_VERSION
     end
     arr[reagentid] = arr[reagentid] or {}
     arr[reagentid][trade] = arr[reagentid][trade] or {}
@@ -93,10 +93,10 @@ function Professions:SetReagentLink(arr, itemlink, trade, reagentlink)
 end
 
 function Professions:GetProfessions(playerid)
-  local trades = TBag:GetPlayerInfo(playerid, TBag.S_TRADES)
+  local trades = TFuBag:GetPlayerInfo(playerid, TFuBag.S_TRADES)
   if not trades then
     trades = {}
-    TBag:SetPlayerInfo(playerid, TBag.S_TRADES, trades)
+    TFuBag:SetPlayerInfo(playerid, TFuBag.S_TRADES, trades)
   end
   return trades
 end
@@ -114,30 +114,30 @@ function Professions:GetTwoProfessions(playerid)
 end
 
 function Professions:GetTradeType(trade)
-  if TBag:Member(self.trades, trade) then
-    return TBag.S_SECOND
-  elseif TBag:Member(self.seconds, trade) then
-    return TBag.S_TRADES
+  if TFuBag:Member(self.trades, trade) then
+    return TFuBag.S_SECOND
+  elseif TFuBag:Member(self.seconds, trade) then
+    return TFuBag.S_TRADES
   else
-    return TBag.S_SKILLS
+    return TFuBag.S_SKILLS
   end
 end
 
 function Professions:GetTradeCreated(trade)
-  if not TBagCfg[TBag.S_CREATED] then
-    TBagCfg[TBag.S_CREATED] = {}
-    TBagCfg[TBag.S_CREATED][TBag.S_VERSION] = self.DB_VERSION
+  if not TFuBagCfg[TFuBag.S_CREATED] then
+    TFuBagCfg[TFuBag.S_CREATED] = {}
+    TFuBagCfg[TFuBag.S_CREATED][TFuBag.S_VERSION] = self.DB_VERSION
   end
-  TBagCfg[TBag.S_CREATED][trade] = TBagCfg[TBag.S_CREATED][trade] or {}
-  return TBagCfg[TBag.S_CREATED][trade]
+  TFuBagCfg[TFuBag.S_CREATED][trade] = TFuBagCfg[TFuBag.S_CREATED][trade] or {}
+  return TFuBagCfg[TFuBag.S_CREATED][trade]
 end
 
 function Professions:GetReagents()
-  if not TBagCfg[TBag.S_REAGENT] then
-    TBagCfg[TBag.S_REAGENT] = {}
-    TBagCfg[TBag.S_REAGENT][TBag.S_VERSION] = self.DB_VERSION
+  if not TFuBagCfg[TFuBag.S_REAGENT] then
+    TFuBagCfg[TFuBag.S_REAGENT] = {}
+    TFuBagCfg[TFuBag.S_REAGENT][TFuBag.S_VERSION] = self.DB_VERSION
   end
-  return TBagCfg[TBag.S_REAGENT]
+  return TFuBagCfg[TFuBag.S_REAGENT]
 end
 
 local scanningTrades = false
@@ -173,7 +173,7 @@ function Professions:GetSkillRank(trade)
 end
 
 function Professions:ScanAllTradeRanks()
-  local player = TBag:GetPlayer(TBag.PLAYERID)
+  local player = TFuBag:GetPlayer(TFuBag.PLAYERID)
   local prof1,prof2,arch,fish,cook,firstAid = GetProfessions()
   -- Grab the info for the first two professions and update them
   -- saving the names so we can wipe everything else.
@@ -182,46 +182,46 @@ function Professions:ScanAllTradeRanks()
     local rank, cache, _
     prof1_name,_,rank = GetProfessionInfo(prof1)
     prof1_name = RL[prof1_name]
-    cache = player[TBag.S_TRADES][prof1_name]
+    cache = player[TFuBag.S_TRADES][prof1_name]
     if cache ~= rank then
-      player[TBag.S_TRADES][prof1_name] = rank
-      TBagCfg["trades_changed"] = 1
+      player[TFuBag.S_TRADES][prof1_name] = rank
+      TFuBagCfg["trades_changed"] = 1
     end
   end
   if prof2 then
     local rank, cache, _
     prof2_name,_,rank = GetProfessionInfo(prof2)
     prof2_name = RL[prof2_name]
-    cache = player[TBag.S_TRADES][prof2_name]
+    cache = player[TFuBag.S_TRADES][prof2_name]
     if cache ~= rank then
-      player[TBag.S_TRADES][prof2_name] = rank
-      TBagCfg["trades_changed"] = 1
+      player[TFuBag.S_TRADES][prof2_name] = rank
+      TFuBagCfg["trades_changed"] = 1
     end
   end
   -- wipe professions that we didn't see this time
-  for trade in pairs(player[TBag.S_TRADES]) do
+  for trade in pairs(player[TFuBag.S_TRADES]) do
     if trade ~= prof1_name and trade ~= prof2_name then
-      player[TBag.S_TRADES][trade] = nil
-      TBagCfg["trades_changed"] = 1
+      player[TFuBag.S_TRADES][trade] = nil
+      TFuBagCfg["trades_changed"] = 1
     end
   end
 
   -- Secondary skills
   if arch then
     local name,_,rank = GetProfessionInfo(arch)
-    player[TBag.S_SECOND][RL[name]] = rank
+    player[TFuBag.S_SECOND][RL[name]] = rank
   end
   if fish then
     local name,_,rank = GetProfessionInfo(fish)
-    player[TBag.S_SECOND][RL[name]] = rank
+    player[TFuBag.S_SECOND][RL[name]] = rank
   end
   if cook then
     local name,_,rank = GetProfessionInfo(cook)
-    player[TBag.S_SECOND][RL[name]] = rank
+    player[TFuBag.S_SECOND][RL[name]] = rank
   end
   if firstAid then
     local name,_,rank = GetProfessionInfo(firstAid)
-    player[TBag.S_SECOND][RL[name]] = rank
+    player[TFuBag.S_SECOND][RL[name]] = rank
   end
 
   -- We don't do anything with other skills
@@ -229,10 +229,10 @@ end
 
 
 local function trade_skill_tooltip_scan(i, j)
-  local tt = TBag_tt
+  local tt = TFuBag_tt
 
   if (not tt) then
-    tt = CreateFrame("GameTooltip","TBag_tt")
+    tt = CreateFrame("GameTooltip","TFuBag_tt")
     -- Allow tooltip set methods to dynamically add new lines based on these
     tt:AddFontStrings(
       tt:CreateFontString("$parentTextLeft1", nil, "GameTooltipText"),
@@ -253,7 +253,7 @@ local function add_craft(created, reagent, tradeskillName, i)
   -- tooltip because it'll give us enough of the link to get what we want.
   local craftItemLink = trade_skill_tooltip_scan(i)
   if not craftItemLink then return end
-  TBag:SetItemLink(created, craftItemLink)
+  TFuBag:SetItemLink(created, craftItemLink)
 
   for j = 1, C_TradeSkillUI.GetRecipeNumReagents(i) do
     local reagentItemLink = trade_skill_tooltip_scan(i, j)
@@ -345,22 +345,22 @@ end
 
 function Professions:MakeTradeCreationKeywords(itm, itemid, trade1, trade2, docreated)
   if not itm or not itemid then return end
-  if not itm[TBag.I_ITEMLINK] then return end
-  local created = TBagCfg[TBag.S_CREATED]
+  if not itm[TFuBag.I_ITEMLINK] then return end
+  local created = TFuBagCfg[TFuBag.S_CREATED]
 
   for trade in pairs(created) do
-    if trade ~= TBag.S_VERSION and trade ~= TBag.S_UPDATE then
+    if trade ~= TFuBag.S_VERSION and trade ~= TFuBag.S_UPDATE then
       if created[trade][itemid] then
         if docreated == 1 then
-          itm[TBag.I_KEYWORD][string.format(L["%s_CREATED"],L[TBag:Cat(trade)])] = 1
+          itm[TFuBag.I_KEYWORD][string.format(L["%s_CREATED"],L[TFuBag:Cat(trade)])] = 1
           if trade == trade1 then
-            itm[TBag.I_KEYWORD][string.format(L["%s_CREATED"],L["TRADE1"])] = 1
+            itm[TFuBag.I_KEYWORD][string.format(L["%s_CREATED"],L["TRADE1"])] = 1
           end
           if trade == trade2 then
-            itm[TBag.I_KEYWORD][string.format(L["%s_CREATED"],L["TRADE2"])] = 1
+            itm[TFuBag.I_KEYWORD][string.format(L["%s_CREATED"],L["TRADE2"])] = 1
           end
         else
-          itm[TBag.I_KEYWORD][string.format(L["%s_CREATED"],L[TBag:Cat(trade)])] = nil
+          itm[TFuBag.I_KEYWORD][string.format(L["%s_CREATED"],L[TFuBag:Cat(trade)])] = nil
         end
       end
     end
@@ -369,8 +369,8 @@ end
 
 function Professions:MakeTradeReagentKeywords(itm, itemid, trade1, trade2)
   if not itm or not itemid then return end
-  if not itm[TBag.I_ITEMLINK] then return end
-  local reagents = TBagCfg[TBag.S_REAGENT]
+  if not itm[TFuBag.I_ITEMLINK] then return end
+  local reagents = TFuBagCfg[TFuBag.S_REAGENT]
 
   if reagents[itemid] then
     local max_count = 0
@@ -387,19 +387,19 @@ function Professions:MakeTradeReagentKeywords(itm, itemid, trade1, trade2)
       end
     end
     for trade in pairs(counts[max_count]) do
-      itm[TBag.I_KEYWORD][L[TBag:Cat(trade)]] = 1
+      itm[TFuBag.I_KEYWORD][L[TFuBag:Cat(trade)]] = 1
       if trade == trade1 then
-        itm[TBag.I_KEYWORD][L["TRADE1"]] = 1
+        itm[TFuBag.I_KEYWORD][L["TRADE1"]] = 1
       end
       if trade == trade2 then
-        itm[TBag.I_KEYWORD][L["TRADE2"]] = 1
+        itm[TFuBag.I_KEYWORD][L["TRADE2"]] = 1
       end
     end
   end
 end
 
 function Professions:MakeAllTradeKeywords(itm, docreated, trade1, trade2)
-  local itemid = TBag:GetItemID(itm[TBag.I_ITEMLINK])
+  local itemid = TFuBag:GetItemID(itm[TFuBag.I_ITEMLINK])
   self:MakeTradeCreationKeywords(itm, itemid, trade1, trade2, docreated)
   self:MakeTradeReagentKeywords(itm, itemid, trade1, trade2)
 end

@@ -11,15 +11,15 @@
 ---------------------------------------------------------------------
 
 local _G = getfenv(0)
-local TBag = _G.TBag
+local TFuBag = _G.TFuBag
 
 local function do_nothing()
   return
 end
 
 local TradeCreations = {
-		[TBag.S_UPDATE] = "1504086123",
-		[TBag.S_VERSION] = 3,
+		[TFuBag.S_UPDATE] = "1504086123",
+		[TFuBag.S_VERSION] = 3,
 		["Alchemy"] = {
 			["118"] = 1,
 			["858"] = 1,
@@ -5046,8 +5046,8 @@ local TradeCreations = {
 
 
 local Reagents = {
-		[TBag.S_UPDATE] = "1504086123",
-		[TBag.S_VERSION] = 3,
+		[TFuBag.S_UPDATE] = "1504086123",
+		[TFuBag.S_VERSION] = 3,
 		["118"] = {
 			["Alchemy"] = {
 				["858"] =1,
@@ -24282,73 +24282,73 @@ local Reagents = {
 
 
 
-function TBag:MergeCreations(TBagCfg,tradetype,new)
-  if TBagCfg[tradetype] == nil then
-    TBagCfg[tradetype] = {};
+function TFuBag:MergeCreations(TFuBagCfg,tradetype,new)
+  if TFuBagCfg[tradetype] == nil then
+    TFuBagCfg[tradetype] = {};
   end
   for trade,value in pairs(new) do
     if (type(new[trade]) == "table") then
-      if TBagCfg[tradetype][trade] == nil then
-        TBagCfg[tradetype][trade] = {};
+      if TFuBagCfg[tradetype][trade] == nil then
+        TFuBagCfg[tradetype][trade] = {};
       end
       for itemid,_ in pairs(new[trade]) do
-        TBagCfg[tradetype][trade][itemid] = 1;
+        TFuBagCfg[tradetype][trade][itemid] = 1;
       end
     else
-      TBagCfg[tradetype][trade] = value;
+      TFuBagCfg[tradetype][trade] = value;
     end
   end
 	-- Remove obsolete poisons entry
-	TBagCfg[tradetype]["Poisons"] = nil
+	TFuBagCfg[tradetype]["Poisons"] = nil
 end
 
-function TBag:RefreshCreations(TBagCfg)
-  if (TBagCfg[self.S_CREATED] == nil or TBagCfg[self.S_CREATED][self.S_VERSION] ~= 3) then
-    TBagCfg[self.S_CREATED] = TradeCreations;
-  elseif (TBagCfg[self.S_CREATED][self.S_UPDATE] == nil or
-          TBagCfg[self.S_CREATED][self.S_UPDATE] < TradeCreations[self.S_UPDATE]) then
-    self:MergeCreations(TBagCfg,self.S_CREATED,TradeCreations);
+function TFuBag:RefreshCreations(TFuBagCfg)
+  if (TFuBagCfg[self.S_CREATED] == nil or TFuBagCfg[self.S_CREATED][self.S_VERSION] ~= 3) then
+    TFuBagCfg[self.S_CREATED] = TradeCreations;
+  elseif (TFuBagCfg[self.S_CREATED][self.S_UPDATE] == nil or
+          TFuBagCfg[self.S_CREATED][self.S_UPDATE] < TradeCreations[self.S_UPDATE]) then
+    self:MergeCreations(TFuBagCfg,self.S_CREATED,TradeCreations);
   end
   -- Replace this function with a noop and remove the data and the merge function
   -- that only needs to be here the first time.
-  TBag.RefreshCreations = do_nothing
-  TBag.MergeCreations = nil
+  TFuBag.RefreshCreations = do_nothing
+  TFuBag.MergeCreations = nil
   TradeCreations = nil
 end
 
-function TBag:MergeReagents(TBagCfg,new)
-  if TBagCfg[self.S_REAGENT] == nil then
-    TBagCfg[self.S_REAGENT] = {};
+function TFuBag:MergeReagents(TFuBagCfg,new)
+  if TFuBagCfg[self.S_REAGENT] == nil then
+    TFuBagCfg[self.S_REAGENT] = {};
   end
   for reagent,reagent_value in pairs(new) do
-    if (TBagCfg[self.S_REAGENT][reagent] == nil) then
-      TBagCfg[self.S_REAGENT][reagent] = {};
+    if (TFuBagCfg[self.S_REAGENT][reagent] == nil) then
+      TFuBagCfg[self.S_REAGENT][reagent] = {};
     end
     if (type(new[reagent]) == "table") then
       for trade,_ in pairs(new[reagent]) do
-        if (TBagCfg[self.S_REAGENT][reagent][trade] == nil) then
-          TBagCfg[self.S_REAGENT][reagent][trade] = {};
+        if (TFuBagCfg[self.S_REAGENT][reagent][trade] == nil) then
+          TFuBagCfg[self.S_REAGENT][reagent][trade] = {};
         end
         for itemid in pairs(new[reagent][trade]) do
-          TBagCfg[self.S_REAGENT][reagent][trade][itemid] = 1;
+          TFuBagCfg[self.S_REAGENT][reagent][trade][itemid] = 1;
         end
       end
     else
-      TBagCfg[self.S_REAGENT][reagent] = reagent_value;
+      TFuBagCfg[self.S_REAGENT][reagent] = reagent_value;
     end
   end
 end
 
-function TBag:RefreshReagents(TBagCfg)
-  if (TBagCfg[self.S_REAGENT] == nil or TBagCfg[self.S_REAGENT][self.S_VERSION] ~= 3) then
-    TBagCfg[self.S_REAGENT] = Reagents;
-  elseif (TBagCfg[self.S_REAGENT][self.S_UPDATE] == nil or
-          TBagCfg[self.S_REAGENT][self.S_UPDATE] < Reagents[self.S_UPDATE]) then
-    self:MergeReagents(TBagCfg,Reagents);
+function TFuBag:RefreshReagents(TFuBagCfg)
+  if (TFuBagCfg[self.S_REAGENT] == nil or TFuBagCfg[self.S_REAGENT][self.S_VERSION] ~= 3) then
+    TFuBagCfg[self.S_REAGENT] = Reagents;
+  elseif (TFuBagCfg[self.S_REAGENT][self.S_UPDATE] == nil or
+          TFuBagCfg[self.S_REAGENT][self.S_UPDATE] < Reagents[self.S_UPDATE]) then
+    self:MergeReagents(TFuBagCfg,Reagents);
   end
   -- Replace this function with a noop and remove the data and the merge function
   -- that only needs to be here the first time.
-  TBag.RefreshReagents = do_nothing
-  TBag.MergeReagents = nil
+  TFuBag.RefreshReagents = do_nothing
+  TFuBag.MergeReagents = nil
   Reagents = nil
 end

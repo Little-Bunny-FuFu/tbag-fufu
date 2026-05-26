@@ -2,9 +2,9 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/"   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"   xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
   <Script file="TInv.lua"/>
 
-  <Frame name="TInvFrame" inherits="TBag_MainTemplate">
+  <Frame name="TFuInvFrame" inherits="TFuBag_MainTemplate">
     <Frames>
-      <Button name="TInv_Button_Close">
+      <Button name="TFuInv_Button_Close">
         <Size><AbsDimension x="34" y="34"/></Size>
         <NormalTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Up" />
         <PushedTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Down" />
@@ -18,18 +18,18 @@
         </Anchors>
         <Scripts>
           <OnClick>
-            TInvFrame:Hide()
+            TFuInvFrame:Hide()
           </OnClick>
         </Scripts>
       </Button>
 
-      <Button name="TInv_Button_MoveLockToggle">
+      <Button name="TFuInv_Button_MoveLockToggle">
         <Size><AbsDimension x="34" y="34"/></Size>
-        <NormalTexture name="TInvLockNorm"/>
-        <PushedTexture name="TInvLockPush"/>
+        <NormalTexture name="TFuInvLockNorm"/>
+        <PushedTexture name="TFuInvLockPush"/>
         <HighlightTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Highlight" AlphaMode="ADD"/>
         <Anchors>
-          <Anchor point="TOPRIGHT" relativeTo="TInv_Button_Close" relativePoint="TOPLEFT">
+          <Anchor point="TOPRIGHT" relativeTo="TFuInv_Button_Close" relativePoint="TOPLEFT">
             <Offset>
               <AbsDimension x="10" y="0"/>
             </Offset>
@@ -37,15 +37,15 @@
         </Anchors>
         <Scripts>
           <OnClick>
-            TInvFrame.Button_MoveLockToggle_OnClick(self, button);
+            TFuInvFrame.Button_MoveLockToggle_OnClick(self, button);
           </OnClick>
           <OnEnter>
-            if (TInvFrame.cfg["moveLock"] == 0) then
-              GameTooltip_AddNewbieTip(self, TBag.LOCALE["Unlock Window"], 1.0, 1.0, 1.0,
-                                       TBag.LOCALE["Allow window to be moved by dragging it."]);
+            if (TFuInvFrame.cfg["moveLock"] == 0) then
+              GameTooltip_AddNewbieTip(self, TFuBag.LOCALE["Unlock Window"], 1.0, 1.0, 1.0,
+                                       TFuBag.LOCALE["Allow window to be moved by dragging it."]);
             else
-              GameTooltip_AddNewbieTip(self, TBag.LOCALE["Lock Window"], 1.0, 1.0, 1.0,
-                                       TBag.LOCALE["Prevent window from being moved by dragging it."]);
+              GameTooltip_AddNewbieTip(self, TFuBag.LOCALE["Lock Window"], 1.0, 1.0, 1.0,
+                                       TFuBag.LOCALE["Prevent window from being moved by dragging it."]);
             end
           </OnEnter>
           <OnLeave>
@@ -55,7 +55,7 @@
         </Scripts>
       </Button>
 
-      <Frame name="TInv_UserDropdown" inherits="TBag_UserDropdownTemplate">
+      <Frame name="TFuInv_UserDropdown" inherits="TFuBag_UserDropdownTemplate">
         <Anchors>
           <Anchor point="TOPLEFT">
             <Offset>
@@ -65,19 +65,19 @@
         </Anchors>
         <Scripts>
           <OnShow>
-            TInvFrame.UserDropdown_OnLoad(self);
+            TFuInvFrame.UserDropdown_OnLoad(self);
           </OnShow>
         </Scripts>
       </Frame>
 
 
-      <Button name="TInv_Button_HighlightToggle">
+      <Button name="TFuInv_Button_HighlightToggle">
         <Size><AbsDimension x="20" y="20"/></Size>
         <NormalTexture file="Interface\Icons\INV_Misc_Gem_Pearl_04" />
         <PushedTexture file="Interface\Icons\INV_Misc_Gem_Pearl_04" />
         <HighlightTexture file="Interface\Icons\INV_Misc_Gem_Pearl_04" alphaMode="ADD" />
         <Anchors>
-          <Anchor point="TOPLEFT" relativeTo="TInv_UserDropdown" relativePoint="TOPRIGHT">
+          <Anchor point="TOPLEFT" relativeTo="TFuInv_UserDropdown" relativePoint="TOPRIGHT">
             <Offset>
               <AbsDimension x="15" y="-3"/>
             </Offset>
@@ -85,15 +85,15 @@
         </Anchors>
         <Scripts>
           <OnClick>
-            TInvFrame.Button_HighlightToggle_OnClick(self, button, down);
+            TFuInvFrame.Button_HighlightToggle_OnClick(self, button, down);
           </OnClick>
           <OnEnter>
-            if (TBag.SrchText) then
-              GameTooltip_AddNewbieTip(self, TBag.LOCALE["Clear Search"], 1.0, 1.0, 1.0, TBag.LOCALE["Stop highlighting search results."]);
-            elseif (TInvFrame.hilight_new == 0) then
-              GameTooltip_AddNewbieTip(self, TBag.LOCALE["Highlight New"], 1.0, 1.0, 1.0, TBag.LOCALE["Highlight items marked as new."]);
+            if (TFuBag.SrchText) then
+              GameTooltip_AddNewbieTip(self, TFuBag.LOCALE["Clear Search"], 1.0, 1.0, 1.0, TFuBag.LOCALE["Stop highlighting search results."]);
+            elseif (TFuInvFrame.hilight_new == 0) then
+              GameTooltip_AddNewbieTip(self, TFuBag.LOCALE["Highlight New"], 1.0, 1.0, 1.0, TFuBag.LOCALE["Highlight items marked as new."]);
             else
-              GameTooltip_AddNewbieTip(self, TBag.LOCALE["Normal"], 1.0, 1.0, 1.0, TBag.LOCALE["Stop highlighting new items."]);
+              GameTooltip_AddNewbieTip(self, TFuBag.LOCALE["Normal"], 1.0, 1.0, 1.0, TFuBag.LOCALE["Stop highlighting new items."]);
             end
           </OnEnter>
           <OnLeave>
@@ -103,13 +103,13 @@
         </Scripts>
       </Button>
 
-      <Button name="TInv_Button_ChangeEditMode">
+      <Button name="TFuInv_Button_ChangeEditMode">
         <Size><AbsDimension x="20" y="20"/></Size>
         <NormalTexture file="Interface\Icons\Trade_Engineering" />
         <PushedTexture file="Interface\Icons\Trade_Engineering" />
         <HighlightTexture file="Interface\Icons\Trade_Engineering" alphaMode="ADD" />
         <Anchors>
-          <Anchor point="TOPLEFT" relativeTo="TInv_Button_HighlightToggle" relativePoint="TOPRIGHT">
+          <Anchor point="TOPLEFT" relativeTo="TFuInv_Button_HighlightToggle" relativePoint="TOPRIGHT">
             <Offset>
               <AbsDimension x="2" y="0"/>
             </Offset>
@@ -117,10 +117,10 @@
         </Anchors>
         <Scripts>
           <OnClick>
-            TInvFrame.Button_ChangeEditMode_OnClick(self, button, down);
+            TFuInvFrame.Button_ChangeEditMode_OnClick(self, button, down);
           </OnClick>
           <OnEnter>
-            GameTooltip_AddNewbieTip(self, TBag.LOCALE["Toggle Edit Mode"], 1.0, 1.0, 1.0, TBag.LOCALE["Select this option to move classes of items into different 'bars' (the red numbers)."]);
+            GameTooltip_AddNewbieTip(self, TFuBag.LOCALE["Toggle Edit Mode"], 1.0, 1.0, 1.0, TFuBag.LOCALE["Select this option to move classes of items into different 'bars' (the red numbers)."]);
           </OnEnter>
           <OnLeave>
             GameTooltip:Hide();
@@ -130,13 +130,13 @@
       </Button>
 
 
-      <Button name="TInv_Button_ShowBank" inherits="GameMenuButtonTemplate">
+      <Button name="TFuInv_Button_ShowBank" inherits="GameMenuButtonTemplate">
         <Size><AbsDimension x="20" y="20"/></Size>
         <NormalTexture file="Interface\Icons\INV_Box_03" />
         <PushedTexture file="Interface\Icons\INV_Box_03" />
         <HighlightTexture file="Interface\Icons\INV_Box_03" alphaMode="ADD" />
         <Anchors>
-          <Anchor point="TOPLEFT" relativeTo="TInv_Button_ChangeEditMode" relativePoint="TOPRIGHT">
+          <Anchor point="TOPLEFT" relativeTo="TFuInv_Button_ChangeEditMode" relativePoint="TOPRIGHT">
             <Offset>
               <AbsDimension x="2" y="0"/>
             </Offset>
@@ -144,10 +144,10 @@
         </Anchors>
         <Scripts>
           <OnClick>
-            TInvFrame.Button_ShowBank_OnClick(self, button, down);
+            TFuInvFrame.Button_ShowBank_OnClick(self, button, down);
           </OnClick>
           <OnEnter>
-            GameTooltip_AddNewbieTip(self, TBag.LOCALE["Toggle Bank"], 1.0, 1.0, 1.0, TBag.LOCALE["Displays bank contents in a view-only mode.  You may select another player's bank to view from the dropdown."]);
+            GameTooltip_AddNewbieTip(self, TFuBag.LOCALE["Toggle Bank"], 1.0, 1.0, 1.0, TFuBag.LOCALE["Displays bank contents in a view-only mode.  You may select another player's bank to view from the dropdown."]);
           </OnEnter>
           <OnLeave>
             GameTooltip:Hide();
@@ -156,13 +156,13 @@
         </Scripts>
       </Button>
 
-      <Button name="TInv_Button_Reload">
+      <Button name="TFuInv_Button_Reload">
         <Size><AbsDimension x="20" y="20"/></Size>
         <NormalTexture file="Interface\Icons\Spell_Frost_Stun" />
         <PushedTexture file="Interface\Icons\Spell_Frost_Stun" />
         <HighlightTexture file="Interface\Icons\Spell_Frost_Stun" alphaMode="ADD" />
         <Anchors>
-          <Anchor point="TOPLEFT" relativeTo="TInv_Button_ShowBank" relativePoint="TOPRIGHT">
+          <Anchor point="TOPLEFT" relativeTo="TFuInv_Button_ShowBank" relativePoint="TOPRIGHT">
             <Offset>
               <AbsDimension x="2" y="0"/>
             </Offset>
@@ -170,10 +170,10 @@
         </Anchors>
         <Scripts>
           <OnClick>
-            TInvFrame.Button_Reload_OnClick(self, button, down);
+            TFuInvFrame.Button_Reload_OnClick(self, button, down);
           </OnClick>
           <OnEnter>
-            GameTooltip_AddNewbieTip(self, TBag.LOCALE["Reload and Sort"], 1.0, 1.0, 1.0, TBag.LOCALE["Reloads your items and sorts them."]);
+            GameTooltip_AddNewbieTip(self, TFuBag.LOCALE["Reload and Sort"], 1.0, 1.0, 1.0, TFuBag.LOCALE["Reloads your items and sorts them."]);
           </OnEnter>
           <OnLeave>
             GameTooltip:Hide();
@@ -182,7 +182,7 @@
         </Scripts>
       </Button>
 
-    <EditBox name="TInv_SearchBox" inherits="TBag_SearchBoxTemplate">
+    <EditBox name="TFuInv_SearchBox" inherits="TFuBag_SearchBoxTemplate">
         <Anchors>
           <Anchor point="BOTTOMLEFT">
             <Offset>
@@ -192,7 +192,7 @@
         </Anchors>
     </EditBox>
 
-      <CheckButton name="TInvacterBag3Slot" inherits="TBag_BagButtonTemplate" id="4">
+      <CheckButton name="TFuInvacterBag3Slot" inherits="TFuBag_BagButtonTemplate" id="4">
         <Anchors>
           <Anchor point="BOTTOMLEFT" relativeTo="$parent_Total" relativePoint="BOTTOMRIGHT">
             <Offset>
@@ -201,38 +201,27 @@
           </Anchor>
         </Anchors>
       </CheckButton>
-      <CheckButton name="TInvacterBag2Slot" inherits="TBag_BagButtonTemplate" id="3">
+      <CheckButton name="TFuInvacterBag2Slot" inherits="TFuBag_BagButtonTemplate" id="3">
         <Anchors>
-          <Anchor point="BOTTOMLEFT" relativeTo="TInvacterBag3Slot" relativePoint="BOTTOMRIGHT">
+          <Anchor point="BOTTOMLEFT" relativeTo="TFuInvacterBag3Slot" relativePoint="BOTTOMRIGHT">
             <Offset>
               <AbsDimension x="3" y="0" />
             </Offset>
           </Anchor>
         </Anchors>
       </CheckButton>
-      <CheckButton name="TInvacterBag1Slot" inherits="TBag_BagButtonTemplate" id="2">
+      <CheckButton name="TFuInvacterBag1Slot" inherits="TFuBag_BagButtonTemplate" id="2">
         <Anchors>
-          <Anchor point="BOTTOMLEFT" relativeTo="TInvacterBag2Slot" relativePoint="BOTTOMRIGHT">
+          <Anchor point="BOTTOMLEFT" relativeTo="TFuInvacterBag2Slot" relativePoint="BOTTOMRIGHT">
             <Offset>
               <AbsDimension x="3" y="0" />
             </Offset>
           </Anchor>
         </Anchors>
       </CheckButton>
-      <CheckButton name="TInvacterBag0Slot" inherits="TBag_BagButtonTemplate" id="1">
+      <CheckButton name="TFuInvacterBag0Slot" inherits="TFuBag_BagButtonTemplate" id="1">
         <Anchors>
-          <Anchor point="BOTTOMLEFT" relativeTo="TInvacterBag1Slot" relativePoint="BOTTOMRIGHT">
-            <Offset>
-              <AbsDimension x="3" y="0" />
-            </Offset>
-          </Anchor>
-        </Anchors>
-      </CheckButton>
-
-
-      <CheckButton name="TInvMenuBarBackpackButton" inherits="TBag_BagButtonTemplate" id="0">
-        <Anchors>
-          <Anchor point="LEFT" relativeTo="TInvacterBag0Slot" relativePoint="RIGHT">
+          <Anchor point="BOTTOMLEFT" relativeTo="TFuInvacterBag1Slot" relativePoint="BOTTOMRIGHT">
             <Offset>
               <AbsDimension x="3" y="0" />
             </Offset>
@@ -240,9 +229,20 @@
         </Anchors>
       </CheckButton>
 
-      <CheckButton name="TInvingButton" hidden="false" inherits="TBag_BagButtonTemplate">
+
+      <CheckButton name="TFuInvMenuBarBackpackButton" inherits="TFuBag_BagButtonTemplate" id="0">
         <Anchors>
-          <Anchor point="BOTTOMLEFT" relativeTo="TInvMenuBarBackpackButton" relativePoint="BOTTOMRIGHT">
+          <Anchor point="LEFT" relativeTo="TFuInvacterBag0Slot" relativePoint="RIGHT">
+            <Offset>
+              <AbsDimension x="3" y="0" />
+            </Offset>
+          </Anchor>
+        </Anchors>
+      </CheckButton>
+
+      <CheckButton name="TFuInvingButton" hidden="false" inherits="TFuBag_BagButtonTemplate">
+        <Anchors>
+          <Anchor point="BOTTOMLEFT" relativeTo="TFuInvMenuBarBackpackButton" relativePoint="BOTTOMRIGHT">
             <Offset>
               <AbsDimension x="4" y="0" />
             </Offset>
@@ -254,18 +254,18 @@
               self:Hide()
               return
             end
-            TBag.BagButton.OnLoad(self)
+            TFuBag.BagButton.OnLoad(self)
             self:SetID(KEYRING_CONTAINER)
           </OnLoad>
         </Scripts>
       </CheckButton>
 
-  <Frame name="TInvainerFrame12" inherits="TBagainerFrameTemplate" id="0"/>
-  <Frame name="TInvainerFrame13" inherits="TBagainerFrameTemplate" id="-2"/>
-  <Frame name="TInvainerFrame1" inherits="TBagainerFrameTemplate" id="1"/>
-  <Frame name="TInvainerFrame2" inherits="TBagainerFrameTemplate" id="2"/>
-  <Frame name="TInvainerFrame3" inherits="TBagainerFrameTemplate" id="3"/>
-  <Frame name="TInvainerFrame4" inherits="TBagainerFrameTemplate" id="4"/>
+  <Frame name="TFuInvainerFrame12" inherits="TFuBagainerFrameTemplate" id="0"/>
+  <Frame name="TFuInvainerFrame13" inherits="TFuBagainerFrameTemplate" id="-2"/>
+  <Frame name="TFuInvainerFrame1" inherits="TFuBagainerFrameTemplate" id="1"/>
+  <Frame name="TFuInvainerFrame2" inherits="TFuBagainerFrameTemplate" id="2"/>
+  <Frame name="TFuInvainerFrame3" inherits="TFuBagainerFrameTemplate" id="3"/>
+  <Frame name="TFuInvainerFrame4" inherits="TFuBagainerFrameTemplate" id="4"/>
 
       <Frame name="$parent_RightClickMenu" inherits="UIDropDownMenuTemplate" id="5" hidden="true">
         <Scripts>
@@ -273,7 +273,7 @@
             self:RegisterEvent("VARIABLES_LOADED");
           </OnLoad>
           <OnEvent>
-            TBag.Inv.RightClickMenu_OnLoad(self);
+            TFuBag.Inv.RightClickMenu_OnLoad(self);
           </OnEvent>
         </Scripts>
       </Frame>

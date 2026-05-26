@@ -1,16 +1,15 @@
-## Interface: 70300
-## Title: TBag
+## Interface: 120000
+## Title: TBag-fufu
 ## Notes: The last bag addon you'll ever need.  Autosorting, viewable anywhere, easy to use yet amazingly configurable.
 ## Notes-deDE: Das einzige Taschenaddon was du jemals brauchen wirst. Automatisches Sortieren, überall einsehbar, Benutzerfreundlich, dabei aber unglaublich gut Konfigurierbar.
 ## Notes-ruRU: Модификация сумок. Возможности - авто-сортировка, просмотр сумок, банка в лубом месте, легок в использовании, гибкие настройки. 
 ## X-Category: Inventory
-## Author: Talos, Modified by Shefki
+## Author: Talos, Modified by Shefki; revived as -fufu fork
 ## X-Email: shefki@shefki.org
-## X-Website: http://wow.curse.com/downloads/details/8064/
-## X-Feedback: http://wow.curseforge.com/projects/tbag-shefki/tickets/
+## X-Notes: Personal -fufu revival fork of the abandoned tbag-shefki; updated for retail 12.0.
 ## RequiredDeps:
 ## OptionalDeps: Auctioneer
-## SavedVariables: TBagCfg, TBagInfo, TBnkItm, TInvItm, TContItm, TBodyItm, TMailItm, TTknItm
+## SavedVariables: TFuBagCfg, TFuBagInfo, TFuBnkItm, TFuInvItm, TFuContItm, TFuBodyItm, TFuMailItm, TFuTknItm
 ## X-Localizations: enUS, deDE, ruRU
 ## X-CompatibleLocales: enUS, deDE, ruRU
 ##

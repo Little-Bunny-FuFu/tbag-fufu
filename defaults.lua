@@ -1,15 +1,15 @@
 -- $Id$
 
 -- Localization Support
-local L = TBag.LOCALE;
+local L = TFuBag.LOCALE;
 
-TBag.S_RARITY  = "R_";  -- Do not touch this  ;-)
+TFuBag.S_RARITY  = "R_";  -- Do not touch this  ;-)
 
-TBag.DefaultItemOverrides = {
+TFuBag.DefaultItemOverrides = {
 };
 
 -- Category, Keywords, Tooltip Search, ItemType, ItemSubType
-TBag.DefaultSearchList = {
+TFuBag.DefaultSearchList = {
 -- Quest items and Collectibles
   { L["ACT_ON"], L[""], L["This Item Begins a Quest"], L[""], L[""] },
   { L["ACT_OPEN"], L[""], L["<Right Click to Open>"], L[""], L[""] },
@@ -159,7 +159,7 @@ TBag.DefaultSearchList = {
   { L["QUEST"], L[""], L["Quest Item"], L[""], L[""] },
   { L["QUEST"], L[""], L["Morbent"], L["Armor"], L[""] },
   { L["CONSUMABLE"], L[""], L["Goblin Gumbo"], L["Consumable"], L[""] },
-  { L["GRAY_ITEMS"], TBag.S_RARITY.."0",  L[""], L[""], L[""] },
+  { L["GRAY_ITEMS"], TFuBag.S_RARITY.."0",  L[""], L[""], L[""] },
 
 -- Containers
   { L["BAG"], L[""], L[""], L["Container"], L[""] },

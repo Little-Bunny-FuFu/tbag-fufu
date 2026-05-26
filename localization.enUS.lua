@@ -31,33 +31,33 @@
 -- patterns.  Documentation can be found at:
 -- http://www.wowwiki.com/HOWTO:_Use_Regular_Expressions
 
-TBag.LOCALES = {}
-TBag.LOCALES.enUS = {}
-TBag.LOCALES.current = TBag.LOCALES.enUS
+TFuBag.LOCALES = {}
+TFuBag.LOCALES.enUS = {}
+TFuBag.LOCALES.current = TFuBag.LOCALES.enUS
 
-TBag.LOCALE = setmetatable({},
+TFuBag.LOCALE = setmetatable({},
   {__index = function(self,key)
-    local value = rawget(TBag.LOCALES.current,key)
+    local value = rawget(TFuBag.LOCALES.current,key)
     if value then
       return value
     end
-    rawset(TBag.LOCALES.current, key, key)
+    rawset(TFuBag.LOCALES.current, key, key)
     -- Only output the warning on unpackaged versions.
     --@alpha@
-    DEFAULT_CHAT_FRAME:AddMessage(string.format("TBag: Please localize: %q", tostring(key)))
+    DEFAULT_CHAT_FRAME:AddMessage(string.format("TFuBag: Please localize: %q", tostring(key)))
     --@end-alpha@
     return key
    end,
    __newindex = function(self, key, value)
-     if not rawget(TBag.LOCALES.current, key) then
+     if not rawget(TFuBag.LOCALES.current, key) then
        -- Replace true with the key as the value
-       rawset(TBag.LOCALES.current, key, value == true and key or value)
+       rawset(TFuBag.LOCALES.current, key, value == true and key or value)
      else
-      DEFAULT_CHAT_FRAME:AddMessage(string.format("TBag: Duplicate translation for: %q",tostring(key)))
+      DEFAULT_CHAT_FRAME:AddMessage(string.format("TFuBag: Duplicate translation for: %q",tostring(key)))
      end
    end })
 
-local L = TBag.LOCALE
+local L = TFuBag.LOCALE
 
 L[""] = true -- Needed to preserve nil returns
 
@@ -404,7 +404,7 @@ L["tests"] = true
 L["getcat"] = true
 
 -- /tbnk help text
-L["TBnk Commands:"] = true
+L["TFuBnk Commands:"] = true
 L[" /tbnk show  -- open window"] = true
 L[" /tbnk hide  -- hide window"] = true
 L[" /tbnk update  -- refresh the window"] = true
@@ -417,7 +417,7 @@ L[" /tbnk printchars -- prints a list of all the chars with cached info"] = true
 L[" /tbnk deletechar CHAR SERVER -- clears all cached info for character "] = true
 
 -- /tinv help text
-L["TInv Commands:"] = true
+L["TFuInv Commands:"] = true
 L[" /tinv show  -- open window"] = true
 L[" /tinv hide  -- hide window"] = true
 L[" /tinv update  -- refresh the window"] = true

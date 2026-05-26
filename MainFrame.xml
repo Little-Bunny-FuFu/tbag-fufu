@@ -2,7 +2,7 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
   <Script file="MainFrame.lua"/>
 
-  <Frame name="TBag_MainTemplate" toplevel="true" frameStrata="MEDIUM" movable="true" enableMouse="true" hidden="true" parent="UIParent" virtual="true">
+  <Frame name="TFuBag_MainTemplate" toplevel="true" frameStrata="MEDIUM" movable="true" enableMouse="true" hidden="true" parent="UIParent" virtual="true">
     <Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
       <EdgeSize>
         <AbsValue val="4"/>
@@ -15,9 +15,9 @@
       </BackgroundInsets>
     </Backdrop>
     <Frames>
-      <Button name="$parent_ColumnsAdd" inherits="TBag_ColumnsButtonTemplate"/>
-      <Button name="$parent_ColumnsDel" inherits="TBag_ColumnsButtonTemplate"/>
-      <Frame name="$parent_Total" hidden="false" inherits="TBag_TotalTemplate"/>
+      <Button name="$parent_ColumnsAdd" inherits="TFuBag_ColumnsButtonTemplate"/>
+      <Button name="$parent_ColumnsDel" inherits="TFuBag_ColumnsButtonTemplate"/>
+      <Frame name="$parent_Total" hidden="false" inherits="TFuBag_TotalTemplate"/>
       <Frame name="$parent_MoneyFrame" hidden="false" inherits="SmallMoneyFrameTemplate">
         <Size><AbsDimension x="22" y="25"/></Size>
         <Scripts>
@@ -27,7 +27,7 @@
           </OnLoad>
         </Scripts>
       </Frame>
-      <Frame name="$parent_TokenFrame" hidden="false" inherits="TBag_TokenFrameTemplate"/>
+      <Frame name="$parent_TokenFrame" hidden="false" inherits="TFuBag_TokenFrameTemplate"/>
     </Frames>
     <Scripts>
       <OnLoad>

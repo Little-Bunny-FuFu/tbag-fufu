@@ -2,7 +2,7 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
   <Script file="TBnkOpts.lua"/>
 
-  <Slider name="TBnk_SliderTemplate" orientation="HORIZONTAL" virtual="true" enableMouse="true">
+  <Slider name="TFuBnk_SliderTemplate" orientation="HORIZONTAL" virtual="true" enableMouse="true">
     <Size>
       <AbsDimension x="128" y="17"/>
     </Size>
@@ -35,7 +35,7 @@
       <OnValueChanged>
         local this = self or _G.this     
         local arg1 = value or _G.arg1
-        arg1 = TBnk_Opts_ControlValueChanged(this, arg1);
+        arg1 = TFuBnk_Opts_ControlValueChanged(this, arg1);
         _G[this:GetName().."_disp_text"]:SetText( arg1 );
       </OnValueChanged>
     </Scripts>
@@ -49,7 +49,7 @@
     </Layers>
   </Slider>
 
-  <EditBox name="TBnk_InputBoxTemplate" inherits="InputBoxTemplate" virtual="true" autoFocus="false">
+  <EditBox name="TFuBnk_InputBoxTemplate" inherits="InputBoxTemplate" virtual="true" autoFocus="false">
     <Scripts>
       <OnTabPressed>
         local this = self or _G.this     
@@ -61,21 +61,21 @@
       </OnEnterPressed>
       <OnTextChanged>
         local this = self or _G.this     
-        TBnk_Opts_ControlValueChanged(this,this:GetText());
+        TFuBnk_Opts_ControlValueChanged(this,this:GetText());
       </OnTextChanged>
     </Scripts>
   </EditBox>
 
-  <Button name="TBnk_Opts_ButtonTemplate" inherits="GameMenuButtonTemplate" virtual="true" hidden="true">
+  <Button name="TFuBnk_Opts_ButtonTemplate" inherits="GameMenuButtonTemplate" virtual="true" hidden="true">
     <Scripts>
       <OnClick>
         local this = self or _G.this     
-        TBnk_Opts_ControlValueChanged(this);
+        TFuBnk_Opts_ControlValueChanged(this);
       </OnClick>
     </Scripts>
   </Button>
 
-  <Frame name="TBnk_Opts_LineTemplate" enableMouse="true" hidden="true" virtual="true">
+  <Frame name="TFuBnk_Opts_LineTemplate" enableMouse="true" hidden="true" virtual="true">
     <Layers>
       <Layer level="ARTWORK">
         <FontString name="$parent_Text_1" inherits="GameFontNormalSmall"/>
@@ -89,28 +89,28 @@
       </Layer>
     </Layers>
     <Frames>
-      <Slider name="$parent_Slider_1" inherits="TBnk_SliderTemplate"/>
-      <Slider name="$parent_Slider_2" inherits="TBnk_SliderTemplate"/>
-      <Slider name="$parent_Slider_3" inherits="TBnk_SliderTemplate"/>
-      <Slider name="$parent_Slider_4" inherits="TBnk_SliderTemplate"/>
-      <EditBox name="$parent_Edit_1" inherits="TBnk_InputBoxTemplate"/>
-      <EditBox name="$parent_Edit_2" inherits="TBnk_InputBoxTemplate"/>
-      <EditBox name="$parent_Edit_3" inherits="TBnk_InputBoxTemplate"/>
-      <EditBox name="$parent_Edit_4" inherits="TBnk_InputBoxTemplate"/>
-      <EditBox name="$parent_Edit_5" inherits="TBnk_InputBoxTemplate"/>
-      <Button name="$parent_Button_1" inherits="TBnk_Opts_ButtonTemplate"/>
-      <Button name="$parent_Button_2" inherits="TBnk_Opts_ButtonTemplate"/>
-      <Button name="$parent_Button_3" inherits="TBnk_Opts_ButtonTemplate"/>
-      <Button name="$parent_Button_4" inherits="TBnk_Opts_ButtonTemplate"/>
+      <Slider name="$parent_Slider_1" inherits="TFuBnk_SliderTemplate"/>
+      <Slider name="$parent_Slider_2" inherits="TFuBnk_SliderTemplate"/>
+      <Slider name="$parent_Slider_3" inherits="TFuBnk_SliderTemplate"/>
+      <Slider name="$parent_Slider_4" inherits="TFuBnk_SliderTemplate"/>
+      <EditBox name="$parent_Edit_1" inherits="TFuBnk_InputBoxTemplate"/>
+      <EditBox name="$parent_Edit_2" inherits="TFuBnk_InputBoxTemplate"/>
+      <EditBox name="$parent_Edit_3" inherits="TFuBnk_InputBoxTemplate"/>
+      <EditBox name="$parent_Edit_4" inherits="TFuBnk_InputBoxTemplate"/>
+      <EditBox name="$parent_Edit_5" inherits="TFuBnk_InputBoxTemplate"/>
+      <Button name="$parent_Button_1" inherits="TFuBnk_Opts_ButtonTemplate"/>
+      <Button name="$parent_Button_2" inherits="TFuBnk_Opts_ButtonTemplate"/>
+      <Button name="$parent_Button_3" inherits="TFuBnk_Opts_ButtonTemplate"/>
+      <Button name="$parent_Button_4" inherits="TFuBnk_Opts_ButtonTemplate"/>
 
-      <Button name="$parent_UpButton_1" inherits="TBnk_Opts_ButtonTemplate">
+      <Button name="$parent_UpButton_1" inherits="TFuBnk_Opts_ButtonTemplate">
         <NormalTexture inherits="UIPanelScrollBarButton" file="Interface\Buttons\UI-ScrollBar-ScrollUpButton-Up"/>
         <PushedTexture inherits="UIPanelScrollBarButton" file="Interface\Buttons\UI-ScrollBar-ScrollUpButton-Down"/>
         <DisabledTexture inherits="UIPanelScrollBarButton" file="Interface\Buttons\UI-ScrollBar-ScrollUpButton-Disabled"/>
         <HighlightTexture inherits="UIPanelScrollBarButton" file="Interface\Buttons\UI-ScrollBar-ScrollUpButton-Highlight" alphaMode="ADD"/>
       </Button>
 
-      <Button name="$parent_DownButton_1" inherits="TBnk_Opts_ButtonTemplate">
+      <Button name="$parent_DownButton_1" inherits="TFuBnk_Opts_ButtonTemplate">
         <NormalTexture inherits="UIPanelScrollBarButton" file="Interface\Buttons\UI-ScrollBar-ScrollDownButton-Up"/>
         <PushedTexture inherits="UIPanelScrollBarButton" file="Interface\Buttons\UI-ScrollBar-ScrollDownButton-Down"/>
         <DisabledTexture inherits="UIPanelScrollBarButton" file="Interface\Buttons\UI-ScrollBar-ScrollDownButton-Disabled"/>
@@ -120,7 +120,7 @@
     </Frames>
   </Frame>
 
-  <Frame name="TBnk_OptsFrame" toplevel="true" frameStrata="MEDIUM" movable="true" enableMouse="true" hidden="true" parent="UIParent">
+  <Frame name="TFuBnk_OptsFrame" toplevel="true" frameStrata="MEDIUM" movable="true" enableMouse="true" hidden="true" parent="UIParent">
     <Size><AbsDimension x="800" y="500"/></Size>
     <Anchors>
       <Anchor point="CENTER">
@@ -143,42 +143,42 @@
     </Backdrop>
 
     <Frames>
-      <Slider name="TBnk_OptsFrame_ScrollBar" inherits="UIPanelScrollBarTemplate">
+      <Slider name="TFuBnk_OptsFrame_ScrollBar" inherits="UIPanelScrollBarTemplate">
         <Scripts>
           <OnValueChanged>
             local arg1 = value or _G.arg1
-            TBnk_Opts_CurrentPosition = arg1;
-            TBnk_Options_UpdateWindow();
+            TFuBnk_Opts_CurrentPosition = arg1;
+            TFuBnk_Options_UpdateWindow();
           </OnValueChanged>
         </Scripts>
       </Slider>
-      <Frame name="TBnk_OptsFrame_Line_1" inherits="TBnk_Opts_LineTemplate"/>
-      <Frame name="TBnk_OptsFrame_Line_2" inherits="TBnk_Opts_LineTemplate"/>
-      <Frame name="TBnk_OptsFrame_Line_3" inherits="TBnk_Opts_LineTemplate"/>
-      <Frame name="TBnk_OptsFrame_Line_4" inherits="TBnk_Opts_LineTemplate"/>
-      <Frame name="TBnk_OptsFrame_Line_5" inherits="TBnk_Opts_LineTemplate"/>
-      <Frame name="TBnk_OptsFrame_Line_6" inherits="TBnk_Opts_LineTemplate"/>
-      <Frame name="TBnk_OptsFrame_Line_7" inherits="TBnk_Opts_LineTemplate"/>
-      <Frame name="TBnk_OptsFrame_Line_8" inherits="TBnk_Opts_LineTemplate"/>
-      <Frame name="TBnk_OptsFrame_Line_9" inherits="TBnk_Opts_LineTemplate"/>
-      <Frame name="TBnk_OptsFrame_Line_10" inherits="TBnk_Opts_LineTemplate"/>
-      <Frame name="TBnk_OptsFrame_Line_11" inherits="TBnk_Opts_LineTemplate"/>
-      <Frame name="TBnk_OptsFrame_Line_12" inherits="TBnk_Opts_LineTemplate"/>
-      <Frame name="TBnk_OptsFrame_Line_13" inherits="TBnk_Opts_LineTemplate"/>
-      <Frame name="TBnk_OptsFrame_Line_14" inherits="TBnk_Opts_LineTemplate"/>
-      <Frame name="TBnk_OptsFrame_Line_15" inherits="TBnk_Opts_LineTemplate"/>
-      <Frame name="TBnk_OptsFrame_Line_16" inherits="TBnk_Opts_LineTemplate"/>
-      <Frame name="TBnk_OptsFrame_Line_17" inherits="TBnk_Opts_LineTemplate"/>
-      <Frame name="TBnk_OptsFrame_Line_18" inherits="TBnk_Opts_LineTemplate"/>
-      <Frame name="TBnk_OptsFrame_Line_19" inherits="TBnk_Opts_LineTemplate"/>
-      <Frame name="TBnk_OptsFrame_Line_20" inherits="TBnk_Opts_LineTemplate"/>
-      <Frame name="TBnk_OptsFrame_Line_21" inherits="TBnk_Opts_LineTemplate"/>
-      <Frame name="TBnk_OptsFrame_Line_22" inherits="TBnk_Opts_LineTemplate"/>
-      <Frame name="TBnk_OptsFrame_Line_23" inherits="TBnk_Opts_LineTemplate"/>
-      <Frame name="TBnk_OptsFrame_Line_24" inherits="TBnk_Opts_LineTemplate"/>
-      <Frame name="TBnk_OptsFrame_Line_25" inherits="TBnk_Opts_LineTemplate"/>
+      <Frame name="TFuBnk_OptsFrame_Line_1" inherits="TFuBnk_Opts_LineTemplate"/>
+      <Frame name="TFuBnk_OptsFrame_Line_2" inherits="TFuBnk_Opts_LineTemplate"/>
+      <Frame name="TFuBnk_OptsFrame_Line_3" inherits="TFuBnk_Opts_LineTemplate"/>
+      <Frame name="TFuBnk_OptsFrame_Line_4" inherits="TFuBnk_Opts_LineTemplate"/>
+      <Frame name="TFuBnk_OptsFrame_Line_5" inherits="TFuBnk_Opts_LineTemplate"/>
+      <Frame name="TFuBnk_OptsFrame_Line_6" inherits="TFuBnk_Opts_LineTemplate"/>
+      <Frame name="TFuBnk_OptsFrame_Line_7" inherits="TFuBnk_Opts_LineTemplate"/>
+      <Frame name="TFuBnk_OptsFrame_Line_8" inherits="TFuBnk_Opts_LineTemplate"/>
+      <Frame name="TFuBnk_OptsFrame_Line_9" inherits="TFuBnk_Opts_LineTemplate"/>
+      <Frame name="TFuBnk_OptsFrame_Line_10" inherits="TFuBnk_Opts_LineTemplate"/>
+      <Frame name="TFuBnk_OptsFrame_Line_11" inherits="TFuBnk_Opts_LineTemplate"/>
+      <Frame name="TFuBnk_OptsFrame_Line_12" inherits="TFuBnk_Opts_LineTemplate"/>
+      <Frame name="TFuBnk_OptsFrame_Line_13" inherits="TFuBnk_Opts_LineTemplate"/>
+      <Frame name="TFuBnk_OptsFrame_Line_14" inherits="TFuBnk_Opts_LineTemplate"/>
+      <Frame name="TFuBnk_OptsFrame_Line_15" inherits="TFuBnk_Opts_LineTemplate"/>
+      <Frame name="TFuBnk_OptsFrame_Line_16" inherits="TFuBnk_Opts_LineTemplate"/>
+      <Frame name="TFuBnk_OptsFrame_Line_17" inherits="TFuBnk_Opts_LineTemplate"/>
+      <Frame name="TFuBnk_OptsFrame_Line_18" inherits="TFuBnk_Opts_LineTemplate"/>
+      <Frame name="TFuBnk_OptsFrame_Line_19" inherits="TFuBnk_Opts_LineTemplate"/>
+      <Frame name="TFuBnk_OptsFrame_Line_20" inherits="TFuBnk_Opts_LineTemplate"/>
+      <Frame name="TFuBnk_OptsFrame_Line_21" inherits="TFuBnk_Opts_LineTemplate"/>
+      <Frame name="TFuBnk_OptsFrame_Line_22" inherits="TFuBnk_Opts_LineTemplate"/>
+      <Frame name="TFuBnk_OptsFrame_Line_23" inherits="TFuBnk_Opts_LineTemplate"/>
+      <Frame name="TFuBnk_OptsFrame_Line_24" inherits="TFuBnk_Opts_LineTemplate"/>
+      <Frame name="TFuBnk_OptsFrame_Line_25" inherits="TFuBnk_Opts_LineTemplate"/>
 
-      <Button name="TBnk_OptsFrame_Button_Reset" inherits="GameMenuButtonTemplate" text="Reset">
+      <Button name="TFuBnk_OptsFrame_Button_Reset" inherits="GameMenuButtonTemplate" text="Reset">
         <Size><AbsDimension x="50" y="25"/></Size>
         <Anchors>
           <Anchor point="BOTTOMLEFT">
@@ -190,17 +190,17 @@
         <Scripts>
           <OnLoad>
             local this = self or _G.this     
-            this:SetText(TBag.LOCALE["Reset"]);
+            this:SetText(TFuBag.LOCALE["Reset"]);
           </OnLoad>
           <OnClick>
-            TBagCfg["Bank"] = {};
-            TBnk_init(1);
-            TBnkOpt_ResizeUpdate();
-            TBnk_Options_UpdateWindow();
+            TFuBagCfg["Bank"] = {};
+            TFuBnk_init(1);
+            TFuBnkOpt_ResizeUpdate();
+            TFuBnk_Options_UpdateWindow();
           </OnClick>
         </Scripts>
       </Button>
-      <Button name="TBnk_OptsFrame_Button_Close" inherits="GameMenuButtonTemplate" text="Close">
+      <Button name="TFuBnk_OptsFrame_Button_Close" inherits="GameMenuButtonTemplate" text="Close">
         <Size><AbsDimension x="70" y="25"/></Size>
         <Anchors>
           <Anchor point="BOTTOM">
@@ -212,14 +212,14 @@
         <Scripts>
           <OnLoad>
             local this = self or _G.this     
-            this:SetText(TBag.LOCALE["Close"]);
+            this:SetText(TFuBag.LOCALE["Close"]);
           </OnLoad>
           <OnClick>
-            TBnk_OptsFrame:Hide();
+            TFuBnk_OptsFrame:Hide();
           </OnClick>
         </Scripts>
       </Button>
-      <Button name="TBnk_OptsFrame_Button_AddCat" inherits="GameMenuButtonTemplate" text="Add New Cat">
+      <Button name="TFuBnk_OptsFrame_Button_AddCat" inherits="GameMenuButtonTemplate" text="Add New Cat">
         <Size><AbsDimension x="130" y="25"/></Size>
         <Anchors>
           <Anchor point="BOTTOMRIGHT">
@@ -231,17 +231,17 @@
         <Scripts>
           <OnLoad>
             local this = self or _G.this     
-            this:SetText(TBag.LOCALE["Add New Cat"]);
+            this:SetText(TFuBag.LOCALE["Add New Cat"]);
           </OnLoad>
           <OnClick>
-            TBnkOpts_AddCat();
+            TFuBnkOpts_AddCat();
           </OnClick>
         </Scripts>
       </Button>
-      <Button name="TBnk_OptsFrame_Button_AssignCat" inherits="GameMenuButtonTemplate" text="Assign Cats">
+      <Button name="TFuBnk_OptsFrame_Button_AssignCat" inherits="GameMenuButtonTemplate" text="Assign Cats">
         <Size><AbsDimension x="120" y="25"/></Size>
         <Anchors>
-          <Anchor point="RIGHT" relativePoint="LEFT" relativeTo="TBnk_OptsFrame_Button_AddCat">
+          <Anchor point="RIGHT" relativePoint="LEFT" relativeTo="TFuBnk_OptsFrame_Button_AddCat">
             <Offset>
               <AbsDimension x="-5" y="0"/>
             </Offset>
@@ -250,11 +250,11 @@
         <Scripts>
           <OnLoad>
             local this = self or _G.this     
-            this:SetText(TBag.LOCALE["Assign Cats"]);
+            this:SetText(TFuBag.LOCALE["Assign Cats"]);
           </OnLoad>
           <OnClick>
-            TBag:AssignCats(TBnkFrame.cfg, 1);
-            TBag:BuildBarClassList(TBnkFrame.BC_LIST, TBnkFrame.cfg);
+            TFuBag:AssignCats(TFuBnkFrame.cfg, 1);
+            TFuBag:BuildBarClassList(TFuBnkFrame.BC_LIST, TFuBnkFrame.cfg);
           </OnClick>
         </Scripts>
       </Button>
@@ -294,7 +294,7 @@
         end
       </OnDragStop>
       <OnShow>
-        TBnk_Options_InitWindow();
+        TFuBnk_Options_InitWindow();
       </OnShow>
     </Scripts>
   </Frame>

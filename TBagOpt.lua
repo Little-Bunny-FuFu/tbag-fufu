@@ -1,25 +1,25 @@
 -- $Id$
 
 local _G = getfenv(0)
-local TBag = _G.TBag
+local TFuBag = _G.TFuBag
 
 -- Localization Support
-local L = TBag.LOCALE;
+local L = TFuBag.LOCALE;
 
 
 
-TBag.NUMCOL_MIN = 8;
-TBag.NUMCOL_MAX = 20;
+TFuBag.NUMCOL_MIN = 8;
+TFuBag.NUMCOL_MAX = 20;
 
-TBag.N_BUTTON_MIN = 26;
-TBag.N_BUTTON_MAX = 50;
-TBag.A_BUTTONSIZE = { 26, 30, 34, 38, 42, 46, 50 };
+TFuBag.N_BUTTON_MIN = 26;
+TFuBag.N_BUTTON_MAX = 50;
+TFuBag.A_BUTTONSIZE = { 26, 30, 34, 38, 42, 46, 50 };
 
-TBag.N_FONT_MIN = 8;
-TBag.N_FONT_MAX = 20;
-TBag.TAG_MAX = 10;
+TFuBag.N_FONT_MIN = 8;
+TFuBag.N_FONT_MAX = 20;
+TFuBag.TAG_MAX = 10;
 
-TBag.N_SPACE_MAX = 5;
+TFuBag.N_SPACE_MAX = 5;
 
 -----------------------------------------------------------------------
 -- Options
@@ -59,23 +59,23 @@ local TBAGOPT_LIST_FRAMES = {
 };
 
 
-function TBag.NilFunc()
+function TFuBag.NilFunc()
   return nil;
 end
 
-function TBag.GetCfg(cfg, name)
+function TFuBag.GetCfg(cfg, name)
   return cfg[name];
 end
-function TBag.SetCfg(cfg, name, val)
+function TFuBag.SetCfg(cfg, name, val)
   cfg[name] = val;
 end
-function TBag.SetCfgUpdate(cfg, name, val, cleanfunc, updatefunc)
+function TFuBag.SetCfgUpdate(cfg, name, val, cleanfunc, updatefunc)
   cfg[name] = cleanfunc(val);
---  TBag:Print("name="..name..", val="..val);
+--  TFuBag:Print("name="..name..", val="..val);
   updatefunc();
 end
 
-function TBag:MakeHeader(cfgopt, text)
+function TFuBag:MakeHeader(cfgopt, text)
   table.insert(cfgopt,  {} );
   table.insert(cfgopt,  {
     { ["type"] = "Text", ["ID"] = 1, ["width"] = 1.0, ["color"] = TBAG_HEADER_COLOR, ["align"] = "center",
@@ -83,48 +83,48 @@ function TBag:MakeHeader(cfgopt, text)
   });
 end
 
-function TBag:MakeCheck(cfgopt, text, cfg, name, updatefunc)
+function TFuBag:MakeCheck(cfgopt, text, cfg, name, updatefunc)
   table.insert(cfgopt,  {
     { ["type"] = "Text", ["ID"] = 1, ["width"] = TBAG_OPT_WIDTH, ["color"] = TBAG_OPT_COLOR, ["text"] = text },
     { ["type"] = "Text", ["ID"] = 2, ["width"] = TBAG_MINMAX_WIDTH, ["color"] = TBAG_MINMAX_COLOR, ["align"] = "right", ["text"] = L["No"] },
     { ["type"] = "Text", ["ID"] = 3, ["width"] = TBAG_SPACER_WIDTH, ["color"] = TBAG_MINMAX_COLOR, ["align"] = "right", [""] = "" },
     { ["type"] = "Slider", ["ID"] = 1, ["width"] = 0.125, ["minValue"] = 0, ["maxValue"] = 1, ["valueStep"] = 1,
       ["defaultValue"] = function()
-        return TBag.GetCfg(cfg, name);
+        return TFuBag.GetCfg(cfg, name);
       end,
       ["func"] = function(v)
-        TBag.SetCfgUpdate(cfg, name, v, tonumber, updatefunc);
+        TFuBag.SetCfgUpdate(cfg, name, v, tonumber, updatefunc);
       end
     },
     { ["type"] = "Text", ["ID"] = 3, ["width"] = TBAG_MINMAX_WIDTH, ["color"] = TBAG_MINMAX_COLOR, ["align"] = "left", ["text"] = L["Yes"] }
   });
 end
 
-function TBag:MakeEdit(cfgopt, text, cfg, name, size, updatefunc)
+function TFuBag:MakeEdit(cfgopt, text, cfg, name, size, updatefunc)
   table.insert(cfgopt,  {
     { ["type"] = "Text", ["ID"] = 1, ["width"] = TBAG_OPT_WIDTH+TBAG_MINMAX_WIDTH+TBAG_SPACER_WIDTH, ["color"] = TBAG_OPT_COLOR, ["text"] = text },
     { ["type"] = "Edit", ["ID"] = 1, ["width"] = 0.125, ["letters"] = size,
       ["defaultValue"] = function()
-        return TBag.GetCfg(cfg, name);
+        return TFuBag.GetCfg(cfg, name);
       end,
       ["func"] = function(v)
-        TBag.SetCfgUpdate(cfg, name, v, tostring, updatefunc);
+        TFuBag.SetCfgUpdate(cfg, name, v, tostring, updatefunc);
       end
     },
   });
 end
 
-function TBag:MakeSlider(cfgopt, text, cfg, name, min, max, step, updatefunc)
+function TFuBag:MakeSlider(cfgopt, text, cfg, name, min, max, step, updatefunc)
   table.insert(cfgopt,  {
     { ["type"] = "Text", ["ID"] = 1, ["width"] = TBAG_OPT_WIDTH, ["color"] = TBAG_OPT_COLOR, ["text"] = text },
     { ["type"] = "Text", ["ID"] = 2, ["width"] = TBAG_MINMAX_WIDTH, ["color"] = TBAG_MINMAX_COLOR, ["align"] = "right", ["text"] = min },
     { ["type"] = "Text", ["ID"] = 3, ["width"] = TBAG_SPACER_WIDTH, ["color"] = TBAG_MINMAX_COLOR, ["align"] = "right", [""] = "" },
     { ["type"] = "Slider", ["ID"] = 1, ["width"] = 0.475, ["minValue"] = min, ["maxValue"] = max, ["valueStep"] = step,
       ["defaultValue"] = function()
-        return TBag.GetCfg(cfg, name);
+        return TFuBag.GetCfg(cfg, name);
       end,
       ["func"] = function(v)
-        TBag.SetCfgUpdate(cfg, name, v, tonumber, updatefunc);
+        TFuBag.SetCfgUpdate(cfg, name, v, tonumber, updatefunc);
       end
     },
     { ["type"] = "Text", ["ID"] = 3, ["width"] = TBAG_MINMAX_WIDTH, ["color"] = TBAG_MINMAX_COLOR, ["align"] = "left", ["text"] = max }
@@ -133,27 +133,27 @@ end
 
 
 
-function TBag.GetItemSearch(cfg, key, idx)
-  return TBag:EscapeNL(cfg["item_search_list"][key][idx])
+function TFuBag.GetItemSearch(cfg, key, idx)
+  return TFuBag:EscapeNL(cfg["item_search_list"][key][idx])
 end
 
-function TBag.AssignItemSearch(v, cfg, key, idx)
+function TFuBag.AssignItemSearch(v, cfg, key, idx)
   if (key ~= nil) then
-    cfg["item_search_list"][key][idx] = TBag:UnEscapeNL(v);
+    cfg["item_search_list"][key][idx] = TFuBag:UnEscapeNL(v);
   end
 end
 
-function TBag.GetItemSearchUpper(cfg, key, idx)
+function TFuBag.GetItemSearchUpper(cfg, key, idx)
   return string.upper(cfg["item_search_list"][key][idx]);
 end
 
-function TBag.AssignItemSearchUpper(v, cfg, key, idx)
+function TFuBag.AssignItemSearchUpper(v, cfg, key, idx)
   if (key ~= nil) then
     cfg["item_search_list"][key][idx] = string.upper(v);
   end
 end
 
-function TBag:MakeItemSearchHeader(cfgopt)
+function TFuBag:MakeItemSearchHeader(cfgopt)
   table.insert(cfgopt,  {});
   table.insert(cfgopt,  {
     { ["type"] = "Text", ["ID"] = 1, ["width"] = 0.035+0.025+0.025+0.005, ["color"] = TBAG_HEADER_COLOR, ["text"] = "" },
@@ -165,7 +165,7 @@ function TBag:MakeItemSearchHeader(cfgopt)
   });
 end
 
-function TBag:MakeItemSearch(cfgopt, cfg, swapfunc)
+function TFuBag:MakeItemSearch(cfgopt, cfg, swapfunc)
   for key = 1, table.getn(cfg["item_search_list"]) do
     local value = cfg["item_search_list"][key];
     table.insert(cfgopt,  {
@@ -179,25 +179,25 @@ function TBag:MakeItemSearch(cfgopt, cfg, swapfunc)
         ["func"] = swapfunc
       },
       { ["type"] = "Edit", ["ID"] = 1, ["width"] = 0.20, ["letters"]=25, ["param1"] = cfg, ["param2"] = key, ["param3"] = 1,
-      ["defaultValue"] = TBag.GetItemSearchUpper, ["func"] = TBag.AssignItemSearchUpper
+      ["defaultValue"] = TFuBag.GetItemSearchUpper, ["func"] = TFuBag.AssignItemSearchUpper
       },
       { ["type"] = "Edit", ["ID"] = 2, ["width"] = 0.18, ["letters"]=25, ["param1"] = cfg, ["param2"] = key, ["param3"] = 2,
-      ["defaultValue"] = TBag.GetItemSearchUpper, ["func"] = TBag.AssignItemSearchUpper
+      ["defaultValue"] = TFuBag.GetItemSearchUpper, ["func"] = TFuBag.AssignItemSearchUpper
       },
       { ["type"] = "Edit", ["ID"] = 3, ["width"] = 0.32, ["letters"]=50, ["param1"] = cfg, ["param2"] = key, ["param3"] = 3,
-      ["defaultValue"] = TBag.GetItemSearch, ["func"] = TBag.AssignItemSearch
+      ["defaultValue"] = TFuBag.GetItemSearch, ["func"] = TFuBag.AssignItemSearch
 },
       { ["type"] = "Edit", ["ID"] = 4, ["width"] = 0.12, ["letters"]=25, ["param1"] = cfg, ["param2"] = key, ["param3"] = 4,
-      ["defaultValue"] = TBag.GetItemSearch, ["func"] = TBag.AssignItemSearch
+      ["defaultValue"] = TFuBag.GetItemSearch, ["func"] = TFuBag.AssignItemSearch
       },
       { ["type"] = "Edit", ["ID"] = 5, ["width"] = 0.08, ["letters"]=25, ["param1"] = cfg, ["param2"] = key, ["param3"] = 5,
-      ["defaultValue"] = TBag.GetItemSearch, ["func"] = TBag.AssignItemSearch
+      ["defaultValue"] = TFuBag.GetItemSearch, ["func"] = TFuBag.AssignItemSearch
       }
       });
   end
 end
 
-function TBag:CreateCfgOpt(cfgopt, cfg, bagarr, updatefunc, resizefunc, forcefunc)
+function TFuBag:CreateCfgOpt(cfgopt, cfg, bagarr, updatefunc, resizefunc, forcefunc)
   self:MakeHeader(cfgopt, L["Main Sizing Preferences"]);
   self:MakeSlider(cfgopt, L["Number of Item Columns:"],
     cfg, "maxColumns", self.NUMCOL_MIN, self.NUMCOL_MAX, 1,
@@ -271,7 +271,7 @@ function TBag:CreateCfgOpt(cfgopt, cfg, bagarr, updatefunc, resizefunc, forcefun
 end
 
 
-function TBag:CreateNewOpt(cfgopt, cfg, updatefunc)
+function TFuBag:CreateNewOpt(cfgopt, cfg, updatefunc)
   self:MakeHeader(cfgopt, L["New Tag Options"]);
   self:MakeEdit(cfgopt, L["New Tag Text:"],
     cfg, self.V_NEWON, self.TAG_MAX, updatefunc);
@@ -287,7 +287,7 @@ function TBag:CreateNewOpt(cfgopt, cfg, updatefunc)
 end
 
 
-function TBag:EnableLine(frame, optsframename, lineheight, sliderheight, elements, y, x_start, available_width, fade )
+function TFuBag:EnableLine(frame, optsframename, lineheight, sliderheight, elements, y, x_start, available_width, fade )
   local value, e, width_start, width;
   local tmpframe, tmpframe_name;
   local tmpframe_text, tmpframe_text2, tmpframe_text3;

@@ -1,20 +1,20 @@
 -- $Id$
 
 local _G = getfenv(0)
-local TBag = _G.TBag
-TBag.Bank = {}
-local Bank = TBag.Bank
+local TFuBag = _G.TFuBag
+TFuBag.Bank = {}
+local Bank = TFuBag.Bank
 
 local BankFrame_Saved = nil;
 
 -- Localization Support
-local L = TBag.LOCALE;
+local L = TFuBag.LOCALE;
 
-BINDING_NAME_TBNK_TOGGLE = L["Toggle Bank Window"];
+BINDING_NAME_TFuBNK_TOGGLE = L["Toggle Bank Window"];
 
 -- Constants
-TBnk_SHOWITEMDEBUGINFO = 0;
-local TBnk_WIPECONFIGONLOAD = 0; -- for debugging, test it out on a new config every load
+TFuBnk_SHOWITEMDEBUGINFO = 0;
+local TFuBnk_WIPECONFIGONLOAD = 0; -- for debugging, test it out on a new config every load
 
 
 ------------------------
@@ -32,38 +32,38 @@ function Bank:CalcButtonSize(newsize, pad)
   self.BGF_HEIGHT = self.BF_HEIGHT * 1.6 + (self.BF_Y_PAD*2);
 
   -- Always ensure a visually appealing fit
-  self.BGF_WIDTH = TBag:MakeEven(self.BGF_WIDTH, self.BF_WIDTH);
-  self.BGF_HEIGHT = TBag:MakeEven(self.BGF_HEIGHT, self.BF_HEIGHT);
+  self.BGF_WIDTH = TFuBag:MakeEven(self.BGF_WIDTH, self.BF_WIDTH);
+  self.BGF_HEIGHT = TFuBag:MakeEven(self.BGF_HEIGHT, self.BF_HEIGHT);
 end
 
 function Bank:SetDefPos(cfg, reset)
-  TBag:SetDef(cfg, "frameLEFT", UIParent:GetRight() * UIParent:GetScale() * 0.294, reset, TBag.NumFunc);
-  TBag:SetDef(cfg, "frameRIGHT", UIParent:GetRight() * UIParent:GetScale() * 0.684, reset, TBag.NumFunc);
-  TBag:SetDef(cfg, "frameTOP", UIParent:GetTop() * UIParent:GetScale() * 0.83, reset, TBag.NumFunc);
-  TBag:SetDef(cfg, "frameBOTTOM", UIParent:GetTop() * UIParent:GetScale() * 0.232, reset, TBag.NumFunc);
-  TBag:SetDef(cfg, "frameXRelativeTo", "LEFT", reset, TBag.StrFunc, {"RIGHT","LEFT"} );
-  TBag:SetDef(cfg, "frameYRelativeTo", "BOTTOM", reset, TBag.StrFunc, {"TOP","BOTTOM"} );
+  TFuBag:SetDef(cfg, "frameLEFT", UIParent:GetRight() * UIParent:GetScale() * 0.294, reset, TFuBag.NumFunc);
+  TFuBag:SetDef(cfg, "frameRIGHT", UIParent:GetRight() * UIParent:GetScale() * 0.684, reset, TFuBag.NumFunc);
+  TFuBag:SetDef(cfg, "frameTOP", UIParent:GetTop() * UIParent:GetScale() * 0.83, reset, TFuBag.NumFunc);
+  TFuBag:SetDef(cfg, "frameBOTTOM", UIParent:GetTop() * UIParent:GetScale() * 0.232, reset, TFuBag.NumFunc);
+  TFuBag:SetDef(cfg, "frameXRelativeTo", "LEFT", reset, TFuBag.StrFunc, {"RIGHT","LEFT"} );
+  TFuBag:SetDef(cfg, "frameYRelativeTo", "BOTTOM", reset, TFuBag.StrFunc, {"TOP","BOTTOM"} );
 end
 
 function Bank:InitDefVals(reset)
   local i, key, value;
   local cfg = self.cfg;
 
-  TBag:InitDefVals(cfg, self.bags, 4, reset);
+  TFuBag:InitDefVals(cfg, self.bags, 4, reset);
 
-  TBag:SetDef(cfg, "maxColumns", 14, reset, TBag.NumFunc, TBag.NUMCOL_MIN,TBag.NUMCOL_MAX);
+  TFuBag:SetDef(cfg, "maxColumns", 14, reset, TFuBag.NumFunc, TFuBag.NUMCOL_MIN,TFuBag.NUMCOL_MAX);
 
-  TBag:SetDef(cfg, "show_purchase_button", 0, reset, TBag.NumFunc, 0, 1);
-  TBag:SetDef(cfg, "show_purchasetoggle", 1, reset, TBag.NumFunc, 0, 1);
+  TFuBag:SetDef(cfg, "show_purchase_button", 0, reset, TFuBag.NumFunc, 0, 1);
+  TFuBag:SetDef(cfg, "show_purchasetoggle", 1, reset, TFuBag.NumFunc, 0, 1);
 
   -- Colors
-  TBag:SetColor(cfg, "bkgr_"..TBag.MAIN_BAR, 0.3, 0.1, 0.0, 0.4, reset);
-  TBag:SetColor(cfg, "brdr_"..TBag.MAIN_BAR, 0.7, 0.1, 0.1, 0.3, reset);
-  for i = 1, TBag.BAR_MAX do
-    TBag:SetColor(cfg, "bkgr_"..i, 0.3, 0.1, 0.0, 0.4, reset);
-    TBag:SetColor(cfg, "brdr_"..i, 0.7, 0.1, 0.1, 0.3, reset);
+  TFuBag:SetColor(cfg, "bkgr_"..TFuBag.MAIN_BAR, 0.3, 0.1, 0.0, 0.4, reset);
+  TFuBag:SetColor(cfg, "brdr_"..TFuBag.MAIN_BAR, 0.7, 0.1, 0.1, 0.3, reset);
+  for i = 1, TFuBag.BAR_MAX do
+    TFuBag:SetColor(cfg, "bkgr_"..i, 0.3, 0.1, 0.0, 0.4, reset);
+    TFuBag:SetColor(cfg, "brdr_"..i, 0.7, 0.1, 0.1, 0.3, reset);
   end
-  TBag:SetDefColors(cfg, reset);
+  TFuBag:SetDefColors(cfg, reset);
 
   self:SetDefPos(cfg, reset);
 
@@ -71,29 +71,29 @@ end
 
 function Bank:SetPlayer(playerid)
   if self.playerid ~= playerid then
-    self.CACHE_REQ = TBag.REQ_MUST
+    self.CACHE_REQ = TFuBag.REQ_MUST
   end
   self.playerid = playerid;
-  TBag.Tokens.Update(TBnkFrame_TokenFrame)
+  TFuBag.Tokens.Update(TFuBnkFrame_TokenFrame)
 end
 
 -- Set reset=1 to restore default values
 function Bank:init(reset)
   if not Bank.metatabledone then
-    setmetatable(TBag.MainFrame, getmetatable(TBnkFrame))
-    setmetatable(TBag.Bank,{__index=TBag.MainFrame})
-    setmetatable(TBnkFrame,{__index=TBag.Bank})
+    setmetatable(TFuBag.MainFrame, getmetatable(TFuBnkFrame))
+    setmetatable(TFuBag.Bank,{__index=TFuBag.MainFrame})
+    setmetatable(TFuBnkFrame,{__index=TFuBag.Bank})
     Bank.metatabledone = true
   end
-  self = TBnkFrame
+  self = TFuBnkFrame
   self:SetUserPlaced(false) -- remove us from the layout-cache
 
   -- Bank switching
   self.playerid = "";
   self.atbank = 0;
-  self.bags = TBag.Bnk_Bags
+  self.bags = TFuBag.Bnk_Bags
 
-  self.CACHE_REQ = TBag.REQ_NONE
+  self.CACHE_REQ = TFuBag.REQ_NONE
 
   self.cfg = nil;
   self.BARITM = {};
@@ -103,7 +103,7 @@ function Bank:init(reset)
   self.edit_selected = "";        -- when editmode is 1, this is the class of item you clicked on
   self.RightClickMenu_mode = "";
   self.RightClickMenu_opts = {};
-  self.RightClickMenu = TBnkFrame_RightClickMenu
+  self.RightClickMenu = TFuBnkFrame_RightClickMenu
 
   self.BC_LIST = {};  -- Bar to Class list
 
@@ -117,35 +117,35 @@ function Bank:init(reset)
   self.BGF_HEIGHT = 38;
 
 
-  TBag:Init();
+  TFuBag:Init();
 
-  self.cfg = TBagCfg["Bnk"]
+  self.cfg = TFuBagCfg["Bnk"]
   local cfg = self.cfg
   self.atbank = 0
 
-  if ( TBnk_WIPECONFIGONLOAD == 1 ) then
+  if ( TFuBnk_WIPECONFIGONLOAD == 1 ) then
     cfg = {};
   end
 
-  self:SetPlayer(TBag.PLAYERID);
+  self:SetPlayer(TFuBag.PLAYERID);
 
   -- Make all the frames
   for _, bag in ipairs(self.bags) do
 --    if (bag == BANK_CONTAINER) then
---      TBag:CreateDummyBag(bag, "TBnk_BankItemButtonTemplate");
+--      TFuBag:CreateDummyBag(bag, "TFuBnk_BankItemButtonTemplate");
 --    else
-      TBag:CreateDummyBag(bag, "TBag_ItemButtonTemplate");
+      TFuBag:CreateDummyBag(bag, "TFuBag_ItemButtonTemplate");
 --    end
   end
 
-  TBag:CreateFrame("Frame", "TBnkFrame_bar_", TBnkFrame,
-    "TBag_BarFrameTemplate", TBag.BAR_MAX, "");
-  TBag:CreateFrame("Button", "TBnkFrame_BarButton_", TBnkFrame,
-    "TBag_BarButtonTemplate", TBag.BAR_MAX, "");
+  TFuBag:CreateFrame("Frame", "TFuBnkFrame_bar_", TFuBnkFrame,
+    "TFuBag_BarFrameTemplate", TFuBag.BAR_MAX, "");
+  TFuBag:CreateFrame("Button", "TFuBnkFrame_BarButton_", TFuBnkFrame,
+    "TFuBag_BarButtonTemplate", TFuBag.BAR_MAX, "");
 
   -- register slash command
-  SlashCmdList["TBnk"] = TBnk_cmd;
-  SLASH_TBnk1 = "/tbnk";
+  SlashCmdList["TFuBnk"] = TFuBnk_cmd;
+  SLASH_TFuBnk1 = "/tbnk";
 
   -- load default values
   self:InitDefVals(reset);
@@ -153,140 +153,140 @@ function Bank:init(reset)
   self:CalcButtonSize(cfg["frameButtonSize"], cfg["framePad"]);
 
   for _, bag in ipairs(self.bags) do
-    TBag:GetBagFrame(bag):SetScale(0.7);
+    TFuBag:GetBagFrame(bag):SetScale(0.7);
   end
   self:InitBagGfx()
 
   self:SetReplaceBank();
 
   if (cfg["moveLock"] == 0) then
-    TBnkLockNorm:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Locked-Up");
-    TBnkLockPush:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Locked-Down");
+    TFuBnkLockNorm:SetTexture("Interface\\AddOns\\tbag-fufu\\images\\LockButton-Locked-Up");
+    TFuBnkLockPush:SetTexture("Interface\\AddOns\\tbag-fufu\\images\\LockButton-Locked-Down");
   else
-    TBnkLockNorm:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Unlocked-Up");
-    TBnkLockPush:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Unlocked-Down");
+    TFuBnkLockNorm:SetTexture("Interface\\AddOns\\tbag-fufu\\images\\LockButton-Unlocked-Up");
+    TFuBnkLockPush:SetTexture("Interface\\AddOns\\tbag-fufu\\images\\LockButton-Unlocked-Down");
   end
 
   if (cfg["show_bagbuttons"] == 0) then
-    TBnkFrameBag1:Hide();
-    TBnkFrameBag2:Hide();
-    TBnkFrameBag3:Hide();
-    TBnkFrameBag4:Hide();
-    TBnkFrameBag5:Hide();
-    TBnkFrameBag6:Hide();
-    TBnkFrameBag7:Hide();
-    TBnkFrameBagBank:Hide();
-    TBnkFrameBagReagent:Hide();
+    TFuBnkFrameBag1:Hide();
+    TFuBnkFrameBag2:Hide();
+    TFuBnkFrameBag3:Hide();
+    TFuBnkFrameBag4:Hide();
+    TFuBnkFrameBag5:Hide();
+    TFuBnkFrameBag6:Hide();
+    TFuBnkFrameBag7:Hide();
+    TFuBnkFrameBagBank:Hide();
+    TFuBnkFrameBagReagent:Hide();
   end
   if (cfg["show_userdropdown"] == 0) then
-    TBnk_UserDropdown:Hide();
+    TFuBnk_UserDropdown:Hide();
   end
   if (cfg["show_reloadbutton"] == 0) then
-    TBnk_Button_Reload:Hide();
+    TFuBnk_Button_Reload:Hide();
   end
   if (cfg["show_editbutton"] == 0) then
-    TBnk_Button_ChangeEditMode:Hide();
+    TFuBnk_Button_ChangeEditMode:Hide();
   end
   if (cfg["show_hilightbutton"] == 0) then
-    TBnk_Button_HighlightToggle:Hide();
+    TFuBnk_Button_HighlightToggle:Hide();
   end
   if (cfg["show_lockbutton"] == 0) then
-    TBnk_Button_MoveLockToggle:Hide();
+    TFuBnk_Button_MoveLockToggle:Hide();
   end
   if (cfg["show_closebutton"] == 0) then
-    TBnk_Button_Close:Hide();
+    TFuBnk_Button_Close:Hide();
   end
   if (cfg["show_total"] == 0) then
-    TBnkFrame_Total:Hide();
+    TFuBnkFrame_Total:Hide();
   end
   if (cfg["show_money"] == 0) then
-    TBnkFrame_MoneyFrame:Hide();
+    TFuBnkFrame_MoneyFrame:Hide();
   end
   if (cfg["show_tokens"] == 0) then
-    TBnkFrame_TokenFrame:Hide();
+    TFuBnkFrame_TokenFrame:Hide();
   end
 
-  TBag:BuildBarClassList(self.BC_LIST, cfg);
+  TFuBag:BuildBarClassList(self.BC_LIST, cfg);
 
   -- Do one sorting to init the baritm array
-  self.BARITM = TBag:SortItmCache(cfg,
-    self.playerid, TBnkItm[self.playerid], self.BARITM, self.bags);
-  TBag:LayoutWindow(self)
+  self.BARITM = TFuBag:SortItmCache(cfg,
+    self.playerid, TFuBnkItm[self.playerid], self.BARITM, self.bags);
+  TFuBag:LayoutWindow(self)
 end
 
 function Bank:UpdateDepositButton()
-  if (self.atbank == 1 and self.cfg["show_depositbutton"] == 1 and TBag:IsReagentBankUnlocked(self.playerid)) then
-    TBnk_Button_DepositReagent:Show()
+  if (self.atbank == 1 and self.cfg["show_depositbutton"] == 1 and TFuBag:IsReagentBankUnlocked(self.playerid)) then
+    TFuBnk_Button_DepositReagent:Show()
   else
-    TBnk_Button_DepositReagent:Hide()
+    TFuBnk_Button_DepositReagent:Hide()
   end
 end
 
 function Bank:UpdateBagGfx()
   local i;
   local bag = BANK_CONTAINER;
-  local numSlots, _ = TBag:GetNumBankSlots(self.playerid);
-  local free, size = TBag:UpdateSlots(self.playerid, bag, self.cfg["show_bag_sizes"]);
+  local numSlots, _ = TFuBag:GetNumBankSlots(self.playerid);
+  local free, size = TFuBag:UpdateSlots(self.playerid, bag, self.cfg["show_bag_sizes"]);
   local totalfree = free;
   local totalsize = size;
 
-  TBag:UpdateBagColors(bag);
-  TBag:SetPlayerBagCfg(self.playerid, bag, TBag.I_ITEMLINK, nil);
+  TFuBag:UpdateBagColors(bag);
+  TFuBag:SetPlayerBagCfg(self.playerid, bag, TFuBag.I_ITEMLINK, nil);
 
   bag = REAGENTBANK_CONTAINER;
-  if TBag:IsReagentBankUnlocked(self.playerid) then
-    SetItemButtonTextureVertexColor(TBnkFrameBagReagent, 1.0, 1.0, 1.0, 1.0);
+  if TFuBag:IsReagentBankUnlocked(self.playerid) then
+    SetItemButtonTextureVertexColor(TFuBnkFrameBagReagent, 1.0, 1.0, 1.0, 1.0);
   else
-    SetItemButtonTextureVertexColor(TBnkFrameBagReagent, 1.0, 0.1, 0.1, 1.0);
+    SetItemButtonTextureVertexColor(TFuBnkFrameBagReagent, 1.0, 0.1, 0.1, 1.0);
   end
-  free, size = TBag:UpdateSlots(self.playerid, bag, self.cfg["show_bag_sizes"]);
-  TBag:UpdateBagColors(bag);
+  free, size = TFuBag:UpdateSlots(self.playerid, bag, self.cfg["show_bag_sizes"]);
+  TFuBag:UpdateBagColors(bag);
   totalfree = totalfree + free;
   totalsize = totalsize + size;
 
   for i=1, numSlots do
     bag = i + 4;
-    local type = TBag:GetBagType(self.playerid, bag); -- needed for cacheing
-    TBag:GetBagFrameTexture(bag):SetVertexColor(1.0,1.0,1.0, 1.0);
+    local type = TFuBag:GetBagType(self.playerid, bag); -- needed for cacheing
+    TFuBag:GetBagFrameTexture(bag):SetVertexColor(1.0,1.0,1.0, 1.0);
   end
   for i=numSlots+1, NUM_BANKBAGSLOTS do
     bag = i + 4;
-    TBag:SetPlayerBagCfg(self.playerid, bag, TBag.I_BAGTYPE, 0);
-    TBag:SetPlayerBagCfg(self.playerid, bag, TBag.I_BAGFREE, 0);
-    TBag:SetPlayerBagCfg(self.playerid, bag, TBag.I_BAGSIZE, 0);
-    TBag:SetPlayerBagCfg(self.playerid, bag, TBag.I_ITEMLINK, nil);
-    TBag:GetBagFrameTexture(bag):SetVertexColor(1.0,0.1,0.1, 1.0);
+    TFuBag:SetPlayerBagCfg(self.playerid, bag, TFuBag.I_BAGTYPE, 0);
+    TFuBag:SetPlayerBagCfg(self.playerid, bag, TFuBag.I_BAGFREE, 0);
+    TFuBag:SetPlayerBagCfg(self.playerid, bag, TFuBag.I_BAGSIZE, 0);
+    TFuBag:SetPlayerBagCfg(self.playerid, bag, TFuBag.I_ITEMLINK, nil);
+    TFuBag:GetBagFrameTexture(bag):SetVertexColor(1.0,0.1,0.1, 1.0);
   end
   for i=1, NUM_BANKBAGSLOTS do
     bag = i + 4;
 
-    TBag:UpdateBagColors(bag);
+    TFuBag:UpdateBagColors(bag);
 
-    TBag:GetBagFrameTexture(bag):SetTexture(
-      TBag:GetBagTexture(self.playerid, bag));
+    TFuBag:GetBagFrameTexture(bag):SetTexture(
+      TFuBag:GetBagTexture(self.playerid, bag));
 
-    local free, size = TBag:UpdateSlots(self.playerid, bag, self.cfg["show_bag_sizes"]);
+    local free, size = TFuBag:UpdateSlots(self.playerid, bag, self.cfg["show_bag_sizes"]);
 
     totalfree = totalfree + free;
     totalsize = totalsize + size;
   end
-  TBag:SetFreeStr(TBnkFrame_TotalText, totalfree, totalsize, self.cfg["show_bag_sizes"]);
+  TFuBag:SetFreeStr(TFuBnkFrame_TotalText, totalfree, totalsize, self.cfg["show_bag_sizes"]);
 end
 
 function Bank:InitBagGfx()
-  local numSlots, _ = TBag:GetNumBankSlots(self.playerid);
+  local numSlots, _ = TFuBag:GetNumBankSlots(self.playerid);
 
   -- Spoof the bank
-  local button = TBnkFrameBagBank;
+  local button = TFuBnkFrameBagBank;
   SetItemButtonTextureVertexColor(button, 1.0,1.0,1.0, 1.0);
-  TBag:GetBagFrameTexture(BANK_CONTAINER):SetTexture(
-        TBag:GetBagTexture(TBnkFrame.playerid, BANK_CONTAINER));
-  TBag:GetBagFrameTexture(REAGENTBANK_CONTAINER):SetTexture(
-        TBag:GetBagTexture(TBnkFrame.playerid, REAGENTBANK_CONTAINER));
+  TFuBag:GetBagFrameTexture(BANK_CONTAINER):SetTexture(
+        TFuBag:GetBagTexture(TFuBnkFrame.playerid, BANK_CONTAINER));
+  TFuBag:GetBagFrameTexture(REAGENTBANK_CONTAINER):SetTexture(
+        TFuBag:GetBagTexture(TFuBnkFrame.playerid, REAGENTBANK_CONTAINER));
 
 
   for i=1, NUM_BANKBAGSLOTS do
-    button = _G["TBnkFrameBag"..i];
+    button = _G["TFuBnkFrameBag"..i];
     if ( button ) then
       if ( i <= numSlots ) then
         SetItemButtonTextureVertexColor(button, 1.0,1.0,1.0, 1.0);
@@ -302,10 +302,10 @@ end
 
 function Bank.Button_HighlightToggle_OnClick(self)
   PlaySound(PlaySoundKitID and "igMainMenuOptioncheckBoxOn" or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
-  if (TBag.SrchText) then
-    TBag:ClearSearch();
-    if (GameTooltip:GetOwner() == TBnk_Button_HighlightToggle) then
-      if (TBnkFrame.highlight_new == 1) then
+  if (TFuBag.SrchText) then
+    TFuBag:ClearSearch();
+    if (GameTooltip:GetOwner() == TFuBnk_Button_HighlightToggle) then
+      if (TFuBnkFrame.highlight_new == 1) then
         GameTooltip_AddNewbieTip(self, L["Normal"], 1.0, 1.0, 1.0,
                                  L["Stop highlighting new items."]);
       else
@@ -314,52 +314,52 @@ function Bank.Button_HighlightToggle_OnClick(self)
       end
     end
     return;
-  elseif (TBnkFrame.hilight_new == 0) then
-    TBnkFrame.hilight_new = 1;
-    if (GameTooltip:GetOwner() == TBnk_Button_HighlightToggle) then
+  elseif (TFuBnkFrame.hilight_new == 0) then
+    TFuBnkFrame.hilight_new = 1;
+    if (GameTooltip:GetOwner() == TFuBnk_Button_HighlightToggle) then
       GameTooltip_AddNewbieTip(self, L["Normal"], 1.0, 1.0, 1.0,
                                L["Stop highlighting new items."]);
     end
   else
-    TBnkFrame.hilight_new = 0;
-    if (GameTooltip:GetOwner() == TBnk_Button_HighlightToggle) then
+    TFuBnkFrame.hilight_new = 0;
+    if (GameTooltip:GetOwner() == TFuBnk_Button_HighlightToggle) then
       GameTooltip_AddNewbieTip(self, L["Highlight New"], 1.0, 1.0, 1.0,
                                L["Highlight items marked as new."]);
     end
   end
-  TBnkFrame:UpdateWindow();
+  TFuBnkFrame:UpdateWindow();
 end
 
 function Bank.Button_ChangeEditMode_OnClick()
   PlaySound(PlaySoundKitID and "igMainMenuOptioncheckBoxOn" or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
-  if (TBnkFrame.edit_mode == 0) then
-    TBnkFrame.edit_mode = 1;
+  if (TFuBnkFrame.edit_mode == 0) then
+    TFuBnkFrame.edit_mode = 1;
   else
-    TBnkFrame.edit_mode = 0;
+    TFuBnkFrame.edit_mode = 0;
   end
 
   -- resort will force a window redraw
-  TBnkFrame:UpdateWindow(TBag.REQ_MUST);
+  TFuBnkFrame:UpdateWindow(TFuBag.REQ_MUST);
 end
 
 function Bank.Button_Reload_OnClick()
   -- To avoid cleaning the bank cache, you only can reload bags at bank.
-  if (TBnkFrame.atbank==1) then
+  if (TFuBnkFrame.atbank==1) then
     -- Hell, let's be paranoid
-    if (TBnkFrame.playerid == TBag.PLAYERID) then
-      TBag:ClearItmCache(TBnkItm[TBnkFrame.playerid], TBnkFrame.bags);
-      TBag:ClearStackSkip(TBnkFrame.bags);
-      TBag:ClearCompSkip(TBnkFrame.bags);
+    if (TFuBnkFrame.playerid == TFuBag.PLAYERID) then
+      TFuBag:ClearItmCache(TFuBnkItm[TFuBnkFrame.playerid], TFuBnkFrame.bags);
+      TFuBag:ClearStackSkip(TFuBnkFrame.bags);
+      TFuBag:ClearCompSkip(TFuBnkFrame.bags);
 
       -- Send a message to restack
-      if (TBnkFrame.cfg["stack_resort"] == 1) then
-        TBnkFrame.cfg["stack_once"] = 1;
+      if (TFuBnkFrame.cfg["stack_resort"] == 1) then
+        TFuBnkFrame.cfg["stack_once"] = 1;
       end
     end
   end
 
-  TBnkFrame:UpdateWindow(TBag.REQ_MUST);
-  TBag:PrintDEBUG("TBnk reloaded.");
+  TFuBnkFrame:UpdateWindow(TFuBag.REQ_MUST);
+  TFuBag:PrintDEBUG("TFuBnk reloaded.");
 end
 
 function Bank.Button_DepositReagent_OnClick()
@@ -368,19 +368,19 @@ end
 
 function Bank.Button_MoveLockToggle_OnClick(self)
   PlaySound(PlaySoundKitID and "igMainMenuOptioncheckBoxOn" or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
-  if (TBnkFrame.cfg["moveLock"] == 0) then
-    TBnkFrame.cfg["moveLock"] = 1;
-    TBnkLockNorm:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Unlocked-Up");
-    TBnkLockPush:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Unlocked-Down");
-    if (GameTooltip:GetOwner() == TBnk_Button_MoveLockToggle) then
+  if (TFuBnkFrame.cfg["moveLock"] == 0) then
+    TFuBnkFrame.cfg["moveLock"] = 1;
+    TFuBnkLockNorm:SetTexture("Interface\\AddOns\\tbag-fufu\\images\\LockButton-Unlocked-Up");
+    TFuBnkLockPush:SetTexture("Interface\\AddOns\\tbag-fufu\\images\\LockButton-Unlocked-Down");
+    if (GameTooltip:GetOwner() == TFuBnk_Button_MoveLockToggle) then
       GameTooltip_AddNewbieTip(self, L["Lock Window"], 1.0, 1.0, 1.0,
                                L["Prevent window from being moved by dragging it."]);
     end
   else
-    TBnkFrame.cfg["moveLock"] = 0;
-    TBnkLockNorm:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Locked-Up");
-    TBnkLockPush:SetTexture("Interface\\AddOns\\TBag\\images\\LockButton-Locked-Down");
-    if (GameTooltip:GetOwner() == TBnk_Button_MoveLockToggle) then
+    TFuBnkFrame.cfg["moveLock"] = 0;
+    TFuBnkLockNorm:SetTexture("Interface\\AddOns\\tbag-fufu\\images\\LockButton-Locked-Up");
+    TFuBnkLockPush:SetTexture("Interface\\AddOns\\tbag-fufu\\images\\LockButton-Locked-Down");
+    if (GameTooltip:GetOwner() == TFuBnk_Button_MoveLockToggle) then
       GameTooltip_AddNewbieTip(self, L["Unlock Window"], 1.0, 1.0, 1.0,
                                L["Allow window to be moved by dragging it."]);
     end
@@ -390,36 +390,36 @@ end
 function Bank.SlotTargetButton_OnClick(self, button)
   local bar, tmp;
 
-  if (TBnkFrame.edit_mode == 1) then
-  for tmp in string.gmatch(self:GetName(), "TBnkFrame_SlotTarget_(%d+)") do
+  if (TFuBnkFrame.edit_mode == 1) then
+  for tmp in string.gmatch(self:GetName(), "TFuBnkFrame_SlotTarget_(%d+)") do
     bar = tonumber(tmp);
   end
 
-  if ( (bar == nil) or (bar < 1) or (bar > TBag.BAR_MAX) ) then
+  if ( (bar == nil) or (bar < 1) or (bar > TFuBag.BAR_MAX) ) then
     return;
   end
 
   if ( button == "LeftButton" ) then
-    if (TBnkFrame.edit_selected ~= "") then
+    if (TFuBnkFrame.edit_selected ~= "") then
   -- we got a click, and we already had one selected.  let's move the items
-  TBag:SetCatBar(TBnkFrame.cfg, TBnkFrame.edit_selected, bar, 1);
+  TFuBag:SetCatBar(TFuBnkFrame.cfg, TFuBnkFrame.edit_selected, bar, 1);
 
-  TBnkFrame.edit_selected = "";
-  TBnkFrame.edit_hilight = "";
+  TFuBnkFrame.edit_selected = "";
+  TFuBnkFrame.edit_hilight = "";
 
-  TBag:BuildBarClassList(TBnkFrame.BC_LIST, TBnkFrame.cfg);
+  TFuBag:BuildBarClassList(TFuBnkFrame.BC_LIST, TFuBnkFrame.cfg);
 
     -- resort will force a window redraw as well
-      TBnkFrame:UpdateWindow(TBag.REQ_MUST);
+      TFuBnkFrame:UpdateWindow(TFuBag.REQ_MUST);
     end
 
   elseif ( button == "RightButton" ) then
     HideDropDownMenu(1);
-    TBnkFrame.RightClickMenu_mode = "bar";
-    TBnkFrame.RightClickMenu_opts = {
-  [TBag.I_BAR] = bar
+    TFuBnkFrame.RightClickMenu_mode = "bar";
+    TFuBnkFrame.RightClickMenu_opts = {
+  [TFuBag.I_BAR] = bar
   };
-    ToggleDropDownMenu(1, nil, TBnkFrame_RightClickMenu, self:GetName(), -50, 0);
+    ToggleDropDownMenu(1, nil, TFuBnkFrame_RightClickMenu, self:GetName(), -50, 0);
 
   end
   end
@@ -429,20 +429,20 @@ function Bank.RightClick_DeleteItemOverride(self)
   local bag, slot, itm;
   local this = self or _G.this
 
-  bag = this.value[TBag.I_BAG];
-  slot = this.value[TBag.I_SLOT];
+  bag = this.value[TFuBag.I_BAG];
+  slot = this.value[TFuBag.I_SLOT];
 
   if ( (bag ~= nil) and (slot ~= nil) ) then
-  itm = TBnkItm[TBnkFrame.playerid][bag][slot];
+  itm = TFuBnkItm[TFuBnkFrame.playerid][bag][slot];
 
-  if (itm[TBag.I_ITEMLINK] ~= nil) then
-    local id = TBag:GetItemID(itm[TBag.I_ITEMLINK]);
-    if TBnkFrame.cfg["item_overrides"][id] ~= nil then
-      TBnkFrame.cfg["item_overrides"][id] = nil;
+  if (itm[TFuBag.I_ITEMLINK] ~= nil) then
+    local id = TFuBag:GetItemID(itm[TFuBag.I_ITEMLINK]);
+    if TFuBnkFrame.cfg["item_overrides"][id] ~= nil then
+      TFuBnkFrame.cfg["item_overrides"][id] = nil;
       HideDropDownMenu(1);
 
       -- resort will force a window redraw as well
-      TBnkFrame:UpdateWindow(TBag.REQ_MUST);
+      TFuBnkFrame:UpdateWindow(TFuBag.REQ_MUST);
     end
   end
   end
@@ -452,35 +452,35 @@ function Bank.RightClick_SetItemOverride(self)
   local bag, slot, itm, new_barclass;
   local this = self or _G.this
 
-  bag = this.value[TBag.I_BAG];
-  slot = this.value[TBag.I_SLOT];
+  bag = this.value[TFuBag.I_BAG];
+  slot = this.value[TFuBag.I_SLOT];
   new_barclass = this.value["barclass"];
 
   if ( (bag ~= nil) and (slot ~= nil) and (new_barclass ~= nil) ) then
-  itm = TBnkItm[TBnkFrame.playerid][bag][slot];
+  itm = TFuBnkItm[TFuBnkFrame.playerid][bag][slot];
 
-  TBnkFrame.cfg["item_overrides"][TBag:GetItemID(itm[TBag.I_ITEMLINK])] = new_barclass;
+  TFuBnkFrame.cfg["item_overrides"][TFuBag:GetItemID(itm[TFuBag.I_ITEMLINK])] = new_barclass;
   HideDropDownMenu(2);
   HideDropDownMenu(1);
 
-  TBnkFrame:UpdateWindow(TBag.REQ_MUST);
+  TFuBnkFrame:UpdateWindow(TFuBag.REQ_MUST);
   end
 end
 
 function Bank:SetTopLeftButton_Anchors()
   local buttons = {
-    "TBnk_Button_HighlightToggle",
-    "TBnk_Button_ChangeEditMode",
-    "TBnk_Button_Reload",
-    "TBnk_Button_DepositReagent",
+    "TFuBnk_Button_HighlightToggle",
+    "TFuBnk_Button_ChangeEditMode",
+    "TFuBnk_Button_Reload",
+    "TFuBnk_Button_DepositReagent",
   };
   local button_left = nil;
 
   -- Handle user dropdown list separately...
-  local dropdown = TBnk_UserDropdown;
+  local dropdown = TFuBnk_UserDropdown;
   if (dropdown and dropdown:IsVisible()) then
     dropdown:ClearAllPoints();
-    dropdown:SetPoint("TOPLEFT",TBnkFrame,"TOPLEFT",-10,-5);
+    dropdown:SetPoint("TOPLEFT",TFuBnkFrame,"TOPLEFT",-10,-5);
     button_left = dropdown;
   end
 
@@ -498,7 +498,7 @@ function Bank:SetTopLeftButton_Anchors()
         end
       else
         -- First button if dropdown is hidden
-        button:SetPoint("TOPLEFT",TBnkFrame,"TOPLEFT",9,-8);
+        button:SetPoint("TOPLEFT",TFuBnkFrame,"TOPLEFT",9,-8);
       end
       if (button:IsVisible()) then
         button_left = button;
@@ -509,8 +509,8 @@ end
 
 function Bank:SetTopRightButton_Anchors()
   local buttons = {
-    "TBnk_Button_Close",
-    "TBnk_Button_MoveLockToggle",
+    "TFuBnk_Button_Close",
+    "TFuBnk_Button_MoveLockToggle",
   }
   local button_right = nil;
 
@@ -520,7 +520,7 @@ function Bank:SetTopRightButton_Anchors()
       if (button_right) then
         button:SetPoint("TOPRIGHT",button_right,"TOPLEFT",10,0);
       else
-        button:SetPoint("TOPRIGHT",TBnkFrame,"TOPRIGHT",0,0);
+        button:SetPoint("TOPRIGHT",TFuBnkFrame,"TOPRIGHT",0,0);
       end
       if (button:IsVisible()) then
         button_right = button;
@@ -531,8 +531,8 @@ end
 
 function Bank:SetBottomLeftButton_Anchors()
   local buttons = {
-    "TBnkFrame_Total",
-    "TBnkFrameBagBank",
+    "TFuBnkFrame_Total",
+    "TFuBnkFrameBagBank",
   }
   local button_left = nil;
 
@@ -549,7 +549,7 @@ function Bank:SetBottomLeftButton_Anchors()
         if (self.edit_mode == 1) then
           y = y + 30;
         end
-        button:SetPoint("BOTTOMLEFT",TBnkFrame,"BOTTOMLEFT",10,y);
+        button:SetPoint("BOTTOMLEFT",TFuBnkFrame,"BOTTOMLEFT",10,y);
       end
       if (button:IsVisible()) then
         button_left = button;
@@ -560,31 +560,31 @@ function Bank:SetBottomLeftButton_Anchors()
   -- Figure the number of columns needed to require the bag buttons
   -- to be split into two rows
   local bags_row = 0;
-  if (TBnkFrameBagBank:IsVisible()) then
+  if (TFuBnkFrameBagBank:IsVisible()) then
     bags_row = bags_row + 5;
   end
-  if (TBnkFrame_Total:IsVisible()) then
+  if (TFuBnkFrame_Total:IsVisible()) then
     bags_row = bags_row + 1;
   end
-  if TBnkFrame_MoneyFrame:IsVisible() or TBnkFrame_TokenFrame:IsVisible() then
+  if TFuBnkFrame_MoneyFrame:IsVisible() or TFuBnkFrame_TokenFrame:IsVisible() then
     bags_row = bags_row + 4;
   end
 
   if (self.cfg["maxColumns"] <= bags_row) then
-    TBnkFrameBag4:ClearAllPoints()
-    TBnkFrameBag4:SetPoint("BOTTOMLEFT",TBnkFrameBagBank,"TOPLEFT",0,3);
+    TFuBnkFrameBag4:ClearAllPoints()
+    TFuBnkFrameBag4:SetPoint("BOTTOMLEFT",TFuBnkFrameBagBank,"TOPLEFT",0,3);
   else
     -- Now separate row required
-    TBnkFrameBag4:ClearAllPoints()
-    TBnkFrameBag4:SetPoint("BOTTOMLEFT",TBnkFrameBag3,"BOTTOMRIGHT",3,0);
+    TFuBnkFrameBag4:ClearAllPoints()
+    TFuBnkFrameBag4:SetPoint("BOTTOMLEFT",TFuBnkFrameBag3,"BOTTOMRIGHT",3,0);
   end
 
 end
 
 function Bank:SetBottomRightButton_Anchors()
   local buttons = {
-    "TBnkFrame_MoneyFrame",
-    "TBnkFrame_TokenFrame",
+    "TFuBnkFrame_MoneyFrame",
+    "TFuBnkFrame_TokenFrame",
   }
   local button_right = nil
 
@@ -599,7 +599,7 @@ function Bank:SetBottomRightButton_Anchors()
         if self.edit_mode == 1 then
           y = y + 30
         end
-        button:SetPoint("BOTTOMRIGHT",TBnkFrame,"BOTTOMRIGHT",5,y)
+        button:SetPoint("BOTTOMRIGHT",TFuBnkFrame,"BOTTOMRIGHT",5,y)
       end
       if button:IsVisible() then
         button_right = button
@@ -613,157 +613,157 @@ function Bank:SetButton_Anchors()
   self:SetTopRightButton_Anchors();
   self:SetBottomLeftButton_Anchors();
   self:SetBottomRightButton_Anchors();
-  TBag:LayoutWindow(self)
+  TFuBag:LayoutWindow(self)
 end
 
 
 function Bank.Toggle_CloseButton()
-  if (TBnkFrame.cfg["show_closebutton"] == 1) then
-    TBnkFrame.cfg["show_closebutton"] = 0;
-    TBnk_Button_Close:Hide();
-    TBnkFrame:SetButton_Anchors();
+  if (TFuBnkFrame.cfg["show_closebutton"] == 1) then
+    TFuBnkFrame.cfg["show_closebutton"] = 0;
+    TFuBnk_Button_Close:Hide();
+    TFuBnkFrame:SetButton_Anchors();
   else
-    TBnkFrame.cfg["show_closebutton"] = 1;
-    TBnk_Button_Close:Show();
-    TBnkFrame:SetButton_Anchors();
+    TFuBnkFrame.cfg["show_closebutton"] = 1;
+    TFuBnk_Button_Close:Show();
+    TFuBnkFrame:SetButton_Anchors();
   end
 end
 
 function Bank.Toggle_LockButton()
-  if (TBnkFrame.cfg["show_lockbutton"] == 1) then
-    TBnkFrame.cfg["show_lockbutton"] = 0;
-    TBnk_Button_MoveLockToggle:Hide();
-    TBnkFrame:SetButton_Anchors();
+  if (TFuBnkFrame.cfg["show_lockbutton"] == 1) then
+    TFuBnkFrame.cfg["show_lockbutton"] = 0;
+    TFuBnk_Button_MoveLockToggle:Hide();
+    TFuBnkFrame:SetButton_Anchors();
   else
-    TBnkFrame.cfg["show_lockbutton"] = 1;
-    TBnk_Button_MoveLockToggle:Show();
-    TBnkFrame:SetButton_Anchors();
+    TFuBnkFrame.cfg["show_lockbutton"] = 1;
+    TFuBnk_Button_MoveLockToggle:Show();
+    TFuBnkFrame:SetButton_Anchors();
   end
 end
 
 function Bank.Toggle_HighlightButton()
-  if (TBnkFrame.cfg["show_hilightbutton"] == 1) then
-    TBnkFrame.cfg["show_hilightbutton"] = 0;
-    TBnk_Button_HighlightToggle:Hide();
-    TBnkFrame:SetButton_Anchors();
+  if (TFuBnkFrame.cfg["show_hilightbutton"] == 1) then
+    TFuBnkFrame.cfg["show_hilightbutton"] = 0;
+    TFuBnk_Button_HighlightToggle:Hide();
+    TFuBnkFrame:SetButton_Anchors();
   else
-    TBnkFrame.cfg["show_hilightbutton"] = 1;
-    TBnk_Button_HighlightToggle:Show();
-    TBnkFrame:SetButton_Anchors();
+    TFuBnkFrame.cfg["show_hilightbutton"] = 1;
+    TFuBnk_Button_HighlightToggle:Show();
+    TFuBnkFrame:SetButton_Anchors();
   end
 end
 
 function Bank.Toggle_EditButton()
-  if (TBnkFrame.cfg["show_editbutton"] == 1) then
-    TBnkFrame.cfg["show_editbutton"] = 0;
-    TBnk_Button_ChangeEditMode:Hide();
-    TBnkFrame:SetButton_Anchors();
+  if (TFuBnkFrame.cfg["show_editbutton"] == 1) then
+    TFuBnkFrame.cfg["show_editbutton"] = 0;
+    TFuBnk_Button_ChangeEditMode:Hide();
+    TFuBnkFrame:SetButton_Anchors();
   else
-    TBnkFrame.cfg["show_editbutton"] = 1;
-    TBnk_Button_ChangeEditMode:Show();
-    TBnkFrame:SetButton_Anchors();
+    TFuBnkFrame.cfg["show_editbutton"] = 1;
+    TFuBnk_Button_ChangeEditMode:Show();
+    TFuBnkFrame:SetButton_Anchors();
   end
 end
 
 function Bank.Toggle_ReloadButton()
-  if (TBnkFrame.cfg["show_reloadbutton"] == 1) then
-    TBnkFrame.cfg["show_reloadbutton"] = 0;
-    TBnk_Button_Reload:Hide();
-    TBnkFrame:SetButton_Anchors();
+  if (TFuBnkFrame.cfg["show_reloadbutton"] == 1) then
+    TFuBnkFrame.cfg["show_reloadbutton"] = 0;
+    TFuBnk_Button_Reload:Hide();
+    TFuBnkFrame:SetButton_Anchors();
   else
-    TBnkFrame.cfg["show_reloadbutton"] = 1;
-    TBnk_Button_Reload:Show();
-    TBnkFrame:SetButton_Anchors();
+    TFuBnkFrame.cfg["show_reloadbutton"] = 1;
+    TFuBnk_Button_Reload:Show();
+    TFuBnkFrame:SetButton_Anchors();
   end
 end
 
 function Bank.Toggle_DepositReagentButton()
-  if (TBnkFrame.cfg["show_depositbutton"] == 1) then
-    TBnkFrame.cfg["show_depositbutton"] = 0;
-    TBnk_Button_DepositReagent:Hide();
-    TBnkFrame:SetButton_Anchors();
+  if (TFuBnkFrame.cfg["show_depositbutton"] == 1) then
+    TFuBnkFrame.cfg["show_depositbutton"] = 0;
+    TFuBnk_Button_DepositReagent:Hide();
+    TFuBnkFrame:SetButton_Anchors();
   else
-    TBnkFrame.cfg["show_depositbutton"] = 1;
-    if (TBnkFrame.atbank == 1 and TBag:IsReagentBankUnlocked(TBnkFrame.playerid)) then
-      TBnk_Button_DepositReagent:Show();
-      TBnkFrame:SetButton_Anchors();
+    TFuBnkFrame.cfg["show_depositbutton"] = 1;
+    if (TFuBnkFrame.atbank == 1 and TFuBag:IsReagentBankUnlocked(TFuBnkFrame.playerid)) then
+      TFuBnk_Button_DepositReagent:Show();
+      TFuBnkFrame:SetButton_Anchors();
     end
   end
 end
 
 function Bank.Toggle_UserDropdown()
-  if (TBnkFrame.cfg["show_userdropdown"] == 1) then
-    TBnkFrame.cfg["show_userdropdown"] = 0;
-    TBnk_UserDropdown:Hide();
-    TBnkFrame:SetButton_Anchors();
+  if (TFuBnkFrame.cfg["show_userdropdown"] == 1) then
+    TFuBnkFrame.cfg["show_userdropdown"] = 0;
+    TFuBnk_UserDropdown:Hide();
+    TFuBnkFrame:SetButton_Anchors();
   else
-    TBnkFrame.cfg["show_userdropdown"] = 1;
-    TBnk_UserDropdown:Show();
-    TBnkFrame:SetButton_Anchors();
+    TFuBnkFrame.cfg["show_userdropdown"] = 1;
+    TFuBnk_UserDropdown:Show();
+    TFuBnkFrame:SetButton_Anchors();
   end
 end
 
 function Bank.Toggle_Money()
-  if (TBnkFrame.cfg["show_money"] == 1) then
-    TBnkFrame.cfg["show_money"] = 0;
-    TBnkFrame_MoneyFrame:Hide();
-    TBnkFrame:SetButton_Anchors();
+  if (TFuBnkFrame.cfg["show_money"] == 1) then
+    TFuBnkFrame.cfg["show_money"] = 0;
+    TFuBnkFrame_MoneyFrame:Hide();
+    TFuBnkFrame:SetButton_Anchors();
   else
-    TBnkFrame.cfg["show_money"] = 1;
-    TBnkFrame_MoneyFrame:Show();
-    TBnkFrame:SetButton_Anchors();
+    TFuBnkFrame.cfg["show_money"] = 1;
+    TFuBnkFrame_MoneyFrame:Show();
+    TFuBnkFrame:SetButton_Anchors();
   end
 end
 
 function Bank.Toggle_Token()
-  if (TBnkFrame.cfg["show_tokens"] == 1) then
-    TBnkFrame.cfg["show_tokens"] = 0;
-    TBnkFrame_TokenFrame:Hide();
-    TBnkFrame:SetButton_Anchors();
+  if (TFuBnkFrame.cfg["show_tokens"] == 1) then
+    TFuBnkFrame.cfg["show_tokens"] = 0;
+    TFuBnkFrame_TokenFrame:Hide();
+    TFuBnkFrame:SetButton_Anchors();
   else
-    TBnkFrame.cfg["show_tokens"] = 1;
-    TBnkFrame_TokenFrame:Show();
-    TBnkFrame:SetButton_Anchors();
+    TFuBnkFrame.cfg["show_tokens"] = 1;
+    TFuBnkFrame_TokenFrame:Show();
+    TFuBnkFrame:SetButton_Anchors();
   end
 end
 
 function Bank.Toggle_BagSlotButtons()
-  if (TBnkFrame.cfg["show_bagbuttons"] == 1) then
-    TBnkFrame.cfg["show_bagbuttons"] = 0;
-    TBnkFrameBag1:Hide();
-    TBnkFrameBag2:Hide();
-    TBnkFrameBag3:Hide();
-    TBnkFrameBag4:Hide();
-    TBnkFrameBag5:Hide();
-    TBnkFrameBag6:Hide();
-    TBnkFrameBag7:Hide();
-    TBnkFrameBagBank:Hide();
-    TBnkFrameBagReagent:Hide();
-    TBnkFrame:SetButton_Anchors();
+  if (TFuBnkFrame.cfg["show_bagbuttons"] == 1) then
+    TFuBnkFrame.cfg["show_bagbuttons"] = 0;
+    TFuBnkFrameBag1:Hide();
+    TFuBnkFrameBag2:Hide();
+    TFuBnkFrameBag3:Hide();
+    TFuBnkFrameBag4:Hide();
+    TFuBnkFrameBag5:Hide();
+    TFuBnkFrameBag6:Hide();
+    TFuBnkFrameBag7:Hide();
+    TFuBnkFrameBagBank:Hide();
+    TFuBnkFrameBagReagent:Hide();
+    TFuBnkFrame:SetButton_Anchors();
   else
-    TBnkFrame.cfg["show_bagbuttons"] = 1;
-    TBnkFrameBag1:Show();
-    TBnkFrameBag2:Show();
-    TBnkFrameBag3:Show();
-    TBnkFrameBag4:Show();
-    TBnkFrameBag5:Show();
-    TBnkFrameBag6:Show();
-    TBnkFrameBag7:Show();
-    TBnkFrameBagBank:Show();
-    TBnkFrameBagReagent:Show();
-    TBnkFrame:SetButton_Anchors();
+    TFuBnkFrame.cfg["show_bagbuttons"] = 1;
+    TFuBnkFrameBag1:Show();
+    TFuBnkFrameBag2:Show();
+    TFuBnkFrameBag3:Show();
+    TFuBnkFrameBag4:Show();
+    TFuBnkFrameBag5:Show();
+    TFuBnkFrameBag6:Show();
+    TFuBnkFrameBag7:Show();
+    TFuBnkFrameBagBank:Show();
+    TFuBnkFrameBagReagent:Show();
+    TFuBnkFrame:SetButton_Anchors();
    end
 end
 
 function Bank.Toggle_Total()
-  if (TBnkFrame.cfg["show_total"] == 1) then
-    TBnkFrame.cfg["show_total"] = 0;
-    TBnkFrame_Total:Hide();
-    TBnkFrame:SetButton_Anchors();
+  if (TFuBnkFrame.cfg["show_total"] == 1) then
+    TFuBnkFrame.cfg["show_total"] = 0;
+    TFuBnkFrame_Total:Hide();
+    TFuBnkFrame:SetButton_Anchors();
   else
-    TBnkFrame.cfg["show_total"] = 1;
-    TBnkFrame_Total:Show();
-    TBnkFrame:SetButton_Anchors();
+    TFuBnkFrame.cfg["show_total"] = 1;
+    TFuBnkFrame_Total:Show();
+    TFuBnkFrame:SetButton_Anchors();
   end
 end
 
@@ -777,47 +777,47 @@ function Bank.RightClickMenu_populate(self, level)
   -------------------------------------------------------------------------------------------------
   ------------------------------- ITEM CONTEXT MENU -----------------------------------------------
   -------------------------------------------------------------------------------------------------
-  if (TBnkFrame.RightClickMenu_mode == "item") then
+  if (TFuBnkFrame.RightClickMenu_mode == "item") then
   -- we have a right click on a button
 
-  bar = TBnkFrame.RightClickMenu_opts[TBag.I_BAR];
-  bag = TBnkFrame.RightClickMenu_opts[TBag.I_BAG];
-  slot = TBnkFrame.RightClickMenu_opts[TBag.I_SLOT];
-  itm = TBnkItm[TBnkFrame.playerid][bag][slot];
-  id = TBag:GetItemID(itm[TBag.I_ITEMLINK]);
+  bar = TFuBnkFrame.RightClickMenu_opts[TFuBag.I_BAR];
+  bag = TFuBnkFrame.RightClickMenu_opts[TFuBag.I_BAG];
+  slot = TFuBnkFrame.RightClickMenu_opts[TFuBag.I_SLOT];
+  itm = TFuBnkItm[TFuBnkFrame.playerid][bag][slot];
+  id = TFuBag:GetItemID(itm[TFuBag.I_ITEMLINK]);
 
   if (level == 1) then
     -- top level of menu
 
-    info = { ["text"] = itm[TBag.I_NAME], ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
+    info = { ["text"] = itm[TFuBag.I_NAME], ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
     UIDropDownMenu_AddButton(info, level);
 
     info = { ["disabled"] = 1 };
     UIDropDownMenu_AddButton(info, level);
 
-    info = { ["text"] = string.format(L["Current Category: %s"],itm[TBag.I_CAT]), ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
+    info = { ["text"] = string.format(L["Current Category: %s"],itm[TFuBag.I_CAT]), ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
     UIDropDownMenu_AddButton(info, level);
 
     info = { ["disabled"] = 1 };
     UIDropDownMenu_AddButton(info, level);
 
     info = { ["text"] = L["Assign item to category:"], ["hasArrow"] = 1, ["value"] = "override_placement" };
-    if (TBnkFrame.cfg["item_overrides"][id] ~= nil) then
+    if (TFuBnkFrame.cfg["item_overrides"][id] ~= nil) then
   info["checked"] = 1;
     end
     UIDropDownMenu_AddButton(info, level);
 
     info = {
   ["text"] = L["Use default category assignment"],
-  ["value"] = { [TBag.I_BAG]=bag, [TBag.I_SLOT]=slot },
-  ["func"] = TBnkFrame.RightClick_DeleteItemOverride
+  ["value"] = { [TFuBag.I_BAG]=bag, [TFuBag.I_SLOT]=slot },
+  ["func"] = TFuBnkFrame.RightClick_DeleteItemOverride
   };
-    if (TBnkFrame.cfg["item_overrides"][id] == nil) then
+    if (TFuBnkFrame.cfg["item_overrides"][id] == nil) then
   info["checked"] = 1;
     end
     UIDropDownMenu_AddButton(info, level);
 
-    if (TBnk_SHOWITEMDEBUGINFO==1) then
+    if (TFuBnk_SHOWITEMDEBUGINFO==1) then
   info = { ["disabled"] = 1 };
   UIDropDownMenu_AddButton(info, level);
 
@@ -826,14 +826,14 @@ function Bank.RightClickMenu_populate(self, level)
     end
   elseif (level == 2) then
     if ( UIDROPDOWNMENU_MENU_VALUE == "override_placement" ) then
-  for i = 1, TBag.BAR_MAX do
+  for i = 1, TFuBag.BAR_MAX do
   info = {
     ["text"] = string.format(L["Categories within bar %d"],i);
-    ["value"] = { ["opt"]="override_placement_select", [TBag.I_BAG]=bag, [TBag.I_SLOT]=slot, ["select_bar"]=i },
+    ["value"] = { ["opt"]="override_placement_select", [TFuBag.I_BAG]=bag, [TFuBag.I_SLOT]=slot, ["select_bar"]=i },
     ["hasArrow"] = 1
     };
-  if ( (TBnkFrame.cfg["item_overrides"][id] ~=
-  nil) and (TBag:GetCat(TBnkFrame.cfg, TBnkFrame.cfg["item_overrides"][id]) == i) ) then
+  if ( (TFuBnkFrame.cfg["item_overrides"][id] ~=
+  nil) and (TFuBag:GetCat(TFuBnkFrame.cfg, TFuBnkFrame.cfg["item_overrides"][id]) == i) ) then
     info["checked"] = 1;
   end
   UIDropDownMenu_AddButton(info, level);
@@ -861,13 +861,13 @@ function Bank.RightClickMenu_populate(self, level)
   elseif (level == 3) then
     if ( UIDROPDOWNMENU_MENU_VALUE ~= nil ) then
   if ( UIDROPDOWNMENU_MENU_VALUE["opt"] == "override_placement_select" ) then
-  for key, barclass in pairs(TBnkFrame.BC_LIST[UIDROPDOWNMENU_MENU_VALUE["select_bar"]]) do
+  for key, barclass in pairs(TFuBnkFrame.BC_LIST[UIDROPDOWNMENU_MENU_VALUE["select_bar"]]) do
     info = {
   ["text"] = barclass;
-  ["value"] = { [TBag.I_BAG]=bag, [TBag.I_SLOT]=slot, ["barclass"]=barclass },
-  ["func"] = TBnkFrame.RightClick_SetItemOverride
+  ["value"] = { [TFuBag.I_BAG]=bag, [TFuBag.I_SLOT]=slot, ["barclass"]=barclass },
+  ["func"] = TFuBnkFrame.RightClick_SetItemOverride
   };
-    if (TBnkFrame.cfg["item_overrides"][id] == barclass) then
+    if (TFuBnkFrame.cfg["item_overrides"][id] == barclass) then
   info["checked"] = 1;
     end
     UIDropDownMenu_AddButton(info, level);
@@ -879,25 +879,25 @@ function Bank.RightClickMenu_populate(self, level)
   -------------------------------------------------------------------------------------------------
   ------------------------ SLOT TARGET CONTEXT MENU -----------------------------------------------
   -------------------------------------------------------------------------------------------------
-  elseif (TBnkFrame.RightClickMenu_mode == "bar") then
+  elseif (TFuBnkFrame.RightClickMenu_mode == "bar") then
   -- right click on a slot
-  bar = TBnkFrame.RightClickMenu_opts[TBag.I_BAR];
+  bar = TFuBnkFrame.RightClickMenu_opts[TFuBag.I_BAR];
 
-  info = { ["text"] = string.format(L["|c%sBar |r|c%s%s|r"],TBag.C_INST,TBag.C_BAR,bar), ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
+  info = { ["text"] = string.format(L["|c%sBar |r|c%s%s|r"],TFuBag.C_INST,TFuBag.C_BAR,bar), ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
   UIDropDownMenu_AddButton(info, level);
 
   info = { ["disabled"] = 1 };
   UIDropDownMenu_AddButton(info, level);
 
-  for key, value in pairs(TBnkFrame.BC_LIST[bar]) do
+  for key, value in pairs(TFuBnkFrame.BC_LIST[bar]) do
     info = {
-    ["text"] = string.format(L["Move: |c%s%s|r"],TBag.C_CAT,value);
+    ["text"] = string.format(L["Move: |c%s%s|r"],TFuBag.C_CAT,value);
     ["value"] = value;
     ["func"] = function(self)
   local this = self or _G.this
-  TBnkFrame.edit_selected = (this.value);
-  TBnkFrame.edit_hilight = (this.value);
-  TBnkFrame:UpdateWindow();
+  TFuBnkFrame.edit_selected = (this.value);
+  TFuBnkFrame.edit_hilight = (this.value);
+  TFuBnkFrame:UpdateWindow();
     end
     };
     UIDropDownMenu_AddButton(info, level);
@@ -910,23 +910,23 @@ function Bank.RightClickMenu_populate(self, level)
   UIDropDownMenu_AddButton(info, level);
 
   for key, value in pairs({
-    [TBag.SORTBY_NONE] = L["No sort"],
-    [TBag.SORTBY_NORM] = L["Sort by name"],
-    [TBag.SORTBY_REV] = L["Sort last words first"]
+    [TFuBag.SORTBY_NONE] = L["No sort"],
+    [TFuBag.SORTBY_NORM] = L["Sort by name"],
+    [TFuBag.SORTBY_REV] = L["Sort last words first"]
     }) do
 
-    if (TBag:GetGrp(TBnkFrame.cfg, TBag.G_BAR_SORT, bar) == key) then
+    if (TFuBag:GetGrp(TFuBnkFrame.cfg, TFuBag.G_BAR_SORT, bar) == key) then
       checked = 1;
     else
       checked = nil;
     end
     info = {
   ["text"] = value;
-  ["value"] = { [TBag.I_BAR]=bar, ["sortby"]=key };
+  ["value"] = { [TFuBag.I_BAR]=bar, ["sortby"]=key };
   ["func"] = function(self)
     local this = self or _G.this
-    TBag:SetGrpDef(TBnkFrame.cfg, TBag.G_BAR_SORT, this.value[TBag.I_BAR], this.value["sortby"], 1);
-    TBnkFrame:UpdateWindow(TBag.REQ_MUST);
+    TFuBag:SetGrpDef(TFuBnkFrame.cfg, TFuBag.G_BAR_SORT, this.value[TFuBag.I_BAR], this.value["sortby"], 1);
+    TFuBnkFrame:UpdateWindow(TFuBag.REQ_MUST);
   end,
   ["checked"] = checked
   };
@@ -944,7 +944,7 @@ function Bank.RightClickMenu_populate(self, level)
     [1] = L["Tag new items"]
     }) do
 
-    if (TBag:GetGrp(TBnkFrame.cfg, TBag.G_USE_NEW, bar) == key) then
+    if (TFuBag:GetGrp(TFuBnkFrame.cfg, TFuBag.G_USE_NEW, bar) == key) then
       checked = 1;
     else
       checked = nil;
@@ -952,11 +952,11 @@ function Bank.RightClickMenu_populate(self, level)
 
     info = {
       ["text"] = value;
-      ["value"] = { [TBag.I_BAR]=bar, ["value"]=key };
+      ["value"] = { [TFuBag.I_BAR]=bar, ["value"]=key };
       ["func"] = function(self)
         local this = self or _G.this
-        TBag:SetGrpDef(TBnkFrame.cfg, TBag.G_USE_NEW, this.value[TBag.I_BAR], this.value["value"], 1);
-        TBnkFrame:UpdateWindow();
+        TFuBag:SetGrpDef(TFuBnkFrame.cfg, TFuBag.G_USE_NEW, this.value[TFuBag.I_BAR], this.value["value"], 1);
+        TFuBnkFrame:UpdateWindow();
     end,
   ["checked"] = checked
   };
@@ -974,7 +974,7 @@ function Bank.RightClickMenu_populate(self, level)
     [1] = L["Hide items assigned to this bar"]
     }) do
 
-    if (TBag:GetGrp(TBnkFrame.cfg, TBag.G_BAR_HIDE, bar) == key) then
+    if (TFuBag:GetGrp(TFuBnkFrame.cfg, TFuBag.G_BAR_HIDE, bar) == key) then
       checked = 1;
     else
       checked = nil;
@@ -982,11 +982,11 @@ function Bank.RightClickMenu_populate(self, level)
 
     info = {
       ["text"] = value;
-      ["value"] = { [TBag.I_BAR]=bar, ["value"]=key };
+      ["value"] = { [TFuBag.I_BAR]=bar, ["value"]=key };
       ["func"] = function(self)
         local this = self or _G.this
-        TBag:SetGrpDef(TBnkFrame.cfg, TBag.G_BAR_HIDE, this.value[TBag.I_BAR], this.value["value"], 1);
-        TBnkFrame:UpdateWindow();
+        TFuBag:SetGrpDef(TFuBnkFrame.cfg, TFuBag.G_BAR_HIDE, this.value[TFuBag.I_BAR], this.value["value"], 1);
+        TFuBnkFrame:UpdateWindow();
     end,
   ["checked"] = checked
   };
@@ -999,24 +999,24 @@ function Bank.RightClickMenu_populate(self, level)
   info = { ["text"] = L["Color:"], ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
   UIDropDownMenu_AddButton(info, level);
 
-  info = TBag:MakeColorPickerInfo(TBnkFrame.cfg, "bkgr_", bar,
-    string.format(L["Background Color for Bar %d"],bar), function () TBnkFramer:UpdateWindow() end);
+  info = TFuBag:MakeColorPickerInfo(TFuBnkFrame.cfg, "bkgr_", bar,
+    string.format(L["Background Color for Bar %d"],bar), function () TFuBnkFramer:UpdateWindow() end);
   UIDropDownMenu_AddButton(info, level);
 
-  info = TBag:MakeColorPickerInfo(TBnkFrame.cfg, "brdr_", bar,
-    string.format(L["Border Color for Bar %d"],bar), function () TBnkFrame:UpdateWindow() end);
+  info = TFuBag:MakeColorPickerInfo(TFuBnkFrame.cfg, "brdr_", bar,
+    string.format(L["Border Color for Bar %d"],bar), function () TFuBnkFrame:UpdateWindow() end);
   UIDropDownMenu_AddButton(info, level);
 
   -------------------------------------------------------------------------------------------------
   ------------------------ MAIN WINDOW CONTEXT MENU -----------------------------------------------
   -------------------------------------------------------------------------------------------------
-  elseif (TBnkFrame.RightClickMenu_mode == "mainwindow") then
+  elseif (TFuBnkFrame.RightClickMenu_mode == "mainwindow") then
   if (level == 1) then
 
-    info = { ["text"] = string.format(L["TBag v%s"],TBag.VERSION), ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
+    info = { ["text"] = string.format(L["TBag v%s"],TFuBag.VERSION), ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
     UIDropDownMenu_AddButton(info, level);
 
-    if (TBnkFrame.atbank == 0) then
+    if (TFuBnkFrame.atbank == 0) then
       info = { ["disabled"] = 1 };
       UIDropDownMenu_AddButton(info, level);
 
@@ -1034,9 +1034,9 @@ function Bank.RightClickMenu_populate(self, level)
     info = {
   ["text"] = L["Edit Mode"],
   ["value"] = nil,
-  ["func"] = TBnkFrame.Button_ChangeEditMode_OnClick
+  ["func"] = TFuBnkFrame.Button_ChangeEditMode_OnClick
   };
-    if (TBnkFrame.edit_mode == 1) then
+    if (TFuBnkFrame.edit_mode == 1) then
       info["checked"] = 1;
     end
     UIDropDownMenu_AddButton(info, level);
@@ -1044,9 +1044,9 @@ function Bank.RightClickMenu_populate(self, level)
     info = {
   ["text"] = L["Lock window"],
   ["value"] = nil,
-  ["func"] = TBnkFrame.Button_MoveLockToggle_OnClick
+  ["func"] = TFuBnkFrame.Button_MoveLockToggle_OnClick
   };
-    if (TBnkFrame.cfg["moveLock"] == 0) then
+    if (TFuBnkFrame.cfg["moveLock"] == 0) then
   info["checked"] = 1;
     end
     UIDropDownMenu_AddButton(info, level);
@@ -1054,14 +1054,14 @@ function Bank.RightClickMenu_populate(self, level)
   info = {
   ["text"] = L["Reload and Sort"],
   ["value"] = nil,
-  ["func"] = TBnkFrame.Button_Reload_OnClick
+  ["func"] = TFuBnkFrame.Button_Reload_OnClick
   };
   UIDropDownMenu_AddButton(info, level);
 
     info = {
   ["text"] = REAGENTBANK_DEPOSIT,
   ["value"] = nil,
-  ["func"] = TBnkFrame.Button_DepositReagent_OnClick
+  ["func"] = TFuBnkFrame.Button_DepositReagent_OnClick
   };
   UIDropDownMenu_AddButton(info, level);
 
@@ -1070,13 +1070,13 @@ function Bank.RightClickMenu_populate(self, level)
 
     info = {
   ["value"] = nil,
-  ["func"] = TBnkFrame.Button_HighlightToggle_OnClick
+  ["func"] = TFuBnkFrame.Button_HighlightToggle_OnClick
   };
-    if (TBag.SrchText) then
+    if (TFuBag.SrchText) then
       info["text"] = L["Clear Search"];
     else
       info["text"] = L["Highlight New Items"];
-      if (TBnkFrame.hilight_new == 1) then
+      if (TFuBnkFrame.hilight_new == 1) then
         info["checked"] = 1;
       end
     end
@@ -1088,17 +1088,17 @@ function Bank.RightClickMenu_populate(self, level)
   ["func"] = function()
     local bag, slot, index;
 
-    for index, bag in ipairs(TBnkFrame.bags) do
-      if (TBnkFrame.cfg["show_Bag"..bag] == 1) then
-        if (table.getn(TBnkItm[TBnkFrame.playerid][bag]) > 0) then
-          for slot = 1, table.getn(TBnkItm[TBnkFrame.playerid][bag]) do
-            TBag:ResetNew(TBnkItm[TBnkFrame.playerid][bag][slot]);
+    for index, bag in ipairs(TFuBnkFrame.bags) do
+      if (TFuBnkFrame.cfg["show_Bag"..bag] == 1) then
+        if (table.getn(TFuBnkItm[TFuBnkFrame.playerid][bag]) > 0) then
+          for slot = 1, table.getn(TFuBnkItm[TFuBnkFrame.playerid][bag]) do
+            TFuBag:ResetNew(TFuBnkItm[TFuBnkFrame.playerid][bag][slot]);
           end
         end
       end
     end
 
-    TBnkFrame:UpdateWindow();
+    TFuBnkFrame:UpdateWindow();
   end
   };
     UIDropDownMenu_AddButton(info, level);
@@ -1110,7 +1110,7 @@ function Bank.RightClickMenu_populate(self, level)
   ["text"] = L["Advanced Configuration"],
   ["value"] = nil,
   ["func"] = function()
-    TBnk_OptsFrame:Show();
+    TFuBnk_OptsFrame:Show();
   end
   };
     UIDropDownMenu_AddButton(info, level);
@@ -1163,171 +1163,171 @@ function Bank.RightClickMenu_populate(self, level)
     elseif (level == 2) then
       if (UIDROPDOWNMENU_MENU_VALUE ~= nil) then
         if (UIDROPDOWNMENU_MENU_VALUE["opt"] == "set_scale") then
-          for _, value in ipairs(TBag.A_BUTTONSIZE) do
+          for _, value in ipairs(TFuBag.A_BUTTONSIZE) do
             info = {
               ["text"] = value.."x"..value;
               ["value"] = value;
               ["func"] = function(self)
                 local this = self or _G.this
-                if ( (type(this.value) == "number") and (this.value >= TBag.N_BUTTON_MIN) ) then
-                    TBnkFrame.cfg["frameButtonSize"], TBnkFrame.cfg["count_font"],
-                      TBnkFrame.cfg["count_font_x"], TBnkFrame.cfg["count_font_y"],
-                      TBnkFrame.cfg["scale"] = TBag:NicePlacement(this.value);
-                  TBnkFrame:CalcButtonSize(TBnkFrame.cfg["frameButtonSize"], TBnkFrame.cfg["framePad"]);
-                  TBnkFrame:UpdateWindow(TBag.REQ_MUST);
+                if ( (type(this.value) == "number") and (this.value >= TFuBag.N_BUTTON_MIN) ) then
+                    TFuBnkFrame.cfg["frameButtonSize"], TFuBnkFrame.cfg["count_font"],
+                      TFuBnkFrame.cfg["count_font_x"], TFuBnkFrame.cfg["count_font_y"],
+                      TFuBnkFrame.cfg["scale"] = TFuBag:NicePlacement(this.value);
+                  TFuBnkFrame:CalcButtonSize(TFuBnkFrame.cfg["frameButtonSize"], TFuBnkFrame.cfg["framePad"]);
+                  TFuBnkFrame:UpdateWindow(TFuBag.REQ_MUST);
                 end
               end
             };
-            if (tonumber(TBnkFrame.cfg["frameButtonSize"]*TBnkFrame.cfg["scale"] - value)
-      < 1.0) and (tonumber(TBnkFrame.cfg["frameButtonSize"]*TBnkFrame.cfg["scale"] - value)
+            if (tonumber(TFuBnkFrame.cfg["frameButtonSize"]*TFuBnkFrame.cfg["scale"] - value)
+      < 1.0) and (tonumber(TFuBnkFrame.cfg["frameButtonSize"]*TFuBnkFrame.cfg["scale"] - value)
       > -1.0) then
               info["checked"] = 1;
             end
             UIDropDownMenu_AddButton(info, level);
           end
         elseif (UIDROPDOWNMENU_MENU_VALUE["opt"] == "set_colors") then
-          TBag:MakeColorMenu(TBnkFrame.cfg, function () TBnkFrame:UpdateWindow() end, level, TBnkFrame.bags);
+          TFuBag:MakeColorMenu(TFuBnkFrame.cfg, function () TFuBnkFrame:UpdateWindow() end, level, TFuBnkFrame.bags);
         elseif (UIDROPDOWNMENU_MENU_VALUE["opt"] == "anchor") then
           info = {
             ["text"] = L["TOPLEFT"];
             ["func"] = function ()
-                         TBag:SetFrameAnchor (TBnkFrame,TBnkFrame.cfg,"TOP","LEFT")
+                         TFuBag:SetFrameAnchor (TFuBnkFrame,TFuBnkFrame.cfg,"TOP","LEFT")
                        end;
             };
-          if (TBnkFrame.cfg["frameXRelativeTo"] == "LEFT" and
-              TBnkFrame.cfg["frameYRelativeTo"] == "TOP") then
+          if (TFuBnkFrame.cfg["frameXRelativeTo"] == "LEFT" and
+              TFuBnkFrame.cfg["frameYRelativeTo"] == "TOP") then
             info["checked"] = 1;
           end
           UIDropDownMenu_AddButton(info, level);
           info = {
             ["text"] = L["TOPRIGHT"];
             ["func"] = function ()
-                         TBag:SetFrameAnchor (TBnkFrame,TBnkFrame.cfg,"TOP","RIGHT")
+                         TFuBag:SetFrameAnchor (TFuBnkFrame,TFuBnkFrame.cfg,"TOP","RIGHT")
                        end;
             };
-          if (TBnkFrame.cfg["frameXRelativeTo"] == "RIGHT" and
-              TBnkFrame.cfg["frameYRelativeTo"] == "TOP") then
+          if (TFuBnkFrame.cfg["frameXRelativeTo"] == "RIGHT" and
+              TFuBnkFrame.cfg["frameYRelativeTo"] == "TOP") then
             info["checked"] = 1;
           end
           UIDropDownMenu_AddButton(info, level);
           info = {
             ["text"] = L["BOTTOMLEFT"];            ["func"] = function ()
-                         TBag:SetFrameAnchor (TBnkFrame,TBnkFrame.cfg,"BOTTOM","LEFT")
+                         TFuBag:SetFrameAnchor (TFuBnkFrame,TFuBnkFrame.cfg,"BOTTOM","LEFT")
                        end;
             };
-          if (TBnkFrame.cfg["frameXRelativeTo"] == "LEFT" and
-              TBnkFrame.cfg["frameYRelativeTo"] == "BOTTOM") then
+          if (TFuBnkFrame.cfg["frameXRelativeTo"] == "LEFT" and
+              TFuBnkFrame.cfg["frameYRelativeTo"] == "BOTTOM") then
             info["checked"] = 1;
           end
           UIDropDownMenu_AddButton(info, level);
           info = {
             ["text"] = L["BOTTOMRIGHT"];
             ["func"] = function ()
-                         TBag:SetFrameAnchor (TBnkFrame,TBnkFrame.cfg,"BOTTOM","RIGHT")
+                         TFuBag:SetFrameAnchor (TFuBnkFrame,TFuBnkFrame.cfg,"BOTTOM","RIGHT")
                        end;
             };
-          if (TBnkFrame.cfg["frameXRelativeTo"] == "RIGHT" and
-              TBnkFrame.cfg["frameYRelativeTo"] == "BOTTOM") then
+          if (TFuBnkFrame.cfg["frameXRelativeTo"] == "RIGHT" and
+              TFuBnkFrame.cfg["frameYRelativeTo"] == "BOTTOM") then
             info["checked"] = 1;
           end
           UIDropDownMenu_AddButton(info, level);
         elseif (UIDROPDOWNMENU_MENU_VALUE["opt"] == "hide_frames") then
           info = {
             ["text"] = L["Hide Player Dropdown"];
-            ["func"] = TBnkFrame.Toggle_UserDropdown;
+            ["func"] = TFuBnkFrame.Toggle_UserDropdown;
             ["keepShownOnClick"] = 1;
             };
-          if (TBnkFrame.cfg["show_userdropdown"] == 0) then
+          if (TFuBnkFrame.cfg["show_userdropdown"] == 0) then
             info["checked"] = 1;
           end
           UIDropDownMenu_AddButton(info, level);
           info = {
             ["text"] = L["Hide Highlight Button"];
-            ["func"] = TBnkFrame.Toggle_HighlightButton;
+            ["func"] = TFuBnkFrame.Toggle_HighlightButton;
             ["keepShownOnClick"] = 1;
             };
-          if (TBnkFrame.cfg["show_hilightbutton"] == 0) then
+          if (TFuBnkFrame.cfg["show_hilightbutton"] == 0) then
             info["checked"] = 1;
           end
           UIDropDownMenu_AddButton(info, level);
           info = {
             ["text"] = L["Hide Edit Button"];
-            ["func"] = TBnkFrame.Toggle_EditButton;
+            ["func"] = TFuBnkFrame.Toggle_EditButton;
             ["keepShownOnClick"] = 1;
            };
-          if (TBnkFrame.cfg["show_editbutton"] == 0) then
+          if (TFuBnkFrame.cfg["show_editbutton"] == 0) then
             info["checked"] = 1;
           end
           UIDropDownMenu_AddButton(info, level);
           info = {
             ["text"] = L["Hide Re-sort Button"];
-            ["func"] = TBnkFrame.Toggle_ReloadButton;
+            ["func"] = TFuBnkFrame.Toggle_ReloadButton;
             ["keepShownOnClick"] = 1;
             };
-          if (TBnkFrame.cfg["show_reloadbutton"] == 0) then
+          if (TFuBnkFrame.cfg["show_reloadbutton"] == 0) then
             info["checked"] = 1;
           end
           UIDropDownMenu_AddButton(info, level);
           info = {
             ["text"] = L["Hide Reagent Deposit Button"];
-            ["func"] = TBnkFrame.Toggle_DepositReagentButton;
+            ["func"] = TFuBnkFrame.Toggle_DepositReagentButton;
             ["keepShownOnClick"] = 1;
             };
-          if (TBnkFrame.cfg["show_depositbutton"] == 0) then
+          if (TFuBnkFrame.cfg["show_depositbutton"] == 0) then
             info["checked"] = 1;
           end
           UIDropDownMenu_AddButton(info, level);
           info = {
             ["text"] = L["Hide Lock Button"];
-            ["func"] = TBnkFrame.Toggle_LockButton;
+            ["func"] = TFuBnkFrame.Toggle_LockButton;
             ["keepShownOnClick"] = 1;
             };
-          if (TBnkFrame.cfg["show_lockbutton"] == 0) then
+          if (TFuBnkFrame.cfg["show_lockbutton"] == 0) then
             info["checked"] = 1;
           end
           UIDropDownMenu_AddButton(info, level);
           info = {
             ["text"] = L["Hide Close Button"];
-            ["func"] = TBnkFrame.Toggle_CloseButton;
+            ["func"] = TFuBnkFrame.Toggle_CloseButton;
             ["keepShownOnClick"] = 1;
             };
-          if (TBnkFrame.cfg["show_closebutton"] == 0) then
+          if (TFuBnkFrame.cfg["show_closebutton"] == 0) then
             info["checked"] = 1;
           end
           UIDropDownMenu_AddButton(info, level);
           info = {
             ["text"] = L["Hide Total"];
-            ["func"] = TBnkFrame.Toggle_Total;
+            ["func"] = TFuBnkFrame.Toggle_Total;
             ["keepShownOnClick"] = 1;
             };
-          if (TBnkFrame.cfg["show_total"] == 0) then
+          if (TFuBnkFrame.cfg["show_total"] == 0) then
             info["checked"] = 1;
           end
           UIDropDownMenu_AddButton(info, level);
           info = {
             ["text"] = L["Hide Bag Buttons"];
-            ["func"] = TBnkFrame.Toggle_BagSlotButtons;
+            ["func"] = TFuBnkFrame.Toggle_BagSlotButtons;
             ["keepShownOnClick"] = 1;
             };
-          if (TBnkFrame.cfg["show_bagbuttons"] == 0) then
+          if (TFuBnkFrame.cfg["show_bagbuttons"] == 0) then
             info["checked"] = 1;
           end
           UIDropDownMenu_AddButton(info, level);
           info = {
             ["text"] = L["Hide Tokens"];
-            ["func"] = TBnkFrame.Toggle_Token;
+            ["func"] = TFuBnkFrame.Toggle_Token;
             ["keepShownOnClick"] = 1;
             };
-          if (TBnkFrame.cfg["show_tokens"] == 0) then
+          if (TFuBnkFrame.cfg["show_tokens"] == 0) then
             info["checked"] = 1;
           end
           UIDropDownMenu_AddButton(info, level);
           info = {
             ["text"] = L["Hide Money"];
-            ["func"] = TBnkFrame.Toggle_Money;
+            ["func"] = TFuBnkFrame.Toggle_Money;
             ["keepShownOnClick"] = 1;
             };
-          if (TBnkFrame.cfg["show_money"] == 0) then
+          if (TFuBnkFrame.cfg["show_money"] == 0) then
             info["checked"] = 1;
           end
           UIDropDownMenu_AddButton(info, level);
@@ -1337,7 +1337,7 @@ function Bank.RightClickMenu_populate(self, level)
       end
     end
   end
-  TBag:FixMenuFrameLevels()
+  TFuBag:FixMenuFrameLevels()
 end
 
 
@@ -1349,11 +1349,11 @@ end
 Bank.WindowIsUpdating = 0;
 
 function Bank:UpdateWindow(resort_req)
-  local frame = TBnkFrame;
+  local frame = TFuBnkFrame;
   local barnum;
   local cur_y;
 
-  TBag:PrintDEBUG("Bank:UpdateWindow(): WindowIsUpdating="..Bank.WindowIsUpdating);
+  TFuBag:PrintDEBUG("Bank:UpdateWindow(): WindowIsUpdating="..Bank.WindowIsUpdating);
 
   if (Bank.WindowIsUpdating == 1) then
     return;
@@ -1368,87 +1368,87 @@ function Bank:UpdateWindow(resort_req)
   -- Set the overall scale
   self:SetScale(self.cfg["scale"]);
 
-  if (resort_req == nil) then resort_req = TBag.REQ_NONE; end
+  if (resort_req == nil) then resort_req = TFuBag.REQ_NONE; end
 
   -- Show some things only when we are at then bank
   if (self.atbank == 1 or self.cfg["show_userdropdown"] == 0) then
-    TBnk_UserDropdown:Hide();
+    TFuBnk_UserDropdown:Hide();
   else
-    TBnk_UserDropdown:Show();
+    TFuBnk_UserDropdown:Show();
   end
 
   -- SORTING
 
   -- Consume a message from updated craft info
-  if (TBagCfg["trades_changed"] == 1) then
-    resort_req = TBag.REQ_MUST;
+  if (TFuBagCfg["trades_changed"] == 1) then
+    resort_req = TFuBag.REQ_MUST;
   end
-  TBagCfg["trades_changed"] = 0;
+  TFuBagCfg["trades_changed"] = 0;
 
   -- Setup stackarr and comparr
-  local stackarr = TBag:CreateStackArr();
-  local comparr = TBag:CreateCompArr();
+  local stackarr = TFuBag:CreateStackArr();
+  local comparr = TFuBag:CreateCompArr();
 
-  local cache_req = TBag:UpdateItmCache(self.cfg, self.playerid, TBnkItm[self.playerid], self.bags, stackarr, comparr, self.atbank);
-  if resort_req == TBag.REQ_PART then
+  local cache_req = TFuBag:UpdateItmCache(self.cfg, self.playerid, TFuBnkItm[self.playerid], self.bags, stackarr, comparr, self.atbank);
+  if resort_req == TFuBag.REQ_PART then
     resort_req = resort_req + self.CACHE_REQ
   end
   resort_req = resort_req + cache_req;
 
   -- Consume a message for bag stacking
   if (self.cfg["stack_once"] == 1) then
-    if (self.playerid == TBag.PLAYERID) then
-      if TBag:Stack(TBag.STACK_BNK,TBnkItm[self.playerid], stackarr, comparr) then
+    if (self.playerid == TFuBag.PLAYERID) then
+      if TFuBag:Stack(TFuBag.STACK_BNK,TFuBnkItm[self.playerid], stackarr, comparr) then
         self.cfg["stack_once"] = 0;
       end
     end
   end
 
-  if (resort_req >= TBag.REQ_MUST) then
-    self.BARITM = TBag:SortItmCache(self.cfg,
-      self.playerid, TBnkItm[self.playerid], self.BARITM, self.bags);
-    TBag:LayoutWindow(self)
+  if (resort_req >= TFuBag.REQ_MUST) then
+    self.BARITM = TFuBag:SortItmCache(self.cfg,
+      self.playerid, TFuBnkItm[self.playerid], self.BARITM, self.bags);
+    TFuBag:LayoutWindow(self)
   elseif cache_req > self.CACHE_REQ then
     self.CACHE_REQ = cache_req
   end
 
   -- Relink the button map
   for _,bag in ipairs(self.bags) do
-    for slot = 1, TBag:GetBagMaxItems(bag) do
-      if TBnkItm[self.playerid][bag] then
-        TBag.BUTTONS[TBag:GetBagItemButtonName(bag, slot)] = TBnkItm[self.playerid][bag][slot]
+    for slot = 1, TFuBag:GetBagMaxItems(bag) do
+      if TFuBnkItm[self.playerid][bag] then
+        TFuBag.BUTTONS[TFuBag:GetBagItemButtonName(bag, slot)] = TFuBnkItm[self.playerid][bag][slot]
       else
-        TBag.BUTTONS[TBag:GetBagItemButtonName(bag, slot)] = {}
+        TFuBag.BUTTONS[TFuBag:GetBagItemButtonName(bag, slot)] = {}
       end
     end
   end
 
   -- BAGS, to get bag sizes below
-  TBnkFrame:UpdateBagGfx();
+  TFuBnkFrame:UpdateBagGfx();
 
   -- Update all the buttons
   for _, bag in ipairs(self.bags) do
-    local size = TBag:GetPlayerBagCfg(self.playerid, bag, TBag.I_BAGSIZE);
+    local size = TFuBag:GetPlayerBagCfg(self.playerid, bag, TFuBag.I_BAGSIZE);
     if (not size) then size = 0; end
-    if (self.cfg["show_Bag"..bag] ~= 1 and not TBag:GetBagFrame(bag):GetChecked()) then
+    if (self.cfg["show_Bag"..bag] ~= 1 and not TFuBag:GetBagFrame(bag):GetChecked()) then
       size = 0
     end
     for slot = 1, size do
-      TBag.ItemButton.Update(_G[TBag:GetBagItemButtonName(bag, slot)])
+      TFuBag.ItemButton.Update(_G[TFuBag:GetBagItemButtonName(bag, slot)])
     end
-    for slot = size+1, TBag:GetBagMaxItems(bag) do
-      _G[TBag:GetBagItemButtonName(bag, slot)]:Hide();
+    for slot = size+1, TFuBag:GetBagMaxItems(bag) do
+      _G[TFuBag:GetBagItemButtonName(bag, slot)]:Hide();
     end
   end
 
   -- MONEY
   if (self.cfg["show_money"] == 1) then
     local type = "STATIC"
-    if (self.playerid == TBag.PLAYERID) then
+    if (self.playerid == TFuBag.PLAYERID) then
       type = "PLAYER"
     end
-    MoneyFrame_SetType(TBnkFrame_MoneyFrame,type)
-    MoneyFrame_Update("TBnkFrame_MoneyFrame", TBag:GetMoney(self.playerid));
+    MoneyFrame_SetType(TFuBnkFrame_MoneyFrame,type)
+    MoneyFrame_Update("TFuBnkFrame_MoneyFrame", TFuBag:GetMoney(self.playerid));
   end
 
   frame:UpdateDepositButton();
@@ -1459,17 +1459,17 @@ function Bank:UpdateWindow(resort_req)
     self.cfg["frame"..self.cfg["frameXRelativeTo"]] / frame:GetScale(),
     self.cfg["frame"..self.cfg["frameYRelativeTo"]] / frame:GetScale());
 
-  TBag:ColorFrame(self.cfg, frame, TBag.MAIN_BAR);
+  TFuBag:ColorFrame(self.cfg, frame, TFuBag.MAIN_BAR);
 
   if (self.edit_mode == 1) then
-    TBnkFrame_ColumnsAdd:Show();
-    TBnkFrame_ColumnsDel:Show();
+    TFuBnkFrame_ColumnsAdd:Show();
+    TFuBnkFrame_ColumnsDel:Show();
   else
-    TBnkFrame_ColumnsAdd:Hide();
-    TBnkFrame_ColumnsDel:Hide();
+    TFuBnkFrame_ColumnsAdd:Hide();
+    TFuBnkFrame_ColumnsDel:Hide();
   end
 
-  TBnkFrame:SetButton_Anchors();
+  TFuBnkFrame:SetButton_Anchors();
 
   Bank.WindowIsUpdating = 0;
 end
@@ -1489,32 +1489,32 @@ end
 
 function Bank.UserDropdown_OnLoad(self)
   UIDropDownMenu_Initialize(self, Bank.UserDropdown_Initialize);
-  UIDropDownMenu_SetSelectedValue(self, TBnkFrame.playerid);
+  UIDropDownMenu_SetSelectedValue(self, TFuBnkFrame.playerid);
   self.tooltip = L["You are viewing the selected player's bank."];
-  UIDropDownMenu_SetWidth(self, TBag.USERDD_WIDTH)
+  UIDropDownMenu_SetWidth(self, TFuBag.USERDD_WIDTH)
   -- UIDropDownMenu_SetWidth actually adds 50 to our width, we really only want
   -- 25 to avoid the control running into our buttons on the right.
-  self:SetWidth(TBag.USERDD_WIDTH + 25);
+  self:SetWidth(TFuBag.USERDD_WIDTH + 25);
 --  OptionsFrame_EnableDropDown(self);
 end
 
 function Bank.UserDropdown_Initialize(self, level)
-  TBag:UserDropdown_Init(Bank.UserDropdown_OnClick,
-    TBnkItm, TBnkFrame.playerid, TBag.REALM, level);
+  TFuBag:UserDropdown_Init(Bank.UserDropdown_OnClick,
+    TFuBnkItm, TFuBnkFrame.playerid, TFuBag.REALM, level);
 end
 
 function Bank.UserDropdown_OnClick(self)
   local this = self or _G.this
-  UIDropDownMenu_SetSelectedValue(TBnk_UserDropdown, this.value);
+  UIDropDownMenu_SetSelectedValue(TFuBnk_UserDropdown, this.value);
   if ( this.value ) then
-    TBnkFrame:SetPlayer(this.value);
+    TFuBnkFrame:SetPlayer(this.value);
   end
-  if ( not TBnkFrame.playerid ) then
-    TBag:PrintDEBUG("UserDropdown_OnClick Failed");
+  if ( not TFuBnkFrame.playerid ) then
+    TFuBag:PrintDEBUG("UserDropdown_OnClick Failed");
     return;
   end
-  TBag:PrintDEBUG("Selected Player "..TBnkFrame.playerid);
+  TFuBag:PrintDEBUG("Selected Player "..TFuBnkFrame.playerid);
   -- Show in whatever state the cache was in before
-  TBnkFrame.atbank = 0;
-  TBnkFrame:UpdateWindow(TBag.REQ_MUST);
+  TFuBnkFrame.atbank = 0;
+  TFuBnkFrame:UpdateWindow(TFuBag.REQ_MUST);
 end

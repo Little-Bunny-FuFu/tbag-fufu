@@ -9,19 +9,19 @@
   <Script file="Events.lua"/>
   <Script file="TBagTest.lua"/>
 
-  <Texture name="TBag_ButtonBkgrTemplate" alphaMode="ADD" file="Interface\AddOns\TBag\images\ButtonBkgr" setAllPoints="true" virtual="true">
+  <Texture name="TFuBag_ButtonBkgrTemplate" alphaMode="ADD" file="Interface\AddOns\tbag-fufu\images\ButtonBkgr" setAllPoints="true" virtual="true">
     <Size>
       <AbsDimension x="64" y="64"/>
     </Size>
   </Texture>
 
-  <Frame name="TBagainerFrameTemplate" frameStrata="MEDIUM" enableMouse="true" virtual="true">
+  <Frame name="TFuBagainerFrameTemplate" frameStrata="MEDIUM" enableMouse="true" virtual="true">
     <Size>
       <AbsDimension x="40" y="40"/>
     </Size>
   </Frame>
 
-  <Frame name="TBag_BarFrameTemplate" toplevel="false" frameStrata="MEDIUM" movable="false" enableMouse="false" hidden="true" virtual="true">
+  <Frame name="TFuBag_BarFrameTemplate" toplevel="false" frameStrata="MEDIUM" movable="false" enableMouse="false" hidden="true" virtual="true">
     <Size><AbsDimension x="200" y="46"/></Size>
     <Anchors>
       <Anchor point="BOTTOMRIGHT">
@@ -44,7 +44,7 @@
     </Backdrop>
   </Frame>
 
-  <Frame name="TBag_UserDropdownTemplate" inherits="UIDropDownMenuTemplate" enableMouse="true" virtual="true">
+  <Frame name="TFuBag_UserDropdownTemplate" inherits="UIDropDownMenuTemplate" enableMouse="true" virtual="true">
   <Scripts>
     <OnEnter>
       GameTooltip:SetOwner(self, "ANCHOR_TOPRIGHT");
@@ -57,11 +57,11 @@
   </Scripts>
   </Frame>
 
-  <EditBox name="TBag_SearchBoxTemplate" inherits="InputBoxTemplate" hidden="false" virtual="true" autoFocus="false">
+  <EditBox name="TFuBag_SearchBoxTemplate" inherits="InputBoxTemplate" hidden="false" virtual="true" autoFocus="false">
     <Size><AbsDimension x="198" y="30"/></Size>
     <Scripts>
       <OnShow>
-        TBag:ClearSearch();
+        TFuBag:ClearSearch();
       </OnShow>
       <OnTabPressed>
         self:ClearFocus();
@@ -71,14 +71,14 @@
       </OnEscapePressed>
       <OnEnterPressed>
         if (self:GetText() ~= "") then
-          TBag:DoSearch(self:GetText());
+          TFuBag:DoSearch(self:GetText());
         end
         self:ClearFocus();
       </OnEnterPressed>
       <OnEditFocusLost>
         self:HighlightText(0, 0);
         if ( self:GetText() == "" ) then
-          TBag:ClearSearch();
+          TFuBag:ClearSearch();
         end
       </OnEditFocusLost>
       <OnEditFocusGained>

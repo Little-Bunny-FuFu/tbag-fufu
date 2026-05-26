@@ -2,7 +2,7 @@
 
 local _G = getfenv(0)
 
-function TBag:VARIABLES_LOADED()
+function TFuBag:VARIABLES_LOADED()
   self.Inv:init(0)
   self.Bank:init(0)
   self:RegisterEvent("BAG_UPDATE")
@@ -27,23 +27,23 @@ function TBag:VARIABLES_LOADED()
   self:RegisterEvent("PLAYER_ENTERING_WORLD")
 
   -- Scan equipment on login.
-  TBag:ScanEquipped()
-  TBagInfo[TBag.PLAYERID][TBag.G_BASIC][TBag.S_LEVEL] = UnitLevel("player")
-  TBagInfo[TBag.PLAYERID][TBag.G_BASIC][TBag.S_FACTION] = UnitFactionGroup("player")
+  TFuBag:ScanEquipped()
+  TFuBagInfo[TFuBag.PLAYERID][TFuBag.G_BASIC][TFuBag.S_LEVEL] = UnitLevel("player")
+  TFuBagInfo[TFuBag.PLAYERID][TFuBag.G_BASIC][TFuBag.S_FACTION] = UnitFactionGroup("player")
 end
 
-function TBag:SKILL_LINES_CHANGED()
-  TBag.Professions:ScanAllTradeRanks()
+function TFuBag:SKILL_LINES_CHANGED()
+  TFuBag.Professions:ScanAllTradeRanks()
 end
 
-function TBag:BAG_UPDATE(event, bag)
+function TFuBag:BAG_UPDATE(event, bag)
   local frame, stack
   if bag then
-    if TBag:Member(TInvFrame.bags, bag) then
-      frame = TInvFrame
+    if TFuBag:Member(TFuInvFrame.bags, bag) then
+      frame = TFuInvFrame
       stack = self.STACK_INV
-    elseif TBag:Member(TBnkFrame.bags, bag) then
-      frame = TBnkFrame
+    elseif TFuBag:Member(TFuBnkFrame.bags, bag) then
+      frame = TFuBnkFrame
       stack = self.STACK_BNK
     end
   end
@@ -57,106 +57,106 @@ function TBag:BAG_UPDATE(event, bag)
   frame:UpdateWindow()
 end
 
-function TBag:BAG_UPDATE_COOLDOWN(event, bag)
+function TFuBag:BAG_UPDATE_COOLDOWN(event, bag)
   -- If we're given an argument check if it's a inventory bag and ignore the event
   -- if it isn't.  If not argument is passed we have to update the window
   -- regardless.  /sigh
   if not bag then
-    TInvFrame:UpdateWindow()
-    TBnkFrame:UpdateWindow()
+    TFuInvFrame:UpdateWindow()
+    TFuBnkFrame:UpdateWindow()
   else
-    if TBag:Member(TInvFrame.bags, bag) then
-      TInvFrame:UpdateWindow()
-    elseif TBag:Member(TBnkFrame.bags, bag) then
-      TBnkFrame:UpdateWindow()
+    if TFuBag:Member(TFuInvFrame.bags, bag) then
+      TFuInvFrame:UpdateWindow()
+    elseif TFuBag:Member(TFuBnkFrame.bags, bag) then
+      TFuBnkFrame:UpdateWindow()
     end
   end
 end
 
-function TBag:ITEM_LOCK_CHANGED(event, bag, slot)
+function TFuBag:ITEM_LOCK_CHANGED(event, bag, slot)
   if bag and slot and type(slot) == "number" then
-    TBag.ItemButton.UpdateLock(_G[TBag:GetBagItemButtonName(bag,slot)])
+    TFuBag.ItemButton.UpdateLock(_G[TFuBag:GetBagItemButtonName(bag,slot)])
   end
 end
 
-function TBag:UIFRAME_SHOW()
-  TInvFrame:Show()
+function TFuBag:UIFRAME_SHOW()
+  TFuInvFrame:Show()
 end
 
-function TBag:PLAYER_LEAVING_WORLD()
-  TBagInfo[TBag.PLAYERID][TBag.G_BASIC][TBag.S_HEARTH] = GetBindLocation()
-  TBagInfo[TBag.PLAYERID][TBag.G_BASIC][TBag.S_LEVEL] = UnitLevel("player")
+function TFuBag:PLAYER_LEAVING_WORLD()
+  TFuBagInfo[TFuBag.PLAYERID][TFuBag.G_BASIC][TFuBag.S_HEARTH] = GetBindLocation()
+  TFuBagInfo[TFuBag.PLAYERID][TFuBag.G_BASIC][TFuBag.S_LEVEL] = UnitLevel("player")
 end
 
-function TBag:BANKFRAME_OPENED()
-  TBnkFrame.atbank = 1
-  TBnkFrame:Show()
+function TFuBag:BANKFRAME_OPENED()
+  TFuBnkFrame.atbank = 1
+  TFuBnkFrame:Show()
 end
 
-function TBag:BANKFRAME_CLOSED()
-  TBnkFrame.atbank = 0
-  TBnkFrame:Hide()
+function TFuBag:BANKFRAME_CLOSED()
+  TFuBnkFrame.atbank = 0
+  TFuBnkFrame:Hide()
 end
 
-function TBag:PLAYERBANKSLOTS_CHANGED()
-  TBnkFrame:UpdateWindow()
+function TFuBag:PLAYERBANKSLOTS_CHANGED()
+  TFuBnkFrame:UpdateWindow()
 end
 
-function TBag:PLAYERBANKBAGSLOTS_CHANGED()
-  TBnkFrame:UpdateWindow(TBag.REQ_MUST)
+function TFuBag:PLAYERBANKBAGSLOTS_CHANGED()
+  TFuBnkFrame:UpdateWindow(TFuBag.REQ_MUST)
 end
 
-function TBag:PLAYER_LEVEL_UP(event, level)
-  TBagInfo[TBag.PLAYERID][TBag.G_BASIC][TBag.S_LEVEL] = level
+function TFuBag:PLAYER_LEVEL_UP(event, level)
+  TFuBagInfo[TFuBag.PLAYERID][TFuBag.G_BASIC][TFuBag.S_LEVEL] = level
 end
 
-function TBag:QUEST_ACCEPTED()
-      TInvFrame:UpdateWindow()
+function TFuBag:QUEST_ACCEPTED()
+      TFuInvFrame:UpdateWindow()
 end
 
-function TBag:UNIT_QUEST_LOG_CHANGED(event, unit)
+function TFuBag:UNIT_QUEST_LOG_CHANGED(event, unit)
       if unit == "player" then
-              TInvFrame:UpdateWindow()
+              TFuInvFrame:UpdateWindow()
       end
 end
 
-function TBag:PLAYER_ENTERING_WORLD(event)
+function TFuBag:PLAYER_ENTERING_WORLD(event)
   -- One time extra scan to avoid bogus data on swapping characters
-  TBag.Tokens.Scan()
+  TFuBag.Tokens.Scan()
   self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 end
 
 
 local events = {
-  ["VARIABLES_LOADED"] = TBag.VARIABLES_LOADED,
-  ["BAG_UPDATE"] = TBag.BAG_UPDATE,
-  ["BAG_UPDATE_COOLDOWN"] = TBag.BAG_UPDATE_COOLDOWN,
-  ["ITEM_LOCK_CHANGED"] = TBag.ITEM_LOCK_CHANGED,
-  ["AUCTION_HOUSE_SHOW"] = TBag.UIFRAME_SHOW,
-  ["MAIL_SHOW"] = TBag.UIFRAME_SHOW,
-  ["MERCHANT_SHOW"] = TBag.UIFRAME_SHOW,
-  ["TRADE_SKILL_SHOW"] = TBag.Professions.ScanRecipes,
-  ["UNIT_INVENTORY_CHANGED"] = TBag.ScanEquipped,
-  ["MAIL_INBOX_UPDATE"] = TBag.ScanMail,
-  ["PLAYER_LEAVING_WORLD"] = TBag.PLAYER_LEAVING_WORLD,
-  ["BANKFRAME_OPENED"] = TBag.BANKFRAME_OPENED,
-  ["BANKFRAME_CLOSED"] = TBag.BANKFRAME_CLOSED,
-  ["PLAYERBANKSLOTS_CHANGED"] = TBag.PLAYERBANKSLOTS_CHANGED,
-  ["PLAYERREAGENTBANKSLOTS_CHANGED"] = TBag.PLAYERBANKSLOTS_CHANGED,
-  ["PLAYERBANKBAGSLOTS_CHANGED"] = TBag.PLAYERBANKBAGSLOTS_CHANGED,
-  ["PLAYER_LEVEL_UP"] = TBag.PLAYER_LEVEL_UP,
-  ["SKILL_LINES_CHANGED"] = TBag.SKILL_LINES_CHANGED,
-  ["QUEST_ACCEPTED"] = TBag.QUEST_ACCEPTED,
-  ["UNIT_QUEST_LOG_CHANGED"] = TBag.UNIT_QUEST_LOG_CHANGED,
-  ["PLAYER_ENTERING_WORLD"] = TBag.PLAYER_ENTERING_WORLD,
+  ["VARIABLES_LOADED"] = TFuBag.VARIABLES_LOADED,
+  ["BAG_UPDATE"] = TFuBag.BAG_UPDATE,
+  ["BAG_UPDATE_COOLDOWN"] = TFuBag.BAG_UPDATE_COOLDOWN,
+  ["ITEM_LOCK_CHANGED"] = TFuBag.ITEM_LOCK_CHANGED,
+  ["AUCTION_HOUSE_SHOW"] = TFuBag.UIFRAME_SHOW,
+  ["MAIL_SHOW"] = TFuBag.UIFRAME_SHOW,
+  ["MERCHANT_SHOW"] = TFuBag.UIFRAME_SHOW,
+  ["TRADE_SKILL_SHOW"] = TFuBag.Professions.ScanRecipes,
+  ["UNIT_INVENTORY_CHANGED"] = TFuBag.ScanEquipped,
+  ["MAIL_INBOX_UPDATE"] = TFuBag.ScanMail,
+  ["PLAYER_LEAVING_WORLD"] = TFuBag.PLAYER_LEAVING_WORLD,
+  ["BANKFRAME_OPENED"] = TFuBag.BANKFRAME_OPENED,
+  ["BANKFRAME_CLOSED"] = TFuBag.BANKFRAME_CLOSED,
+  ["PLAYERBANKSLOTS_CHANGED"] = TFuBag.PLAYERBANKSLOTS_CHANGED,
+  ["PLAYERREAGENTBANKSLOTS_CHANGED"] = TFuBag.PLAYERBANKSLOTS_CHANGED,
+  ["PLAYERBANKBAGSLOTS_CHANGED"] = TFuBag.PLAYERBANKBAGSLOTS_CHANGED,
+  ["PLAYER_LEVEL_UP"] = TFuBag.PLAYER_LEVEL_UP,
+  ["SKILL_LINES_CHANGED"] = TFuBag.SKILL_LINES_CHANGED,
+  ["QUEST_ACCEPTED"] = TFuBag.QUEST_ACCEPTED,
+  ["UNIT_QUEST_LOG_CHANGED"] = TFuBag.UNIT_QUEST_LOG_CHANGED,
+  ["PLAYER_ENTERING_WORLD"] = TFuBag.PLAYER_ENTERING_WORLD,
 }
 
-function TBag:OnEvent(event, ...)
---  TBag:Print("OnEvent: "..event)
+function TFuBag:OnEvent(event, ...)
+--  TFuBag:Print("OnEvent: "..event)
   if events[event] then
-    events[event](TBag,event, ...)
+    events[event](TFuBag,event, ...)
   end
 end
 
-TBag:SetScript("OnEvent",TBag.OnEvent)
-TBag:SetScript("OnUpdate",TBag.OnUpdate)
+TFuBag:SetScript("OnEvent",TFuBag.OnEvent)
+TFuBag:SetScript("OnUpdate",TFuBag.OnUpdate)

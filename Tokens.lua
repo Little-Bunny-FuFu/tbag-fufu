@@ -1,15 +1,15 @@
 -- $Id$
 local _G = getfenv(0)
-local TBag = _G.TBag
-local L = TBag.LOCALE
-TBag.Tokens = {}
-local Tokens = TBag.Tokens
+local TFuBag = _G.TFuBag
+local L = TFuBag.LOCALE
+TFuBag.Tokens = {}
+local Tokens = TFuBag.Tokens
 
 function Tokens.GetItemStringFromCurrencyIndex(index)
-  local tt = TBag_tt
+  local tt = TFuBag_tt
 
   if (not tt) then
-    tt = CreateFrame("GameTooltip","TBag_tt")
+    tt = CreateFrame("GameTooltip","TFuBag_tt")
     -- Allow tooltip set methods to dynamically add new lines based on these
     tt:AddFontStrings(
       tt:CreateFontString("$parentTextLeft1", nil, "GameTooltipText"),
@@ -21,7 +21,7 @@ function Tokens.GetItemStringFromCurrencyIndex(index)
 
   tt:SetCurrencyToken(index)
   local _,itemlink = tt:GetItem()
-  local _,itemstring = TBag:GetItemID(itemlink)
+  local _,itemstring = TFuBag:GetItemID(itemlink)
   return itemstring
 end
 
@@ -32,13 +32,13 @@ function Tokens.SetItmFromCurrencyIndex(index,itm)
     return false
   end
 
-  itm[TBag.I_NAME] = name
-  itm[TBag.I_HEADER] = isHeader
-  itm[TBag.I_EXPAND] = isExpand
-  itm[TBag.I_UNUSED] = isUnused
-  itm[TBag.I_WATCH] = isWatched
-  itm[TBag.I_COUNT] = count
-  itm[TBag.I_ICON] = icon
+  itm[TFuBag.I_NAME] = name
+  itm[TFuBag.I_HEADER] = isHeader
+  itm[TFuBag.I_EXPAND] = isExpand
+  itm[TFuBag.I_UNUSED] = isUnused
+  itm[TFuBag.I_WATCH] = isWatched
+  itm[TFuBag.I_COUNT] = count
+  itm[TFuBag.I_ICON] = icon
   return true
 end
 
@@ -48,13 +48,13 @@ function Tokens.Scan()
   scanning = true
 
   local n = 0
-  if not TTknItm[TBag.PLAYERID] then
-    TTknItm[TBag.PLAYERID] = {}
+  if not TFuTknItm[TFuBag.PLAYERID] then
+    TFuTknItm[TFuBag.PLAYERID] = {}
   end
-  if not TTknItm[TBag.PLAYERID][TBag.D_BAG] then
-    TTknItm[TBag.PLAYERID][TBag.D_BAG] = {}
+  if not TFuTknItm[TFuBag.PLAYERID][TFuBag.D_BAG] then
+    TFuTknItm[TFuBag.PLAYERID][TFuBag.D_BAG] = {}
   end
-  local dbag = TTknItm[TBag.PLAYERID][TBag.D_BAG]
+  local dbag = TFuTknItm[TFuBag.PLAYERID][TFuBag.D_BAG]
   table.wipe(dbag)
 
   for i = 1, GetCurrencyListSize() do
@@ -64,7 +64,7 @@ function Tokens.Scan()
       scanning = false
       return
     end
-    if dbag[n][TBag.I_HEADER] and not dbag[n][TBag.I_EXPAND] then
+    if dbag[n][TFuBag.I_HEADER] and not dbag[n][TFuBag.I_EXPAND] then
       local size = GetCurrencyListSize()
       ExpandCurrencyList(i,1)
       size = GetCurrencyListSize() - size
@@ -84,16 +84,16 @@ end
 
 function Tokens.UpdateTokenButtonFromItm(button, itm, playerid)
   -- Update watched tokens
-  if itm[TBag.I_NAME] then
-    button.extraCurrencyType = itm[TBag.I_TYPE]
-    button.itemstring = itm[TBag.I_ITEMLINK]
-    button.count_val = itm[TBag.I_COUNT]
-    button.name = itm[TBag.I_NAME]
-    if itm[TBag.I_TYPE]  == 1 then --Arena points
+  if itm[TFuBag.I_NAME] then
+    button.extraCurrencyType = itm[TFuBag.I_TYPE]
+    button.itemstring = itm[TFuBag.I_ITEMLINK]
+    button.count_val = itm[TFuBag.I_COUNT]
+    button.name = itm[TFuBag.I_NAME]
+    if itm[TFuBag.I_TYPE]  == 1 then --Arena points
       button.icon:SetTexture("Interface\\PVPFrame\\PVP-ArenaPoints-Icon")
       button.icon:SetTexCoord(0, 1, 0, 1)
-    elseif itm[TBag.I_TYPE]  == 2 then -- Honor Points
-      local factionGroup = TBagInfo[playerid][TBag.G_BASIC][TBag.S_FACTION] or 'FFA'
+    elseif itm[TFuBag.I_TYPE]  == 2 then -- Honor Points
+      local factionGroup = TFuBagInfo[playerid][TFuBag.G_BASIC][TFuBag.S_FACTION] or 'FFA'
       if factionGroup then
         button.icon:SetTexture("Interface\\TargetingFrame\\UI-PVP-"..factionGroup)
         button.icon:SetTexCoord( 0.03125, 0.59375, 0.03125, 0.59375)
@@ -101,13 +101,13 @@ function Tokens.UpdateTokenButtonFromItm(button, itm, playerid)
         button.icon:SetTexCoord(0, 1, 0, 1)
       end
     else
-      local itemlink = itm[TBag.I_ITEMLINK]
-      local icon = itemlink and GetItemIcon(itemlink) or itm[TBag.I_ICON]
+      local itemlink = itm[TFuBag.I_ITEMLINK]
+      local icon = itemlink and GetItemIcon(itemlink) or itm[TFuBag.I_ICON]
       button.icon:SetTexture(icon)
       button.icon:SetTexCoord(0, 1, 0, 1)
     end
-    if itm[TBag.I_COUNT] <= 99999 then
-      button.count:SetText(itm[TBag.I_COUNT])
+    if itm[TFuBag.I_COUNT] <= 99999 then
+      button.count:SetText(itm[TFuBag.I_COUNT])
     else
       button.count:SetText("*")
     end
@@ -119,14 +119,14 @@ function Tokens.Update(frame)
   local framename = frame:GetName()
   local mainFrame = frame:GetParent()
   if mainFrame.cfg.show_tokens ~= 1 then return end
-  if not (TTknItm and TTknItm[mainFrame.playerid] and
-          TTknItm[mainFrame.playerid][TBag.D_BAG]) then
+  if not (TFuTknItm and TFuTknItm[mainFrame.playerid] and
+          TFuTknItm[mainFrame.playerid][TFuBag.D_BAG]) then
     frame:Hide()
     return
   end
   local i = 1
-  for _,itm in pairs(TTknItm[mainFrame.playerid][TBag.D_BAG]) do
-    if itm[TBag.I_WATCH] then
+  for _,itm in pairs(TFuTknItm[mainFrame.playerid][TFuBag.D_BAG]) do
+    if itm[TFuBag.I_WATCH] then
       local watchButton = _G[framename.."Token"..i]
       Tokens.UpdateTokenButtonFromItm(watchButton,itm, mainFrame.playerid)
       frame:Show()
@@ -152,8 +152,8 @@ end
 -- the tracked tokens change.
 function Tokens.Hook()
   Tokens.Scan()
-  Tokens.Update(TInvFrame_TokenFrame)
-  Tokens.Update(TBnkFrame_TokenFrame)
+  Tokens.Update(TFuInvFrame_TokenFrame)
+  Tokens.Update(TFuBnkFrame_TokenFrame)
 end
 
 -- Turn on the hook, we have to delay doing this until variables

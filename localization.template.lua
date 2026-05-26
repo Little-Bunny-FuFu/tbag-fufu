@@ -43,9 +43,9 @@ if GetLocale() ~= "deDE" then return end
 -- patterns.  Documentation can be found at:
 -- http://www.wowwiki.com/HOWTO:_Use_Regular_Expressions
 
-TBag.LOCALES.deDE = {}
-TBag.LOCALES.current = TBag.LOCALES.deDE
-local L = TBag.LOCALE
+TFuBag.LOCALES.deDE = {}
+TFuBag.LOCALES.current = TFuBag.LOCALES.deDE
+local L = TFuBag.LOCALE
 
 L[""] = false  -- Needed to preserve nil returns
 
@@ -394,7 +394,7 @@ L["tests"] = false
 L["getcat"] = false
 
 -- /tbnk help text
-L["TBnk Commands:"] = false
+L["TFuBnk Commands:"] = false
 L[" /tbnk show  -- open window"] = false
 L[" /tbnk hide  -- hide window"] = false
 L[" /tbnk update  -- refresh the window"] = false
@@ -407,7 +407,7 @@ L[" /tbnk printchars -- prints a list of all the chars with cached info"] = fals
 L[" /tbnk deletechar CHAR SERVER -- clears all cached info for character "] = false
 
 -- /tinv help text
-L["TInv Commands:"] = false
+L["TFuInv Commands:"] = false
 L[" /tinv show  -- open window"] = false
 L[" /tinv hide  -- hide window"] = false
 L[" /tinv update  -- refresh the window"] = false

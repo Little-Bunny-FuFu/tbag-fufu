@@ -1,13 +1,13 @@
 -- $Id$
 
 local _G = getfenv(0)
-local TBag = _G.TBag
+local TFuBag = _G.TFuBag
 
 -- Localization support
-local L = TBag.LOCALE;
+local L = TFuBag.LOCALE;
 
-local TBNK_HELP = {
-    L["TBnk Commands:"],
+local TFuBNK_HELP = {
+    L["TFuBnk Commands:"],
     L[" /tbnk show  -- open window"],
     L[" /tbnk hide  -- hide window"],
     L[" /tbnk update  -- refresh the window"],
@@ -20,8 +20,8 @@ local TBNK_HELP = {
     L[" /tbnk deletechar CHAR SERVER -- clears all cached info for character "]
 };
 
-local TINV_HELP = {
-    L["TInv Commands:"],
+local TFuINV_HELP = {
+    L["TFuInv Commands:"],
     L[" /tinv show  -- open window"],
     L[" /tinv hide  -- hide window"],
     L[" /tinv update  -- refresh the window"],
@@ -35,99 +35,99 @@ local TINV_HELP = {
 };
 
 
-function TBag:ShowHelp(arr)
+function TFuBag:ShowHelp(arr)
   for _, line in ipairs(arr) do
     self:Print(line);
   end
 end
 
-function TBnk_cmd(msg)
-  local cmd, params = TBag:SplitStr(msg," ");
+function TFuBnk_cmd(msg)
+  local cmd, params = TFuBag:SplitStr(msg," ");
 
   cmd = string.lower(cmd);
 
   if (cmd == L["hide"]) then
-    TBnkFrame:Hide();
+    TFuBnkFrame:Hide();
   elseif (cmd == L["show"]) then
-    TBnkFrame:Show();
+    TFuBnkFrame:Show();
   elseif (cmd == L["update"]) then
-    TBnkFrame:UpdateWindow(TBag.REQ_MUST);
+    TFuBnkFrame:UpdateWindow(TFuBag.REQ_MUST);
   elseif (cmd == L["debug"]) then
-    if (TBag.DEBUGMESSAGES == 0) then
-      TBag.DEBUGMESSAGES = 1;
-      TBag:Print("TBnk: Debugging messages on.");
+    if (TFuBag.DEBUGMESSAGES == 0) then
+      TFuBag.DEBUGMESSAGES = 1;
+      TFuBag:Print("TFuBnk: Debugging messages on.");
     else
-      TBag.DEBUGMESSAGES = 0;
-      TBag:Print("TBnk: Debugging messages off.");
+      TFuBag.DEBUGMESSAGES = 0;
+      TFuBag:Print("TFuBnk: Debugging messages off.");
     end
   elseif (cmd == L["reset"]) then
-    TBagCfg["Bnk"] = {};
-    TBnkFrame:init(1);
-    TBnkOpt_ResizeUpdate();
+    TFuBagCfg["Bnk"] = {};
+    TFuBnkFrame:init(1);
+    TFuBnkOpt_ResizeUpdate();
   elseif (cmd == L["resetsorts"]) then
-    TBag:ResetSorts(TBnkFrame.cfg);
-    TBnkFrame:UpdateWindow(TBag.REQ_MUST);
+    TFuBag:ResetSorts(TFuBnkFrame.cfg);
+    TFuBnkFrame:UpdateWindow(TFuBag.REQ_MUST);
   elseif (cmd == L["resetpos"]) then
-    TBnkFrame:SetDefPos(TBnkFrame.cfg,1);
-    TBnkFrame:UpdateWindow(TBag.REQ_MUST);
+    TFuBnkFrame:SetDefPos(TFuBnkFrame.cfg,1);
+    TFuBnkFrame:UpdateWindow(TFuBag.REQ_MUST);
   elseif (cmd == L["printchars"]) then
-    TBag:PrintCachedCharacters();
+    TFuBag:PrintCachedCharacters();
   elseif (cmd == L["deletechar"]) then
-    local char, realm = TBag:SplitStr(params," ");
-    TBag:DeleteCachedCharacter(char,realm);
+    local char, realm = TFuBag:SplitStr(params," ");
+    TFuBag:DeleteCachedCharacter(char,realm);
   elseif (cmd == L["config"]) then
-    TBnk_OptsFrame:Show();
-  elseif (cmd == L["getcat"] and TBag.GetCategory and type(TBag.GetCategory) == "function") then
-    TBag:GetCategory(params);
-  elseif (cmd == L["tests"] and TBag.RunTests and type(TBag.RunTests) == "function") then
-    TBag:RunTests(params == "verbose");
+    TFuBnk_OptsFrame:Show();
+  elseif (cmd == L["getcat"] and TFuBag.GetCategory and type(TFuBag.GetCategory) == "function") then
+    TFuBag:GetCategory(params);
+  elseif (cmd == L["tests"] and TFuBag.RunTests and type(TFuBag.RunTests) == "function") then
+    TFuBag:RunTests(params == "verbose");
   else
-    TBag:ShowHelp(TBNK_HELP);
+    TFuBag:ShowHelp(TFuBNK_HELP);
   end
 end
 
 
-function TInv_cmd(msg)
-  local cmd, params = TBag:SplitStr(msg," ");
+function TFuInv_cmd(msg)
+  local cmd, params = TFuBag:SplitStr(msg," ");
 
   cmd = string.lower(cmd);
 
   if (cmd == L["hide"]) then
-    TInvFrame:Hide();
+    TFuInvFrame:Hide();
   elseif (cmd == L["show"]) then
-    TInvFrame:Show();
+    TFuInvFrame:Show();
   elseif (cmd == L["update"]) then
-    TInvFrame:UpdateWindow(TBag.REQ_MUST);
+    TFuInvFrame:UpdateWindow(TFuBag.REQ_MUST);
   elseif (cmd == L["debug"]) then
-    if (TBag.DEBUGMESSAGES == 0) then
-      TBag.DEBUGMESSAGES = 1;
-      TBag:Print("TInv: Debugging messages on.");
+    if (TFuBag.DEBUGMESSAGES == 0) then
+      TFuBag.DEBUGMESSAGES = 1;
+      TFuBag:Print("TFuInv: Debugging messages on.");
     else
-      TBag.DEBUGMESSAGES = 0;
-      TBag:Print("TInv: Debugging messages off.");
+      TFuBag.DEBUGMESSAGES = 0;
+      TFuBag:Print("TFuInv: Debugging messages off.");
     end
   elseif (cmd == L["reset"]) then
-    TBagCfg["Inv"] = {};
-    TInvFrame:init(1);
-    TInvOpt_ResizeUpdate();
+    TFuBagCfg["Inv"] = {};
+    TFuInvFrame:init(1);
+    TFuInvOpt_ResizeUpdate();
   elseif (cmd == L["resetsorts"]) then
-    TBag:ResetSorts(TInvFrame.cfg);
-    TInvFrame:UpdateWindow(TBag.REQ_MUST);
+    TFuBag:ResetSorts(TFuInvFrame.cfg);
+    TFuInvFrame:UpdateWindow(TFuBag.REQ_MUST);
   elseif (cmd == L["resetpos"]) then
-    TInvFrame:SetDefPos(TInvFrame.cfg,1);
-    TInvFrame:UpdateWindow(TBag.REQ_MUST);
+    TFuInvFrame:SetDefPos(TFuInvFrame.cfg,1);
+    TFuInvFrame:UpdateWindow(TFuBag.REQ_MUST);
   elseif (cmd == L["printchars"]) then
-    TBag:PrintCachedCharacters();
+    TFuBag:PrintCachedCharacters();
   elseif (cmd == L["deletechar"]) then
-    local char, realm = TBag:SplitStr(params," ");
-    TBag:DeleteCachedCharacter(char,realm);
+    local char, realm = TFuBag:SplitStr(params," ");
+    TFuBag:DeleteCachedCharacter(char,realm);
   elseif (cmd == L["config"]) then
-    TInv_OptsFrame:Show();
-  elseif (cmd == L["getcat"] and TBag.GetCategory and type(TBag.GetCategory) == "function") then
-    TBag:GetCategory(params);
-  elseif (cmd == L["tests"] and TBag.RunTests and type(TBag.RunTests) == "function") then
-    TBag:RunTests(params == "verbose");
+    TFuInv_OptsFrame:Show();
+  elseif (cmd == L["getcat"] and TFuBag.GetCategory and type(TFuBag.GetCategory) == "function") then
+    TFuBag:GetCategory(params);
+  elseif (cmd == L["tests"] and TFuBag.RunTests and type(TFuBag.RunTests) == "function") then
+    TFuBag:RunTests(params == "verbose");
   else
-    TBag:ShowHelp(TINV_HELP);
+    TFuBag:ShowHelp(TFuINV_HELP);
   end
 end

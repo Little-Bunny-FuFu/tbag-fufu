@@ -3,8 +3,8 @@
 -- Implementation of the base class for the main frames i.e. the Inventory
 -- and Bank Windows.
 
-TBag.MainFrame = {}
-local MainFrame = TBag.MainFrame
+TFuBag.MainFrame = {}
+local MainFrame = TFuBag.MainFrame
 
 function MainFrame:FrameX(width)
   return (width * (self.BF_PADWIDTH + self.cfg.frameXSpace)) + self.cfg.frameXSpace
@@ -31,16 +31,16 @@ function MainFrame:PoolY(space)
 end
 
 function MainFrame:IncreaseColumns()
-  if self.cfg.maxColumns < TBag.NUMCOL_MAX then
+  if self.cfg.maxColumns < TFuBag.NUMCOL_MAX then
     self.cfg.maxColumns = self.cfg.maxColumns + 1
-    self:UpdateWindow(TBag.REQ_MUST)
+    self:UpdateWindow(TFuBag.REQ_MUST)
   end
 end
 
 function MainFrame:DecreaseColumns()
-  if self.cfg.maxColumns > TBag.NUMCOL_MIN then
+  if self.cfg.maxColumns > TFuBag.NUMCOL_MIN then
     self.cfg.maxColumns = self.cfg.maxColumns - 1
-    self:UpdateWindow(TBag.REQ_MUST)
+    self:UpdateWindow(TFuBag.REQ_MUST)
   end
 end
 
@@ -74,7 +74,7 @@ function MainFrame:DragStop()
     self.cfg.frameTOP    = self:GetTop()    * scale
     self.cfg.frameBOTTOM = self:GetBottom() * scale
 
-    TBag:PrintDEBUG("new position: top="..self.cfg.frameTOP..
+    TFuBag:PrintDEBUG("new position: top="..self.cfg.frameTOP..
                     ", bottom="..self.cfg.frameBOTTOM..
                     ", left="..self.cfg.frameLEFT..
                     ", right="..self.cfg.frameRIGHT)
@@ -98,13 +98,13 @@ function MainFrame:OnHide()
 
   -- Unhighlight any bags that are still highlighted.
   for _, bag in ipairs(self.bags) do
-    local bagframe = TBag:GetBagFrame(bag)
+    local bagframe = TFuBag:GetBagFrame(bag)
     if bagframe:GetChecked() then
-      self.CACHE_REQ = TBag.REQ_MUST
+      self.CACHE_REQ = TFuBag.REQ_MUST
       bagframe:SetChecked(false)
     end
   end
-  TBag:UpdateButtonHighlights()
+  TFuBag:UpdateButtonHighlights()
 
   if self.atbank and self.atbank == 1 then
     self.atbank = 0
@@ -112,21 +112,21 @@ function MainFrame:OnHide()
   end
 
   -- Always reset to the global player for event processing
-  self:SetPlayer(TBag.PLAYERID)
+  self:SetPlayer(TFuBag.PLAYERID)
 end
 
 function MainFrame:OnShow()
   PlaySound(PlaySoundKitID and "igBackPackOpen" or SOUNDKIT.IG_BACKPACK_OPEN)
 
   -- Always default to the current player
-  self:SetPlayer(TBag.PLAYERID)
+  self:SetPlayer(TFuBag.PLAYERID)
   self.edit_mode = 0
 
-  if self == TBnkFrame then
-    TInvFrame:Show()
+  if self == TFuBnkFrame then
+    TFuInvFrame:Show()
   end
 
-  self:UpdateWindow(TBag.REQ_PART)
+  self:UpdateWindow(TFuBag.REQ_PART)
 
   -- Bring ourselves to the top
   self:Raise()
