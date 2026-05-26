@@ -1270,6 +1270,7 @@ function TFuBag:InitDefVals(cfg, bagarr, row1offset, reset)
   self:SetDef(cfg, "frameYSpace", 1, reset, self.NumFunc, 0, self.N_SPACE_MAX);
   self:SetDef(cfg, "frameXPool", 1, reset, self.NumFunc, 0, self.N_SPACE_MAX);
   self:SetDef(cfg, "frameYPool", 2, reset, self.NumFunc, 0, self.N_SPACE_MAX);
+  self:SetDef(cfg, "cat_spacing", 0, reset, self.NumFunc, 0, self.N_CATSPACE_MAX);
   self:SetDef(cfg, "count_font", 14, reset, self.NumFunc, self.N_FONT_MIN, self.N_FONT_MAX);
   self:SetDef(cfg, "count_font_x", 2, reset, self.NumFunc, 0, self.N_BUTTON_MAX);
   self:SetDef(cfg, "count_font_y", 2, reset, self.NumFunc, 0, self.N_BUTTON_MAX);
@@ -3030,6 +3031,9 @@ function TFuBag:LayoutWindow(frame)
   local bar_x = cfg.bar_x
   local edit_mode = frame.edit_mode
   local assignfunc = frame.AssignButtonsToFrame
+  -- Category Spacing: extra hard gap between adjacent category bars (both axes),
+  -- on top of the existing Space/Pool budgets. Default 0 leaves layout unchanged.
+  local cat_spacing = cfg.cat_spacing or 0
   local PAD_BOTTOM = 0;
   local PAD_TOP = 0;
   local calc_dat = {}
@@ -3037,8 +3041,12 @@ function TFuBag:LayoutWindow(frame)
   local barframe = {};
   local tmpframe;
   local iBar;
+  local drew_row = false;
+  -- Grow the window by the horizontal gaps a full row needs (bar_x-1 gaps); the
+  -- bars below are shifted left by the same total, so the left border is kept.
   local available_width = frame:FrameX(cfg["maxColumns"])
-      + frame:SpaceX(bar_x-1) + frame:PoolX(bar_x+1) + (2 * self.BORDER);
+      + frame:SpaceX(bar_x-1) + frame:PoolX(bar_x+1) + (2 * self.BORDER)
+      + ((bar_x - 1) * cat_spacing);
   local width_in_between;
 
   if (framename == "TFuInvFrame") then
@@ -3132,6 +3140,11 @@ function TFuBag:LayoutWindow(frame)
         barframe[iBar]:Hide();
       end
     else
+      -- Category Spacing: hard vertical gap above this row, but only between
+      -- drawn rows (no leading gap before the first, none after empty rows).
+      if (drew_row) then
+        cur_y = cur_y + cat_spacing;
+      end
       local cur_x = frame:PoolX(1) + (self.BORDER);
       local cur_width = 0;
 
@@ -3160,7 +3173,8 @@ function TFuBag:LayoutWindow(frame)
             frame:FrameX(calc_dat[iBar.."_width"]),
             frame:FrameY(calc_dat["height"]));
 
-          cur_x = cur_x + frame:FrameX(calc_dat[iBar.."_width"]);
+          -- Category Spacing: hard horizontal gap between adjacent category bars.
+          cur_x = cur_x + frame:FrameX(calc_dat[iBar.."_width"]) + cat_spacing;
 
           -- Color the frame and assign buttons
           self:ColorFrame(cfg, barframe[iBar], (barnum+iBar));
@@ -3174,6 +3188,7 @@ function TFuBag:LayoutWindow(frame)
       end
 
       cur_y = cur_y + frame:FrameY(calc_dat["height"]) + frame:PoolY(1);
+      drew_row = true;
     end
   end
 

@@ -554,6 +554,7 @@ L["Spacing - X Button:"] = true
 L["Spacing - Y Button:"] = true
 L["Spacing - X Pool:"] = true
 L["Spacing - Y Pool:"] = true
+L["Category Spacing:"] = true
 L["Count Font Size:"] = true
 L["Count Placement - X:"] = true
 L["Count Placement - Y:"] = true

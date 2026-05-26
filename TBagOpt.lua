@@ -20,6 +20,9 @@ TFuBag.N_FONT_MAX = 20;
 TFuBag.TAG_MAX = 10;
 
 TFuBag.N_SPACE_MAX = 5;
+-- Category Spacing has its own, larger range: it is the gap BETWEEN category
+-- frames (not item buttons), so it needs more travel than the per-button spaces.
+TFuBag.N_CATSPACE_MAX = 30;
 
 -----------------------------------------------------------------------
 -- Options
@@ -225,6 +228,9 @@ function TFuBag:CreateCfgOpt(cfgopt, cfg, bagarr, updatefunc, resizefunc, forcef
     resizefunc);
   self:MakeSlider(cfgopt, L["Spacing - Y Pool:"],
     cfg, "frameYPool", 0, self.N_SPACE_MAX, 1,
+    resizefunc);
+  self:MakeSlider(cfgopt, L["Category Spacing:"],
+    cfg, "cat_spacing", 0, self.N_CATSPACE_MAX, 1,
     resizefunc);
   self:MakeSlider(cfgopt, L["Count Font Size:"],
     cfg, "count_font", self.N_FONT_MIN, self.N_FONT_MAX, 1,
