@@ -482,7 +482,10 @@ function TFuBag:CreateDummyBag(bag, template)
     for slot = 1, self:GetBagMaxItems(bag) do
       buttonname = self:GetBagItemButtonName(bag, slot);
       if not (_G[buttonname]) then
-        local button = CreateFrame("Button", buttonname, dbag, template);
+        -- 12.0: TFuBag_ItemButtonTemplate is the ItemButton intrinsic, so the
+        -- frame must be created as type "ItemButton" (not "Button") for the
+        -- ItemButtonMixin + icon/Count/Stock children to apply.
+        local button = CreateFrame("ItemButton", buttonname, dbag, template);
         button:SetID(slot);
         button:Hide();
         button:SetFrameLevel(level)
