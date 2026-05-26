@@ -136,7 +136,7 @@
         <PushedTexture file="Interface\Icons\Spell_Frost_Stun" />
         <HighlightTexture file="Interface\Icons\Spell_Frost_Stun" alphaMode="ADD" />
         <Anchors>
-          <Anchor point="TOPLEFT" relativeTo="TFuBnk_Button_ShowPurchase" relativePoint="TOPRIGHT">
+          <Anchor point="TOPLEFT" relativeTo="TFuBnk_Button_ChangeEditMode" relativePoint="TOPRIGHT">
             <Offset>
               <AbsDimension x="2" y="0"/>
             </Offset>

@@ -128,10 +128,12 @@ function Tokens.Update(frame)
       frame:Show()
       i = i + 1
     end
-    if i > MAX_WATCHED_TOKENS then return end
+    if i > 18 then return end  -- MAX_WATCHED_TOKENS removed in 12.0; use a literal cap
   end
-  for n = i, MAX_WATCHED_TOKENS do
-    _G[framename.."Token"..n]:Hide()
+  for n = i, 18 do
+    if _G[framename.."Token"..n] then
+      _G[framename.."Token"..n]:Hide()
+    end
     if n == 1 then
       frame:Hide()
     end
