@@ -3045,7 +3045,6 @@ function TFuBag:LayoutWindow(frame)
   local barframe = {};
   local tmpframe;
   local iBar;
-  local bar_y = self:GetBarY(bar_x);
   local available_width = frame:FrameX(cfg["maxColumns"])
       + frame:SpaceX(bar_x-1) + frame:PoolX(bar_x+1) + (2 * self.BORDER);
   local width_in_between;
@@ -3116,8 +3115,11 @@ function TFuBag:LayoutWindow(frame)
   -- ITEM BUTTONS
   local cur_y = frame:PoolY(1) + self.BORDER + PAD_BOTTOM;
 
-  for barnum = 1, bar_x * bar_y, bar_x do
-    for iBar = 0, bar_x - 1 do
+  for barnum = 1, self.BAR_MAX, bar_x do
+    -- last row is partial when bar_x does not divide BAR_MAX evenly; only the
+    -- bars that actually exist (<= BAR_MAX) are touched.
+    local nbars = math.min(bar_x, self.BAR_MAX - barnum + 1)
+    for iBar = 0, nbars - 1 do
       barframe[iBar] = _G[framename.."_bar_"..(barnum+iBar)];
       tmpframe = _G[framename.."_BarButton_"..(barnum+iBar)];
       if (edit_mode ~= 1) then
@@ -3128,13 +3130,13 @@ function TFuBag:LayoutWindow(frame)
       end
     end
 
-    self:CalcBarLayout(calc_dat, baritm, barnum, bar_x,
+    self:CalcBarLayout(calc_dat, baritm, barnum, nbars,
       cfg["maxColumns"], edit_mode);
 
     --- now we know the size and height of all bars for this line
 
     if (calc_dat["height"] == 0) then
-      for iBar = 0, bar_x - 1 do
+      for iBar = 0, nbars - 1 do
         barframe[iBar]:Hide();
       end
     else
@@ -3144,12 +3146,12 @@ function TFuBag:LayoutWindow(frame)
       -- Find the space left over
       width_in_between = frame:FrameX(cfg["maxColumns"])
         + frame:SpaceX(bar_x-1) + frame:PoolX(bar_x-1);
-      for iBar = 0, bar_x - 1 do
+      for iBar = 0, nbars - 1 do
         width_in_between = width_in_between - frame:FrameX(calc_dat[iBar.."_width"]);
       end
 
       -- Then position the frames appropriately
-      for iBar = 0, bar_x - 1 do
+      for iBar = 0, nbars - 1 do
         if (calc_dat[iBar.."_width"] >= 0 and
             (table.getn(baritm[barnum+iBar]) > 0 or edit_mode == 1)) then
           -- Keep width separate to get roundoff staggering
@@ -3183,15 +3185,8 @@ function TFuBag:LayoutWindow(frame)
     end
   end
 
-  -- Hide any "leftover" frames
-  for barnum = bar_x * bar_y + 1, self.BAR_MAX do
-    _G[framename.."_bar_"..barnum]:Hide();
-    _G[framename.."_BarButton_"..barnum]:Hide()
-    for _,itm in pairs(baritm[barnum]) do
-      local bag, slot = itm[self.I_BAG], itm[self.I_SLOT]
-      _G[self:GetBagItemButtonName(bag,slot)]:Hide()
-    end
-  end
+  -- (No leftover frames to hide: the loop above lays out all BAR_MAX bars,
+  -- including a partial final row when bar_x does not divide BAR_MAX evenly.)
 
   local new_height;
   new_height = cur_y + PAD_TOP + frame:SpaceY(1) + frame:PoolY(1) + self.BORDER;
