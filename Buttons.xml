@@ -39,7 +39,7 @@
     </Layers>
     <Scripts>
       <OnLoad>
-        ContainerFrameItemButton_OnLoad(self);
+        if ContainerFrameItemButton_OnLoad then ContainerFrameItemButton_OnLoad(self); end  -- removed in 12.0; ItemButton mixin self-inits
         self.UpdateTooltip = TFuBag.ItemButton.OnEnter;
         local newitem = _G[self:GetName() .. "NewItemTexture"]
         if newitem then
@@ -59,7 +59,8 @@
     </Scripts>
   </Button>
 
-  <Button name="TFuBag_BarButtonTemplate" inherits="ItemButtonTemplate" hidden="true" virtual="true">
+  <!-- 12.0: old ItemButtonTemplate is now the "ItemButton" intrinsic; use it directly. -->
+  <ItemButton name="TFuBag_BarButtonTemplate" hidden="true" virtual="true">
     <Size><AbsDimension x="40" y="40"/></Size>
     <Layers>
       <Layer level="BORDER">
@@ -80,7 +81,7 @@
         TFuBag.BarButton.OnLeave(self, motion)
       </OnLeave>
     </Scripts>
-  </Button>
+  </ItemButton>
 
   <CheckButton name="TFuBag_BagButtonTemplate" inherits="ItemButtonTemplate" virtual="true">
     <Frames>
