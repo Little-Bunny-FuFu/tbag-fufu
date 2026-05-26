@@ -791,6 +791,12 @@ function TFuBag:DoSearch(srch)
     local found;
 
     self.SrchText = string.lower(srch);
+    -- Treat the search box text as a literal substring, not a Lua pattern:
+    -- escape magic chars so e.g. "void-t" matches "Void-Touched" instead of being
+    -- read as the pattern "d-t" (- is a quantifier, so "void-" matched only "voi"
+    -- and any following letter then failed). SrchText is consumed by string.find /
+    -- string.match in GatherSearchResults and the item-highlight alpha pass.
+    self.SrchText = self.SrchText:gsub("([%(%)%.%%%+%-%*%?%[%]%^%$])", "%%%1");
 
     -- Gather all the search info
     self:GatherSearchResults(TFuInvItm, L["bags"]);
