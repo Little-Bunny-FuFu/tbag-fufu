@@ -22,6 +22,13 @@ local Professions = TFuBag.Professions
 -- Current DB Version
 Professions.DB_VERSION = 2
 
+-- 12.0: the recipe/reagent keyword scan (ScanRecipes) is built on the old
+-- GetTradeSkill*/SetTradeSkill*/TradeSkillOnlyShowMakeable frame API, which was
+-- removed. Gated off until rewritten against C_TradeSkillUI. While off the
+-- created/reagent caches just stay empty and the keyword consumers
+-- (MakeTradeCreationKeywords / MakeTradeReagentKeywords) iterate nothing.
+Professions.RECIPE_SCAN_ENABLED = false
+
 -- Trade type breakdowns
 Professions.trades = {
   "Alchemy",
@@ -284,6 +291,10 @@ local function process_skill_line(i, numTradeSkills, created, reagent, tradeskil
 end
 
 function Professions.ScanRecipes()
+  -- 12.0: gated off — the old GetTradeSkill* frame API below is gone. See
+  -- Professions.RECIPE_SCAN_ENABLED above.
+  if not Professions.RECIPE_SCAN_ENABLED then return end
+
   -- Get the name of the tradeskill and reverse it to enUS
   local tradeskillName = RL[C_TradeSkillUI.GetTradeSkillLine()]
 
