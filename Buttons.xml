@@ -33,7 +33,7 @@
       </Frame>
     </Frames>
     <Layers>
-      <Layer frameStrata="BORDER">
+      <Layer level="BORDER">
         <Texture name="$parent_bkgr" inherits="TFuBag_ButtonBkgrTemplate"/>
       </Layer>
     </Layers>
@@ -62,7 +62,7 @@
   <Button name="TFuBag_BarButtonTemplate" inherits="ItemButtonTemplate" hidden="true" virtual="true">
     <Size><AbsDimension x="40" y="40"/></Size>
     <Layers>
-      <Layer frameStrata="BORDER">
+      <Layer level="BORDER">
         <Texture name="$parent_bkgr" inherits="TFuBag_ButtonBkgrTemplate"/>
       </Layer>
     </Layers>

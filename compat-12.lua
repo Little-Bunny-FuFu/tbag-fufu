@@ -39,6 +39,11 @@ if C then
   end
 end
 
+-- MAX_CONTAINER_ITEMS (removed Blizzard global) was used as the fallback
+-- bag-size cap in GetBagMaxItems / CreateDummyBag; restore it generously
+-- (the largest carried bag is currently ~38 slots).
+MAX_CONTAINER_ITEMS = MAX_CONTAINER_ITEMS or 40
+
 -- ---------------------------------------------------------------------------
 -- AddOn API -> C_AddOns (11.0).
 -- ---------------------------------------------------------------------------

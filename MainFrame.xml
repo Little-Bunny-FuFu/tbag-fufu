@@ -2,18 +2,9 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
   <Script file="MainFrame.lua"/>
 
-  <Frame name="TFuBag_MainTemplate" toplevel="true" frameStrata="MEDIUM" movable="true" enableMouse="true" hidden="true" parent="UIParent" virtual="true">
-    <Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
-      <EdgeSize>
-        <AbsValue val="4"/>
-      </EdgeSize>
-      <TileSize>
-        <AbsValue val="4"/>
-      </TileSize>
-      <BackgroundInsets>
-        <AbsInset left="2" right="2" top="2" bottom="2"/>
-      </BackgroundInsets>
-    </Backdrop>
+  <Frame name="TFuBag_MainTemplate" inherits="BackdropTemplate" toplevel="true" frameStrata="MEDIUM" movable="true" enableMouse="true" hidden="true" parent="UIParent" virtual="true">
+    <!-- Inline <Backdrop> removed from XML in 9.0; set via BackdropTemplate
+         mixin in OnLoad below. -->
     <Frames>
       <Button name="$parent_ColumnsAdd" inherits="TFuBag_ColumnsButtonTemplate"/>
       <Button name="$parent_ColumnsDel" inherits="TFuBag_ColumnsButtonTemplate"/>
@@ -31,6 +22,12 @@
     </Frames>
     <Scripts>
       <OnLoad>
+        self:SetBackdrop({
+          bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+          edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+          tile = true, tileSize = 4, edgeSize = 4,
+          insets = { left = 2, right = 2, top = 2, bottom = 2 },
+        })
         table.insert(UISpecialFrames, self:GetName())
       </OnLoad>
       <OnShow>
