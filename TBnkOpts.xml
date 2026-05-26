@@ -179,7 +179,7 @@
           </OnLoad>
           <OnClick>
             TFuBagCfg["Bank"] = {};
-            TFuBnk_init(1);
+            TFuBnkFrame:init(1);
             TFuBnkOpt_ResizeUpdate();
             TFuBnk_Options_UpdateWindow();
           </OnClick>

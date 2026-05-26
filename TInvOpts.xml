@@ -179,7 +179,7 @@
           </OnLoad>
           <OnClick>
             TFuBagCfg["Inv"] = {};
-            TFuInv_init(1);
+            TFuInvFrame:init(1);
             TFuInvOpt_ResizeUpdate();
             TFuInv_Options_UpdateWindow();
           </OnClick>
