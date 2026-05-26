@@ -178,10 +178,10 @@
             this:SetText(TFuBag.LOCALE["Reset"]);
           </OnLoad>
           <OnClick>
-            TFuBagCfg["Bank"] = {};
+            TFuBagCfg["Bnk"] = {};
             TFuBnkFrame:init(1);
             TFuBnkOpt_ResizeUpdate();
-            TFuBnk_Options_UpdateWindow();
+            TFuBnk_Options_InitWindow();
           </OnClick>
         </Scripts>
       </Button>

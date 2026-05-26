@@ -181,7 +181,7 @@
             TFuBagCfg["Inv"] = {};
             TFuInvFrame:init(1);
             TFuInvOpt_ResizeUpdate();
-            TFuInv_Options_UpdateWindow();
+            TFuInv_Options_InitWindow();
           </OnClick>
         </Scripts>
       </Button>
