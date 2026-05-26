@@ -218,10 +218,12 @@ function ItemButton.Update(self)
 
   -- Get the various frames.
   local framename = self:GetName()
-  local frame_texture = _G[framename.."IconTexture"]
-  local frame_font = _G[framename.."Count"]
+  -- 12.0: ItemButton intrinsic children expose parentKeys (icon/Count/Stock),
+  -- not reliable $parent global names; prefer the parentKey, fall back to global.
+  local frame_texture = self.icon or _G[framename.."IconTexture"]
+  local frame_font = self.Count or _G[framename.."Count"]
   local frame_bkgr = _G[framename.."_bkgr"]
-  local frame_stock = _G[framename.."Stock"]
+  local frame_stock = self.Stock or _G[framename.."Stock"]
   local editFrame = _G[framename.."_EditButton"]
   local questTexture = _G[framename.."IconQuestTexture"]
 
