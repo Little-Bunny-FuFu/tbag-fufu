@@ -89,6 +89,7 @@ function TFuBag:PLAYER_LEAVING_WORLD()
 end
 
 function TFuBag:BANKFRAME_OPENED()
+  if not TFuBag.BANK_ENABLED then return end  -- bank gated off (12.0 revival); let Blizzard's bank show
   TFuBnkFrame.atbank = 1
   TFuBnkFrame:Show()
 end

@@ -5,6 +5,12 @@ local TFuBag = _G.TFuBag
 TFuBag.Bank = {}
 local Bank = TFuBag.Bank
 
+-- Bank module gated OFF for the 12.0 revival: the classic-bank API is gone and
+-- the bank needs a ground-up C_Bank rewrite (see tbag-fufu-bank-rewrite-design.md).
+-- While false, the Blizzard-bank hijack (SetReplaceBank, a taint risk) and the
+-- TBag bank window are suppressed. Flip to true once TFuBnk is rewritten.
+TFuBag.BANK_ENABLED = false
+
 local BankFrame_Saved = nil;
 
 -- Localization Support
@@ -157,7 +163,7 @@ function Bank:init(reset)
   end
   self:InitBagGfx()
 
-  self:SetReplaceBank();
+  if TFuBag.BANK_ENABLED then self:SetReplaceBank(); end
 
   if (cfg["moveLock"] == 0) then
     TFuBnkLockNorm:SetTexture("Interface\\AddOns\\tbag-fufu\\images\\LockButton-Locked-Up");

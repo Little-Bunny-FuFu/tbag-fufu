@@ -13,6 +13,7 @@
 ## X-Localizations: enUS, deDE, ruRU
 ## X-CompatibleLocales: enUS, deDE, ruRU
 ##
+compat-12.lua
 stub.lua
 localization.enUS.lua
 localization.deDE.lua

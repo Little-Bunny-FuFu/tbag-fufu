@@ -3399,7 +3399,7 @@ function TFuBag.SplitContainerItem(bag, slot, split)
   TFuBag.STACKSPLIT = 1;
 end
 
-hooksecurefunc('SplitContainerItem', TFuBag.SplitContainerItem);
+hooksecurefunc(C_Container, "SplitContainerItem", TFuBag.SplitContainerItem);
 
 function TFuBag.PickupContainerItem(bag, slot)
   -- Only skip a slot if we have just manually split
@@ -3410,7 +3410,7 @@ function TFuBag.PickupContainerItem(bag, slot)
   TFuBag.STACKSPLIT = nil;
 end
 
-hooksecurefunc('PickupContainerItem', TFuBag.PickupContainerItem);
+hooksecurefunc(C_Container, "PickupContainerItem", TFuBag.PickupContainerItem);
 
 -- array to hold the instructions
 -- don't edit this directly use TFuBag:ItemMover.
