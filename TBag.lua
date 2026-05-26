@@ -15,7 +15,7 @@ if TFuBag.VERSION  == "\64project-version\64" then
 end
 
 
-BINDING_HEADER_TFuBag = "TFuBag";
+BINDING_HEADER_TFuBag = "TBag-fufu";
 
 -----------------------------------------------------------------------
 -- General Constants
@@ -146,7 +146,7 @@ TFuBag.C_CAT  = "ffcc55ee";
 TFuBag.C_BAR  = "ffff3366";
 TFuBag.C_INST = "ff00ff7f";
 
-TFuBag.SCP  = "|cffcc33ccTBag: |r";
+TFuBag.SCP  = "|cffcc33ccTBag-fufu: |r";
 
 -- Assorted player info constants
 TFuBag.S_MONEY     = "money";

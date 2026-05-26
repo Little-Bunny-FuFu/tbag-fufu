@@ -388,7 +388,7 @@ L[" /tinv deletechar CHAR SERVER -- clears all cached info for character "] = " 
 -----------------------------------------------------------------------
 -- WINDOW STRINGS
 -----------------------------------------------------------------------
-L["TBag v%s"] = "TBag v%s"
+L["TBag v%s"] = "TBag-fufu v%s"
 
 L["Normal"] = "Нормальный вид"
 L["Stop highlighting new items."] = "Остановить перемещение на первый план новых вещей"
@@ -493,8 +493,8 @@ L["TOPLEFT"] = "ВЕРХВЛЕВО"
 L["TOPRIGHT"] = "ВЕРХВПРАВО"
 L["BOTTOMLEFT"] = "НИЗВЛЕВО"
 L["BOTTOMRIGHT"] = "НИЗВПРАВО"
-L["Show on TBag"] = "Показать в TBag"
-L["Checking this option will allow you to track this currency type in TBag for this character.\n\nYou can also Shift-click a currency to add or remove it from being tracked in TBag."] = "Выбрав этот вариант,вы позволите отслеживать этот тип валюты в TBag для этого персонажа.\n\n Также вы можете использовать комбинацию Shift-Click, чтобы добавить или удалить отслеживание валюты в TBag."
+L["Show on TBag"] = "Показать в TBag-fufu"
+L["Checking this option will allow you to track this currency type in TBag for this character.\n\nYou can also Shift-click a currency to add or remove it from being tracked in TBag."] = "Выбрав этот вариант,вы позволите отслеживать этот тип валюты в TBag-fufu для этого персонажа.\n\n Также вы можете использовать комбинацию Shift-Click, чтобы добавить или удалить отслеживание валюты в TBag-fufu."
 L["Deposits all Reagents in your bag."] = false
 
 -- Option Window Strings

@@ -388,7 +388,7 @@ L[" /tinv deletechar CHAR SERVER -- clears all cached info for character "] = " 
 -----------------------------------------------------------------------
 -- WINDOW STRINGS
 -----------------------------------------------------------------------
-L["TBag v%s"] = "TBag v%s"
+L["TBag v%s"] = "TBag-fufu v%s"
 
 L["Normal"] = "Normal"
 L["Stop highlighting new items."] = "Neue Items nicht mehr hervorheben."
@@ -493,8 +493,8 @@ L["TOPLEFT"] = "OBENLINKS"
 L["TOPRIGHT"] = "OBENRECHTS"
 L["BOTTOMLEFT"] = "UNTENLINKS"
 L["BOTTOMRIGHT"] = "UNTENRECHTS"
-L["Show on TBag"] = "Zeige in TBag"
-L["Checking this option will allow you to track this currency type in TBag for this character.\n\nYou can also Shift-click a currency to add or remove it from being tracked in TBag."] = "Ist diese Option aktiviert wird diese W\195\164hrung in TBag f\195\188r diesen Charakter angezeigt.\n\nDu kannst auch auf eine W\195\164hrung Shift-Rechtsklicken um sie in TBag anzuzeigen oder zu entfernen."
+L["Show on TBag"] = "Zeige in TBag-fufu"
+L["Checking this option will allow you to track this currency type in TBag for this character.\n\nYou can also Shift-click a currency to add or remove it from being tracked in TBag."] = "Ist diese Option aktiviert wird diese W\195\164hrung in TBag-fufu f\195\188r diesen Charakter angezeigt.\n\nDu kannst auch auf eine W\195\164hrung Shift-Rechtsklicken um sie in TBag-fufu anzuzeigen oder zu entfernen."
 L["Deposits all Reagents in your bag."] = "Verstaut alle Materialien in deiner Tasche"
 
 -- Option Window Strings
