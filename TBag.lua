@@ -1954,10 +1954,14 @@ function TFuBag.SetColorFunc(prev)
   local r, g, b, opacity
 
   if prev then
-    r, g, b, opacity = prev.r, prev.g, prev.b, prev.opacity
+    -- cancelFunc receives ColorPickerFrame.previousValues = {r,g,b,a} (12.0 uses
+    -- the key "a", not "opacity").
+    r, g, b, opacity = prev.r, prev.g, prev.b, (prev.a or prev.opacity)
   else
+    -- 12.0: OpacitySliderFrame was removed in the ColorPickerFrame rework; alpha
+    -- now comes from ColorPickerFrame:GetColorAlpha().
     r, g, b = ColorPickerFrame:GetColorRGB()
-    opacity = OpacitySliderFrame:GetValue()
+    opacity = ColorPickerFrame:GetColorAlpha()
   end
 
   local value = UIDROPDOWNMENU_MENU_VALUE
