@@ -25,8 +25,8 @@
         self:SetBackdrop({
           bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
           edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-          tile = true, tileSize = 4, edgeSize = 4,
-          insets = { left = 2, right = 2, top = 2, bottom = 2 },
+          tile = true, tileSize = 8, edgeSize = 8,
+          insets = { left = 3, right = 3, top = 3, bottom = 3 },
         })
         -- Keep the window fully on-screen: prevents dragging it off the edge
         -- (where WoW reverts the un-placed off-screen drop back to the pre-move
