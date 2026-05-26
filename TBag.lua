@@ -2951,9 +2951,13 @@ function TFuBag:AssignButtonsToFrame(mainFrame, barnum, frame, width, height)
       mainFrame.BGF_WIDTH, mainFrame.BGF_HEIGHT)
 
     -- resize frame texture (this is the little border)
-    local frame_normaltexture = _G[buttonname.."NormalTexture"]
-    frame_normaltexture:SetWidth(mainFrame.BGF_WIDTH)
-    frame_normaltexture:SetHeight(mainFrame.BGF_HEIGHT)
+    -- 12.0: intrinsic ItemButton children have no $parent global name; get the
+    -- NormalTexture via the button method instead of _G[name.."NormalTexture"].
+    local frame_normaltexture = _G[buttonname] and _G[buttonname]:GetNormalTexture()
+    if frame_normaltexture then
+      frame_normaltexture:SetWidth(mainFrame.BGF_WIDTH)
+      frame_normaltexture:SetHeight(mainFrame.BGF_HEIGHT)
+    end
 
     -- Relink the button map
     self.BUTTONS[buttonname] = itm
@@ -2977,12 +2981,16 @@ function TFuBag:AssignButtonsToFrame(mainFrame, barnum, frame, width, height)
       0-mainFrame.BF_X_PAD, mainFrame.BF_Y_PAD,
       mainFrame.BGF_WIDTH, mainFrame.BGF_HEIGHT)
 
-    local frame_normaltexture = _G[buttonname.."NormalTexture"]
-    frame_normaltexture:SetWidth(mainFrame.BGF_WIDTH)
-    frame_normaltexture:SetHeight(mainFrame.BGF_HEIGHT)
+    -- 12.0: intrinsic ItemButton children have no $parent global name; get the
+    -- NormalTexture via the button method instead of _G[name.."NormalTexture"].
+    local frame_normaltexture = _G[buttonname] and _G[buttonname]:GetNormalTexture()
+    if frame_normaltexture then
+      frame_normaltexture:SetWidth(mainFrame.BGF_WIDTH)
+      frame_normaltexture:SetHeight(mainFrame.BGF_HEIGHT)
+    end
 
-    local tmpframe = _G[buttonname.."Stock"]
-    tmpframe:SetText(barnum)
+    local tmpframe = _G[buttonname] and _G[buttonname].Stock  -- intrinsic parentKey, not a global name
+    if tmpframe then tmpframe:SetText(barnum) end
     tmpframe = _G[buttonname.."_bkgr"]
     tmpframe:SetVertexColor(1,0,0.25,0.8)
     tmpframe:Show()
