@@ -18,8 +18,13 @@ function TFuBag:VARIABLES_LOADED()
   self:RegisterEvent("BANKFRAME_OPENED")
   self:RegisterEvent("BANKFRAME_CLOSED")
   self:RegisterEvent("PLAYERBANKSLOTS_CHANGED")
-  self:RegisterEvent("PLAYERREAGENTBANKSLOTS_CHANGED")
-  self:RegisterEvent("PLAYERBANKBAGSLOTS_CHANGED")
+  -- 12.0: these bank events were removed; register only if still valid.
+  if C_EventUtils.IsEventValid("PLAYERREAGENTBANKSLOTS_CHANGED") then
+    self:RegisterEvent("PLAYERREAGENTBANKSLOTS_CHANGED")
+  end
+  if C_EventUtils.IsEventValid("PLAYERBANKBAGSLOTS_CHANGED") then
+    self:RegisterEvent("PLAYERBANKBAGSLOTS_CHANGED")
+  end
   self:RegisterEvent("PLAYER_LEVEL_UP")
   self:RegisterEvent("SKILL_LINES_CHANGED")
   self:RegisterEvent("QUEST_ACCEPTED")
