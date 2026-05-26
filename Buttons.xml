@@ -42,7 +42,8 @@
     </Layers>
     <Scripts>
       <OnLoad>
-        if ContainerFrameItemButton_OnLoad then ContainerFrameItemButton_OnLoad(self); end  -- removed in 12.0; ItemButton mixin self-inits
+        self:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+        self:RegisterForDrag("LeftButton");  -- 12.0: needed for drag-to-pickup (OnDragStart -> OnClick)
         self.UpdateTooltip = TFuBag.ItemButton.OnEnter;
         local newitem = _G[self:GetName() .. "NewItemTexture"]
         if newitem then
