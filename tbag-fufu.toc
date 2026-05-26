@@ -1,9 +1,9 @@
-## Interface: 120000
+## Interface: 120005,120007
 ## Title: TBag-fufu
 ## Notes: The last bag addon you'll ever need.  Autosorting, viewable anywhere, easy to use yet amazingly configurable.
 ## Notes-deDE: Das einzige Taschenaddon was du jemals brauchen wirst. Automatisches Sortieren, überall einsehbar, Benutzerfreundlich, dabei aber unglaublich gut Konfigurierbar.
 ## Notes-ruRU: Модификация сумок. Возможности - авто-сортировка, просмотр сумок, банка в лубом месте, легок в использовании, гибкие настройки. 
-## X-Category: Inventory
+## Category: Inventory
 ## Author: Talos, Modified by Shefki; revived as -fufu fork
 ## X-Email: shefki@shefki.org
 ## X-Notes: Personal -fufu revival fork of the abandoned tbag-shefki; updated for retail 12.0.
