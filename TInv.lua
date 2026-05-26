@@ -195,6 +195,7 @@ function Inv:init(reset)
     TFuInvacterBag1Slot:Hide();
     TFuInvacterBag2Slot:Hide();
     TFuInvacterBag3Slot:Hide();
+    TFuInvacterBag4Slot:Hide();
     TFuInvMenuBarBackpackButton:Hide();
     TFuInvingButton:Hide();
   end
@@ -429,7 +430,7 @@ end
 function Inv:SetBottomLeftButton_Anchors()
   local buttons = {
     "TFuInvFrame_Total",
-    "TFuInvacterBag3Slot",
+    "TFuInvacterBag4Slot",
   }
   local button_left = nil;
 
@@ -635,6 +636,7 @@ function Inv.Toggle_BagSlotButtons()
     TFuInvacterBag1Slot:Hide();
     TFuInvacterBag2Slot:Hide();
     TFuInvacterBag3Slot:Hide();
+    TFuInvacterBag4Slot:Hide();
     TFuInvMenuBarBackpackButton:Hide();
     TFuInvingButton:Hide();
     TFuInvFrame:SetButton_Anchors();
@@ -644,6 +646,7 @@ function Inv.Toggle_BagSlotButtons()
     TFuInvacterBag1Slot:Show();
     TFuInvacterBag2Slot:Show();
     TFuInvacterBag3Slot:Show();
+    TFuInvacterBag4Slot:Show();
     TFuInvMenuBarBackpackButton:Show();
     TFuInvingButton:Show();
     TFuInvFrame:SetButton_Anchors();

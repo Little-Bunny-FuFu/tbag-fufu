@@ -530,9 +530,12 @@ function BagButton:OnClick(button,down,drag)
     return
   end
 
-  -- Unpurchased bag slot
+  -- Unpurchased bank bag slot (bank window only). Without the frame guard the
+  -- inventory reagent bag (bag 5) satisfies `bag > numSlots + 4` (GetNumBankSlots
+  -- returns 0 here) and is misread as an unpurchased bank slot, so the click
+  -- returns early and never reaches UpdateButtonHighlights -> no highlight.
   local numSlots = TFuBag:GetNumBankSlots(mainFrame.playerid)
-  if bag > numSlots + 4 then
+  if mainFrame == TFuBnkFrame and bag > numSlots + 4 then
     self:SetChecked(not self:GetChecked())
     -- Needed to make the CONFIRM_BUY_BANK_SLOT popup work right
     BankFrame.nextSlotCost = GetBankSlotCost(numSlots)

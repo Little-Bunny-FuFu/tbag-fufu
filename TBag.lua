@@ -184,7 +184,10 @@ local L = TFuBag.LOCALE;
 TFuBag.BAGMIN = REAGENTBANK_CONTAINER;
 TFuBag.BAGMAX = 11;
 TFuBag.MAX_REAGENTBANK_ITEMS = 98 -- has to be a constant since game can't tell us in time
-TFuBag.Inv_Bags = { BACKPACK_CONTAINER, 4, 3, 2, 1 };
+-- Reagent bag (Enum.BagIndex.ReagentBag = 5, added 10.0) appended last so the
+-- existing bag layout order is unchanged; GetContainerNumSlots(5) is 0 when no
+-- reagent bag is equipped, so the section degrades to empty/hidden cleanly.
+TFuBag.Inv_Bags = { BACKPACK_CONTAINER, 4, 3, 2, 1, 5 };
 
 TFuBag.Bnk_Bags = { BANK_CONTAINER, REAGENTBANK_CONTAINER, 5, 6, 7, 8, 9, 10, 11 };
 TFuBag.Body_Slots = {
@@ -1488,7 +1491,11 @@ function TFuBag:GetBagDispName(bag)
   if (bag == 2) then return L["Third Bag"]; end
   if (bag == 3) then return L["Second Bag"]; end
   if (bag == 4) then return L["First Bag"]; end
-  if (bag == 5) then return L["First Bank Bag"]; end
+  -- Bag 5 is the live reagent bag (Enum.BagIndex.ReagentBag). The old bank model
+  -- also numbered its first bank bag 5, but the bank module is gated off pending
+  -- a C_Bank rewrite (which uses CharacterBankTab_* ids, not 5), so labeling 5 as
+  -- the reagent bag is correct for current behavior. Revisit in the bank rewrite.
+  if (bag == 5) then return L["Reagent Bag"]; end
   if (bag == 6) then return L["Second Bank Bag"]; end
   if (bag == 7) then return L["Third Bank Bag"]; end
   if (bag == 8) then return L["Fourth Bank Bag"]; end
@@ -1507,7 +1514,9 @@ function TFuBag:GetBagPosName(bag)
   if (bag == 2) then return L["BAG2"]; end
   if (bag == 3) then return L["BAG3"]; end
   if (bag == 4) then return L["BAG4"]; end
-  if (bag == 5) then return L["BBAG1"]; end
+  -- Bag 5 = reagent bag (live). See GetBagDispName for the bank-bag-1 collision
+  -- note; RBAG keeps the reagent bag's empty-slot category distinct.
+  if (bag == 5) then return L["RBAG"]; end
   if (bag == 6) then return L["BBAG2"]; end
   if (bag == 7) then return L["BBAG3"]; end
   if (bag == 8) then return L["BBAG4"]; end
@@ -2022,38 +2031,20 @@ end
 
 function TFuBag:UpdateButtonHighlights()
   local isopen = {};
-  local r = {};
-  local g = {};
-  local b = {};
-  local a = {};
   local bag, buttonname, itm;
   local texture;
-  local cfg;
 
-  -- First check all the bag open states, and highlight their colors
+  -- Record each bag's physical open state (used below to auto-show highlights
+  -- for bags that are open). The highlight COLOR is resolved per-button from the
+  -- bag's owning window cfg (GetCfgFromBag), not a shared bag-indexed table: bag 5
+  -- (the reagent bag) is a member of BOTH Inv_Bags and Bnk_Bags, so a single
+  -- bag->color table would let the bank's bag_5 color clobber the inventory's
+  -- (and vice versa), painting the wrong highlight color.
   for _, bag in ipairs(TFuBag.Inv_Bags) do
     isopen[bag] = IsBagOpen(bag);
-    r[bag], g[bag], b[bag], a[bag] = self:GetColor(TFuInvFrame.cfg, "bag_"..bag);
-
---    texture = self:GetBagFrameHighlight(bag);
---    texture:SetVertexColor(r[bag], g[bag], b[bag], a[bag]);
---    if (isopen[bag]) then
---      texture:Show();
---    else
---      texture:Hide();
---    end
   end
   for _, bag in ipairs(TFuBag.Bnk_Bags) do
     isopen[bag] = IsBagOpen(bag);
-    r[bag], g[bag], b[bag], a[bag] = self:GetColor(TFuBnkFrame.cfg, "bag_"..bag);
-
---    texture = self:GetBagFrameHighlight(bag);
---    texture:SetVertexColor(r[bag], g[bag], b[bag], a[bag]);
---    if (isopen[bag]) then
---      texture:Show();
---    else
---      texture:Hide();
---    end
   end
 
   -- Then cycle through all the buttons
@@ -2061,8 +2052,9 @@ function TFuBag:UpdateButtonHighlights()
     texture = _G[buttonname.."HighlightFrameTexture"];
     if (texture) and (itm) and next(itm) then
       bag = itm[self.I_BAG];
-      texture:SetVertexColor(r[bag], g[bag], b[bag], a[bag]);
       local cfg = self:GetCfgFromBag(bag);
+      local cr, cg, cb, ca = self:GetColor(cfg, "bag_"..bag);
+      texture:SetVertexColor(cr, cg, cb, ca);
 
       if (self:GetBagFrame(bag):GetChecked() or isopen[bag]) and (cfg)
         and (cfg["spotlight_open"] == 1) then

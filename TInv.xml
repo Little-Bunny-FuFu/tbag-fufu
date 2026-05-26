@@ -192,11 +192,20 @@
         </Anchors>
     </EditBox>
 
-      <CheckButton name="TFuInvacterBag3Slot" inherits="TFuBag_BagButtonTemplate" id="4">
+      <CheckButton name="TFuInvacterBag4Slot" inherits="TFuBag_BagButtonTemplate" id="5">
         <Anchors>
           <Anchor point="BOTTOMLEFT" relativeTo="$parent_Total" relativePoint="BOTTOMRIGHT">
             <Offset>
               <AbsDimension x="3" y="-1" />
+            </Offset>
+          </Anchor>
+        </Anchors>
+      </CheckButton>
+      <CheckButton name="TFuInvacterBag3Slot" inherits="TFuBag_BagButtonTemplate" id="4">
+        <Anchors>
+          <Anchor point="BOTTOMLEFT" relativeTo="TFuInvacterBag4Slot" relativePoint="BOTTOMRIGHT">
+            <Offset>
+              <AbsDimension x="3" y="0" />
             </Offset>
           </Anchor>
         </Anchors>
@@ -266,6 +275,7 @@
   <Frame name="TFuInvainerFrame2" inherits="TFuBagainerFrameTemplate" id="2"/>
   <Frame name="TFuInvainerFrame3" inherits="TFuBagainerFrameTemplate" id="3"/>
   <Frame name="TFuInvainerFrame4" inherits="TFuBagainerFrameTemplate" id="4"/>
+  <Frame name="TFuInvainerFrame5" inherits="TFuBagainerFrameTemplate" id="5"/>
 
       <Frame name="$parent_RightClickMenu" inherits="UIDropDownMenuTemplate" id="5" hidden="true">
         <Scripts>
