@@ -120,7 +120,7 @@
             TFuInvFrame.Button_ChangeEditMode_OnClick(self, button, down);
           </OnClick>
           <OnEnter>
-            TFuBag.NewbieTip(self, TFuBag.LOCALE["Toggle Edit Mode"], 1.0, 1.0, 1.0, TFuBag.LOCALE["Select this option to move classes of items into different 'bars' (the red numbers)."]);
+            TFuBag.NewbieTip(self, TFuBag.LOCALE["Manual Layout"], 1.0, 1.0, 1.0, TFuBag.LOCALE["Drag categories to arrange them freely. Off uses the automatic layout."]);
           </OnEnter>
           <OnLeave>
             GameTooltip:Hide();

@@ -296,13 +296,13 @@ function Inv.Button_HighlightToggle_OnClick(self)
   TFuInvFrame:UpdateWindow();
 end
 
+-- Repurposed as the Manual Layout toggle (freeform draggable categories
+-- replaces the old numbered-bar edit mode). Name kept to avoid churn in the XML
+-- and menu references.
 function Inv.Button_ChangeEditMode_OnClick()
   PlaySound(PlaySoundKitID and "igMainMenuOptioncheckBoxOn" or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
-  if (TFuInvFrame.edit_mode == 0) then
-    TFuInvFrame.edit_mode = 1;
-  else
-    TFuInvFrame.edit_mode = 0;
-  end
+  local cfg = TFuInvFrame.cfg;
+  cfg["manual_layout"] = (cfg["manual_layout"] == 1) and 0 or 1;
   -- resort will force a window redraw
   TFuInvFrame:UpdateWindow(TFuBag.REQ_MUST);
 end
@@ -972,11 +972,11 @@ function Inv.RightClickMenu_populate(self, level)
       UIDropDownMenu_AddButton(info, level);
 
       info = {
-        ["text"] = L["Edit Mode"],
+        ["text"] = L["Manual Layout"],
         ["value"] = nil,
         ["func"] = TFuInvFrame.Button_ChangeEditMode_OnClick
         };
-      if (TFuInvFrame.edit_mode == 1) then
+      if (TFuInvFrame.cfg["manual_layout"] == 1) then
         info["checked"] = 1;
       end
       UIDropDownMenu_AddButton(info, level);
@@ -1417,6 +1417,25 @@ function Inv:UpdateWindow(resort_req)
     else
       TFuInvFrame_ColumnsAdd:Hide();
       TFuInvFrame_ColumnsDel:Hide();
+    end
+
+    -- Manual Layout toggle button shows a green glow around it when on.
+    local mlbtn = TFuInv_Button_ChangeEditMode;
+    if (not mlbtn.MLGlow) then
+      mlbtn.MLGlow = mlbtn:CreateTexture(nil, "OVERLAY");
+      mlbtn.MLGlow:SetTexture("Interface\\Buttons\\UI-ActionButton-Border");
+      mlbtn.MLGlow:SetBlendMode("ADD");
+      mlbtn.MLGlow:SetVertexColor(0, 1, 0);  -- green
+      mlbtn.MLGlow:SetPoint("CENTER", mlbtn, "CENTER", 0, 0);
+      local w, h = mlbtn:GetSize();
+      mlbtn.MLGlow:SetSize((w or 20) * 1.7, (h or 20) * 1.7);
+    end
+    if (self.cfg["manual_layout"] == 1) then
+      mlbtn.MLGlow:Show();
+      mlbtn:SetAlpha(1.0);
+    else
+      mlbtn.MLGlow:Hide();
+      mlbtn:SetAlpha(0.4);  -- faded when off
     end
 
   self:SetButton_Anchors();

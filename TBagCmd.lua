@@ -123,6 +123,12 @@ function TFuInv_cmd(msg)
     TFuBag:DeleteCachedCharacter(char,realm);
   elseif (cmd == L["config"]) then
     TFuInv_OptsFrame:Show();
+  elseif (cmd == "reseed") then
+    -- TEMP (Stage 1a): clear the saved freeform layout so it re-snapshots from
+    -- the current auto-flow on the next enable.
+    TFuInvFrame.cfg.cat_layout = {};
+    TFuBag:Print("TFuInv: Manual Layout reset; will re-snapshot from the default layout.");
+    TFuInvFrame:UpdateWindow(TFuBag.REQ_MUST);
   elseif (cmd == L["getcat"] and TFuBag.GetCategory and type(TFuBag.GetCategory) == "function") then
     TFuBag:GetCategory(params);
   elseif (cmd == L["tests"] and TFuBag.RunTests and type(TFuBag.RunTests) == "function") then

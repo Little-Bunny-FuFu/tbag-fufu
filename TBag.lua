@@ -1258,6 +1258,16 @@ function TFuBag:InitDefVals(cfg, bagarr, row1offset, reset)
   self:SetDef(cfg, "spotlight_hover", 1, reset, self.NumFunc, 0, 1);
   self:SetDef(cfg, "show_rarity_color", 1, reset, self.NumFunc, 0, 1);
   self:SetDef(cfg, "show_cat_names", 0, reset, self.NumFunc, 0, 1);
+  self:SetDef(cfg, "manual_layout", 0, reset, self.NumFunc, 0, 1);
+  -- Manual Layout: per-category placement records (drag-positioned containers).
+  -- Keyed by bar index: cat_layout[barnum] = { gx, gy, cols, grow }. Stored as
+  -- GRID COORDS (cells, not pixels) so placements scale with button size and
+  -- window scale. This cfg is per-window (Inv vs Bnk each get their own), so
+  -- placements are independent per window. Preserved across loads; wiped only
+  -- on a full defaults reset.
+  if (cfg["cat_layout"] == nil or reset == 1) then
+    cfg["cat_layout"] = {};
+  end
 
   self:SetDef(cfg, "stack_auto", 1, reset, self.NumFunc, 0, 1);
   self:SetDef(cfg, "stack_resort", 1, reset, self.NumFunc, 0, 1);
@@ -3130,6 +3140,268 @@ end
 -- fx = Tqqq_FrameX
 -- sx = Tqqq_SpaceX
 
+-- Manual Layout seed: give any item-bearing bar that has no cat_layout record
+-- yet a stable freeform position (grid coords gx,gy + width cols). The bulk
+-- first-enable case lays categories out in reading order on a clean packed grid
+-- mirroring the auto-flow rows; a lone new category appearing later is appended
+-- below the already-occupied area. Coords are in CELLS (one item button each),
+-- so placements scale with button size / window scale.
+function TFuBag:SeedCatLayout(frame, calc_dat)
+  local cfg = frame.cfg;
+  local baritm = frame.BARITM;
+  local bar_x = cfg.bar_x;
+  local cat_layout = cfg.cat_layout;
+  local colmax = cfg["maxColumns"];
+
+  -- Where does already-placed content end (so new categories append below)?
+  local any_placed = false;
+  local max_row = 0;
+  for bn = 1, self.BAR_MAX do
+    local rec = cat_layout[bn];
+    if (rec) then
+      any_placed = true;
+      local n = table.getn(baritm[bn]);
+      local cols = rec.cols or 1; if (cols < 1) then cols = 1; end
+      local rows = math.ceil((n > 0 and n or 1) / cols);
+      if ((rec.gy or 0) + rows > max_row) then max_row = (rec.gy or 0) + rows; end
+    end
+  end
+
+  local gx, gy = 0, (any_placed and max_row or 0);
+  for barnum = 1, self.BAR_MAX, bar_x do
+    local nbars = math.min(bar_x, self.BAR_MAX - barnum + 1);
+    self:CalcBarLayout(calc_dat, baritm, barnum, nbars, colmax, 0);
+    if (calc_dat["height"] and calc_dat["height"] > 0) then
+      local row_h = 0;
+      local placed_in_row = false;
+      for iBar = 0, nbars - 1 do
+        local bn = barnum + iBar;
+        local n = table.getn(baritm[bn]);
+        if (n > 0 and not cat_layout[bn]) then
+          local cols = calc_dat[iBar.."_width"];
+          if (not cols or cols < 1) then cols = 1; end
+          local rows = math.ceil(n / cols);
+          if (gx + cols > colmax) then gx = 0; gy = gy + row_h; row_h = 0; end
+          cat_layout[bn] = { gx = gx, gy = gy, cols = cols };
+          gx = gx + cols;
+          if (rows > row_h) then row_h = rows; end
+          placed_in_row = true;
+        end
+      end
+      if (placed_in_row) then gx = 0; gy = gy + row_h; end
+    end
+  end
+end
+
+-- Manual Layout first-enable snapshot: the normal auto-flow has just positioned
+-- every category box, so read each box's rendered geometry back and convert it
+-- to grid coords. This makes turning Manual Layout on the first time reproduce
+-- the current (ML-off) layout instead of re-packing it. Rows are detected by
+-- shared bottom edge (the auto-flow bottom-anchors each row) and gy is the
+-- cumulative content-row height above, so the per-row label gap (band gap in
+-- LayoutWindowFree) is reserved cleanly rather than baked into pixel positions.
+function TFuBag:SnapshotCatLayout(frame)
+  local framename = frame:GetName();
+  local cfg = frame.cfg;
+  local baritm = frame.BARITM;
+  local cat_layout = cfg.cat_layout;
+  local pitchX = frame.BF_PADWIDTH + cfg.frameXSpace;
+  local pitchY = frame.BF_PADHEIGHT + cfg.frameYSpace;
+
+  local boxes = {};
+  local minLeft;
+  for bn = 1, self.BAR_MAX do
+    local bf = _G[framename.."_bar_"..bn];
+    if (bf and bf:IsShown() and table.getn(baritm[bn]) > 0) then
+      local l, b, w, h = bf:GetLeft(), bf:GetBottom(), bf:GetWidth(), bf:GetHeight();
+      if (l and b and w and h) then
+        local cols = math.floor((w - cfg.frameXSpace) / pitchX + 0.5);
+        if (cols < 1) then cols = 1; end
+        local rows = math.floor((h - cfg.frameYSpace) / pitchY + 0.5);
+        if (rows < 1) then rows = 1; end
+        table.insert(boxes, { bn = bn, l = l, b = b, cols = cols, rows = rows });
+        if (not minLeft or l < minLeft) then minLeft = l; end
+      end
+    end
+  end
+  if (not minLeft) then return; end
+
+  -- Group boxes into rows by shared bottom edge.
+  local rows_list = {};
+  for _, bx in ipairs(boxes) do
+    local row;
+    for _, r in ipairs(rows_list) do
+      if (math.abs(r.bottom - bx.b) < pitchY / 2) then row = r; break; end
+    end
+    if (not row) then
+      row = { bottom = bx.b, maxrows = 0, items = {} };
+      table.insert(rows_list, row);
+    end
+    table.insert(row.items, bx);
+    if (bx.rows > row.maxrows) then row.maxrows = bx.rows; end
+  end
+  -- Top row first (highest bottom).
+  table.sort(rows_list, function(a, b) return a.bottom > b.bottom; end);
+
+  local gy = 0;
+  for _, r in ipairs(rows_list) do
+    for _, bx in ipairs(r.items) do
+      local gx = math.floor((bx.l - minLeft) / pitchX + 0.5);
+      if (gx < 0) then gx = 0; end
+      -- Bottom-align within the row (like the auto-flow): a box shorter than the
+      -- row's tallest sits at the row's bottom, so its title drops below the
+      -- taller neighbour's title instead of colliding with it horizontally.
+      cat_layout[bx.bn] = { gx = gx, gy = gy + (r.maxrows - bx.rows), cols = bx.cols };
+    end
+    gy = gy + r.maxrows;
+  end
+end
+
+-- Manual Layout placement: draw each category box at its saved grid coords and
+-- auto-grow the window to fit. (Stage 1a: cols come from the seed/snapshot width,
+-- no drag and no per-category options yet.)
+function TFuBag:LayoutWindowFree(frame, PAD_TOP, PAD_BOTTOM, show_cat_names, CATNAME_H)
+  local framename = frame:GetName();
+  local cfg = frame.cfg;
+  local baritm = frame.BARITM;
+  local calc_dat = {};
+  local colmax = cfg["maxColumns"];
+
+  self:SeedCatLayout(frame, calc_dat);
+
+  local cat_layout = cfg.cat_layout;
+  local pitchX = frame.BF_PADWIDTH + cfg.frameXSpace;
+  local pitchY = frame.BF_PADHEIGHT + cfg.frameYSpace;
+  local label_gap = (show_cat_names and CATNAME_H or 0);
+
+  -- Rows are "bands" keyed by their shared BOTTOM cell (gy + rows); boxes that
+  -- bottom-align in the same row share a band even though their tops differ. A
+  -- category's name label sits ~CATNAME_H above its box, which would land on the
+  -- band above when bands are only one cell apart, so reserve label_gap of
+  -- headroom ABOVE each band: a box in the Nth band (0-based, top first) is
+  -- pushed down by N*label_gap. (Mirrors the auto-flow's per-row "+ CATNAME_H".)
+  local band_rank = {};
+  do
+    local bottoms, seen = {}, {};
+    for barnum = 1, self.BAR_MAX do
+      local rec = cat_layout[barnum];
+      local n = table.getn(baritm[barnum]);
+      if (rec and n > 0) then
+        local cols = rec.cols or 1;
+        if (cols < 1) then cols = 1; end
+        if (cols > colmax) then cols = colmax; end
+        local rows = math.ceil(n / cols);
+        if (rows < 1) then rows = 1; end
+        local bottom = (rec.gy or 0) + rows;
+        if (not seen[bottom]) then seen[bottom] = true; table.insert(bottoms, bottom); end
+      end
+    end
+    table.sort(bottoms);
+    for i = 1, table.getn(bottoms) do band_rank[bottoms[i]] = i - 1; end
+  end
+
+  -- Window content width is known up front from the rightmost occupied cell;
+  -- the name-label edge-justify (below) needs it to decide when a title would
+  -- run off a window border.
+  local max_col = 0;
+  for barnum = 1, self.BAR_MAX do
+    local rec = cat_layout[barnum];
+    if (rec and table.getn(baritm[barnum]) > 0) then
+      local cols = rec.cols or 1;
+      if (cols < 1) then cols = 1; end
+      if (cols > colmax) then cols = colmax; end
+      if ((rec.gx or 0) + cols > max_col) then max_col = (rec.gx or 0) + cols; end
+    end
+  end
+  if (max_col < 1) then max_col = 1; end
+  local window_width = frame:FrameX(max_col) + 2 * self.BORDER;
+
+  -- Headroom at the top for the topmost band's name labels.
+  local top_reserve = PAD_TOP + self.BORDER + label_gap;
+  local max_bottom = 0;
+
+  for barnum = 1, self.BAR_MAX do
+    local barname = framename.."_bar_"..barnum;
+    local bf = _G[barname];
+    local bb = _G[framename.."_BarButton_"..barnum];
+    if (bb) then bb:Hide(); end
+
+    local n = table.getn(baritm[barnum]);
+    local rec = cat_layout[barnum];
+    if (bf and n > 0 and rec) then
+      local cols = rec.cols or 1;
+      if (cols < 1) then cols = 1; end
+      if (cols > colmax) then cols = colmax; end
+      local rows = math.ceil(n / cols);
+      if (rows < 1) then rows = 1; end
+      local gx = rec.gx or 0; if (gx < 0) then gx = 0; end
+      local gy = rec.gy or 0; if (gy < 0) then gy = 0; end
+
+      local px = self.BORDER + gx * pitchX;
+      local py = top_reserve + gy * pitchY + (band_rank[gy + rows] or 0) * label_gap;
+
+      -- Anchor TOPLEFT-from-TOPLEFT so grid (0,0) is the top-left content cell.
+      self:PositionFrame(barname, "TOPLEFT", framename, "TOPLEFT",
+        px, 0 - py, frame:FrameX(cols), frame:FrameY(rows));
+
+      self:ColorFrame(cfg, bf, barnum);
+      TFuBag:AssignButtonsToFrame(frame, barnum, barname, cols, rows);
+      bf:Show();
+
+      -- Name label: center over the box when it fits the box columns; when it is
+      -- wider, justify toward the window interior at an edge (so it never runs
+      -- off-window), else center with symmetric overhang. (Same rule as the
+      -- auto-flow path, in window-left coordinates.)
+      local label = bf.CatName;
+      if (label) then
+        if (show_cat_names) then
+          label:SetWordWrap(false);
+          label:SetWidth(0);
+          label:SetText(self:GetBarCategoryName(baritm[barnum]));
+          label:ClearAllPoints();
+          local box_w = frame:FrameX(cols);
+          local title_w = label:GetStringWidth();
+          -- A button's edge sits this far in from the box edge (buttons are
+          -- centered in the box); justify titles to the items, not the box.
+          local edge_margin = frame:FrameX(0) + frame.BF_X_PAD;
+          if (title_w <= box_w) then
+            label:SetJustifyH("CENTER");
+            label:SetPoint("BOTTOM", bf, "TOP", 0, 1);
+          else
+            local box_center = px + box_w / 2;
+            if (box_center - title_w / 2 < self.BORDER) then
+              label:SetJustifyH("LEFT");
+              label:SetPoint("BOTTOMLEFT", bf, "TOPLEFT", edge_margin, 1);
+            elseif (box_center + title_w / 2 > window_width - self.BORDER) then
+              label:SetJustifyH("RIGHT");
+              label:SetPoint("BOTTOMRIGHT", bf, "TOPRIGHT", -edge_margin, 1);
+            else
+              label:SetJustifyH("CENTER");
+              label:SetPoint("BOTTOM", bf, "TOP", 0, 1);
+            end
+          end
+          label:Show();
+        else
+          label:Hide();
+        end
+      end
+
+      local box_bottom = py + frame:FrameY(rows);
+      if (box_bottom > max_bottom) then max_bottom = box_bottom; end
+    elseif (bf) then
+      bf:Hide();
+      local label = bf.CatName;
+      if (label) then label:Hide(); end
+    end
+  end
+
+  if (max_bottom < 1) then max_bottom = top_reserve + frame:FrameY(1); end
+
+  frame:SetWidth(window_width);
+  frame:SetHeight(max_bottom + PAD_BOTTOM + self.BORDER + frame:PoolY(1));
+  return frame:GetHeight();
+end
+
 function TFuBag:LayoutWindow(frame)
   local framename = frame:GetName()
   local cfg = frame.cfg
@@ -3221,6 +3493,23 @@ function TFuBag:LayoutWindow(frame)
         TFuBnk_Button_Close:IsVisible() or TFuBnk_Button_MoveLockToggle:IsVisible()) then
       PAD_TOP = self.PAD_TOP_NORM;
     end
+  end
+
+  -- Manual Layout: freeform, drag-placed category containers. When already
+  -- seeded, draw the categories at their saved grid coords and grow the window
+  -- to fit. On the very first enable (no saved layout) fall through and run the
+  -- normal auto-flow once below; the tail then snapshots those positions to the
+  -- grid and re-lays-out in freeform, so enabling looks identical to ML-off.
+  local ml_seed = false;
+  if (cfg.manual_layout == 1) then
+    local seeded = false;
+    for bn = 1, self.BAR_MAX do
+      if (cfg.cat_layout[bn]) then seeded = true; break; end
+    end
+    if (seeded) then
+      return self:LayoutWindowFree(frame, PAD_TOP, PAD_BOTTOM, show_cat_names, CATNAME_H);
+    end
+    ml_seed = true;
   end
 
   -- ITEM BUTTONS
@@ -3384,6 +3673,13 @@ function TFuBag:LayoutWindow(frame)
 
   frame:SetWidth( available_width );
   frame:SetHeight( new_height );
+
+  -- Manual Layout first enable: the auto-flow above has positioned every box, so
+  -- capture those positions as grid coords and re-lay-out in freeform.
+  if (ml_seed) then
+    self:SnapshotCatLayout(frame);
+    return self:LayoutWindowFree(frame, PAD_TOP, PAD_BOTTOM, show_cat_names, CATNAME_H);
+  end
 
   return cur_y;
 end
