@@ -264,6 +264,8 @@ function TFuBag:CreateCfgOpt(cfgopt, cfg, bagarr, updatefunc, resizefunc, forcef
     cfg, "spotlight_hover", updatefunc);
   self:MakeCheck(cfgopt, L["Show Item Rarity Color:"],
     cfg, "show_rarity_color", updatefunc);
+  self:MakeCheck(cfgopt, L["Show Category Names:"],
+    cfg, "show_cat_names", forcefunc);
 
   self:MakeCheck(cfgopt, L["Auto Stack:"],
     cfg, "stack_auto", updatefunc);

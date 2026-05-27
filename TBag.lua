@@ -1257,6 +1257,7 @@ function TFuBag:InitDefVals(cfg, bagarr, row1offset, reset)
   self:SetDef(cfg, "spotlight_open", 1, reset, self.NumFunc, 0, 1);
   self:SetDef(cfg, "spotlight_hover", 1, reset, self.NumFunc, 0, 1);
   self:SetDef(cfg, "show_rarity_color", 1, reset, self.NumFunc, 0, 1);
+  self:SetDef(cfg, "show_cat_names", 0, reset, self.NumFunc, 0, 1);
 
   self:SetDef(cfg, "stack_auto", 1, reset, self.NumFunc, 0, 1);
   self:SetDef(cfg, "stack_resort", 1, reset, self.NumFunc, 0, 1);
@@ -1480,6 +1481,107 @@ function TFuBag:BuildBarClassList(bclist, cfg)
   for bar = 1, self.BAR_MAX do
     table.sort(bclist[bar]);
   end
+end
+
+-- Builds (once) a DISPLAY-only label map: category identity -> condensed label.
+-- This is keyed on the real category string (itm[I_CAT]) and only affects what
+-- the "Show Category Names" header prints. It deliberately does NOT touch the
+-- category identities, so item->bar matching, keyword matching, and the within-
+-- bar sort (which groups same-type items, e.g. helms with helms) are unchanged.
+-- The slot-based families (equipped / soulbound / account-bound / carried armor)
+-- collapse to one label each for the header, while their per-slot identities are
+-- preserved so sorting still groups by slot.
+function TFuBag:BuildCatLabels()
+  if (self.CatLabel) then return self.CatLabel; end
+  local C = {};
+
+  -- Direct one-to-one condensed names.
+  local direct = {
+    CONSUMABLE = "Consumables", ACT_ON = "Quest Starter", ACT_OPEN = "Openable",
+    ACT_SELL = "Sellable", BAG = "Bags", GRAY_ITEMS = "Junk", QUEST = "Quest Items",
+    KEY_QUEST = "Keys", ENCHANTS = "Enchants", GLYPHS = "Glyphs", BOOK = "Books",
+    DESIGN = "Designs", FORMULA = "Formulas", RECIPE = "Recipes", PATTERN = "Patterns",
+    PLANS = "Plans", SCHEMATIC = "Schematics", RECIPE_OTHER = "Recipes",
+    BLUEPRINTS = "Blueprints", PVP = "PvP", REAGENT = "Reagents",
+    TRADE_GOODS = "Trade Goods", CLOTH = "Cloth", FOLLOWERS = "Followers",
+    MINIPET = "Companion Pets", COMBATPETS = "Combat Pets", COSTUMES = "Costumes",
+    FIREWORKS = "Fireworks", TOYS = "Toys", MOUNT = "Mounts", FOOD = "Food",
+    FOOD_BUFF = "Food Buffs", DRINK = "Drink", COMBO = "Refreshment", BUFF = "Buffs",
+    DUMMY = "Target Dummy", BANDAGE = "Bandages", HEALTH_RESTORE = "Health",
+    HEALTHSTONE = "Healthstone", MANA_RESTORE = "Mana", COMBO_RESTORE = "Health & Mana",
+    RAGE_RESTORE = "Rage", ENERGY_RESTORE = "Energy", CURE = "Cures",
+    EXPLOSIVES = "Explosives", HEARTH = "Hearthstone", MISC = "Miscellaneous",
+    ARTIFACTPOWER = "Artifact Power", ARTIFACTRELIC = "Artifact Relics",
+    UNKNOWN = "Unsorted",
+    TIMBERMAW = "Timbermaw Hold", CENARION_EXPEDITION = "Cenarion Expedition",
+    SPOREGGAR = "Sporeggar", ALDOR = "The Aldor", SCRYER = "The Scryers",
+    LOWER_CITY = "Lower City", AHN_QIRAJ = "Ahn'Qiraj", NETHERWING = "Netherwing",
+    BLACKWING_LAIR = "Blackwing Lair", DARKMOON_FAIRE = "Darkmoon Faire",
+    ["OGRI'LA"] = "Ogri'la", MOLTEN_CORE = "Molten Core", CONSORTIUM = "The Consortium",
+    HALAA = "Halaa",
+    ALCHEMY = "Alchemy", BLACKSMITHING = "Blacksmithing", ENCHANTING = "Enchanting",
+    ENGINEERING = "Engineering", JEWELCRAFTING = "Jewelcrafting",
+    LEATHERWORKING = "Leatherworking", MINING = "Mining", TAILORING = "Tailoring",
+    INSCRIPTION = "Inscription", FIRST_AID = "First Aid", COOKING = "Cooking",
+    FISHING = "Fishing", ARCHAEOLOGY = "Archaeology", RUNEFORGING = "Runeforging",
+    TRADE_TOOL = "Profession Tools",
+    RING = "Ring", TRINKET = "Trinket", WEAPON = "Weapon", OTHER = "Other",
+    DRUID = "Druid", WARLOCK = "Warlock", ROGUE = "Rogue", MAGE = "Mage",
+    PALADIN = "Paladin", PRIEST = "Priest", SHAMAN = "Shaman", WARRIOR = "Warrior",
+    HUNTER = "Hunter", DEATHKNIGHT = "Death Knight", MONK = "Monk",
+    DEMONHUNTER = "Demon Hunter", CLASS_REAGENT = "Class Reagents",
+  };
+  for k, v in pairs(direct) do
+    C[L[k]] = v;
+  end
+
+  -- Slot families: collapse the per-slot equipped/soulbound/account-bound
+  -- categories to a single header label each (identities stay per-slot).
+  local slots = { "01_HEAD","02_NECK","03_SHOULDER","04_BACK","05_CHEST","06_SHIRT",
+    "07_TABARD","08_WRIST","09_HANDS","10_WAIST","11_LEGS","12_FEET","13_OFFHAND",
+    "RING","TRINKET","ARMOR","WEAPON","OTHER" };
+  for _, s in ipairs(slots) do
+    C[string.format(L["EQUIPPED_%s"], L[s])]     = "Equipped";
+    C[string.format(L["SOULBOUND_%s"], L[s])]    = "Soulbound";
+    C[string.format(L["ACCOUNTBOUND_%s"], L[s])] = "Account-Bound";
+  end
+
+  -- Carried (un-equipped) armor pieces collapse to "Armor" for the header; their
+  -- per-slot identities remain, so the within-bar sort still groups by slot.
+  local armorslots = { "01_HEAD","02_NECK","03_SHOULDER","04_BACK","05_CHEST",
+    "06_SHIRT","07_TABARD","08_WRIST","09_HANDS","10_WAIST","11_LEGS","12_FEET",
+    "13_OFFHAND","ARMOR" };
+  for _, s in ipairs(armorslots) do
+    C[L[s]] = "Armor";
+  end
+
+  self.CatLabel = C;
+  return C;
+end
+
+-- Returns the displayed name for a bar: the distinct condensed labels of the
+-- items actually present in it. Items are already sorted by their (per-slot)
+-- category, so the collapsed labels appear grouped. Used by "Show Category Names".
+function TFuBag:GetBarCategoryName(baritmbar)
+  local labels = self:BuildCatLabels();
+  local seen = {};
+  local names = {};
+  for _, itm in ipairs(baritmbar) do
+    local cat;
+    -- Empty slots carry an internal "EMPTY_<pos>_SLOTS" category; collapse all of
+    -- those into a single clean "Empty" label instead of the raw token.
+    if (not itm[self.I_ITEMLINK] or itm[self.I_ITEMLINK] == "") then
+      cat = L["Empty"];
+    else
+      cat = itm[self.I_CAT];
+      cat = labels[cat] or cat;
+    end
+    if (cat and cat ~= "" and not seen[cat]) then
+      seen[cat] = true;
+      table.insert(names, cat);
+    end
+  end
+  return table.concat(names, " / ");
 end
 
 -- Used for options strings
@@ -2961,8 +3063,12 @@ function TFuBag:AssignButtonsToFrame(mainFrame, barnum, frame, width, height)
   for position, itm in pairs(mainFrame.BARITM[barnum]) do
     local buttonname = TFuBag:GetBagItemButtonName(itm[TFuBag.I_BAG], itm[TFuBag.I_SLOT])
 
+    -- -BF_X_PAD (instead of +) centers the button cluster in the box: the frame
+    -- is 2*BF_X_PAD wider than the buttons need, so this splits that slack evenly
+    -- left/right (a slight edge on both sides) rather than leaving the rightmost
+    -- button flush against the box edge.
     self:PositionFrame(buttonname, "BOTTOMRIGHT", frame, "BOTTOMRIGHT",
-      0-mainFrame:FrameX(cur_x)+mainFrame.BF_X_PAD,
+      0-mainFrame:FrameX(cur_x)-mainFrame.BF_X_PAD,
       mainFrame:FrameY(cur_y)+mainFrame.BF_Y_PAD,
       mainFrame.BF_WIDTH, mainFrame.BF_HEIGHT)
 
@@ -2993,7 +3099,7 @@ function TFuBag:AssignButtonsToFrame(mainFrame, barnum, frame, width, height)
     local buttonname = mainFrame:GetName().."_BarButton_"..barnum
 
     self:PositionFrame(buttonname, "BOTTOMRIGHT", frame, "BOTTOMRIGHT",
-      0-mainFrame:FrameX(width-1)+mainFrame.BF_X_PAD,
+      0-mainFrame:FrameX(width-1)-mainFrame.BF_X_PAD,
       mainFrame:FrameY(height-1)+mainFrame.BF_Y_PAD,
       mainFrame.BF_WIDTH, mainFrame.BF_HEIGHT)
 
@@ -3034,6 +3140,11 @@ function TFuBag:LayoutWindow(frame)
   -- Category Spacing: extra hard gap between adjacent category bars (both axes),
   -- on top of the existing Space/Pool budgets. Default 0 leaves layout unchanged.
   local cat_spacing = cfg.cat_spacing or 0
+  -- Category Names: when on, each drawn bar shows its category name in a label
+  -- above it. We reserve CATNAME_H of vertical room per bar (in the inter-row gap
+  -- and the window top) so the labels never overlap the bar above.
+  local show_cat_names = (cfg.show_cat_names == 1)
+  local CATNAME_H = 14
   local PAD_BOTTOM = 0;
   local PAD_TOP = 0;
   local calc_dat = {}
@@ -3142,8 +3253,9 @@ function TFuBag:LayoutWindow(frame)
     else
       -- Category Spacing: hard vertical gap above this row, but only between
       -- drawn rows (no leading gap before the first, none after empty rows).
+      -- This gap also holds the name label of the row below it (CATNAME_H).
       if (drew_row) then
-        cur_y = cur_y + cat_spacing;
+        cur_y = cur_y + cat_spacing + (show_cat_names and CATNAME_H or 0);
       end
       local cur_x = frame:PoolX(1) + (self.BORDER);
       local cur_width = 0;
@@ -3166,12 +3278,30 @@ function TFuBag:LayoutWindow(frame)
             cur_width = math.floor(iBar * width_in_between / (bar_x - 1));
           end
 
+          -- Distance from this bar's RIGHT edge in to the window's right border,
+          -- captured now because cur_x is incremented below before the category
+          -- name label (which needs it to decide if its text fits to the right).
+          local bar_right_inset = cur_x + cur_width;
+
+          -- Wrap this category's coloured box to its OWN occupied rows instead of
+          -- the row's shared (tallest) height, so a sparse category (e.g. a single
+          -- item next to a big one) gets a small box hugging its items rather than
+          -- a tall box with the item stranded at the bottom. The box is anchored
+          -- BOTTOMRIGHT, so a shorter height just brings its top (and its title)
+          -- down to the items. Edit mode keeps the shared height: it places a bar
+          -- button on the shared-height top row, which a shrunk box would clip.
+          local bar_w = calc_dat[iBar.."_width"];
+          if (bar_w < 1) then bar_w = 1; end
+          local bar_rows = math.ceil(calc_dat[iBar] / bar_w);
+          if (bar_rows < 1) then bar_rows = 1; end
+          local bar_h = (edit_mode == 1) and calc_dat["height"] or bar_rows;
+
           self:PositionFrame(framename.."_bar_"..(barnum+iBar),
             "BOTTOMRIGHT", framename, "BOTTOMRIGHT",
             0-cur_x-cur_width,
             cur_y,
             frame:FrameX(calc_dat[iBar.."_width"]),
-            frame:FrameY(calc_dat["height"]));
+            frame:FrameY(bar_h));
 
           -- Category Spacing: hard horizontal gap between adjacent category bars.
           cur_x = cur_x + frame:FrameX(calc_dat[iBar.."_width"]) + cat_spacing;
@@ -3182,6 +3312,54 @@ function TFuBag:LayoutWindow(frame)
           TFuBag:AssignButtonsToFrame(frame,(barnum+iBar), framename.."_bar_"..(barnum+iBar),
             calc_dat[iBar.."_width"], calc_dat["height"] );
             barframe[iBar]:Show();
+
+          -- Category name label, in the reserved gap above the box. Buttons are
+          -- centered in the box, so the box's top-center is also the items'
+          -- center. Alignment rule:
+          --   * title fits within the box columns        -> center over the box
+          --   * wider than the box, at the RIGHT edge     -> right-justify (right
+          --     edge over the items, text extends left, stays on-window)
+          --   * wider than the box, at the LEFT edge      -> left-justify (mirror)
+          --   * wider than the box, interior              -> center, overhanging
+          --     into the empty gap on both sides
+          -- "At an edge" = a centered title would cross that window border.
+          -- Insets are from the window's right border (the box anchors
+          -- BOTTOMRIGHT). GetStringWidth is valid right after SetText.
+          local label = barframe[iBar].CatName;
+          if (label) then
+            if (show_cat_names) then
+              label:SetWordWrap(false);
+              label:SetWidth(0);   -- auto-size to full text (no truncation)
+              label:SetText(self:GetBarCategoryName(baritm[barnum+iBar]));
+              label:ClearAllPoints();
+              local box_w = frame:FrameX(calc_dat[iBar.."_width"]);
+              local title_w = label:GetStringWidth();
+              -- A button's edge sits this far in from the box edge (buttons are
+              -- centered in the box); justify titles to the items, not the box.
+              local edge_margin = frame:FrameX(0) + frame.BF_X_PAD;
+              if (title_w <= box_w) then
+                label:SetJustifyH("CENTER");
+                label:SetPoint("BOTTOM", barframe[iBar], "TOP", 0, 1);
+              else
+                local box_center = bar_right_inset + box_w/2;
+                if (box_center - title_w/2 < self.BORDER) then
+                  label:SetJustifyH("RIGHT");
+                  label:SetPoint("BOTTOMRIGHT", barframe[iBar], "TOPRIGHT",
+                    -edge_margin, 1);
+                elseif (box_center + title_w/2 > available_width - self.BORDER) then
+                  label:SetJustifyH("LEFT");
+                  label:SetPoint("BOTTOMLEFT", barframe[iBar], "TOPLEFT",
+                    edge_margin, 1);
+                else
+                  label:SetJustifyH("CENTER");
+                  label:SetPoint("BOTTOM", barframe[iBar], "TOP", 0, 1);
+                end
+              end
+              label:Show();
+            else
+              label:Hide();
+            end
+          end
         else
           barframe[iBar]:Hide();
         end
@@ -3197,6 +3375,12 @@ function TFuBag:LayoutWindow(frame)
 
   local new_height;
   new_height = cur_y + PAD_TOP + frame:SpaceY(1) + frame:PoolY(1) + self.BORDER;
+
+  -- Headroom for the topmost row's category name label (the inter-row gaps cover
+  -- all the lower rows' labels; the top row's label sits above everything).
+  if (show_cat_names and drew_row) then
+    new_height = new_height + CATNAME_H;
+  end
 
   frame:SetWidth( available_width );
   frame:SetHeight( new_height );

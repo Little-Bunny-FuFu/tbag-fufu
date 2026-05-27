@@ -31,6 +31,21 @@
       </Anchor>
     </Anchors>
 
+    <!-- Category name label, shown above the bar when "Show Category Names" is on.
+         Anchored bottom-left to the bar's top-left so it sits in the reserved gap
+         above the bar (LayoutWindow sets its text/width and reserves the room). -->
+    <Layers>
+      <Layer level="OVERLAY">
+        <FontString parentKey="CatName" inherits="GameFontNormalSmall" justifyH="LEFT" hidden="true">
+          <Anchors>
+            <Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT">
+              <Offset><AbsDimension x="2" y="1"/></Offset>
+            </Anchor>
+          </Anchors>
+        </FontString>
+      </Layer>
+    </Layers>
+
     <!-- Inline <Backdrop> was removed from XML in 9.0; set it via the 12.0
          BackdropTemplate mixin instead. inherit="append" keeps the template's
          own OnLoad (mixin setup) running first. -->

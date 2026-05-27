@@ -212,6 +212,7 @@ L["MISC"] = true
 L["ARTIFACTPOWER"] = true
 L["ARTIFACTRELIC"] = true
 L["UNKNOWN"] = true
+L["Empty"] = true
 
 -- Faction and Collectable Categories.
 L["TIMBERMAW"] = true
@@ -567,6 +568,7 @@ L["Show Bag Icons on Empty Slots:"] = true
 L["Spotlight Open or Selected Bags:"] = true
 L["Spotlight Mouseover:"] = true
 L["Show Item Rarity Color:"] = true
+L["Show Category Names:"] = true
 L["Auto Stack:"] = true
 L["Stack on Re-sort:"] = true
 L["Profession Bags precede Sorting:"] = true
