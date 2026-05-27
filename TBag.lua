@@ -1258,15 +1258,28 @@ function TFuBag:InitDefVals(cfg, bagarr, row1offset, reset)
   self:SetDef(cfg, "spotlight_hover", 1, reset, self.NumFunc, 0, 1);
   self:SetDef(cfg, "show_rarity_color", 1, reset, self.NumFunc, 0, 1);
   self:SetDef(cfg, "show_cat_names", 0, reset, self.NumFunc, 0, 1);
+  -- Reagent split: off = generic Reagent/Trade Goods bars (Baganator-style);
+  -- on = original TBag per-profession reagent/trade-good split (the "psplit"
+  -- rules in DefaultSearchList, gated in PickBar).
+  self:SetDef(cfg, "reagent_split", 0, reset, self.NumFunc, 0, 1);
   self:SetDef(cfg, "manual_layout", 0, reset, self.NumFunc, 0, 1);
-  -- Manual Layout: per-category placement records (drag-positioned containers).
-  -- Keyed by bar index: cat_layout[barnum] = { gx, gy, cols, grow }. Stored as
-  -- GRID COORDS (cells, not pixels) so placements scale with button size and
-  -- window scale. This cfg is per-window (Inv vs Bnk each get their own), so
-  -- placements are independent per window. Preserved across loads; wiped only
+  -- Manual Layout placement mode: 0 = grid (snap to button cells, bottom-aligned
+  -- rows), 1 = free placement (drag anywhere, snap/dock by the spacing settings,
+  -- per-box titles). Each mode keeps its OWN saved positions (cat_layout vs
+  -- cat_layout_free) so toggling between them doesn't clobber either arrangement.
+  self:SetDef(cfg, "ml_freeplace", 0, reset, self.NumFunc, 0, 1);
+  -- GRID positions. Keyed by bar index: cat_layout[barnum] = { gx, gy, cols }.
+  -- Integer GRID COORDS (cells) so placements scale with button size/window scale.
+  -- Per-window (Inv vs Bnk each get their own). Preserved across loads; wiped only
   -- on a full defaults reset.
   if (cfg["cat_layout"] == nil or reset == 1) then
     cfg["cat_layout"] = {};
+  end
+  -- FREE-PLACEMENT positions: cat_layout_free[barnum] = { fx, fy, cols }. fx/fy are
+  -- FRACTIONAL cell coords (pixels / button size) so they rescale too, but are not
+  -- snapped to whole cells. Same per-window / preserve / reset rules.
+  if (cfg["cat_layout_free"] == nil or reset == 1) then
+    cfg["cat_layout_free"] = {};
   end
 
   self:SetDef(cfg, "stack_auto", 1, reset, self.NumFunc, 0, 1);
@@ -2864,7 +2877,9 @@ function TFuBag:PickBar(cfg, playerid, itm, trade1, trade2)
   if (itm[self.I_CAT] == nil) then
     for i = 1, table.getn(cfg["item_search_list"]) do
       local value = cfg["item_search_list"][i];
-      if (value[1] ~= "") then
+      -- "psplit" rules are the optional per-profession reagent/trade-good split;
+      -- skip them unless reagent_split is enabled (see DefaultSearchList).
+      if (value[1] ~= "" and not (value[6] == "psplit" and cfg["reagent_split"] ~= 1)) then
         local found = 1;
 
         -- value[1] == category to place it in
@@ -3200,13 +3215,30 @@ end
 -- shared bottom edge (the auto-flow bottom-anchors each row) and gy is the
 -- cumulative content-row height above, so the per-row label gap (band gap in
 -- LayoutWindowFree) is reserved cleanly rather than baked into pixel positions.
+-- Manual Layout grid metrics. The grid is TIGHT: pitchX/pitchY are exactly one
+-- item-button cell, the same unit FrameX/FrameY use to size a box, so a box's
+-- grid footprint (in cells) equals its rendered size -- collision and drops line
+-- up with what's drawn. Horizontal category spacing is NOT folded into the pitch:
+-- the first-enable snapshot already captures ML-off's between-box spacing in the
+-- grid coords (a box further right gets a larger gx), and a per-cell gap both
+-- balloons the window vs ML-off and inflates the collision rect past the visual
+-- box (rejecting valid drops). Vertical category spacing is added once PER ROW
+-- BAND in LayoutWindowFree (never per cell). Returns pitchX, pitchY, cellX (cellX
+-- == pitchX; returned for call-site clarity). Shared by SnapshotCatLayout,
+-- LayoutWindowFree, and MLDragStop so they stay on one grid.
+function TFuBag:MLGridPitch(frame)
+  local cfg = frame.cfg;
+  local cellX = frame.BF_PADWIDTH + cfg.frameXSpace;
+  local cellY = frame.BF_PADHEIGHT + cfg.frameYSpace;
+  return cellX, cellY, cellX;
+end
+
 function TFuBag:SnapshotCatLayout(frame)
   local framename = frame:GetName();
   local cfg = frame.cfg;
   local baritm = frame.BARITM;
   local cat_layout = cfg.cat_layout;
-  local pitchX = frame.BF_PADWIDTH + cfg.frameXSpace;
-  local pitchY = frame.BF_PADHEIGHT + cfg.frameYSpace;
+  local pitchX, pitchY, cellX = self:MLGridPitch(frame);
 
   local boxes = {};
   local minLeft;
@@ -3215,7 +3247,9 @@ function TFuBag:SnapshotCatLayout(frame)
     if (bf and bf:IsShown() and table.getn(baritm[bn]) > 0) then
       local l, b, w, h = bf:GetLeft(), bf:GetBottom(), bf:GetWidth(), bf:GetHeight();
       if (l and b and w and h) then
-        local cols = math.floor((w - cfg.frameXSpace) / pitchX + 0.5);
+        -- column count comes from the rendered width via the CELL pitch; the grid
+        -- column (gx, below) uses the gap-aware pitchX.
+        local cols = math.floor((w - cfg.frameXSpace) / cellX + 0.5);
         if (cols < 1) then cols = 1; end
         local rows = math.floor((h - cfg.frameYSpace) / pitchY + 0.5);
         if (rows < 1) then rows = 1; end
@@ -3257,9 +3291,513 @@ function TFuBag:SnapshotCatLayout(frame)
   end
 end
 
+-- ===== Manual Layout: drag-to-reposition (Stage 2) =====
+-- A category box (the _bar_N frame) is draggable in Manual Layout mode. The grab
+-- region is the box's own background -- mouse is enabled on the bar frame, so a
+-- click on the colored backdrop around/between item buttons starts a drag, while
+-- the item buttons sit on top and keep their own clicks -- plus, when category
+-- names are shown, a transparent handle over the name label above the box (the
+-- label is a FontString and can't take mouse itself).
+--
+-- We do NOT move the box itself: the item buttons are only anchored to it (not
+-- children), so StartMoving the box made them trail a frame behind and slide under
+-- the cursor, where the release would pick up an item. Instead a translucent
+-- "ghost" rectangle (one per window, mouse-transparent) follows the cursor; the
+-- box and items stay put. On drop we convert the ghost's movement to a whole-cell
+-- grid delta, add it to the saved gx,gy, and re-layout (which re-snaps onto the
+-- grid and re-applies per-band label headroom). Measuring the delta -- not the
+-- absolute drop position -- keeps the snap immune to band-gap offsets baked into
+-- on-screen y. A drop that would overlap another category is reverted.
+TFuBag.MLDrag = TFuBag.MLDrag or { active = false };
+
+-- The grid footprint [gx, gx+cols) x [gy, gy+rows) a category occupies, given a
+-- candidate top-left (gx,gy). cols/rows mirror the layout's own clamping.
+function TFuBag:MLCatFootprint(frame, barnum, gx, gy)
+  local cfg = frame.cfg;
+  local rec = cfg.cat_layout[barnum];
+  local n = table.getn(frame.BARITM[barnum]);
+  local colmax = cfg.maxColumns;
+  local cols = (rec and rec.cols) or 1;
+  if (cols < 1) then cols = 1; end
+  if (cols > colmax) then cols = colmax; end
+  local rows = math.ceil((n > 0 and n or 1) / cols);
+  if (rows < 1) then rows = 1; end
+  return gx, gy, gx + cols, gy + rows;
+end
+
+-- Would placing barnum at (gx,gy) overlap any other item-bearing category? Pure
+-- half-open rectangle intersection on grid cells.
+function TFuBag:MLOverlaps(frame, barnum, gx, gy)
+  local ax1, ay1, ax2, ay2 = self:MLCatFootprint(frame, barnum, gx, gy);
+  local cfg = frame.cfg;
+  for bn = 1, self.BAR_MAX do
+    if (bn ~= barnum and cfg.cat_layout[bn] and table.getn(frame.BARITM[bn]) > 0) then
+      local r = cfg.cat_layout[bn];
+      local bx1, by1, bx2, by2 = self:MLCatFootprint(frame, bn, r.gx or 0, r.gy or 0);
+      if (ax1 < bx2 and ax2 > bx1 and ay1 < by2 and ay2 > by1) then
+        return true;
+      end
+    end
+  end
+  return false;
+end
+
+-- The drag ghost (one per window): a translucent rectangle that follows the
+-- cursor during a drag. High strata so it floats above the boxes and items, and
+-- mouse-ENABLED so that on release it shields the item button under the cursor --
+-- otherwise a reverted/short drop lands a click on that item and picks it up. The
+-- frame-drag itself is owned by the bar frame's RegisterForDrag, so OnDragStop
+-- still fires regardless of the ghost being moused.
+function TFuBag:MLGetGhost(frame)
+  local g = frame.MLGhost;
+  if (not g) then
+    g = CreateFrame("Frame", nil, frame);
+    g:SetFrameStrata("DIALOG");
+    g:EnableMouse(true);
+    g:SetMovable(true);
+    g:SetClampedToScreen(true);
+    local tex = g:CreateTexture(nil, "BACKGROUND");
+    tex:SetAllPoints(g);
+    tex:SetColorTexture(0.2, 0.9, 0.2, 0.25);
+    g.tex = tex;
+    g:Hide();
+    frame.MLGhost = g;
+  end
+  return g;
+end
+
+-- Toggle mouse on every item button for the duration of a bar drag. While a bar is
+-- being dragged, item buttons must be inert: otherwise, as the drag crosses another
+-- bar's buttons, the inherited container button can grab the item under the cursor
+-- (it has RegisterForDrag("LeftButton")). Disabled on drag start, restored on stop.
+function TFuBag:MLSetItemMouse(frame, enabled)
+  for _, bag in ipairs(frame.bags) do
+    for slot = 1, self:GetBagMaxItems(bag) do
+      local btn = _G[self:GetBagItemButtonName(bag, slot)];
+      if (btn) then btn:EnableMouse(enabled); end
+    end
+  end
+end
+
+function TFuBag:MLDragStart(frame, barnum, bf)
+  local cfg = frame.cfg;
+  if (cfg.manual_layout ~= 1) then return; end
+  local free = (cfg.ml_freeplace == 1);
+  local rec = (free and cfg.cat_layout_free or cfg.cat_layout)[barnum];
+  if (not rec) then return; end
+  local l, t = bf:GetLeft(), bf:GetTop();
+  if (not l or not t) then return; end
+
+  local g = self:MLGetGhost(frame);
+  g:ClearAllPoints();
+  g:SetWidth(bf:GetWidth());
+  g:SetHeight(bf:GetHeight());
+  g:SetPoint("TOPLEFT", bf, "TOPLEFT", 0, 0);
+  g:Show();
+
+  self.MLDrag.active = true;
+  self.MLDrag.frame  = frame;
+  self.MLDrag.barnum = barnum;
+  self.MLDrag.free   = free;
+  self.MLDrag.gx0    = rec.gx or rec.fx or 0;
+  self.MLDrag.gy0    = rec.gy or rec.fy or 0;
+  self.MLDrag.left0  = l;   -- ghost starts anchored over the box, so box L/T == ghost L/T
+  self.MLDrag.top0   = t;
+  self:MLSetItemMouse(frame, false);  -- items inert until the drag ends
+  g:StartMoving();
+end
+
+-- Cell gaps from the spacing settings (X/Y Pool + Category Spacing), and the title
+-- height in cells (titlec) when names are shown. The title is kept SEPARATE from
+-- the gap and is instead folded into each bar's collision footprint (a bar's title
+-- sits in the strip directly above its box), so vertical neighbours leave room for
+-- the lower bar's title without double-counting it in the gap.
+function TFuBag:MLGapCells(frame)
+  local cfg = frame.cfg;
+  local cellX = frame.BF_PADWIDTH + cfg.frameXSpace;
+  local cellY = frame.BF_PADHEIGHT + cfg.frameYSpace;
+  local sp = cfg.cat_spacing or 0;
+  local gapXc = (frame:PoolX(1) + sp) / cellX;
+  local gapYc = (frame:PoolY(1) + sp) / cellY;
+  local titlec = (cfg.show_cat_names == 1) and (14 / cellY) or 0;  -- CATNAME_H
+  return gapXc, gapYc, titlec;
+end
+
+-- Magnetic edge snap (free placement). The box was dropped at (afx,afy); nudge each
+-- axis onto the nearest alignment line from another bar -- its left/top edge (line
+-- bars up) or the spacing-gap position just past its right/bottom or before its
+-- left/top (dock flush beside it) -- but only within a small threshold, so a drop
+-- in open space stays where you put it. Each axis snaps independently. Returns the
+-- snapped afx,afy. This gives clean alignment WITHOUT forcing the box into any
+-- bar's slot, so it never yanks the dropped box onto a neighbour.
+function TFuBag:MLSnapFree(frame, barnum, afx, afy, dcols, drows)
+  local cfg = frame.cfg;
+  local store = cfg.cat_layout_free;
+  local gapXc, gapYc, titlec = self:MLGapCells(frame);
+  local THRESH = 0.45;  -- cells
+  local bestX, bestXd, bestY, bestYd;
+  for bn = 1, self.BAR_MAX do
+    if (bn ~= barnum and store[bn] and table.getn(frame.BARITM[bn]) > 0) then
+      local r = store[bn];
+      local bc = r.cols or 1; if (bc < 1) then bc = 1; end
+      local m = table.getn(frame.BARITM[bn]);
+      local br = math.ceil(m / bc); if (br < 1) then br = 1; end
+      local bfx, bfy = r.fx or 0, r.fy or 0;
+      local cx = { bfx, bfx + bc + gapXc, bfx - dcols - gapXc };
+      for _, v in ipairs(cx) do
+        local d = math.abs(afx - v);
+        if (d < THRESH and (not bestXd or d < bestXd)) then bestXd = d; bestX = v; end
+      end
+      -- below/above candidates include the title height (vertical neighbours leave
+      -- room for the lower bar's title).
+      local cy = { bfy, bfy + br + gapYc + titlec, bfy - drows - gapYc - titlec };
+      for _, v in ipairs(cy) do
+        local d = math.abs(afy - v);
+        if (d < THRESH and (not bestYd or d < bestYd)) then bestYd = d; bestY = v; end
+      end
+    end
+  end
+  if (bestX) then afx = bestX; end
+  if (bestY) then afy = bestY; end
+  return afx, afy;
+end
+
+-- Push every OTHER bar the dropped box overlaps away from it (anchor stays put),
+-- along the axis of shallower penetration, toward whichever side the bar leans,
+-- flush + the spacing gap. A pushed bar that then overlaps more bars propagates the
+-- push (cascade). Used for the "tight" case where the dropped box has no adjacent
+-- free space and must make room. Guard-bounded.
+function TFuBag:MLPushNeighbors(frame, anchorbar, acols, arows)
+  local store = frame.cfg.cat_layout_free;
+  local gapXc, gapYc, titlec = self:MLGapCells(frame);
+  -- rect returns the collision footprint: the box plus the title strip directly
+  -- above it (top extended by titlec), so a vertical push leaves room for the
+  -- pushed bar's title.
+  local function rect(bn)
+    local r = store[bn];
+    if (not r) then return nil; end
+    local m = table.getn(frame.BARITM[bn]);
+    if (m <= 0) then return nil; end
+    local c = r.cols or 1; if (c < 1) then c = 1; end
+    local rr = math.ceil(m / c); if (rr < 1) then rr = 1; end
+    local x1, y1 = r.fx or 0, r.fy or 0;
+    return x1, y1 - titlec, x1 + c, y1 + rr, c, rr;
+  end
+  local frontier = { anchorbar };
+  local guard = 0;
+  while (table.getn(frontier) > 0 and guard < 12 * self.BAR_MAX) do
+    guard = guard + 1;
+    local cur = table.remove(frontier);
+    local cx1, cy1, cx2, cy2 = rect(cur);
+    if (cx1) then
+      local ccx, ccy = (cx1 + cx2) / 2, (cy1 + cy2) / 2;
+      for bn = 1, self.BAR_MAX do
+        if (bn ~= cur and bn ~= anchorbar) then
+          local bx1, by1, bx2, by2, bc, br = rect(bn);
+          -- within-gap collision (see MLResolveFree): keeps spacing between bars.
+          if (bx1 and cx1 < bx2 + gapXc and cx2 + gapXc > bx1 and cy1 < by2 + gapYc and cy2 + gapYc > by1) then
+            local penX = math.min(cx2, bx2) - math.max(cx1, bx1);
+            local penY = math.min(cy2, by2) - math.max(cy1, by1);
+            local r = store[bn];
+            local moved = false;
+            -- r.fx/r.fy are BOX coords; cy2 is cur's box bottom, cy1 its footprint
+            -- top (already title-extended). Pushing DOWN adds the moved bar's own
+            -- title; pushing UP gets cur's title via cy1.
+            if (penX <= penY) then
+              if ((bx1 + bx2) / 2 >= ccx) then
+                local t = cx2 + gapXc;                 if (t > (r.fx or 0)) then r.fx = t; moved = true; end
+              else
+                local t = cx1 - gapXc - bc;            if (t < (r.fx or 0)) then r.fx = t; moved = true; end
+              end
+            else
+              if ((by1 + by2) / 2 >= ccy) then
+                local t = cy2 + gapYc + titlec;        if (t > (r.fy or 0)) then r.fy = t; moved = true; end
+              else
+                local t = cy1 - gapYc - br;            if (t < (r.fy or 0)) then r.fy = t; moved = true; end
+              end
+            end
+            if (moved) then table.insert(frontier, bn); end
+          end
+        end
+      end
+    end
+  end
+end
+
+-- Resolve overlaps after a free drop. Prefer EXISTING free space: slide the dropped
+-- box out past the bar it landed on (shortest way, toward its lean). If that lands
+-- it in the clear, keep it there and leave every other bar untouched. If it's still
+-- blocked (a tight/packed spot with no adjacent room), put the box back where it was
+-- dropped and PUSH the neighbours apart to make room instead.
+function TFuBag:MLResolveFree(frame, barnum, acols, arows)
+  local cfg = frame.cfg;
+  local store = cfg.cat_layout_free;
+  local rec = store[barnum];
+  if (not rec) then return; end
+  local gapXc, gapYc, titlec = self:MLGapCells(frame);
+  if (not acols or acols < 1) then acols = 1; end
+  if (not arows or arows < 1) then arows = 1; end
+  -- rect = collision footprint (box + title strip above it).
+  local function rect(bn)
+    local r = store[bn];
+    if (not r) then return nil; end
+    local m = table.getn(frame.BARITM[bn]);
+    if (m <= 0) then return nil; end
+    local c = r.cols or 1; if (c < 1) then c = 1; end
+    local rr = math.ceil(m / c); if (rr < 1) then rr = 1; end
+    local x1, y1 = r.fx or 0, r.fy or 0;
+    return x1, y1 - titlec, x1 + c, y1 + rr;
+  end
+  local function hits()
+    -- returns count of overlapped bars, and the first one's footprint. The dropped
+    -- box's own footprint includes its title strip too.
+    local ax1, ay1 = rec.fx or 0, (rec.fy or 0) - titlec;
+    local ax2, ay2 = (rec.fx or 0) + acols, (rec.fy or 0) + arows;
+    local n, fx1, fy1, fx2, fy2 = 0;
+    for bn = 1, self.BAR_MAX do
+      if (bn ~= barnum) then
+        local bx1, by1, bx2, by2 = rect(bn);
+        -- "collide" = within the spacing gap, not just box-on-box, so a bar dropped
+        -- with too little room to keep Category Spacing still counts as needing room.
+        if (bx1 and ax1 < bx2 + gapXc and ax2 + gapXc > bx1 and ay1 < by2 + gapYc and ay2 + gapYc > by1) then
+          n = n + 1;
+          if (not fx1) then fx1, fy1, fx2, fy2 = bx1, by1, bx2, by2; end
+        end
+      end
+    end
+    return n, fx1, fy1, fx2, fy2;
+  end
+
+  local nhit, hx1, hy1, hx2, hy2 = hits();
+  if (nhit == 0) then return; end        -- dropped in the clear: nothing to do
+
+  local sx, sy = rec.fx or 0, rec.fy or 0;  -- remember the drop for the tight fallback
+
+  -- Overlapping two or more bars means the box was wedged BETWEEN them: make room on
+  -- both sides (push them apart) rather than sliding it next to just one.
+  if (nhit >= 2) then
+    self:MLPushNeighbors(frame, barnum, acols, arows);
+    return;
+  end
+  -- Slide the box out past that bar (shortest way, toward the side it leans). Use
+  -- the box's footprint (title strip on top) so it clears the bar's title too; a
+  -- downward slide adds the box's own title height.
+  local ax1, ay1 = sx, sy - titlec;
+  local ax2, ay2 = sx + acols, sy + arows;
+  local ox = math.min(ax2, hx2) - math.max(ax1, hx1);
+  local oy = math.min(ay2, hy2) - math.max(ay1, hy1);
+  if (ox <= oy) then
+    if ((ax1 + ax2) / 2 < (hx1 + hx2) / 2) then rec.fx = hx1 - gapXc - acols;
+    else rec.fx = hx2 + gapXc; end
+  else
+    if ((ay1 + ay2) / 2 < (hy1 + hy2) / 2) then rec.fy = hy1 - gapYc - arows;
+    else rec.fy = hy2 + gapYc + titlec; end
+  end
+
+  if (hits() == 0) then return; end      -- slid into free space: keep it, others stay
+
+  -- Tight: no adjacent room. Restore the drop position and make room by pushing.
+  rec.fx, rec.fy = sx, sy;
+  self:MLPushNeighbors(frame, barnum, acols, arows);
+end
+
+function TFuBag:MLDragStop(frame, barnum, bf)
+  local g = frame.MLGhost;
+  if (g) then g:StopMovingOrSizing(); end
+  self:MLSetItemMouse(frame, true);  -- restore item mouse (always, any drag path)
+  if (not self.MLDrag.active or self.MLDrag.barnum ~= barnum) then
+    if (g) then g:Hide(); end
+    return;
+  end
+  self.MLDrag.active = false;
+
+  local cfg = frame.cfg;
+
+  -- FREE PLACEMENT (Stage 2): drop the box where it was released, magnet-snap its
+  -- edges to nearby bars for clean alignment, then push only the bars it actually
+  -- overlaps (shortest way out). Dropping into free space moves nothing; the box
+  -- itself is never yanked onto a neighbour. The layout then normalizes the origin.
+  if (cfg.ml_freeplace == 1) then
+    local rec = cfg.cat_layout_free[barnum];
+    if (rec and g) then
+      local cellX = frame.BF_PADWIDTH + cfg.frameXSpace;
+      local cellY = frame.BF_PADHEIGHT + cfg.frameYSpace;
+      local n = table.getn(frame.BARITM[barnum]);
+      local dcols = rec.cols or 1; if (dcols < 1) then dcols = 1; end
+      local drows = math.ceil((n > 0 and n or 1) / dcols); if (drows < 1) then drows = 1; end
+      local gl, gt = g:GetLeft(), g:GetTop();
+      if (gl and gt and self.MLDrag.left0 and self.MLDrag.top0 and cellX > 0 and cellY > 0) then
+        local afx = (self.MLDrag.gx0 or 0) + (gl - self.MLDrag.left0) / cellX;
+        local afy = (self.MLDrag.gy0 or 0) + (self.MLDrag.top0 - gt) / cellY;
+        afx, afy = self:MLSnapFree(frame, barnum, afx, afy, dcols, drows);
+        rec.fx = afx;
+        rec.fy = afy;
+        self:MLResolveFree(frame, barnum, dcols, drows);
+      end
+    end
+    if (g) then g:Hide(); end
+    frame:UpdateWindow(TFuBag.REQ_MUST);
+    return;
+  end
+
+  local cat_layout = cfg.cat_layout;
+  local rec = cat_layout[barnum];
+  if (rec and g) then
+    local framename = frame:GetName();
+    local pitchX, pitchY = self:MLGridPitch(frame);
+    local fl = frame:GetLeft();
+    local gl, gt, gb = g:GetLeft(), g:GetTop(), g:GetBottom();
+
+    -- dragged box height in cells (footprint at origin: 4th return == rows)
+    local _, _, _, drows = self:MLCatFootprint(frame, barnum, 0, 0);
+
+    -- Horizontal: snap the ghost's left to the nearest grid column. Absolute (not
+    -- delta) so it matches placement (px = BORDER + gx*pitchX) exactly.
+    local ngx = self.MLDrag.gx0 or 0;
+    if (gl and fl and pitchX > 0) then
+      ngx = math.floor((gl - fl - self.BORDER) / pitchX + 0.5);
+    end
+    -- ngx may be negative (dropped past the left edge); handled by the origin
+    -- shift below so the grid can grow leftward, mirroring rightward growth.
+
+    -- Vertical: rows are rendered with a variable title/Pool gap between them, so a
+    -- uniform-pitch snap lands off by that gap (the box snaps just above/below a
+    -- side neighbour instead of level with it). Instead align the dragged box's
+    -- BOTTOM row to the nearest existing box's rendered bottom (boxes in a row are
+    -- bottom-aligned). Fall back to a cell-delta only when no box is near -- i.e.
+    -- dropping into empty space to start a fresh row.
+    local ngy;
+    -- Snap vertically by aligning EITHER the dragged box's top OR its bottom to a
+    -- neighbour's corresponding edge -- whichever edge the drop landed nearest. Top
+    -- edge = the title row, bottom edge = the last item row. Both are valid align
+    -- points, so a tall box can line up its title with a neighbour's title or its
+    -- bottom with a neighbour's bottom. We measure neighbours' actual rendered
+    -- edges (not an inferred pitch) so the title/Pool band gap can't slip the snap
+    -- a button, and snap to whole-cell offsets so it always lands on a clean row.
+    local best;  -- { diff, edge = "top"|"bottom", cell, pos }
+    if (gt and gb) then
+      for bn = 1, self.BAR_MAX do
+        if (bn ~= barnum and cat_layout[bn] and table.getn(frame.BARITM[bn]) > 0) then
+          local obf = _G[framename.."_bar_"..bn];
+          if (obf and obf:IsShown()) then
+            local ot, ob = obf:GetTop(), obf:GetBottom();
+            local orec = cat_layout[bn];
+            local _, otopcell, _, obotcell = self:MLCatFootprint(frame, bn, orec.gx or 0, orec.gy or 0);
+            if (ot) then
+              local d = math.abs(ot - gt);
+              if (not best or d < best.diff) then best = { diff = d, edge = "top", cell = otopcell, pos = ot }; end
+            end
+            if (ob) then
+              local d = math.abs(ob - gb);
+              if (not best or d < best.diff) then best = { diff = d, edge = "bottom", cell = obotcell, pos = ob }; end
+            end
+          end
+        end
+      end
+    end
+    if (best and pitchY > 0) then
+      if (best.edge == "top") then
+        -- align dragged TOP (gy) to a whole-cell offset from the neighbour's top
+        local cellsDown = math.floor((best.pos - gt) / pitchY + 0.5);
+        ngy = best.cell + cellsDown;
+      else
+        -- align dragged BOTTOM (gy + rows) to a whole-cell offset from the bottom
+        local cellsDown = math.floor((best.pos - gb) / pitchY + 0.5);
+        ngy = (best.cell + cellsDown) - drows;
+      end
+    elseif (gt and self.MLDrag.top0 and pitchY > 0) then
+      local dcy = math.floor((self.MLDrag.top0 - gt) / pitchY + 0.5);
+      ngy = (self.MLDrag.gy0 or 0) + dcy;            -- no other boxes: cell-delta
+    else
+      ngy = self.MLDrag.gy0 or 0;
+    end
+    -- ngy may be negative (dropped past the top edge); origin shift below handles it.
+
+    -- Collision (v1): block drops that create a NEW overlap, but never trap a box.
+    -- If the box is already overlapping (stale/changed layout), allow any move so
+    -- it can be dragged free. Overlap is tested at the pre-shift coords (every box
+    -- shifts by the same amount, so the relative result is identical).
+    local stuck = self:MLOverlaps(frame, barnum, self.MLDrag.gx0 or 0, self.MLDrag.gy0 or 0);
+    if (stuck or not self:MLOverlaps(frame, barnum, ngx, ngy)) then
+      -- Grow the grid origin when dropped past the left/top edge: shift every other
+      -- box right/down so the dropped box can take the new edge cell, and the window
+      -- auto-grows on that side (mirrors how dropping past the right/bottom grows it
+      -- there). With no shift this is a plain move.
+      local shiftX = (ngx < 0) and -ngx or 0;
+      local shiftY = (ngy < 0) and -ngy or 0;
+      if (shiftX > 0 or shiftY > 0) then
+        for bn = 1, self.BAR_MAX do
+          local r = cat_layout[bn];
+          if (r and bn ~= barnum) then
+            r.gx = (r.gx or 0) + shiftX;
+            r.gy = (r.gy or 0) + shiftY;
+          end
+        end
+      end
+      rec.gx = ngx + shiftX;   -- == max(ngx, 0)
+      rec.gy = ngy + shiftY;
+    end
+  end
+  if (g) then g:Hide(); end
+  frame:UpdateWindow(TFuBag.REQ_MUST);
+end
+
+-- Wire the drag/right-click scripts onto a bar frame exactly once. barnum and
+-- frame are stable for a given _bar_N frame (it always belongs to one window and
+-- one bar index), so the closures may capture them. A right-click is forwarded to
+-- the main window's menu so enabling box mouse does not swallow it.
+function TFuBag:MLInitBarDrag(frame, barnum, bf)
+  if (bf.mlDragInit) then return; end
+  bf:RegisterForDrag("LeftButton");
+  bf:SetScript("OnDragStart", function(s) TFuBag:MLDragStart(frame, barnum, s); end);
+  bf:SetScript("OnDragStop",  function(s) TFuBag:MLDragStop(frame, barnum, s); end);
+  bf:SetScript("OnMouseUp", function(_, button)
+    if (button == "RightButton") then frame:OnMouseDown("RightButton"); end
+  end);
+
+  local h = CreateFrame("Frame", nil, bf);
+  h:EnableMouse(true);
+  h:RegisterForDrag("LeftButton");
+  h:SetScript("OnDragStart", function() TFuBag:MLDragStart(frame, barnum, bf); end);
+  h:SetScript("OnDragStop",  function() TFuBag:MLDragStop(frame, barnum, bf); end);
+  h:SetScript("OnMouseUp", function(_, button)
+    if (button == "RightButton") then frame:OnMouseDown("RightButton"); end
+  end);
+  bf.MLTitleHandle = h;
+
+  bf.mlDragInit = true;
+end
+
+-- Toggle dragging for a bar frame. Called per-bar by the layout: enabled in the
+-- freeform path (with a title handle when names are shown), disabled in the
+-- auto-flow path so boxes are inert when Manual Layout is off.
+function TFuBag:SetBarDraggable(frame, barnum, bf, enabled, show_title_handle, label_gap)
+  if (enabled) then
+    self:MLInitBarDrag(frame, barnum, bf);
+    bf:EnableMouse(true);
+    local h = bf.MLTitleHandle;
+    if (h) then
+      if (show_title_handle and label_gap and label_gap > 0) then
+        h:ClearAllPoints();
+        h:SetPoint("BOTTOMLEFT", bf, "TOPLEFT", 0, 0);
+        h:SetPoint("TOPRIGHT", bf, "TOPRIGHT", 0, label_gap);
+        h:SetFrameLevel(bf:GetFrameLevel() + 10);
+        h:Show();
+      else
+        h:Hide();
+      end
+    end
+  else
+    if (bf.mlDragInit) then
+      bf:EnableMouse(false);
+      if (bf.MLTitleHandle) then bf.MLTitleHandle:Hide(); end
+    end
+  end
+end
+
 -- Manual Layout placement: draw each category box at its saved grid coords and
--- auto-grow the window to fit. (Stage 1a: cols come from the seed/snapshot width,
--- no drag and no per-category options yet.)
+-- auto-grow the window to fit. Boxes are drag-repositionable (Stage 2); cols come
+-- from the seed/snapshot width (per-category options are a later stage).
 function TFuBag:LayoutWindowFree(frame, PAD_TOP, PAD_BOTTOM, show_cat_names, CATNAME_H)
   local framename = frame:GetName();
   local cfg = frame.cfg;
@@ -3270,16 +3808,50 @@ function TFuBag:LayoutWindowFree(frame, PAD_TOP, PAD_BOTTOM, show_cat_names, CAT
   self:SeedCatLayout(frame, calc_dat);
 
   local cat_layout = cfg.cat_layout;
-  local pitchX = frame.BF_PADWIDTH + cfg.frameXSpace;
-  local pitchY = frame.BF_PADHEIGHT + cfg.frameYSpace;
+
+  -- Trim leading empty columns/rows: shift the whole layout so the left-most and
+  -- top-most occupied cells sit at the origin. The window already shrinks to the
+  -- right/bottom edges (via the rightmost cell), so without this, dragging a box
+  -- past the left edge -- which pushes every other box right -- would leave that
+  -- empty space on the left permanently when the box is moved back. Normalising
+  -- every layout makes the left/top reclaim space symmetrically with right/bottom.
+  do
+    local minX, minY;
+    for barnum = 1, self.BAR_MAX do
+      local rec = cat_layout[barnum];
+      if (rec and table.getn(baritm[barnum]) > 0) then
+        local gx = rec.gx or 0;
+        local gy = rec.gy or 0;
+        if (not minX or gx < minX) then minX = gx; end
+        if (not minY or gy < minY) then minY = gy; end
+      end
+    end
+    local sx = (minX and minX > 0) and minX or 0;
+    local sy = (minY and minY > 0) and minY or 0;
+    if (sx > 0 or sy > 0) then
+      for barnum = 1, self.BAR_MAX do
+        local rec = cat_layout[barnum];
+        if (rec) then
+          rec.gx = (rec.gx or 0) - sx;
+          rec.gy = (rec.gy or 0) - sy;
+        end
+      end
+    end
+  end
+
+  local pitchX, pitchY = self:MLGridPitch(frame);
   local label_gap = (show_cat_names and CATNAME_H or 0);
+  -- Per-row vertical spacing, applied once per band (NOT per cell): the name-label
+  -- headroom plus the same Y Pool + Category Spacing the auto-flow puts between
+  -- rows. Applied per band so it never accumulates with box height -- this is what
+  -- keeps ML-on row spacing equal to ML-off instead of ballooning.
+  local row_gap = label_gap + frame:PoolY(1) + (cfg.cat_spacing or 0);
 
   -- Rows are "bands" keyed by their shared BOTTOM cell (gy + rows); boxes that
-  -- bottom-align in the same row share a band even though their tops differ. A
-  -- category's name label sits ~CATNAME_H above its box, which would land on the
-  -- band above when bands are only one cell apart, so reserve label_gap of
-  -- headroom ABOVE each band: a box in the Nth band (0-based, top first) is
-  -- pushed down by N*label_gap. (Mirrors the auto-flow's per-row "+ CATNAME_H".)
+  -- bottom-align in the same row share a band even though their tops differ. The
+  -- name label sits ~CATNAME_H above its box and the auto-flow leaves a Pool/
+  -- Category-Spacing gap between rows, so push a box in the Nth band (0-based, top
+  -- first) down by N*row_gap. (Mirrors the auto-flow's per-row spacing.)
   local band_rank = {};
   do
     local bottoms, seen = {}, {};
@@ -3300,21 +3872,24 @@ function TFuBag:LayoutWindowFree(frame, PAD_TOP, PAD_BOTTOM, show_cat_names, CAT
     for i = 1, table.getn(bottoms) do band_rank[bottoms[i]] = i - 1; end
   end
 
-  -- Window content width is known up front from the rightmost occupied cell;
-  -- the name-label edge-justify (below) needs it to decide when a title would
-  -- run off a window border.
-  local max_col = 0;
+  -- Window width comes from the rightmost box's actual right edge: placement uses
+  -- the gap-aware grid pitch, so the window is wider than FrameX(max_col). The
+  -- name-label edge-justify (below) needs window_width to decide when a title
+  -- would run off a border.
+  local max_right = 0;
   for barnum = 1, self.BAR_MAX do
     local rec = cat_layout[barnum];
     if (rec and table.getn(baritm[barnum]) > 0) then
       local cols = rec.cols or 1;
       if (cols < 1) then cols = 1; end
       if (cols > colmax) then cols = colmax; end
-      if ((rec.gx or 0) + cols > max_col) then max_col = (rec.gx or 0) + cols; end
+      local gx = rec.gx or 0; if (gx < 0) then gx = 0; end
+      local right = self.BORDER + gx * pitchX + frame:FrameX(cols);
+      if (right > max_right) then max_right = right; end
     end
   end
-  if (max_col < 1) then max_col = 1; end
-  local window_width = frame:FrameX(max_col) + 2 * self.BORDER;
+  if (max_right < 1) then max_right = self.BORDER + frame:FrameX(1); end
+  local window_width = max_right + self.BORDER;
 
   -- Headroom at the top for the topmost band's name labels.
   local top_reserve = PAD_TOP + self.BORDER + label_gap;
@@ -3338,7 +3913,7 @@ function TFuBag:LayoutWindowFree(frame, PAD_TOP, PAD_BOTTOM, show_cat_names, CAT
       local gy = rec.gy or 0; if (gy < 0) then gy = 0; end
 
       local px = self.BORDER + gx * pitchX;
-      local py = top_reserve + gy * pitchY + (band_rank[gy + rows] or 0) * label_gap;
+      local py = top_reserve + gy * pitchY + (band_rank[gy + rows] or 0) * row_gap;
 
       -- Anchor TOPLEFT-from-TOPLEFT so grid (0,0) is the top-left content cell.
       self:PositionFrame(barname, "TOPLEFT", framename, "TOPLEFT",
@@ -3347,6 +3922,7 @@ function TFuBag:LayoutWindowFree(frame, PAD_TOP, PAD_BOTTOM, show_cat_names, CAT
       self:ColorFrame(cfg, bf, barnum);
       TFuBag:AssignButtonsToFrame(frame, barnum, barname, cols, rows);
       bf:Show();
+      self:SetBarDraggable(frame, barnum, bf, true, show_cat_names, label_gap);
 
       -- Name label: center over the box when it fits the box columns; when it is
       -- wider, justify toward the window interior at an edge (so it never runs
@@ -3390,6 +3966,7 @@ function TFuBag:LayoutWindowFree(frame, PAD_TOP, PAD_BOTTOM, show_cat_names, CAT
       if (box_bottom > max_bottom) then max_bottom = box_bottom; end
     elseif (bf) then
       bf:Hide();
+      self:SetBarDraggable(frame, barnum, bf, false);
       local label = bf.CatName;
       if (label) then label:Hide(); end
     end
@@ -3398,6 +3975,221 @@ function TFuBag:LayoutWindowFree(frame, PAD_TOP, PAD_BOTTOM, show_cat_names, CAT
   if (max_bottom < 1) then max_bottom = top_reserve + frame:FrameY(1); end
 
   frame:SetWidth(window_width);
+  frame:SetHeight(max_bottom + PAD_BOTTOM + self.BORDER + frame:PoolY(1));
+  return frame:GetHeight();
+end
+
+-- ===== Manual Layout: FREE PLACEMENT mode (Stage 1) =====
+-- Parallel to the grid path, selected by cfg.ml_freeplace. Positions live in
+-- cat_layout_free as FRACTIONAL cell coords {fx, fy, cols} -- pixels/button-size,
+-- so they rescale, but are NOT snapped to whole cells. No bottom-align bands: each
+-- box is positioned by its own top-left and its title sits directly above it, so a
+-- box can line up by title (top) or by bottom freely. Edge-dock + spacing-based
+-- snap come in Stage 2; Stage 1 is free movement with the window growing to fit.
+
+-- First-enable snapshot: read the auto-flow's rendered box positions and store them
+-- as fractional coords relative to the top-left-most box, so enabling free mode the
+-- first time looks like the ML-off layout.
+function TFuBag:SnapshotCatLayoutFree(frame)
+  local framename = frame:GetName();
+  local cfg = frame.cfg;
+  local baritm = frame.BARITM;
+  local store = cfg.cat_layout_free;
+  local cellX = frame.BF_PADWIDTH + cfg.frameXSpace;
+  local cellY = frame.BF_PADHEIGHT + cfg.frameYSpace;
+
+  local boxes = {};
+  local minLeft, maxTop;
+  for bn = 1, self.BAR_MAX do
+    local bf = _G[framename.."_bar_"..bn];
+    if (bf and bf:IsShown() and table.getn(baritm[bn]) > 0) then
+      local l, tp, w = bf:GetLeft(), bf:GetTop(), bf:GetWidth();
+      if (l and tp and w) then
+        local cols = math.floor((w - cfg.frameXSpace) / cellX + 0.5);
+        if (cols < 1) then cols = 1; end
+        table.insert(boxes, { bn = bn, l = l, tp = tp, cols = cols });
+        if (not minLeft or l < minLeft) then minLeft = l; end
+        if (not maxTop or tp > maxTop) then maxTop = tp; end
+      end
+    end
+  end
+  if (not minLeft) then return; end
+  for _, b in ipairs(boxes) do
+    store[b.bn] = {
+      fx = (b.l - minLeft) / cellX,
+      fy = (maxTop - b.tp) / cellY,   -- screen-down is +fy
+      cols = b.cols,
+    };
+  end
+end
+
+-- Give any item-bearing bar that has no free record yet (a category that appeared
+-- after the snapshot) a position below the occupied area.
+function TFuBag:SeedCatLayoutFree(frame)
+  local cfg = frame.cfg;
+  local baritm = frame.BARITM;
+  local store = cfg.cat_layout_free;
+  local colmax = cfg.maxColumns;
+
+  local maxBottom, any = 0, false;
+  for bn = 1, self.BAR_MAX do
+    local rec = store[bn];
+    if (rec and table.getn(baritm[bn]) > 0) then
+      any = true;
+      local cols = rec.cols or 1; if (cols < 1) then cols = 1; end
+      local rows = math.ceil(table.getn(baritm[bn]) / cols); if (rows < 1) then rows = 1; end
+      local b = (rec.fy or 0) + rows;
+      if (b > maxBottom) then maxBottom = b; end
+    end
+  end
+
+  local fx, fy = 0, (any and maxBottom or 0);
+  for bn = 1, self.BAR_MAX do
+    local n = table.getn(baritm[bn]);
+    if (n > 0 and not store[bn]) then
+      local cols = math.min(n, colmax); if (cols < 1) then cols = 1; end
+      store[bn] = { fx = fx, fy = fy, cols = cols };
+      fx = fx + cols;
+      if (fx >= colmax) then fx = 0; fy = fy + math.ceil(n / cols); end
+    end
+  end
+end
+
+function TFuBag:LayoutWindowFreePlace(frame, PAD_TOP, PAD_BOTTOM, show_cat_names, CATNAME_H)
+  local framename = frame:GetName();
+  local cfg = frame.cfg;
+  local baritm = frame.BARITM;
+  local colmax = cfg["maxColumns"];
+  local store = cfg.cat_layout_free;
+  local cellX = frame.BF_PADWIDTH + cfg.frameXSpace;
+  local cellY = frame.BF_PADHEIGHT + cfg.frameYSpace;
+  local label_gap = (show_cat_names and CATNAME_H or 0);
+
+  self:SeedCatLayoutFree(frame);
+
+  -- Re-anchor the origin to the left/top-most occupied box (shift by the minimum,
+  -- whatever its sign). A NEGATIVE min means a box was dragged past the left/top
+  -- edge: shifting everything right/down by -min grows the layout on that side and
+  -- lands the dragged box at the new edge. A POSITIVE min means leading empty space:
+  -- the same shift reclaims it. So both edges grow and shrink symmetrically.
+  do
+    local minX, minY;
+    for bn = 1, self.BAR_MAX do
+      local rec = store[bn];
+      if (rec and table.getn(baritm[bn]) > 0) then
+        if (not minX or (rec.fx or 0) < minX) then minX = rec.fx or 0; end
+        if (not minY or (rec.fy or 0) < minY) then minY = rec.fy or 0; end
+      end
+    end
+    local sx = minX or 0;
+    local sy = minY or 0;
+    if (sx ~= 0 or sy ~= 0) then
+      for bn = 1, self.BAR_MAX do
+        local rec = store[bn];
+        if (rec) then rec.fx = (rec.fx or 0) - sx; rec.fy = (rec.fy or 0) - sy; end
+      end
+    end
+  end
+
+  local top_reserve = PAD_TOP + self.BORDER + label_gap;
+  local max_right, max_bottom = 0, 0;
+
+  -- Window width up front (rightmost box edge), so the title edge-justify below can
+  -- tell when a centered title would run off a window border.
+  local window_width = 0;
+  for barnum = 1, self.BAR_MAX do
+    local rec = store[barnum];
+    if (rec and table.getn(baritm[barnum]) > 0) then
+      local cols = rec.cols or 1;
+      if (cols < 1) then cols = 1; end
+      if (cols > colmax) then cols = colmax; end
+      local fx = rec.fx or 0; if (fx < 0) then fx = 0; end
+      local right = self.BORDER + fx * cellX + frame:FrameX(cols);
+      if (right > window_width) then window_width = right; end
+    end
+  end
+  window_width = window_width + self.BORDER;
+  if (window_width < frame:FrameX(1) + 2 * self.BORDER) then
+    window_width = frame:FrameX(1) + 2 * self.BORDER;
+  end
+
+  for barnum = 1, self.BAR_MAX do
+    local barname = framename.."_bar_"..barnum;
+    local bf = _G[barname];
+    local bb = _G[framename.."_BarButton_"..barnum];
+    if (bb) then bb:Hide(); end
+
+    local n = table.getn(baritm[barnum]);
+    local rec = store[barnum];
+    if (bf and n > 0 and rec) then
+      local cols = rec.cols or 1;
+      if (cols < 1) then cols = 1; end
+      if (cols > colmax) then cols = colmax; end
+      local rows = math.ceil(n / cols);
+      if (rows < 1) then rows = 1; end
+      local fx = rec.fx or 0; if (fx < 0) then fx = 0; end
+      local fy = rec.fy or 0; if (fy < 0) then fy = 0; end
+
+      local px = self.BORDER + fx * cellX;
+      local py = top_reserve + fy * cellY;
+      self:PositionFrame(barname, "TOPLEFT", framename, "TOPLEFT",
+        px, 0 - py, frame:FrameX(cols), frame:FrameY(rows));
+
+      self:ColorFrame(cfg, bf, barnum);
+      TFuBag:AssignButtonsToFrame(frame, barnum, barname, cols, rows);
+      bf:Show();
+      self:SetBarDraggable(frame, barnum, bf, true, show_cat_names, label_gap);
+
+      local label = bf.CatName;
+      if (label) then
+        if (show_cat_names) then
+          label:SetWordWrap(false);
+          label:SetWidth(0);
+          label:SetText(self:GetBarCategoryName(baritm[barnum]));
+          label:ClearAllPoints();
+          -- Same center / edge-justify rule as the grid and auto-flow: center over
+          -- the box when the title fits; otherwise justify toward the interior at a
+          -- window border so it never runs off-window, else center with overhang.
+          local box_w = frame:FrameX(cols);
+          local title_w = label:GetStringWidth();
+          local edge_margin = frame:FrameX(0) + frame.BF_X_PAD;
+          if (title_w <= box_w) then
+            label:SetJustifyH("CENTER");
+            label:SetPoint("BOTTOM", bf, "TOP", 0, 1);
+          else
+            local box_center = px + box_w / 2;
+            if (box_center - title_w / 2 < self.BORDER) then
+              label:SetJustifyH("LEFT");
+              label:SetPoint("BOTTOMLEFT", bf, "TOPLEFT", edge_margin, 1);
+            elseif (box_center + title_w / 2 > window_width - self.BORDER) then
+              label:SetJustifyH("RIGHT");
+              label:SetPoint("BOTTOMRIGHT", bf, "TOPRIGHT", -edge_margin, 1);
+            else
+              label:SetJustifyH("CENTER");
+              label:SetPoint("BOTTOM", bf, "TOP", 0, 1);
+            end
+          end
+          label:Show();
+        else
+          label:Hide();
+        end
+      end
+
+      local right = px + frame:FrameX(cols);
+      if (right > max_right) then max_right = right; end
+      local bottom = py + frame:FrameY(rows);
+      if (bottom > max_bottom) then max_bottom = bottom; end
+    elseif (bf) then
+      bf:Hide();
+      self:SetBarDraggable(frame, barnum, bf, false);
+      local label = bf.CatName;
+      if (label) then label:Hide(); end
+    end
+  end
+
+  if (max_right < 1) then max_right = self.BORDER + frame:FrameX(1); end
+  if (max_bottom < 1) then max_bottom = top_reserve + frame:FrameY(1); end
+  frame:SetWidth(max_right + self.BORDER);
   frame:SetHeight(max_bottom + PAD_BOTTOM + self.BORDER + frame:PoolY(1));
   return frame:GetHeight();
 end
@@ -3495,21 +4287,39 @@ function TFuBag:LayoutWindow(frame)
     end
   end
 
-  -- Manual Layout: freeform, drag-placed category containers. When already
-  -- seeded, draw the categories at their saved grid coords and grow the window
-  -- to fit. On the very first enable (no saved layout) fall through and run the
-  -- normal auto-flow once below; the tail then snapshots those positions to the
-  -- grid and re-lays-out in freeform, so enabling looks identical to ML-off.
+  -- Manual Layout: freeform, drag-placed category containers. Only applies when
+  -- viewing the LOGGED-IN character: cat_layout is account-wide and tailored to
+  -- your own inventory (category set + box sizes), so applying it to an alt's
+  -- different bags overlaps/stacks boxes. Viewing an alt falls through to the
+  -- normal auto-flow. When already seeded, draw at the saved coords; on the first
+  -- enable (no saved layout) run the auto-flow once below, then the tail snapshots
+  -- it and re-lays-out freeform so enabling looks identical to ML-off.
+  local use_ml = (cfg.manual_layout == 1 and frame.playerid == TFuBag.PLAYERID);
+  local ml_free = (cfg.ml_freeplace == 1);
   local ml_seed = false;
-  if (cfg.manual_layout == 1) then
+  if (use_ml) then
+    local store = ml_free and cfg.cat_layout_free or cfg.cat_layout;
     local seeded = false;
     for bn = 1, self.BAR_MAX do
-      if (cfg.cat_layout[bn]) then seeded = true; break; end
+      if (store[bn]) then seeded = true; break; end
     end
     if (seeded) then
+      if (ml_free) then
+        return self:LayoutWindowFreePlace(frame, PAD_TOP, PAD_BOTTOM, show_cat_names, CATNAME_H);
+      end
       return self:LayoutWindowFree(frame, PAD_TOP, PAD_BOTTOM, show_cat_names, CATNAME_H);
     end
     ml_seed = true;
+  end
+
+  -- Auto-flow path (ML off, or viewing an alt): make sure no category box is left
+  -- mouse-grabbable from a previous freeform session, so the boxes stay inert --
+  -- the whole window drags normally and item clicks are unobstructed.
+  if (not use_ml) then
+    for bn = 1, self.BAR_MAX do
+      local bf = _G[framename.."_bar_"..bn];
+      if (bf and bf.mlDragInit) then self:SetBarDraggable(frame, bn, bf, false); end
+    end
   end
 
   -- ITEM BUTTONS
@@ -3675,8 +4485,12 @@ function TFuBag:LayoutWindow(frame)
   frame:SetHeight( new_height );
 
   -- Manual Layout first enable: the auto-flow above has positioned every box, so
-  -- capture those positions as grid coords and re-lay-out in freeform.
+  -- capture those positions and re-lay-out in the chosen Manual Layout mode.
   if (ml_seed) then
+    if (ml_free) then
+      self:SnapshotCatLayoutFree(frame);
+      return self:LayoutWindowFreePlace(frame, PAD_TOP, PAD_BOTTOM, show_cat_names, CATNAME_H);
+    end
     self:SnapshotCatLayout(frame);
     return self:LayoutWindowFree(frame, PAD_TOP, PAD_BOTTOM, show_cat_names, CATNAME_H);
   end
@@ -4007,22 +4821,28 @@ function TFuBag:UserDropdown_Init(onclickfunc, TItm, curplayer, selRealm,level)
   local info;
   local users = {};
 
-  -- Grab all the users on this realm only
+  -- List EVERY cached character. The old code filtered to realm == selRealm, which
+  -- hid all alts whose stored realm string differed from the current realm -- i.e.
+  -- everyone on a connected/sister realm, or anyone cached under a differently
+  -- formatted realm name -- leaving only the current character in the dropdown.
   for key, value in pairs(TItm) do
-    local name,realm = strsplit("|", key)
-    if ( realm == selRealm ) then
-      table.insert(users, key);
-    end
+    table.insert(users, key);
   end
 
   -- Sort and add them
   table.sort(users);
-  for key, value in pairs(users) do
+  for _, key in ipairs(users) do
+    local name, realm = strsplit("|", key);
     info = {};
-    info.text = strsplit("|",value)
-    info.value = value;
+    -- Disambiguate same-named alts: show the realm when it isn't the current one.
+    if (realm and realm ~= "" and realm ~= selRealm) then
+      info.text = name.." - "..realm;
+    else
+      info.text = name;
+    end
+    info.value = key;
     info.func = onclickfunc;
-    if (value == curplayer) then
+    if (key == curplayer) then
       info.checked = 1;
     end
     UIDropDownMenu_AddButton(info,level);

@@ -66,6 +66,7 @@ function TFuBnk_cmd(msg)
     TFuBnkOpt_ResizeUpdate();
   elseif (cmd == L["resetsorts"]) then
     TFuBag:ResetSorts(TFuBnkFrame.cfg);
+    TFuBag:Print("TFuBnk: Sort rules reset to defaults.");
     TFuBnkFrame:UpdateWindow(TFuBag.REQ_MUST);
   elseif (cmd == L["resetpos"]) then
     TFuBnkFrame:SetDefPos(TFuBnkFrame.cfg,1);
@@ -112,6 +113,7 @@ function TFuInv_cmd(msg)
     TFuInvOpt_ResizeUpdate();
   elseif (cmd == L["resetsorts"]) then
     TFuBag:ResetSorts(TFuInvFrame.cfg);
+    TFuBag:Print("TFuInv: Sort rules reset to defaults.");
     TFuInvFrame:UpdateWindow(TFuBag.REQ_MUST);
   elseif (cmd == L["resetpos"]) then
     TFuInvFrame:SetDefPos(TFuInvFrame.cfg,1);
@@ -124,9 +126,10 @@ function TFuInv_cmd(msg)
   elseif (cmd == L["config"]) then
     TFuInv_OptsFrame:Show();
   elseif (cmd == "reseed") then
-    -- TEMP (Stage 1a): clear the saved freeform layout so it re-snapshots from
-    -- the current auto-flow on the next enable.
+    -- TEMP: clear BOTH saved Manual Layouts (grid + free) so the active mode
+    -- re-snapshots from the current auto-flow on the next enable.
     TFuInvFrame.cfg.cat_layout = {};
+    TFuInvFrame.cfg.cat_layout_free = {};
     TFuBag:Print("TFuInv: Manual Layout reset; will re-snapshot from the default layout.");
     TFuInvFrame:UpdateWindow(TFuBag.REQ_MUST);
   elseif (cmd == L["getcat"] and TFuBag.GetCategory and type(TFuBag.GetCategory) == "function") then

@@ -329,7 +329,10 @@ function Hooks.MerchantFrame_OnHide(...)
 end
 
 function Hooks.MerchantFrame_OnShow(...)
-  TFuInvFrame:UpdateWindow()
-  TFuBnkFrame:UpdateWindow()
+  if (TFuInvFrame and TFuInvFrame.UpdateWindow) then TFuInvFrame:UpdateWindow() end
+  -- The bank is gated off pending its 12.0 rewrite, so Bank:init (which gives
+  -- TFuBnkFrame its UpdateWindow via metatable) may not have run; guard the call
+  -- so opening a merchant doesn't error.
+  if (TFuBnkFrame and TFuBnkFrame.UpdateWindow) then TFuBnkFrame:UpdateWindow() end
 end
 MerchantFrame:HookScript("OnShow", Hooks.MerchantFrame_OnShow)

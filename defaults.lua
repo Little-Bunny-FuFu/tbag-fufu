@@ -165,18 +165,11 @@ TFuBag.DefaultSearchList = {
   { L["BAG"], L[""], L[""], L["Container"], L[""] },
 
 
-  { L["BOOK"], L[""], L["Codex: "], L["Recipe"], L[""] },
-  { L["BOOK"], L[""], L["Manual: "], L["Recipe"], L[""] },
-  { L["BOOK"], L[""], L["Expert "], L["Recipe"], L[""] },
-  { L["BOOK"], L[""], L["Tome of "], L["Recipe"], L[""] },
-  { L["DESIGN"], L[""], L["Design: "], L["Recipe"], L[""] },
-  { L["FORMULA"], L[""], L["Formula: "], L["Recipe"], L[""] },
-  { L["RECIPE"], L[""], L["Recipe: "], L["Recipe"], L[""] },
-  { L["PATTERN"], L[""], L["Pattern: "], L["Recipe"], L[""] },
-  { L["PLANS"], L[""], L["Plans: "], L["Recipe"], L[""] },
-  { L["SCHEMATIC"], L[""], L["Schematic: "], L["Recipe"], L[""] },
   { L["BLUEPRINTS"], L[""], L["Garrison Blueprint"], L["Miscellaneous"], L[""] },
-  { L["RECIPE_OTHER"], L[""], L[""], L["Recipe"], L[""] },
+  -- All profession recipe-class items collapse into one "Recipe" category,
+  -- matched purely by item class (Baganator-style) instead of by the recipe-name
+  -- prefix (Recipe:/Pattern:/Design:/Formula:/Plans:/Schematic:/Codex: ...).
+  { L["RECIPE"], L[""], L[""], L["Recipe"], L[""] },
 
 -- Equipment
   { L["TRADE_TOOL"], L[""], L["[Ss]kinning [Kk]nife"], L["Weapon"], L[""] },
@@ -415,38 +408,50 @@ TFuBag.DefaultSearchList = {
 
 
 -- Trades (fishing done above before equipment)
+-- Reagent/trade-good categorization has two modes, controlled by the option
+-- cfg["reagent_split"]:
+--   * OFF (default, Baganator-style): items sort by their own name/tooltip text
+--     and item class only. Reagents/trade goods land in a few generic bars.
+--   * ON ("original TBag look"): the per-profession rules below also apply,
+--     splitting reagents/trade goods into Mining/Blacksmithing/Tailoring/etc.
+-- The per-profession rules are tagged with a 6th field == "psplit"; PickBar skips
+-- them when reagent_split is off. These crafted-by/profession-keyword rules rely
+-- on an account-wide, character-agnostic created/reagent DB (TBagItemInfo.lua), so
+-- with the option ON a character can show a profession bar it doesn't actually
+-- have -- that is the original TBag behavior, kept opt-in. The rule editor only
+-- touches fields 1-5, so the "psplit" tag survives edits/reorders.
   { L["ALCHEMY"], L[""], L[" Vial"], L["Tradeskill"], L[""] },
   { L["CLOTH"], L[""],   L["[cC]loth"], L["Tradeskill"], L[""] },
-  { L["TRADE1"], L["TRADE1"], L[""], L[""], L[""] },
-  { L["TRADE2"], L["TRADE2"], L[""], L[""], L[""] },
+  { L["TRADE1"], L["TRADE1"], L[""], L[""], L[""], "psplit" },
+  { L["TRADE2"], L["TRADE2"], L[""], L[""], L[""], "psplit" },
   { string.format(L["%s_CREATED"],L["TRADE1"]), string.format(L["%s_CREATED"],L["TRADE1"]),
-    L[""], L[""], L[""] },
+    L[""], L[""], L[""], "psplit" },
   { string.format(L["%s_CREATED"],L["TRADE2"]), string.format(L["%s_CREATED"],L["TRADE2"]),
-    L[""], L[""], L[""] },
-  { L["ALCHEMY"], L["ALCHEMY"], L[""], L[""], L[""] },
-  { L["COOKING"], L["COOKING"], L[""], L[""], L[""] },
+    L[""], L[""], L[""], "psplit" },
+  { L["ALCHEMY"], L["ALCHEMY"], L[""], L[""], L[""], "psplit" },
+  { L["COOKING"], L["COOKING"], L[""], L[""], L[""], "psplit" },
   { L["COOKING"], L[""], L["Raw "], L["Consumable"], L[""] },
   { L["COOKING"], L[""], L["[Ff]ish"], L["Consumable"], L[""] },
   { L["COOKING"], L[""], L[" Meat"], L["Tradeskill"], L[""] },
-  { L["ENCHANTING"], L["ENCHANTING"], L[""], L[""], L[""] },
+  { L["ENCHANTING"], L["ENCHANTING"], L[""], L[""], L[""], "psplit" },
   { L["ENCHANTING"], L[""], L["%a+ Dust"], L[""], L[""] },
   { L["ENCHANTING"], L[""], L["Lesser %a+ Essence"], L[""], L[""] },
   { L["ENCHANTING"], L[""], L["Greater %a+ Essence"], L[""], L[""] },
   { L["ENCHANTING"], L[""], L["Small %a+ Shard"], L["Tradeskill"], L["Enchanting"] },
   { L["ENCHANTING"], L[""], L["Large %a+ Shard"], L["Tradeskill"], L["Enchanting"] },
-  { L["BLACKSMITHING"], L["BLACKSMITHING"], L[""], L[""], L[""] },
+  { L["BLACKSMITHING"], L["BLACKSMITHING"], L[""], L[""], L[""], "psplit" },
   { L["ENGINEERING"], L[""], L["Engineer's Ink"], L[""], L[""]},
   { L["INSCRIPTION"], L[""], L["Ink"], L["Tradeskill"], L["Parts"]},
   { L["INSCRIPTION"], L[""], L[" Parchment"], L["Tradeskill"], L[""]},
   { L["INSCRIPTION"], L[""], L[" Pigment"], L["Tradeskill"], L[""]},
-  { L["INSCRIPTION"], L["INSCRIPTION"], L[""], L[""], L[""]},
-  { L["ENGINEERING"], L["ENGINEERING"], L[""], L[""], L[""]},
-  { L["FIRST_AID"], L["FIRST_AID"], L[""], L[""], L[""] },
-  { L["FISHING"], L["FISHING"], L[""], L[""], L[""] },
-  { L["JEWELCRAFTING"], L["JEWELCRAFTING"], L[""], L[""], L[""] },
-  { L["LEATHERWORKING"], L["LEATHERWORKING"], L[""], L[""], L[""]},
-  { L["MINING"], L["MINING"], L[""], L[""], L[""] },
-  { L["TAILORING"], L["TAILORING"], L[""], L[""], L[""]},
+  { L["INSCRIPTION"], L["INSCRIPTION"], L[""], L[""], L[""], "psplit" },
+  { L["ENGINEERING"], L["ENGINEERING"], L[""], L[""], L[""], "psplit" },
+  { L["FIRST_AID"], L["FIRST_AID"], L[""], L[""], L[""], "psplit" },
+  { L["FISHING"], L["FISHING"], L[""], L[""], L[""], "psplit" },
+  { L["JEWELCRAFTING"], L["JEWELCRAFTING"], L[""], L[""], L[""], "psplit" },
+  { L["LEATHERWORKING"], L["LEATHERWORKING"], L[""], L[""], L[""], "psplit" },
+  { L["MINING"], L["MINING"], L[""], L[""], L[""], "psplit" },
+  { L["TAILORING"], L["TAILORING"], L[""], L[""], L[""], "psplit" },
   { L["ARCHAEOLOGY"], L[""], L["[Aa]rchaeology"], L[""], L[""] },
   { L["ARCHAEOLOGY"], L[""], L["digsite"], L[""], L[""] },
 

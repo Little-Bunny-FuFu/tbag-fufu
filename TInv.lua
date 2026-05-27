@@ -1367,10 +1367,15 @@ function Inv:UpdateWindow(resort_req)
     end
   end
 
-  -- Relink the button map
+  -- Relink the button map. A cached character (selected from the dropdown) may not
+  -- have every bag in its cache, so guard the per-bag table -- otherwise switching
+  -- to such a character indexes a nil bag and errors. (SortItmCache above already
+  -- tolerates missing bags.)
+  local pcache = TFuInvItm[self.playerid];
   for _,bag in ipairs(self.bags) do
+    local pbag = pcache and pcache[bag];
     for slot = 1, TFuBag:GetBagMaxItems(bag) do
-      TFuBag.BUTTONS[TFuBag:GetBagItemButtonName(bag, slot)] = TFuInvItm[self.playerid][bag][slot]
+      TFuBag.BUTTONS[TFuBag:GetBagItemButtonName(bag, slot)] = pbag and pbag[slot] or nil;
     end
   end
 

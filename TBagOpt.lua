@@ -272,8 +272,12 @@ function TFuBag:CreateCfgOpt(cfgopt, cfg, bagarr, updatefunc, resizefunc, forcef
   self:MakeCheck(cfgopt, L["Stack on Re-sort:"],
     cfg, "stack_resort", updatefunc);
 
+  self:MakeCheck(cfgopt, L["Free Placement (Manual Layout):"],
+    cfg, "ml_freeplace", forcefunc);
   self:MakeCheck(cfgopt, L["Profession Bags precede Sorting:"],
     cfg, "special_bag_sort", updatefunc);
+  self:MakeCheck(cfgopt, L["Split Reagents by Profession (original TBag style):"],
+    cfg, "reagent_split", forcefunc);
   self:MakeCheck(cfgopt, L["Trade Creation precedes Sorting (Reopen Window):"],
     cfg, "trade_created_sort", forcefunc);
 end
