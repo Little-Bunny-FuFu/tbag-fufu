@@ -135,6 +135,11 @@ function Bank:init(reset)
 
   self:SetPlayer(TFuBag.PLAYERID);
 
+  -- Scroll viewport (WowScrollBox single-content-frame pattern; see TInv.lua).
+  local bnkContainer = TFuBnkFrame.Scroll
+    and TFuBnkFrame.Scroll.ScrollChild
+    and TFuBnkFrame.Scroll.ScrollChild.Container;
+
   -- Make all the frames
   for _, bag in ipairs(self.bags) do
 --    if (bag == BANK_CONTAINER) then
@@ -144,9 +149,9 @@ function Bank:init(reset)
 --    end
   end
 
-  TFuBag:CreateFrame("Frame", "TFuBnkFrame_bar_", TFuBnkFrame,
+  TFuBag:CreateFrame("Frame", "TFuBnkFrame_bar_", bnkContainer or TFuBnkFrame,
     "TFuBag_BarFrameTemplate", TFuBag.BAR_MAX, "");
-  TFuBag:CreateFrame("Button", "TFuBnkFrame_BarButton_", TFuBnkFrame,
+  TFuBag:CreateFrame("Button", "TFuBnkFrame_BarButton_", bnkContainer or TFuBnkFrame,
     "TFuBag_BarButtonTemplate", TFuBag.BAR_MAX, "");
 
   -- register slash command
@@ -1459,11 +1464,14 @@ function Bank:UpdateWindow(resort_req)
 
   frame:UpdateDepositButton();
 
-  frame:ClearAllPoints();
-  frame:SetPoint(self.cfg["frameYRelativeTo"]..self.cfg["frameXRelativeTo"],
-    "UIParent", "BOTTOMLEFT",
-    self.cfg["frame"..self.cfg["frameXRelativeTo"]] / frame:GetScale(),
-    self.cfg["frame"..self.cfg["frameYRelativeTo"]] / frame:GetScale());
+  -- Don't snap-anchor while the user is mid-drag (see TInv.lua for rationale).
+  if (not self.isMoving) then
+    frame:ClearAllPoints();
+    frame:SetPoint(self.cfg["frameYRelativeTo"]..self.cfg["frameXRelativeTo"],
+      "UIParent", "BOTTOMLEFT",
+      self.cfg["frame"..self.cfg["frameXRelativeTo"]] / frame:GetScale(),
+      self.cfg["frame"..self.cfg["frameYRelativeTo"]] / frame:GetScale());
+  end
 
   TFuBag:ColorFrame(self.cfg, frame, TFuBag.MAIN_BAR);
 

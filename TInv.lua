@@ -147,14 +147,32 @@ function Inv:init(reset)
 
   self:SetPlayer(TFuBag.PLAYERID);
 
+  -- Scroll viewport (WowScrollBox single-content-frame pattern):
+  --   TFuInvFrame.Scroll              -- WowScrollBox (clipChildren via template)
+  --     TFuInvFrame.Scroll.ScrollChild   -- .scrollable=true, LinearView manages this
+  --       TFuInvFrame.Scroll.ScrollChild.Container  -- holds the bars
+  -- Bars are children of Container so the clip cascades through ScrollChild ->
+  -- ScrollBox. Dummy bag containers are reparented into Container too so
+  -- items render INSIDE the scroll viewport rather than at UIParent level --
+  -- otherwise icons render past sb's bottom and overlap the chrome (bag
+  -- slots, search, money, currency, horizontal scrollbar) because
+  -- clipChildren can't catch frames that aren't descendants.
+  local invContainer = TFuInvFrame.Scroll
+    and TFuInvFrame.Scroll.ScrollChild
+    and TFuInvFrame.Scroll.ScrollChild.Container;
+
   -- Make all the frames
   for _, bag in ipairs(self.bags) do
     TFuBag:CreateDummyBag(bag, "TFuBag_ItemButtonTemplate");
+    if (invContainer) then
+      local dbag = _G[TFuBag:GetDummyBagFrameName(bag)];
+      if (dbag) then dbag:SetParent(invContainer); end
+    end
   end
 
-  TFuBag:CreateFrame("Frame", "TFuInvFrame_bar_", TFuInvFrame,
+  TFuBag:CreateFrame("Frame", "TFuInvFrame_bar_", invContainer or TFuInvFrame,
     "TFuBag_BarFrameTemplate", TFuBag.BAR_MAX, "");
-  TFuBag:CreateFrame("Button", "TFuInvFrame_BarButton_", TFuInvFrame,
+  TFuBag:CreateFrame("Button", "TFuInvFrame_BarButton_", invContainer or TFuInvFrame,
     "TFuBag_BarButtonTemplate", TFuBag.BAR_MAX, "");
 
   -- register slash command
@@ -1407,11 +1425,18 @@ function Inv:UpdateWindow(resort_req)
     MoneyFrame_Update("TFuInvFrame_MoneyFrame", TFuBag:GetMoney(self.playerid));
   end
 
-    frame:ClearAllPoints();
-    frame:SetPoint(self.cfg["frameYRelativeTo"]..self.cfg["frameXRelativeTo"],
-      "UIParent", "BOTTOMLEFT",
-      self.cfg["frame"..self.cfg["frameXRelativeTo"]] / frame:GetScale(),
-      self.cfg["frame"..self.cfg["frameYRelativeTo"]] / frame:GetScale());
+    -- Don't snap the frame back to its saved cfg corner while the user is
+    -- mid-drag (StartMoving is binding it to the cursor). The WowScrollBox's
+    -- managed-visibility / size callbacks can fire UpdateWindow while the bag
+    -- is being moved -- without this guard, every callback re-anchors the
+    -- frame to the OLD position and the bag "snaps back, leaves cursor behind."
+    if (not self.isMoving) then
+      frame:ClearAllPoints();
+      frame:SetPoint(self.cfg["frameYRelativeTo"]..self.cfg["frameXRelativeTo"],
+        "UIParent", "BOTTOMLEFT",
+        self.cfg["frame"..self.cfg["frameXRelativeTo"]] / frame:GetScale(),
+        self.cfg["frame"..self.cfg["frameYRelativeTo"]] / frame:GetScale());
+    end
 
 
     TFuBag:ColorFrame(self.cfg, frame, TFuBag.MAIN_BAR);

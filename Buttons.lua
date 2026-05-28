@@ -12,10 +12,7 @@ local ItemButton = TFuBag.ItemButton
 function ItemButton:OnEnter()
   local itm = TFuBag:GetItmFromFrame(TFuBag.BUTTONS, self)
   if not itm or not next(itm) then return end
-  local mainFrame = self:GetParent():GetParent()
-  if self:GetName():match('_EditButton') then
-    mainFrame = self:GetParent():GetParent():GetParent()
-  end
+  local mainFrame = TFuBag:GetButtonMainFrame(self)
   local bar, bag, slot = itm[TFuBag.I_BAR], itm[TFuBag.I_BAG], itm[TFuBag.I_SLOT]
   local cat, link = itm[TFuBag.I_CAT], itm[TFuBag.I_ITEMLINK]
   local charges = itm[TFuBag.I_CHARGES]
@@ -109,10 +106,7 @@ end
 
 function ItemButton:OnLeave()
   local itm = TFuBag:GetItmFromFrame(TFuBag.BUTTONS, self)
-  local mainFrame = self:GetParent():GetParent()
-  if self:GetName():match('_EditButton') then
-    mainFrame = self:GetParent():GetParent():GetParent()
-  end
+  local mainFrame = TFuBag:GetButtonMainFrame(self)
 
   if mainFrame.edit_selected == "" then
     mainFrame.edit_hilight = ""
@@ -137,10 +131,7 @@ end
 function ItemButton:OnClick(button)
   local itm = TFuBag:GetItmFromFrame(TFuBag.BUTTONS, self)
   if not itm or not next(itm) then return end
-  local mainFrame = self:GetParent():GetParent()
-  if self:GetName():match('_EditButton') then
-    mainFrame = self:GetParent():GetParent():GetParent()
-  end
+  local mainFrame = TFuBag:GetButtonMainFrame(self)
   if mainFrame.edit_mode ~= 1 then return end
 
   local bar, bag, slot = itm[TFuBag.I_BAR], itm[TFuBag.I_BAG], itm[TFuBag.I_SLOT]
@@ -179,7 +170,7 @@ end
 function ItemButton.UpdateLock(self, itm, mainFrame)
   if not itm then itm = TFuBag:GetItmFromFrame(TFuBag.BUTTONS, self) end
   if not itm or not next(itm) then return end
-  if not mainFrame then mainFrame = self:GetParent():GetParent() end
+  if not mainFrame then mainFrame = TFuBag:GetButtonMainFrame(self) end
 
   -- Another player's view never appears locked
   if not TFuBag:IsLive(mainFrame) then return end
@@ -196,7 +187,7 @@ function ItemButton.UpdateCooldown(self, itm, mainFrame)
   if not cooldownFrame then return end
   if not itm then itm = TFuBag:GetItmFromFrame(TFuBag.BUTTONS, self) end
   if not itm or not next(itm) then return end
-  if not mainFrame then mainFrame = self:GetParent():GetParent() end
+  if not mainFrame then mainFrame = TFuBag:GetButtonMainFrame(self) end
   local start, duration, enable = 0, 0, false
 
   if itm[TFuBag.I_ITEMLINK] and TFuBag:IsLive(mainFrame) then
@@ -207,7 +198,7 @@ function ItemButton.UpdateCooldown(self, itm, mainFrame)
 end
 
 function ItemButton.Update(self)
-  local mainFrame = self:GetParent():GetParent()
+  local mainFrame = TFuBag:GetButtonMainFrame(self)
   local cfg = mainFrame.cfg
   local playerid = mainFrame.playerid
   local hilight_new = mainFrame.hilight_new

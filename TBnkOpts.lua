@@ -93,7 +93,7 @@ function TFuBnkOpt_CreateCfgOpt()
     TFuBag:CreateNewOpt(TFuBnk_CfgOpt, TFuBnkFrame.cfg, function () TFuBnkFrame:UpdateWindow() end);
 
   TFuBag:MakeItemSearchHeader(TFuBnk_CfgOpt);
-  TFuBag:MakeItemSearch(TFuBnk_CfgOpt, TFuBnkFrame.cfg, TFuBnkOpt_SwapSearchItems);
+  TFuBag:MakeItemSearch(TFuBnk_CfgOpt, TFuBnkFrame.cfg, TFuBnkOpt_SwapSearchItems, TFuBnkOpts_RemoveCat);
 end
 
 
@@ -175,8 +175,10 @@ end
 
 
 function TFuBnkOpts_AddCat()
-  -- Add a blank entry
+  -- See TFuInvOpts_AddCat for the rationale on AssignCats here.
   table.insert(TFuBnkFrame.cfg["item_search_list"], {L["UNKNOWN"], "", "", "", ""});
+  TFuBag:AssignCats(TFuBnkFrame.cfg, 0);
+  TFuBag:BuildBarClassList(TFuBnkFrame.BC_LIST, TFuBnkFrame.cfg);
 
   -- Refresh the window, scrolling down to last entry
   TFuBnkOpt_CreateCfgOpt();
@@ -184,4 +186,18 @@ function TFuBnkOpts_AddCat()
   TFuBnk_OptsFrame_ScrollBar:SetMinMaxValues(1, TFuBnk_Config_MaxScroll);
   TFuBnk_OptsFrame_ScrollBar:SetValue(TFuBnk_Config_MaxScroll);
   TFuBnk_Options_UpdateWindow();
+end
+
+function TFuBnkOpts_RemoveCat(unused_value, key)
+  if (key == nil) then return; end
+  if (TFuBnkFrame.cfg["item_search_list"][key] == nil) then return; end
+  table.remove(TFuBnkFrame.cfg["item_search_list"], key);
+  TFuBag:BuildBarClassList(TFuBnkFrame.BC_LIST, TFuBnkFrame.cfg);
+  TFuBnkOpt_CreateCfgOpt();
+  if (TFuBnk_Config_MaxScroll > 1) then
+    TFuBnk_Config_MaxScroll = TFuBnk_Config_MaxScroll - 1;
+  end
+  TFuBnk_OptsFrame_ScrollBar:SetMinMaxValues(1, TFuBnk_Config_MaxScroll);
+  TFuBnk_Options_UpdateWindow();
+  TFuBnkFrame:UpdateWindow(TFuBag.REQ_MUST);
 end

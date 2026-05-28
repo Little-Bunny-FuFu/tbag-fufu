@@ -2,7 +2,136 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
   <Script file="MainFrame.lua"/>
 
-  <Frame name="TFuBag_MainTemplate" inherits="BackdropTemplate" toplevel="true" frameStrata="MEDIUM" movable="true" enableMouse="true" hidden="true" parent="UIParent" virtual="true">
+  <!-- Thin horizontal scroll bar that visually matches the vertical
+       MinimalScrollBar (8px thickness, two arrow steppers + solid track +
+       solid thumb). Built on HorizontalScrollBarTemplate so ScrollBarMixin's
+       drag/track logic works. The Back/Forward steppers borrow the same
+       minimal-scrollbar-arrow-top/bottom atlases the vertical bar uses;
+       SetTexCoord (UV-only rotation, no geometry stretch) flips them to
+       point left/right. Track and Thumb use solid colours close to what the
+       vertical bar's atlases render at 8 px; atlas-rotation across both
+       distorted the middle strip into a vertical bar so we keep that simple. -->
+  <EventFrame name="TFuBag_MinimalHScrollBar" inherits="HorizontalScrollBarTemplate" virtual="true">
+    <!-- Bar frame is 8 tall (mirror of vertical MinimalScrollBar's Size x=8).
+         The 11x17 stepper buttons extend 4.5 px above and below this 8-tall
+         frame, the same way the vertical bar's 17x11 steppers extend 4.5 px
+         left and right beyond its 8-wide frame. Total visual height = 17 px. -->
+    <Size><AbsDimension x="200" y="8"/></Size>
+    <KeyValues>
+      <KeyValue key="thumbAnchor" value="LEFT" type="string"/>
+      <KeyValue key="minThumbExtent" value="23" type="number"/>
+    </KeyValues>
+    <Frames>
+      <EventButton parentKey="Back">
+        <Size><AbsDimension x="11" y="17"/></Size>
+        <Anchors><Anchor point="LEFT"/></Anchors>
+        <KeyValues>
+          <KeyValue key="direction" value="ScrollControllerMixin.Directions.Decrease" type="global"/>
+        </KeyValues>
+        <NormalTexture parentKey="Texture" atlas="minimal-scrollbar-arrow-top" useAtlasSize="false">
+          <Size><AbsDimension x="11" y="17"/></Size>
+        </NormalTexture>
+        <Scripts>
+          <OnLoad>
+            -- minimal-scrollbar-arrow-top is the vertical bar's up-arrow
+            -- atlas (17 wide x 11 tall in the source). UV-remap to a 90 deg
+            -- counter-clockwise rotation so the same art reads as a
+            -- left-pointing arrow in our 11-wide x 17-tall rect.
+            local t = self:GetNormalTexture()
+            if (t) then
+              t:SetTexCoord(1, 0,   0, 0,   1, 1,   0, 1)
+            end
+          </OnLoad>
+        </Scripts>
+      </EventButton>
+      <EventButton parentKey="Forward">
+        <Size><AbsDimension x="11" y="17"/></Size>
+        <Anchors><Anchor point="RIGHT"/></Anchors>
+        <KeyValues>
+          <KeyValue key="direction" value="ScrollControllerMixin.Directions.Increase" type="global"/>
+        </KeyValues>
+        <NormalTexture parentKey="Texture" atlas="minimal-scrollbar-arrow-bottom" useAtlasSize="false">
+          <Size><AbsDimension x="11" y="17"/></Size>
+        </NormalTexture>
+        <Scripts>
+          <OnLoad>
+            -- minimal-scrollbar-arrow-bottom rotated the same way reads as
+            -- a right-pointing arrow.
+            local t = self:GetNormalTexture()
+            if (t) then
+              t:SetTexCoord(1, 0,   0, 0,   1, 1,   0, 1)
+            end
+          </OnLoad>
+        </Scripts>
+      </EventButton>
+      <Frame parentKey="Track" enableMouse="true">
+        <Anchors>
+          <Anchor point="LEFT"  x="19"  y="0"/>
+          <Anchor point="RIGHT" x="-19" y="0"/>
+        </Anchors>
+        <Size><AbsDimension y="8"/></Size>
+        <Layers>
+          <Layer level="BACKGROUND">
+            <Texture parentKey="Bg">
+              <Anchors>
+                <Anchor point="TOPLEFT"/>
+                <Anchor point="BOTTOMRIGHT"/>
+              </Anchors>
+              <Color r="0.05" g="0.05" b="0.07" a="0.85"/>
+            </Texture>
+          </Layer>
+        </Layers>
+        <Frames>
+          <EventButton parentKey="Thumb" enableMouse="true">
+            <Size><AbsDimension x="30" y="8"/></Size>
+            <Anchors>
+              <Anchor point="LEFT"/>
+            </Anchors>
+            <HitRectInsets>
+              <AbsInset left="-2" right="-2" top="-4" bottom="-4"/>
+            </HitRectInsets>
+            <Layers>
+              <Layer level="ARTWORK">
+                <Texture parentKey="Begin" atlas="minimal-scrollbar-small-thumb-top" useAtlasSize="false">
+                  <Size><AbsDimension x="6" y="8"/></Size>
+                  <Anchors><Anchor point="LEFT"/></Anchors>
+                </Texture>
+                <Texture parentKey="End" atlas="minimal-scrollbar-small-thumb-bottom" useAtlasSize="false">
+                  <Size><AbsDimension x="6" y="8"/></Size>
+                  <Anchors><Anchor point="RIGHT"/></Anchors>
+                </Texture>
+                <Texture parentKey="Middle" atlas="minimal-scrollbar-small-thumb-middle" useAtlasSize="false">
+                  <Anchors>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.Begin" relativePoint="TOPRIGHT"/>
+                    <Anchor point="BOTTOMRIGHT" relativeKey="$parent.End" relativePoint="BOTTOMLEFT"/>
+                  </Anchors>
+                </Texture>
+              </Layer>
+            </Layers>
+            <Scripts>
+              <OnLoad>
+                -- The minimal-scrollbar-small-thumb-* atlases are authored
+                -- for the vertical bar (top cap / vertical middle strip /
+                -- bottom cap). UV-rotate each piece 90 deg counter-clockwise
+                -- so the same art reads horizontally: top cap becomes left
+                -- cap, bottom cap becomes right cap, vertical middle strip
+                -- becomes a horizontal middle strip. SetTexCoord rotates
+                -- only the texture lookup -- the rendered rect stays at the
+                -- frame size, so this avoids the SetRotation pitfall where
+                -- rotating geometry stretched the Middle into a giant
+                -- vertical bar across the screen.
+                self.Begin:SetTexCoord(1, 0,   0, 0,   1, 1,   0, 1)
+                self.Middle:SetTexCoord(1, 0,   0, 0,   1, 1,   0, 1)
+                self.End:SetTexCoord(1, 0,   0, 0,   1, 1,   0, 1)
+              </OnLoad>
+            </Scripts>
+          </EventButton>
+        </Frames>
+      </Frame>
+    </Frames>
+  </EventFrame>
+
+  <Frame name="TFuBag_MainTemplate" inherits="BackdropTemplate" toplevel="true" frameStrata="MEDIUM" movable="true" enableMouse="true" hidden="true" parent="UIParent" virtual="true" clipChildren="true">
     <!-- Inline <Backdrop> removed from XML in 9.0; set via BackdropTemplate
          mixin in OnLoad below. -->
     <Frames>
@@ -19,6 +148,43 @@
         </Scripts>
       </Frame>
       <Frame name="$parent_TokenFrame" hidden="false" inherits="TFuBag_TokenFrameTemplate"/>
+
+      <!-- Scroll viewport. WowScrollBox inherits ScrollBoxBaseTemplate which
+           sets clipChildren on the base frame; combined with the
+           single-content-frame pattern (ScrollChild is the only .scrollable=true
+           child, Container is a non-scrollable subchild that holds the bars),
+           the framework engages pixel-perfect clipping and smooth scrolling
+           for arbitrary-positioned content. See Baganator AddScrollBar for the
+           reference impl. Initialization done in Lua at the end of init() since
+           ScrollUtil.InitScrollBoxWithScrollBar takes the scrollbar widget. -->
+      <Frame name="$parent_Scroll" parentKey="Scroll" hidden="true" inherits="WowScrollBox">
+        <Anchors>
+          <Anchor point="TOPLEFT"><Offset><AbsDimension x="0" y="0"/></Offset></Anchor>
+        </Anchors>
+        <Size><AbsDimension x="1" y="1"/></Size>
+        <Frames>
+          <Frame name="$parent_ScrollChild" parentKey="ScrollChild">
+            <KeyValues>
+              <KeyValue key="scrollable" value="true" type="boolean"/>
+            </KeyValues>
+            <Size><AbsDimension x="1" y="1"/></Size>
+            <Frames>
+              <!-- Container is anchored TOPLEFT(2,-2) inside ScrollChild and
+                   sized to (content_w, content_h) in Lua. ScrollChild is sized
+                   to (content_w + 4, content_h + 4) so the 2px Container margin
+                   plus the +4 ScrollChild buffer matches the Baganator pattern
+                   that reliably engages WowScrollBox's clipChildren cascade. -->
+              <Frame name="$parent_Container" parentKey="Container">
+                <Anchors>
+                  <Anchor point="TOPLEFT"><Offset><AbsDimension x="2" y="-2"/></Offset></Anchor>
+                </Anchors>
+              </Frame>
+            </Frames>
+          </Frame>
+        </Frames>
+      </Frame>
+      <EventFrame name="$parent_ScrollBar" parentKey="ScrollBar" inherits="MinimalScrollBar" hidden="true"/>
+      <EventFrame name="$parent_HScrollBar" parentKey="HScrollBar" inherits="TFuBag_MinimalHScrollBar" hidden="true"/>
     </Frames>
     <Scripts>
       <OnLoad>

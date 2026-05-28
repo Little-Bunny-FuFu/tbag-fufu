@@ -101,7 +101,7 @@ function TFuInvOpt_CreateCfgOpt()
     TFuBag:CreateNewOpt(TFuInv_CfgOpt, TFuInvFrame.cfg, function () TFuInvFrame:UpdateWindow() end);
 
   TFuBag:MakeItemSearchHeader(TFuInv_CfgOpt);
-  TFuBag:MakeItemSearch(TFuInv_CfgOpt, TFuInvFrame.cfg, TFuInvOpt_SwapSearchItems);
+  TFuBag:MakeItemSearch(TFuInv_CfgOpt, TFuInvFrame.cfg, TFuInvOpt_SwapSearchItems, TFuInvOpts_RemoveCat);
 end
 
 function TFuInv_Options_InitWindow()
@@ -175,8 +175,19 @@ function TFuInv_Opts_Scroll_Update()
 end
 
 function TFuInvOpts_AddCat()
-  -- Add a blank entry
+  -- Add a blank entry. The default category name is L["UNKNOWN"] (i.e.
+  -- whatever the existing fallback bar is called), so before the user edits
+  -- the row it is effectively a no-op duplicate of the post-loop UNKNOWN
+  -- fallback. Once the user retypes the category name to something new, the
+  -- rule starts placing matching items into that name -- BUT the new name
+  -- has no entry in cfg[CAT_BAR] yet, so GetCat returns nil and the matched
+  -- items fall through to UNKNOWN (the symptom of "items dump to Junk").
+  -- AssignCats below seeds bar 1 for any rule category that lacks a slot,
+  -- so the new category gets a place to render and the user just needs to
+  -- drag it (via the bar reassign UI) to where they want it.
   table.insert(TFuInvFrame.cfg["item_search_list"], {L["UNKNOWN"], "", "", "", ""});
+  TFuBag:AssignCats(TFuInvFrame.cfg, 0);
+  TFuBag:BuildBarClassList(TFuInvFrame.BC_LIST, TFuInvFrame.cfg);
 
   -- Refresh the window, scrolling down to last entry
   TFuInvOpt_CreateCfgOpt();
@@ -184,4 +195,21 @@ function TFuInvOpts_AddCat()
   TFuInv_OptsFrame_ScrollBar:SetMinMaxValues(1, TFuInv_Config_MaxScroll);
   TFuInv_OptsFrame_ScrollBar:SetValue(TFuInv_Config_MaxScroll);
   TFuInv_Options_UpdateWindow();
+end
+
+function TFuInvOpts_RemoveCat(unused_value, key)
+  if (key == nil) then return; end
+  if (TFuInvFrame.cfg["item_search_list"][key] == nil) then return; end
+  table.remove(TFuInvFrame.cfg["item_search_list"], key);
+  -- Rebuild the options list (row indices shift after the removed key) and
+  -- the bar -> categories lookup (an orphaned cat -> bar mapping is harmless
+  -- but visible in the bar header; BuildBarClassList re-derives it).
+  TFuBag:BuildBarClassList(TFuInvFrame.BC_LIST, TFuInvFrame.cfg);
+  TFuInvOpt_CreateCfgOpt();
+  if (TFuInv_Config_MaxScroll > 1) then
+    TFuInv_Config_MaxScroll = TFuInv_Config_MaxScroll - 1;
+  end
+  TFuInv_OptsFrame_ScrollBar:SetMinMaxValues(1, TFuInv_Config_MaxScroll);
+  TFuInv_Options_UpdateWindow();
+  TFuInvFrame:UpdateWindow(TFuBag.REQ_MUST);
 end

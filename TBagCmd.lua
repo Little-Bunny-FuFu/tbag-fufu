@@ -66,6 +66,8 @@ function TFuBnk_cmd(msg)
     TFuBnkOpt_ResizeUpdate();
   elseif (cmd == L["resetsorts"]) then
     TFuBag:ResetSorts(TFuBnkFrame.cfg);
+    TFuBag:AssignCats(TFuBnkFrame.cfg, 0);
+    TFuBag:BuildBarClassList(TFuBnkFrame.BC_LIST, TFuBnkFrame.cfg);
     TFuBag:Print("TFuBnk: Sort rules reset to defaults.");
     TFuBnkFrame:UpdateWindow(TFuBag.REQ_MUST);
   elseif (cmd == L["resetpos"]) then
@@ -113,6 +115,8 @@ function TFuInv_cmd(msg)
     TFuInvOpt_ResizeUpdate();
   elseif (cmd == L["resetsorts"]) then
     TFuBag:ResetSorts(TFuInvFrame.cfg);
+    TFuBag:AssignCats(TFuInvFrame.cfg, 0);
+    TFuBag:BuildBarClassList(TFuInvFrame.BC_LIST, TFuInvFrame.cfg);
     TFuBag:Print("TFuInv: Sort rules reset to defaults.");
     TFuInvFrame:UpdateWindow(TFuBag.REQ_MUST);
   elseif (cmd == L["resetpos"]) then

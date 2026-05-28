@@ -141,6 +141,11 @@ TFuBag.PAD_BOTTOM_SPACER = 5;
 TFuBag.PAD_TOP_GFX = 63;
 TFuBag.PAD_TOP_NORM = 25;
 TFuBag.BORDER = 8;
+-- Reserved column on the right of mainFrame for the scrollbar widget. The
+-- ScrollBox stops short of this column so bars never lay out behind the
+-- scrollbar. MinimalScrollBar's 8px frame has 17px arrow textures; 20px gives
+-- the visible widget room with a couple px breathing space on each side.
+TFuBag.SB_COL = 20;
 
 TFuBag.COOLDOWN_SCALE = 0.8;
 
@@ -1130,25 +1135,10 @@ function TFuBag:SetDefLayout(cfg, bagarr, row1offset, reset)
   self:SetCatBar(cfg, L["FISHING"], 11, reset);
   self:SetCatBar(cfg, L["TRADE_TOOL"], 11, reset);
 
-  self:SetCatBar(cfg, string.format(L["EQUIPPED_%s"],L["RING"]), 10, reset);
-  self:SetCatBar(cfg, string.format(L["EQUIPPED_%s"],L["TRINKET"]), 10, reset);
-  self:SetCatBar(cfg, string.format(L["EQUIPPED_%s"],L["OTHER"]), 10, reset);
-
-  self:SetCatBar(cfg, string.format(L["EQUIPPED_%s"],L["01_HEAD"]), 9, reset);
-  self:SetCatBar(cfg, string.format(L["EQUIPPED_%s"],L["02_NECK"]), 9, reset);
-  self:SetCatBar(cfg, string.format(L["EQUIPPED_%s"],L["03_SHOULDER"]), 9, reset);
-  self:SetCatBar(cfg, string.format(L["EQUIPPED_%s"],L["04_BACK"]), 9, reset);
-  self:SetCatBar(cfg, string.format(L["EQUIPPED_%s"],L["05_CHEST"]), 9, reset);
-  self:SetCatBar(cfg, string.format(L["EQUIPPED_%s"],L["06_SHIRT"]), 9, reset);
-  self:SetCatBar(cfg, string.format(L["EQUIPPED_%s"],L["07_TABARD"]), 9, reset);
-  self:SetCatBar(cfg, string.format(L["EQUIPPED_%s"],L["08_WRIST"]), 9, reset);
-  self:SetCatBar(cfg, string.format(L["EQUIPPED_%s"],L["09_HANDS"]), 9, reset);
-  self:SetCatBar(cfg, string.format(L["EQUIPPED_%s"],L["10_WAIST"]), 9, reset);
-  self:SetCatBar(cfg, string.format(L["EQUIPPED_%s"],L["11_LEGS"]), 9, reset);
-  self:SetCatBar(cfg, string.format(L["EQUIPPED_%s"],L["12_FEET"]), 9, reset);
-  self:SetCatBar(cfg, string.format(L["EQUIPPED_%s"],L["13_OFFHAND"]), 9, reset);
-  self:SetCatBar(cfg, string.format(L["EQUIPPED_%s"],L["ARMOR"]), 9, reset);
-  self:SetCatBar(cfg, string.format(L["EQUIPPED_%s"],L["WEAPON"]), 9, reset);
+-- (Bars 9 and 10 were the EQUIPPED_* category zone -- removed; the category
+-- collected bag duplicates of currently-equipped gear, which in practice
+-- only fired when the player had a same-itemID, same-ilvl spare item. Empty
+-- for ~everyone and shadowed by the bind-state categories anyway.)
 
 -- Second default line - Out of Combat Stocks
   self:SetCatBar(cfg, L["FOOD"], 8, reset);
@@ -1245,7 +1235,22 @@ end
 
 function TFuBag:ResetSorts(cfg)
   cfg["item_overrides"] = {};
-  cfg["item_search_list"] = self.DefaultSearchList;
+  -- Deep-copy DefaultSearchList. The old code assigned by reference, which
+  -- meant every cfg this session was the same table as the global
+  -- DefaultSearchList; any user edit (Add Cat / Remove Cat / typed field)
+  -- mutated the global in place. Once corrupted in-session, /reset just
+  -- re-pointed cfg back at the same already-mutated table, so Reset never
+  -- actually restored defaults until the addon was reloaded. The copy
+  -- guarantees independence: future edits never reach back to the source.
+  local copy = {};
+  for i, row in ipairs(self.DefaultSearchList) do
+    local r = {};
+    for j = 1, table.getn(row) do
+      r[j] = row[j];
+    end
+    copy[i] = r;
+  end
+  cfg["item_search_list"] = copy;
 end
 
 -- set reset to 1 to restore all default values
@@ -1466,6 +1471,21 @@ function TFuBag:GetCat(cfg, bar)
   end
 end
 
+-- Walk up the parent chain until we find a frame carrying the addon's `cfg` --
+-- that's the bag window (TFuInvFrame / TFuBnkFrame). Previously item-button code
+-- did `self:GetParent():GetParent()`, baking in the Item->DummyBag->MainFrame
+-- depth. The scroll viewport inserts ScrollChild + ScrollFrame between the
+-- DummyBag and MainFrame, so a fixed step-count is wrong; this helper makes the
+-- depth flexible (and tolerates the EditButton variant that was one level deeper).
+function TFuBag:GetButtonMainFrame(btn)
+  local f = btn and btn:GetParent();
+  while (f) do
+    if (f.cfg) then return f; end
+    f = f:GetParent();
+  end
+  return nil;
+end
+
 function TFuBag:PositionFrame(frameName, childAttachPoint, parentFrameName, parentAttachPoint, xoffset, yoffset, width, height)
   local frame = _G[frameName];
 
@@ -1548,7 +1568,7 @@ function TFuBag:BuildCatLabels()
     INSCRIPTION = "Inscription", FIRST_AID = "First Aid", COOKING = "Cooking",
     FISHING = "Fishing", ARCHAEOLOGY = "Archaeology", RUNEFORGING = "Runeforging",
     TRADE_TOOL = "Profession Tools",
-    RING = "Ring", TRINKET = "Trinket", WEAPON = "Weapon", OTHER = "Other",
+    RING = "Ring", TRINKET = "Trinket", WEAPON = "BoE", OTHER = "Other",
     DRUID = "Druid", WARLOCK = "Warlock", ROGUE = "Rogue", MAGE = "Mage",
     PALADIN = "Paladin", PRIEST = "Priest", SHAMAN = "Shaman", WARRIOR = "Warrior",
     HUNTER = "Hunter", DEATHKNIGHT = "Death Knight", MONK = "Monk",
@@ -1558,24 +1578,30 @@ function TFuBag:BuildCatLabels()
     C[L[k]] = v;
   end
 
-  -- Slot families: collapse the per-slot equipped/soulbound/account-bound
-  -- categories to a single header label each (identities stay per-slot).
+  -- Slot families: collapse the per-slot soulbound/account-bound categories
+  -- to a single header label each (identities stay per-slot). The EQUIPPED_*
+  -- family was removed -- it served no real purpose in practice (matched
+  -- only true bag-copies of currently-equipped gear at the same effective
+  -- ilvl, which was empty for the typical inventory).
   local slots = { "01_HEAD","02_NECK","03_SHOULDER","04_BACK","05_CHEST","06_SHIRT",
     "07_TABARD","08_WRIST","09_HANDS","10_WAIST","11_LEGS","12_FEET","13_OFFHAND",
     "RING","TRINKET","ARMOR","WEAPON","OTHER" };
   for _, s in ipairs(slots) do
-    C[string.format(L["EQUIPPED_%s"], L[s])]     = "Equipped";
     C[string.format(L["SOULBOUND_%s"], L[s])]    = "Soulbound";
     C[string.format(L["ACCOUNTBOUND_%s"], L[s])] = "Account-Bound";
   end
 
-  -- Carried (un-equipped) armor pieces collapse to "Armor" for the header; their
-  -- per-slot identities remain, so the within-bar sort still groups by slot.
+  -- Carried (un-equipped, un-bound) gear collapses to "BoE" for the header
+  -- because the bar 17 default groups un-bound armor + weapon (typically
+  -- Bind-on-Equip drops). Per-slot identities remain so the within-bar sort
+  -- still groups by slot. The plain WEAPON label is set to "BoE" in the
+  -- direct map above for the same reason -- so the bar dedupes to a single
+  -- "BoE" header instead of "Weapon / Armor".
   local armorslots = { "01_HEAD","02_NECK","03_SHOULDER","04_BACK","05_CHEST",
     "06_SHIRT","07_TABARD","08_WRIST","09_HANDS","10_WAIST","11_LEGS","12_FEET",
     "13_OFFHAND","ARMOR" };
   for _, s in ipairs(armorslots) do
-    C[L[s]] = "Armor";
+    C[L[s]] = "BoE";
   end
 
   self.CatLabel = C;
@@ -2846,14 +2872,7 @@ function TFuBag:PickBar(cfg, playerid, itm, trade1, trade2)
     itm[self.I_KEYWORD][L["CRAFTINGREAGENT"]] = 1;
   end
 
-  if (itm[self.I_SOULBOUND] == 1 or itm[self.I_ACCTBOUND]) then
-    -- Only treat soulbound or accountbound equipment as equipped
-    if ( self:GetPlayerInfo(playerid, self.S_EQUIPPED) ~= nil ) then
-      if (self:GetPlayerInfo(playerid, self.S_EQUIPPED)[ itemid ] ~= nil) then
-      itm[self.I_KEYWORD][L["EQUIPPED"]] = 1;
-      end
-    end
-  end
+  -- (EQUIPPED keyword wiring removed with the EQUIPPED_* categories.)
 
   -- Load tooltip
   tooltip = self:MakeToolTipStr(playerid, itm[self.I_ITEMLINK], itm[self.I_BAG], itm[self.I_SLOT], itm[self.I_LINKSUFFIX]);
@@ -2940,9 +2959,9 @@ function TFuBag:ScanEquipped()
 
 --  self:Print( "Scanning Equipment: ");
 
-  if (self:GetPlayerInfo(self.PLAYERID, self.S_EQUIPPED) == nil) then
-    self:SetPlayerInfo(self.PLAYERID, self.S_EQUIPPED, {});
-  end
+  -- The legacy S_EQUIPPED set powered the EQUIPPED_* category, which was
+  -- removed. Clearing it on every scan so nothing reads the stale data.
+  self:SetPlayerInfo(self.PLAYERID, self.S_EQUIPPED, {});
 
   -- Arrange by itemlink (for equipped) and player (for TFuBody)
   for key, value in pairs(self.Body_Slots) do
@@ -2953,8 +2972,6 @@ function TFuBag:ScanEquipped()
     TFuBodyItm[self.PLAYERID][self.D_BAG][value] = {};
     local dbag = TFuBodyItm[self.PLAYERID][self.D_BAG][value];
     if (itemLink) then
-      self:SetItemLink(self:GetPlayerInfo(self.PLAYERID, self.S_EQUIPPED), itemLink);
-
       local _
       _, dbag[self.I_ITEMLINK], dbag[self.I_LINKSUFFIX] = self:GetItemID(itemLink);
 
@@ -3645,17 +3662,22 @@ function TFuBag:MLDragStop(frame, barnum, bf)
   if (rec and g) then
     local framename = frame:GetName();
     local pitchX, pitchY = self:MLGridPitch(frame);
-    local fl = frame:GetLeft();
+    -- Container is the bars' anchor parent; its screen position already moves
+    -- with the WowScrollBox scroll, so (gl - container.left) is the bar's
+    -- saved-coord px regardless of scroll position.
+    local container = frame.Scroll and frame.Scroll.ScrollChild
+                      and frame.Scroll.ScrollChild.Container;
+    local cl = container and container:GetLeft();
     local gl, gt, gb = g:GetLeft(), g:GetTop(), g:GetBottom();
 
     -- dragged box height in cells (footprint at origin: 4th return == rows)
     local _, _, _, drows = self:MLCatFootprint(frame, barnum, 0, 0);
 
-    -- Horizontal: snap the ghost's left to the nearest grid column. Absolute (not
-    -- delta) so it matches placement (px = BORDER + gx*pitchX) exactly.
+    -- Horizontal: snap the ghost's left to the nearest grid column. px = gx*pitchX
+    -- relative to Container, so saved gx = (gl - container.left) / pitchX.
     local ngx = self.MLDrag.gx0 or 0;
-    if (gl and fl and pitchX > 0) then
-      ngx = math.floor((gl - fl - self.BORDER) / pitchX + 0.5);
+    if (gl and cl and pitchX > 0) then
+      ngx = math.floor((gl - cl) / pitchX + 0.5);
     end
     -- ngx may be negative (dropped past the left edge); handled by the origin
     -- shift below so the grid can grow leftward, mirroring rightward growth.
@@ -3798,6 +3820,288 @@ end
 -- Manual Layout placement: draw each category box at its saved grid coords and
 -- auto-grow the window to fit. Boxes are drag-repositionable (Stage 2); cols come
 -- from the seed/snapshot width (per-category options are a later stage).
+-- Hide bars whose visual rectangle is ENTIRELY outside the ScrollBox bounds
+-- (any overlap keeps the bar shown). WoW's frame-level clipping doesn't
+-- deep-clip the framework's child frames, so bars near the viewport edges
+-- would render past the bag window -- but full-fit hide was too aggressive
+-- (hid bars the user was actively dragging to an edge). This overlap-based
+-- check keeps grabbable, partially-visible bars on screen at the cost of a
+-- few pixels of overhang past the ScrollBox edges.
+function TFuBag:UpdateBarVisibilityForScroll(frame)
+  local sb = frame.Scroll;
+  if (not sb) then return; end
+  local sb_top, sb_bot = sb:GetTop(), sb:GetBottom();
+  local sb_left, sb_right = sb:GetLeft(), sb:GetRight();
+  if (not (sb_top and sb_bot and sb_left and sb_right)) then return; end
+  for barnum = 1, self.BAR_MAX do
+    local bf = _G[frame:GetName().."_bar_"..barnum];
+    if (bf) then
+      local bt, bb = bf:GetTop(), bf:GetBottom();
+      local bl, br = bf:GetLeft(), bf:GetRight();
+      if (bt and bb and bl and br) then
+        -- Standard 2D AABB overlap (WoW Y axis is inverted: GetTop > GetBottom).
+        local overlaps = (bt > sb_bot and bb < sb_top
+                          and br > sb_left and bl < sb_right);
+        if (overlaps) then bf:Show(); else bf:Hide(); end
+      end
+    end
+  end
+end
+
+-- Cheap item-visibility refresh used by the scroll callback. Mirrors the
+-- (bar_visible AND not bar_hide_cfg) logic from ItemButton.Update without the
+-- per-item tooltip / cooldown / rarity work.
+function TFuBag:RefreshItemVisibility(frame)
+  local cfg = frame.cfg;
+  if (not cfg) then return; end
+  for barnum = 1, self.BAR_MAX do
+    local bf = _G[frame:GetName().."_bar_"..barnum];
+    local bar_visible = bf and bf:IsShown();
+    local bar_hide = self:GetGrp(cfg, self.G_BAR_HIDE, barnum) == 1;
+    local items = frame.BARITM and frame.BARITM[barnum];
+    if (items) then
+      for _, itm in pairs(items) do
+        local bag, slot = itm[self.I_BAG], itm[self.I_SLOT];
+        local btn = _G[self:GetBagItemButtonName(bag, slot)];
+        if (btn) then
+          local forced = self.FORCED_SHOW[self:BagSlotToString(bag, slot)];
+          if ((bar_hide and not forced) or not bar_visible) then
+            btn:Hide();
+          else
+            btn:Show();
+          end
+        end
+      end
+    end
+  end
+end
+
+-- (Custom wheel handler removed: WowScrollBox handles wheel + scrollbar drag
+-- natively via the LinearView + MinimalScrollBar wiring in UpdateScrollViewport.)
+
+-- Pre-cap dims (frame-local units), so layout code can decide which bars to
+-- hide because they fall outside the viewport. Computed up-front so callers can
+-- both clamp the window AND decide visibility from a single source of truth.
+function TFuBag:GetWindowCap(frame)
+  local scale = frame:GetScale();
+  if (scale <= 0) then scale = 1; end
+  return UIParent:GetWidth()  * 0.85 / scale,
+         UIParent:GetHeight() * 0.85 / scale;
+end
+
+-- Position + size the WowScrollBox viewport. Pattern follows Baganator's
+-- single-content-frame model: ScrollBox is the viewport (with clipChildren via
+-- ScrollBoxBaseTemplate inheritance), ScrollChild is the one .scrollable=true
+-- child the LinearView manages, Container is anchored inside ScrollChild and
+-- holds the actual bars (their PositionFrame anchors target the Container).
+-- Bars at arbitrary px/py positions get clipped at the ScrollBox edge by the
+-- framework -- no manual hide / scroll-offset math needed.
+-- Height reserved at the bottom for the horizontal scrollbar (17px bar with
+-- arrow steppers + 4px breathing room before the bottom chrome). The 17px
+-- matches the vertical bar's stepper height so the two orthogonal bars look
+-- like rotated siblings. Used in two places below.
+TFuBag.HSCROLL_H = 21;
+
+function TFuBag:UpdateScrollViewport(frame, PAD_TOP, PAD_BOTTOM, content_w, content_h, cap_enabled)
+  local sb = frame.Scroll;        -- ScrollBox (WowScrollBox)
+  if (not sb) then return; end
+  local sc = sb.ScrollChild;
+  if (not sc) then return; end
+  local container = sc.Container;
+  if (not container) then return; end
+  local bar = frame.ScrollBar;
+  local hbar = frame.HScrollBar;
+
+  -- One-time wiring: matches Baganator's working WowScrollBox setup exactly.
+  -- The Baganator pattern reliably engages the framework's clipChildren cascade
+  -- (which our previous custom-anchored attempts did not). Key parts:
+  -- - InitScrollBoxWithScrollBar + AddManagedScrollBarVisibilityBehavior
+  -- - SetPanExtent for wheel/scroll step
+  -- - NIL OnSizeChanged on both ScrollBox and ScrollChild so the framework's
+  --   reentrant size updates don't fight our explicit SetSize calls
+  if (not frame.scrollInitDone) then
+    if (ScrollUtil and ScrollUtil.InitScrollBoxWithScrollBar and CreateScrollBoxLinearView) then
+      ScrollUtil.InitScrollBoxWithScrollBar(sb, bar, CreateScrollBoxLinearView());
+      if (ScrollUtil.AddManagedScrollBarVisibilityBehavior) then
+        ScrollUtil.AddManagedScrollBarVisibilityBehavior(sb, bar);
+      end
+    end
+    sc:SetScript("OnSizeChanged", nil);
+    sb:SetScript("OnSizeChanged", nil);
+    if (sb.SetPanExtent) then sb:SetPanExtent(frame.BF_PADHEIGHT or 36); end
+    if (sb.SetPropagateMouseClicks) then sb:SetPropagateMouseClicks(true); end
+    if (sb.SetPropagateMouseMotion) then sb:SetPropagateMouseMotion(true); end
+    sb:EnableMouseWheel(true);
+
+    -- Both scroll bars draw above any dummy-bag items. Bumping just the bar
+    -- frame is not enough -- ScrollBarMixin:OnLoad set the Track / Thumb /
+    -- stepper levels relative to hbar's INITIAL level (before this bump),
+    -- so they stay at low absolute levels and disappear behind dbag items
+    -- (which now sit inside Container thanks to the reparenting). Push the
+    -- whole subtree explicitly.
+    local mf_level = frame:GetFrameLevel();
+    if (bar) then
+      bar:SetFrameLevel(mf_level + 10);
+      if (bar.Track) then bar.Track:SetFrameLevel(mf_level + 12); end
+      if (bar.Track and bar.Track.Thumb) then bar.Track.Thumb:SetFrameLevel(mf_level + 13); end
+      if (bar.Back)    then bar.Back:SetFrameLevel(mf_level + 13);    end
+      if (bar.Forward) then bar.Forward:SetFrameLevel(mf_level + 13); end
+    end
+    if (hbar) then
+      hbar:SetFrameLevel(mf_level + 10);
+      if (hbar.Track) then hbar.Track:SetFrameLevel(mf_level + 12); end
+      if (hbar.Track and hbar.Track.Thumb) then hbar.Track.Thumb:SetFrameLevel(mf_level + 13); end
+      if (hbar.Back)    then hbar.Back:SetFrameLevel(mf_level + 13);    end
+      if (hbar.Forward) then hbar.Forward:SetFrameLevel(mf_level + 13); end
+    end
+
+    -- Horizontal scroll wiring. LinearView is vertical-only, so we drive the
+    -- horizontal axis manually: HScrollBar's OnScroll callback shifts
+    -- Container's TOPLEFT X anchor inside ScrollChild. The clipChildren
+    -- cascade established by MainTemplate clips the shifted overflow.
+    if (hbar) then
+      hbar:RegisterCallback("OnScroll", function(_, percent)
+        local overflow = frame.hScrollOverflow or 0;
+        container:ClearAllPoints();
+        container:SetPoint("TOPLEFT", sc, "TOPLEFT", 2 - percent * overflow, -2);
+      end, frame);
+    end
+
+    -- Shift+mousewheel routes to the horizontal bar; plain wheel keeps the
+    -- framework's vertical handler. We wrap (not replace) the framework's
+    -- OnMouseWheel so InitScrollBoxWithScrollBar's wiring still runs for the
+    -- non-shift case.
+    local origWheel = sb:GetScript("OnMouseWheel");
+    sb:SetScript("OnMouseWheel", function(self, delta)
+      if (IsShiftKeyDown() and hbar and hbar:IsShown()) then
+        hbar:OnMouseWheel(delta);
+      elseif (origWheel) then
+        origWheel(self, delta);
+      end
+    end);
+
+    frame.scrollInitDone = true;
+  end
+
+  -- Baganator-pattern sizing. The 2px Container inset (XML TOPLEFT(2,-2)) +
+  -- ScrollChild.size = Container.size+4 + ScrollBox.size = (Container.w+4,
+  -- min(Container.h+5, cap)) is the exact recipe that engages the framework's
+  -- clipChildren cascade for arbitrary-positioned content. Deviating from
+  -- these magic offsets is what kept our clipping broken.
+  local bottom_pad = PAD_BOTTOM + self.BORDER + frame:PoolY(1);
+  local sb_w = content_w + 4;
+  local sb_h = content_h + 5;
+  if (cap_enabled) then
+    local cap_w, cap_h = self:GetWindowCap(frame);
+    -- Available horizontal area: chrome eats 2*BORDER plus the reserved
+    -- scrollbar column. Capping sb_w creates horizontal overflow which the
+    -- HScrollBar (below) lets the user pan through.
+    local viewport_w_cap = cap_w - 2 * self.BORDER - self.SB_COL;
+    if (sb_w > viewport_w_cap) then sb_w = viewport_w_cap; end
+    -- The HScrollBar appears IFF the width cap took effect. When visible,
+    -- it reserves HSCROLL_H at the bottom of the viewport so content (e.g.
+    -- dummy bag items parented to mainFrame, which clipChildren clips at
+    -- mainFrame's edge only) cannot render behind it.
+    local hbar_will_show = (sb_w < content_w + 4);
+    local h_reserve = hbar_will_show and self.HSCROLL_H or 0;
+    -- Available vertical area inside the bag chrome (minus the HScrollBar
+    -- reservation, so items can't scroll behind the bar).
+    local viewport_h_cap = cap_h - PAD_TOP - bottom_pad - h_reserve;
+    if (sb_h > viewport_h_cap) then sb_h = viewport_h_cap; end
+  end
+  container:SetSize(content_w, content_h);
+  sc:SetSize(content_w + 4, content_h + 4);
+  sb:SetSize(sb_w, sb_h);
+  -- ScrollBox anchored TOPLEFT ONLY -- size is set explicitly above. The
+  -- BOTTOMRIGHT anchor we used to have was fighting the framework's internal
+  -- SetFrameExtent calls on the ScrollTarget.
+  sb:ClearAllPoints();
+  sb:SetPoint("TOPLEFT", frame, "TOPLEFT", self.BORDER, -PAD_TOP);
+
+  -- Horizontal overflow drives whether the HScrollBar shows and how much it
+  -- pans. Compare ScrollChild width (content_w + 4) against viewport width
+  -- (sb_w); the difference is the panning range, stored on the frame so the
+  -- bar's OnScroll callback can read it without recomputing.
+  local h_overflow = (content_w + 4) - sb_w;
+  if (h_overflow < 0) then h_overflow = 0; end
+  frame.hScrollOverflow = h_overflow;
+  local hbar_visible = (h_overflow > 0);
+
+  -- mainFrame width = ScrollBox (sb_w) + 2 BORDERs + optional SB_COL.
+  -- SB_COL reserves space for the vertical scrollbar in cap mode; in
+  -- auto-flow there is no cap (and no vertical scrollbar can appear), so
+  -- skip the reservation -- otherwise bars anchored to mainFrame's
+  -- BOTTOMRIGHT extend into that empty gap and get clipped at sb's right
+  -- edge by the framework's clipChildren cascade.
+  local sb_col_reserve = cap_enabled and self.SB_COL or 0;
+  frame:SetWidth(sb_w + 2 * self.BORDER + sb_col_reserve);
+  frame:SetHeight(PAD_TOP + sb_h + bottom_pad + (hbar_visible and self.HSCROLL_H or 0));
+
+  if (sb.FullUpdate and ScrollBoxConstants) then
+    sb:FullUpdate(ScrollBoxConstants.UpdateImmediately);
+  end
+
+  -- Vertical scrollbar sits centered in its reserved column, below the close
+  -- button. The column spans (mainFrame.right - BORDER - SB_COL) to
+  -- (mainFrame.right - BORDER). Anchoring both TOPRIGHT and BOTTOMRIGHT to
+  -- mainFrame at the same X (-col_inset) keeps the bar vertical (anchoring
+  -- one to sb and one to frame would skew it because their right edges no
+  -- longer align). When the horizontal bar is visible the vertical bar
+  -- shortens by HSCROLL_H so the two don't overlap in the corner.
+  if (bar) then
+    local col_inset = self.BORDER + (self.SB_COL - 8) / 2;
+    bar:ClearAllPoints();
+    bar:SetPoint("TOPRIGHT",    frame, "TOPRIGHT",    -col_inset, -36);
+    bar:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -col_inset,
+      bottom_pad + (hbar_visible and self.HSCROLL_H or 0));
+  end
+
+  -- Horizontal scrollbar: anchor to sb's BOTTOMLEFT/BOTTOMRIGHT so it spans
+  -- exactly the viewport width and tracks any future width changes. Init
+  -- with visibleExtentPercentage = sb_w / total_w so the thumb is sized
+  -- proportionally (ScrollBarMixin handles the rest).
+  if (hbar) then
+    -- The bar frame is 8 tall (mirror of vertical's 8 wide). The 17-tall
+    -- stepper buttons extend 4 px above and below the bar frame, so we
+    -- anchor TOP 8 px below sb's BOTTOM: stepper top sits at sb's BOTTOM
+    -- minus 4 (a clean 4 px gap), bar BOTTOM is 16 below sb, stepper
+    -- BOTTOM is 20 below sb. Total reserved (HSCROLL_H) = 21 covers this
+    -- with a little breathing room before the chrome.
+    hbar:ClearAllPoints();
+    hbar:SetPoint("TOPLEFT",  sb, "BOTTOMLEFT",  0, -8);
+    hbar:SetPoint("TOPRIGHT", sb, "BOTTOMRIGHT", 0, -8);
+    if (hbar_visible) then
+      -- Show BEFORE SetVisibleExtentPercentage so the track has a measured
+      -- width when ScrollBarMixin:Update computes the proportional thumb
+      -- extent. If track width is 0 at compute time, the framework clamps
+      -- the thumb to the track and HIDES it ( showThumb = not clamped ).
+      hbar:Show();
+      local total_w = content_w + 4;
+      local visible_pct = (total_w > 0) and (sb_w / total_w) or 1;
+      if (hbar.SetVisibleExtentPercentage) then
+        hbar:SetVisibleExtentPercentage(visible_pct);
+      end
+      -- Re-apply current scroll percent so Container's anchor X matches the
+      -- bar position after a resize (the OnScroll callback reads the new
+      -- hScrollOverflow). Clamp to 0..1 since the previous percent may have
+      -- corresponded to a larger overflow that no longer exists.
+      local p = (hbar.GetScrollPercentage and hbar:GetScrollPercentage()) or 0;
+      if (p > 1) then p = 1; end
+      if (p < 0) then p = 0; end
+      container:ClearAllPoints();
+      container:SetPoint("TOPLEFT", sc, "TOPLEFT", 2 - p * h_overflow, -2);
+    else
+      hbar:Hide();
+      -- No horizontal overflow: reset Container to its default TOPLEFT(2,-2)
+      -- so it isn't stuck shifted from a previous (capped) layout.
+      container:ClearAllPoints();
+      container:SetPoint("TOPLEFT", sc, "TOPLEFT", 2, -2);
+    end
+  end
+
+  sb:Show();
+end
+
 function TFuBag:LayoutWindowFree(frame, PAD_TOP, PAD_BOTTOM, show_cat_names, CATNAME_H)
   local framename = frame:GetName();
   local cfg = frame.cfg;
@@ -3872,11 +4176,13 @@ function TFuBag:LayoutWindowFree(frame, PAD_TOP, PAD_BOTTOM, show_cat_names, CAT
     for i = 1, table.getn(bottoms) do band_rank[bottoms[i]] = i - 1; end
   end
 
-  -- Window width comes from the rightmost box's actual right edge: placement uses
-  -- the gap-aware grid pitch, so the window is wider than FrameX(max_col). The
-  -- name-label edge-justify (below) needs window_width to decide when a title
-  -- would run off a border.
-  local max_right = 0;
+  -- Window/content width: rightmost box's right edge in Container coords (which
+  -- has its origin at the inside of the chrome, so the leading BORDER is on the
+  -- ScrollBox's offset, NOT in px). Outer window width still adds 2*BORDER.
+  -- Bars are positioned against the Container (which lives inside ScrollChild,
+  -- which lives inside the WowScrollBox); the framework clips at the ScrollBox.
+  local scname = framename.."_Scroll_ScrollChild_Container";
+  local max_right_sc = 0;
   for barnum = 1, self.BAR_MAX do
     local rec = cat_layout[barnum];
     if (rec and table.getn(baritm[barnum]) > 0) then
@@ -3884,15 +4190,17 @@ function TFuBag:LayoutWindowFree(frame, PAD_TOP, PAD_BOTTOM, show_cat_names, CAT
       if (cols < 1) then cols = 1; end
       if (cols > colmax) then cols = colmax; end
       local gx = rec.gx or 0; if (gx < 0) then gx = 0; end
-      local right = self.BORDER + gx * pitchX + frame:FrameX(cols);
-      if (right > max_right) then max_right = right; end
+      local right = gx * pitchX + frame:FrameX(cols);
+      if (right > max_right_sc) then max_right_sc = right; end
     end
   end
-  if (max_right < 1) then max_right = self.BORDER + frame:FrameX(1); end
-  local window_width = max_right + self.BORDER;
+  if (max_right_sc < 1) then max_right_sc = frame:FrameX(1); end
+  local window_width = max_right_sc + 2 * self.BORDER + self.SB_COL;
 
-  -- Headroom at the top for the topmost band's name labels.
-  local top_reserve = PAD_TOP + self.BORDER + label_gap;
+  -- Headroom at the top for the topmost band's name labels. PAD_TOP is the chrome
+  -- inset (handled by the ScrollBox's TOPLEFT offset), so top_reserve carries
+  -- only the BORDER + label-row headroom inside the Container.
+  local top_reserve = self.BORDER + label_gap;
   local max_bottom = 0;
 
   for barnum = 1, self.BAR_MAX do
@@ -3912,22 +4220,25 @@ function TFuBag:LayoutWindowFree(frame, PAD_TOP, PAD_BOTTOM, show_cat_names, CAT
       local gx = rec.gx or 0; if (gx < 0) then gx = 0; end
       local gy = rec.gy or 0; if (gy < 0) then gy = 0; end
 
-      local px = self.BORDER + gx * pitchX;
+      local px = gx * pitchX;
       local py = top_reserve + gy * pitchY + (band_rank[gy + rows] or 0) * row_gap;
 
-      -- Anchor TOPLEFT-from-TOPLEFT so grid (0,0) is the top-left content cell.
-      self:PositionFrame(barname, "TOPLEFT", framename, "TOPLEFT",
+      -- Position bars at raw Container coords. The WowScrollBox + ScrollChild
+      -- (.scrollable=true) framework handles scrolling and pixel-clips bars
+      -- past the ScrollBox edge -- no manual scroll offset or visibility hide.
+      self:PositionFrame(barname, "TOPLEFT", scname, "TOPLEFT",
         px, 0 - py, frame:FrameX(cols), frame:FrameY(rows));
 
       self:ColorFrame(cfg, bf, barnum);
+
       TFuBag:AssignButtonsToFrame(frame, barnum, barname, cols, rows);
       bf:Show();
       self:SetBarDraggable(frame, barnum, bf, true, show_cat_names, label_gap);
 
       -- Name label: center over the box when it fits the box columns; when it is
-      -- wider, justify toward the window interior at an edge (so it never runs
-      -- off-window), else center with symmetric overhang. (Same rule as the
-      -- auto-flow path, in window-left coordinates.)
+      -- wider, justify toward the ScrollChild interior at an edge (so it never runs
+      -- off-viewport), else center with symmetric overhang. Coordinates are in
+      -- ScrollChild space here, so the edges are 0 and max_right_sc.
       local label = bf.CatName;
       if (label) then
         if (show_cat_names) then
@@ -3937,18 +4248,16 @@ function TFuBag:LayoutWindowFree(frame, PAD_TOP, PAD_BOTTOM, show_cat_names, CAT
           label:ClearAllPoints();
           local box_w = frame:FrameX(cols);
           local title_w = label:GetStringWidth();
-          -- A button's edge sits this far in from the box edge (buttons are
-          -- centered in the box); justify titles to the items, not the box.
           local edge_margin = frame:FrameX(0) + frame.BF_X_PAD;
           if (title_w <= box_w) then
             label:SetJustifyH("CENTER");
             label:SetPoint("BOTTOM", bf, "TOP", 0, 1);
           else
             local box_center = px + box_w / 2;
-            if (box_center - title_w / 2 < self.BORDER) then
+            if (box_center - title_w / 2 < 0) then
               label:SetJustifyH("LEFT");
               label:SetPoint("BOTTOMLEFT", bf, "TOPLEFT", edge_margin, 1);
-            elseif (box_center + title_w / 2 > window_width - self.BORDER) then
+            elseif (box_center + title_w / 2 > max_right_sc) then
               label:SetJustifyH("RIGHT");
               label:SetPoint("BOTTOMRIGHT", bf, "TOPRIGHT", -edge_margin, 1);
             else
@@ -3975,7 +4284,8 @@ function TFuBag:LayoutWindowFree(frame, PAD_TOP, PAD_BOTTOM, show_cat_names, CAT
   if (max_bottom < 1) then max_bottom = top_reserve + frame:FrameY(1); end
 
   frame:SetWidth(window_width);
-  frame:SetHeight(max_bottom + PAD_BOTTOM + self.BORDER + frame:PoolY(1));
+  frame:SetHeight(PAD_TOP + max_bottom + PAD_BOTTOM + self.BORDER + frame:PoolY(1));
+  self:UpdateScrollViewport(frame, PAD_TOP, PAD_BOTTOM, max_right_sc, max_bottom, true);
   return frame:GetHeight();
 end
 
@@ -4091,12 +4401,15 @@ function TFuBag:LayoutWindowFreePlace(frame, PAD_TOP, PAD_BOTTOM, show_cat_names
     end
   end
 
-  local top_reserve = PAD_TOP + self.BORDER + label_gap;
+  -- top_reserve in Container coords: only BORDER + label-row headroom; the
+  -- chrome inset (PAD_TOP) lives on the ScrollBox's TOPLEFT offset.
+  local top_reserve = self.BORDER + label_gap;
+  local scname = framename.."_Scroll_ScrollChild_Container";
   local max_right, max_bottom = 0, 0;
 
-  -- Window width up front (rightmost box edge), so the title edge-justify below can
-  -- tell when a centered title would run off a window border.
-  local window_width = 0;
+  -- Content width up front (rightmost box edge) in ScrollChild coords, so the
+  -- title edge-justify below can tell when a centered title would run off-viewport.
+  local content_w = 0;
   for barnum = 1, self.BAR_MAX do
     local rec = store[barnum];
     if (rec and table.getn(baritm[barnum]) > 0) then
@@ -4104,14 +4417,11 @@ function TFuBag:LayoutWindowFreePlace(frame, PAD_TOP, PAD_BOTTOM, show_cat_names
       if (cols < 1) then cols = 1; end
       if (cols > colmax) then cols = colmax; end
       local fx = rec.fx or 0; if (fx < 0) then fx = 0; end
-      local right = self.BORDER + fx * cellX + frame:FrameX(cols);
-      if (right > window_width) then window_width = right; end
+      local right = fx * cellX + frame:FrameX(cols);
+      if (right > content_w) then content_w = right; end
     end
   end
-  window_width = window_width + self.BORDER;
-  if (window_width < frame:FrameX(1) + 2 * self.BORDER) then
-    window_width = frame:FrameX(1) + 2 * self.BORDER;
-  end
+  if (content_w < frame:FrameX(1)) then content_w = frame:FrameX(1); end
 
   for barnum = 1, self.BAR_MAX do
     local barname = framename.."_bar_"..barnum;
@@ -4130,9 +4440,9 @@ function TFuBag:LayoutWindowFreePlace(frame, PAD_TOP, PAD_BOTTOM, show_cat_names
       local fx = rec.fx or 0; if (fx < 0) then fx = 0; end
       local fy = rec.fy or 0; if (fy < 0) then fy = 0; end
 
-      local px = self.BORDER + fx * cellX;
+      local px = fx * cellX;
       local py = top_reserve + fy * cellY;
-      self:PositionFrame(barname, "TOPLEFT", framename, "TOPLEFT",
+      self:PositionFrame(barname, "TOPLEFT", scname, "TOPLEFT",
         px, 0 - py, frame:FrameX(cols), frame:FrameY(rows));
 
       self:ColorFrame(cfg, bf, barnum);
@@ -4148,8 +4458,8 @@ function TFuBag:LayoutWindowFreePlace(frame, PAD_TOP, PAD_BOTTOM, show_cat_names
           label:SetText(self:GetBarCategoryName(baritm[barnum]));
           label:ClearAllPoints();
           -- Same center / edge-justify rule as the grid and auto-flow: center over
-          -- the box when the title fits; otherwise justify toward the interior at a
-          -- window border so it never runs off-window, else center with overhang.
+          -- the box when the title fits; otherwise justify toward the interior at
+          -- the ScrollChild edge so it never runs off-viewport.
           local box_w = frame:FrameX(cols);
           local title_w = label:GetStringWidth();
           local edge_margin = frame:FrameX(0) + frame.BF_X_PAD;
@@ -4158,10 +4468,10 @@ function TFuBag:LayoutWindowFreePlace(frame, PAD_TOP, PAD_BOTTOM, show_cat_names
             label:SetPoint("BOTTOM", bf, "TOP", 0, 1);
           else
             local box_center = px + box_w / 2;
-            if (box_center - title_w / 2 < self.BORDER) then
+            if (box_center - title_w / 2 < 0) then
               label:SetJustifyH("LEFT");
               label:SetPoint("BOTTOMLEFT", bf, "TOPLEFT", edge_margin, 1);
-            elseif (box_center + title_w / 2 > window_width - self.BORDER) then
+            elseif (box_center + title_w / 2 > content_w) then
               label:SetJustifyH("RIGHT");
               label:SetPoint("BOTTOMRIGHT", bf, "TOPRIGHT", -edge_margin, 1);
             else
@@ -4187,10 +4497,12 @@ function TFuBag:LayoutWindowFreePlace(frame, PAD_TOP, PAD_BOTTOM, show_cat_names
     end
   end
 
-  if (max_right < 1) then max_right = self.BORDER + frame:FrameX(1); end
+  if (max_right < 1) then max_right = frame:FrameX(1); end
   if (max_bottom < 1) then max_bottom = top_reserve + frame:FrameY(1); end
-  frame:SetWidth(max_right + self.BORDER);
-  frame:SetHeight(max_bottom + PAD_BOTTOM + self.BORDER + frame:PoolY(1));
+
+  frame:SetWidth(max_right + 2 * self.BORDER + self.SB_COL);
+  frame:SetHeight(PAD_TOP + max_bottom + PAD_BOTTOM + self.BORDER + frame:PoolY(1));
+  self:UpdateScrollViewport(frame, PAD_TOP, PAD_BOTTOM, max_right, max_bottom, true);
   return frame:GetHeight();
 end
 
@@ -4483,6 +4795,16 @@ function TFuBag:LayoutWindow(frame)
 
   frame:SetWidth( available_width );
   frame:SetHeight( new_height );
+
+  -- Scroll viewport in auto-flow: bars here stay anchored to mainFrame BOTTOMRIGHT
+  -- (not the ScrollChild), so the ScrollFrame doesn't actually scroll auto-flow
+  -- content — it just needs to be sized to the content area so the reparented
+  -- bars/items render unclipped. Window cap (step 4) applies only when ML is on.
+  local af_content_w = available_width - 2 * self.BORDER;
+  local af_content_h = new_height - PAD_TOP - PAD_BOTTOM - self.BORDER - frame:PoolY(1);
+  if (af_content_w < 1) then af_content_w = 1; end
+  if (af_content_h < 1) then af_content_h = 1; end
+  self:UpdateScrollViewport(frame, PAD_TOP, PAD_BOTTOM, af_content_w, af_content_h);
 
   -- Manual Layout first enable: the auto-flow above has positioned every box, so
   -- capture those positions and re-lay-out in the chosen Manual Layout mode.

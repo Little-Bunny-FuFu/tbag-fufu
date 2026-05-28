@@ -254,7 +254,7 @@ function Hooks.ContainerFrameItemButton_OnModifiedClick(self, button, ...)
   -- Get the itm and ultimately know if it's one of our buttons
   local itm = TFuBag:GetItmFromFrame(TFuBag.BUTTONS, self)
   if not itm then return func(self, button, ...) end
-  local mainFrame = self:GetParent():GetParent()
+  local mainFrame = TFuBag:GetButtonMainFrame(self)
 
   if TFuBag:IsLive(mainFrame) then
     -- Manage Alt+Click Auto Trade/Auction

@@ -156,6 +156,20 @@ function TFuBag.AssignItemSearchUpper(v, cfg, key, idx)
   end
 end
 
+-- Special variant for the category-name column (idx 1). Same write as
+-- AssignItemSearchUpper, plus a no-op AssignCats so any rule referring to
+-- a new category gets a bar slot immediately. Without this, the rule
+-- matches items but GetCat returns nil for the missing category and the
+-- items fall through to UNKNOWN -- the "all my categories disappeared"
+-- symptom users reported when typing a new category name into a rule
+-- without then pressing the "Assign Cats" button.
+function TFuBag.AssignItemSearchCatName(v, cfg, key, idx)
+  if (key ~= nil) then
+    cfg["item_search_list"][key][idx] = string.upper(v);
+    TFuBag:AssignCats(cfg, 0);
+  end
+end
+
 function TFuBag:MakeItemSearchHeader(cfgopt)
   table.insert(cfgopt,  {});
   table.insert(cfgopt,  {
@@ -168,11 +182,11 @@ function TFuBag:MakeItemSearchHeader(cfgopt)
   });
 end
 
-function TFuBag:MakeItemSearch(cfgopt, cfg, swapfunc)
+function TFuBag:MakeItemSearch(cfgopt, cfg, swapfunc, removefunc)
   for key = 1, table.getn(cfg["item_search_list"]) do
     local value = cfg["item_search_list"][key];
     table.insert(cfgopt,  {
-      { ["type"] = "Text", ["ID"] = 1, ["width"] = 0.035, ["color"] = { 1,0,1 }, ["text"] = key.."." },
+      { ["type"] = "Text", ["ID"] = 1, ["width"] = 0.045, ["color"] = { 1,0,1 }, ["text"] = key.."." },
       { ["type"] = "UpButton", ["ID"] = 1, ["width"] = 0.025,
         ["param1"] = key, ["param2"] = key-1,
         ["func"] = swapfunc
@@ -181,20 +195,26 @@ function TFuBag:MakeItemSearch(cfgopt, cfg, swapfunc)
         ["param1"] = key, ["param2"] = key+1,
         ["func"] = swapfunc
       },
-      { ["type"] = "Edit", ["ID"] = 1, ["width"] = 0.20, ["letters"]=25, ["param1"] = cfg, ["param2"] = key, ["param3"] = 1,
+      { ["type"] = "Edit", ["ID"] = 1, ["width"] = 0.19, ["letters"]=25, ["param1"] = cfg, ["param2"] = key, ["param3"] = 1,
+      ["defaultValue"] = TFuBag.GetItemSearchUpper, ["func"] = TFuBag.AssignItemSearchCatName
+      },
+      { ["type"] = "Edit", ["ID"] = 2, ["width"] = 0.17, ["letters"]=25, ["param1"] = cfg, ["param2"] = key, ["param3"] = 2,
       ["defaultValue"] = TFuBag.GetItemSearchUpper, ["func"] = TFuBag.AssignItemSearchUpper
       },
-      { ["type"] = "Edit", ["ID"] = 2, ["width"] = 0.18, ["letters"]=25, ["param1"] = cfg, ["param2"] = key, ["param3"] = 2,
-      ["defaultValue"] = TFuBag.GetItemSearchUpper, ["func"] = TFuBag.AssignItemSearchUpper
-      },
-      { ["type"] = "Edit", ["ID"] = 3, ["width"] = 0.32, ["letters"]=50, ["param1"] = cfg, ["param2"] = key, ["param3"] = 3,
+      { ["type"] = "Edit", ["ID"] = 3, ["width"] = 0.30, ["letters"]=50, ["param1"] = cfg, ["param2"] = key, ["param3"] = 3,
       ["defaultValue"] = TFuBag.GetItemSearch, ["func"] = TFuBag.AssignItemSearch
 },
-      { ["type"] = "Edit", ["ID"] = 4, ["width"] = 0.12, ["letters"]=25, ["param1"] = cfg, ["param2"] = key, ["param3"] = 4,
+      { ["type"] = "Edit", ["ID"] = 4, ["width"] = 0.11, ["letters"]=25, ["param1"] = cfg, ["param2"] = key, ["param3"] = 4,
       ["defaultValue"] = TFuBag.GetItemSearch, ["func"] = TFuBag.AssignItemSearch
       },
       { ["type"] = "Edit", ["ID"] = 5, ["width"] = 0.08, ["letters"]=25, ["param1"] = cfg, ["param2"] = key, ["param3"] = 5,
       ["defaultValue"] = TFuBag.GetItemSearch, ["func"] = TFuBag.AssignItemSearch
+      },
+      -- Per-row remove button. The swap/remove split lets us hand each
+      -- inv/bnk panel its own remover (the cfg target differs).
+      { ["type"] = "Button", ["ID"] = 1, ["width"] = 0.030, ["text"] = "X",
+        ["param1"] = key,
+        ["func"] = removefunc
       }
       });
   end

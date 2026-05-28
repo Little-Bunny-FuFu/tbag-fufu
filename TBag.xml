@@ -21,7 +21,7 @@
     </Size>
   </Frame>
 
-  <Frame name="TFuBag_BarFrameTemplate" inherits="BackdropTemplate" toplevel="false" frameStrata="MEDIUM" movable="false" enableMouse="false" hidden="true" virtual="true">
+  <Frame name="TFuBag_BarFrameTemplate" inherits="BackdropTemplate" toplevel="false" movable="false" enableMouse="false" hidden="true" virtual="true">
     <Size><AbsDimension x="200" y="46"/></Size>
     <Anchors>
       <Anchor point="BOTTOMRIGHT">
