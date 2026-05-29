@@ -155,6 +155,25 @@ L["Warband"] = true
 L["Buy a Bank Tab"] = true
 L["Right-click for tab settings"] = true
 L["Bank Tab"] = true
+
+-- Bank tab settings dialog (12.0)
+L["Bank Tab Settings"] = true
+L["Name"] = true
+L["Auto-Deposit Settings"] = true
+L["Assign Equipment"] = true
+L["Assign Consumables"] = true
+L["Assign Profession Goods"] = true
+L["Assign Reagents"] = true
+L["Assign Junk"] = true
+L["Assign Quest Items"] = true
+L["Ignore this tab when cleaning up bags"] = true
+L["Choose an Icon"] = true
+L["Prev"] = true
+L["Next"] = true
+L["Okay"] = true
+L["Cancel"] = true
+L["Tab settings are unavailable for this tab."] = true
+L["Tab settings are unavailable on this client."] = true
 L["Collapse Empty Slots (one cell + free count):"] = true
 L["%d free slots"] = true
 L["Drop an item on the window to deposit it."] = true
