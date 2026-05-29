@@ -35,6 +35,15 @@ function TFuInv_Opts_ControlValueChanged(this,v)
     if v and step and  step > 0 then
       v = math.ceil(v / step) * step
     end
+    -- One-shot echo guard. EnableLine stashes the value it programmatically set
+    -- when (re)drawing this control. A deferred OnValueChanged/OnTextChanged from
+    -- that set escapes the UPDATE_HAPPENING gate (it fires after the flag resets),
+    -- which would run a redundant TFuInvFrame:UpdateWindow on every scroll notch.
+    -- Swallow the first echo carrying that exact value, then disarm the guard so
+    -- genuine user edits (including dragging back to the stashed value) apply.
+    local echo = (this.tfu_set_value ~= nil and v == this.tfu_set_value)
+    this.tfu_set_value = nil
+    if (echo) then return v; end
     -- Debounce the (heavy) change handler so dragging/clicking the slider does
     -- not run a full UpdateWindow on every step (which hangs the game). Coalesce
     -- rapid changes and apply once, shortly after the value stops moving. The

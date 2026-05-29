@@ -357,6 +357,13 @@ function TFuBag:EnableLine(frame, optsframename, lineheight, sliderheight, eleme
         -- from the stepped value, and binary (0/1) sliders rest at fractions.
         tmpframe:SetObeyStepOnDrag(true);
         tmpframe:SetValue( e["defaultValue"](e["param1"], e["param2"], e["param3"], e["param4"]) );
+        -- One-shot echo guard. Recycling this Line frame to a new config row
+        -- changes the slider's value; that programmatic SetValue can fire
+        -- OnValueChanged on a LATER frame, after the UPDATE_HAPPENING flag has
+        -- already reset to 0 -- so the flag gate misses it and the (heavy)
+        -- change handler runs on every scroll notch. Stash the value we just
+        -- set so ControlValueChanged can swallow that first matching echo.
+        tmpframe.tfu_set_value = tmpframe:GetValue();
         tmpframe_text:SetText( tmpframe:GetValue() );
         tmpframe_text:SetJustifyH("LEFT");
 
@@ -373,6 +380,9 @@ function TFuBag:EnableLine(frame, optsframename, lineheight, sliderheight, eleme
       elseif (e["type"] == "Edit") then
         tmpframe:SetMaxLetters(e["letters"]);
         tmpframe:SetText( e["defaultValue"](e["param1"], e["param2"], e["param3"], e["param4"]) );
+        -- Echo guard (see Slider branch): a recycled edit box's programmatic
+        -- SetText can fire OnTextChanged past the flag window.
+        tmpframe.tfu_set_value = tmpframe:GetText();
 
         self:PositionFrame( tmpframe_name, "TOPLEFT",
         frame:GetName(), "TOPLEFT",
