@@ -1369,6 +1369,10 @@ function Inv:UpdateWindow(resort_req)
 
   -- SORTING and ITEMCACHE
   if (resort_req == nil) then resort_req = TFuBag.REQ_NONE; end
+  -- config/category/profession change forced this sort (explicit REQ_MUST):
+  -- recategorize everything. An item-move-driven sort (REQ_NONE here, MUST only
+  -- after cache_req is added) instead recats just the changed slots.
+  local force_full = (resort_req >= TFuBag.REQ_MUST)
   local cache_req = TFuBag:UpdateItmCache(self.cfg, self.playerid, TFuInvItm[self.playerid], self.bags,stackarr,comparr);
   if (resort_req == TFuBag.REQ_PART) then
     resort_req = resort_req + self.CACHE_REQ;
@@ -1385,6 +1389,7 @@ function Inv:UpdateWindow(resort_req)
   end
 
   if (resort_req >= TFuBag.REQ_MUST) then
+    if (force_full) then TFuBag:BumpCatGen() end
     self.CACHE_REQ = TFuBag.REQ_NONE
     self.BARITM = TFuBag:SortItmCache(self.cfg,
       self.playerid, TFuInvItm[self.playerid], self.BARITM, self.bags);

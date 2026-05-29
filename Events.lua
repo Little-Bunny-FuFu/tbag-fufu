@@ -2,6 +2,61 @@
 
 local _G = getfenv(0)
 
+-- Coalesce high-frequency, event-driven window updates. A single user action
+-- (Deposit All, a bag<->bank move) makes the server emit a *burst* of BAG_UPDATE
+-- / bank-slot-changed events; running a full UpdateWindow (slot rescan + a
+-- categorizing sort over up to ~1000 bank slots) per event is what caused the
+-- heavy lag. Record the highest resort level requested in the burst and run ONE
+-- real update a short moment later, collapsing the flood into a single rebuild.
+-- Coalesce high-frequency, event-driven window updates. A single user action
+-- (Deposit All, a bag<->bank move) makes the server emit a *burst* of BAG_UPDATE
+-- / bank-slot-changed events, and a fast stream of right-click moves emits one
+-- such burst per item; running a full UpdateWindow (slot rescan + categorizing
+-- sort + relayout over up to ~1000 bank slots) for each is what caused the lag.
+-- This is a SLIDING debounce with a hard cap: the real update fires once the
+-- events stop for UPDATE_DEBOUNCE, but never later than UPDATE_MAX_WAIT after the
+-- burst began -- so continuous rapid clicking refreshes a few times per second
+-- instead of rebuilding the whole bank on every single click.
+local UPDATE_DEBOUNCE = 0.10   -- fire this long after the LAST event in a burst
+local UPDATE_MAX_WAIT = 0.30   -- but never defer a pending update longer than this
+
+function TFuBag:RequestUpdate(frame, resort_req)
+  -- UpdateWindow no-ops on a hidden frame anyway; skip scheduling so closed
+  -- windows don't spawn a timer on every BAG_UPDATE during normal play.
+  if not frame or not frame:IsVisible() then return end
+  resort_req = resort_req or TFuBag.REQ_NONE
+  if (frame.pending_resort_req == nil) or (resort_req > frame.pending_resort_req) then
+    frame.pending_resort_req = resort_req
+  end
+
+  local now = GetTime()
+  if (not frame.update_scheduled) then
+    -- First event of a new burst: start the hard-deadline clock.
+    frame.update_scheduled = true
+    frame.update_deadline = now + UPDATE_MAX_WAIT
+  end
+
+  -- Re-arm a trailing timer one debounce period after THIS event, clamped so it
+  -- never fires later than the burst's hard deadline. A monotonic token lets the
+  -- latest re-arm supersede earlier in-flight timers (C_Timer has no cancel), so
+  -- only one real UpdateWindow runs per coalesced burst.
+  local fire_at = now + UPDATE_DEBOUNCE
+  if (fire_at > frame.update_deadline) then fire_at = frame.update_deadline end
+  frame.update_token = (frame.update_token or 0) + 1
+  local mytoken = frame.update_token
+  local delay = fire_at - now
+  if (delay < 0) then delay = 0 end
+  C_Timer.After(delay, function()
+    if (frame.update_token ~= mytoken) then return end  -- superseded by a later event
+    -- Clear guards BEFORE updating so a UpdateWindow error can't wedge the frame.
+    frame.update_scheduled = nil
+    frame.update_deadline = nil
+    local req = frame.pending_resort_req or TFuBag.REQ_NONE
+    frame.pending_resort_req = nil
+    frame:UpdateWindow(req)
+  end)
+end
+
 function TFuBag:VARIABLES_LOADED()
   self.Inv:init(0)
   self.Bank:init(0)
@@ -72,7 +127,7 @@ function TFuBag:BAG_UPDATE(event, bag)
     frame.cfg.stack_once = 1
   end
 
-  frame:UpdateWindow()
+  TFuBag:RequestUpdate(frame)
 end
 
 function TFuBag:BAG_UPDATE_COOLDOWN(event, bag)
@@ -87,10 +142,10 @@ function TFuBag:BAG_UPDATE_COOLDOWN(event, bag)
   -- are set correctly on open / bag change; they just don't tick live while parked
   -- at the bank, which is fine (you don't use items off cooldown from the bank).
   if not bag then
-    TFuInvFrame:UpdateWindow()
+    TFuBag:RequestUpdate(TFuInvFrame)
   else
     if TFuBag:Member(TFuInvFrame.bags, bag) then
-      TFuInvFrame:UpdateWindow()
+      TFuBag:RequestUpdate(TFuInvFrame)
     end
   end
 end
@@ -134,7 +189,7 @@ function TFuBag:BANK_TABS_CHANGED()
   if not TFuBag.BANK_ENABLED then return end
   TFuBnkFrame:RebuildTabList()
   if (TFuBnkFrame.atbank == 1) then
-    TFuBnkFrame:UpdateWindow(TFuBag.REQ_MUST)
+    TFuBag:RequestUpdate(TFuBnkFrame, TFuBag.REQ_MUST)
   end
 end
 
@@ -144,7 +199,7 @@ function TFuBag:BANK_TAB_SETTINGS_UPDATED()
   if not TFuBag.BANK_ENABLED then return end
   TFuBnkFrame:RebuildTabList()
   if (TFuBnkFrame.atbank == 1) then
-    TFuBnkFrame:UpdateWindow(TFuBag.REQ_MUST)
+    TFuBag:RequestUpdate(TFuBnkFrame, TFuBag.REQ_MUST)
   end
 end
 
@@ -152,16 +207,20 @@ end
 function TFuBag:PLAYER_ACCOUNT_BANK_TAB_SLOTS_CHANGED()
   if not TFuBag.BANK_ENABLED then return end
   if (TFuBnkFrame.atbank == 1) then
-    TFuBnkFrame:UpdateWindow(TFuBag.REQ_MUST)
+    -- REQ_NONE (not REQ_MUST): warband item moves are frequent; UpdateItmCache
+    -- detects the changed slots and drives the sort, recategorizing only those
+    -- slots. Forcing REQ_MUST here would re-run the per-item tooltip scan over the
+    -- whole warband bank on every move (the lag). Mirrors PLAYERBANKSLOTS_CHANGED.
+    TFuBag:RequestUpdate(TFuBnkFrame)
   end
 end
 
 function TFuBag:PLAYERBANKSLOTS_CHANGED()
-  TFuBnkFrame:UpdateWindow()
+  TFuBag:RequestUpdate(TFuBnkFrame)
 end
 
 function TFuBag:PLAYERBANKBAGSLOTS_CHANGED()
-  TFuBnkFrame:UpdateWindow(TFuBag.REQ_MUST)
+  TFuBag:RequestUpdate(TFuBnkFrame, TFuBag.REQ_MUST)
 end
 
 function TFuBag:PLAYER_LEVEL_UP(event, level)
@@ -169,12 +228,12 @@ function TFuBag:PLAYER_LEVEL_UP(event, level)
 end
 
 function TFuBag:QUEST_ACCEPTED()
-      TFuInvFrame:UpdateWindow()
+      TFuBag:RequestUpdate(TFuInvFrame)
 end
 
 function TFuBag:UNIT_QUEST_LOG_CHANGED(event, unit)
       if unit == "player" then
-              TFuInvFrame:UpdateWindow()
+              TFuBag:RequestUpdate(TFuInvFrame)
       end
 end
 

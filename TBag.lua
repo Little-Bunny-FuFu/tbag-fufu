@@ -2826,6 +2826,9 @@ function TFuBag:UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, compar
 
           if (itm[self.I_ITEMLINK] ~= itmcache[bag][slot][self.I_ITEMLINK]) then
             -- the item changed
+            -- The slot's content changed: drop its categorization stamp so the
+            -- next sort re-runs PickBar for just this slot (see catGen memo above).
+            self:SetCatStamp(playerid, bag, slot, nil)
             if (itm[self.I_TIMESTAMP] ~= nil) then
               if (cfg["show_Bag"..bag] == 1 or TFuBag:IsBankTab(bag)
                   or (TFuBag:GetBagFrame(bag) and TFuBag:GetBagFrame(bag):GetChecked())) then
@@ -2929,6 +2932,38 @@ function TFuBag:UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, compar
 end
 
 
+-- Categorization memo (perf). PickBar runs a per-item tooltip scan, the dominant
+-- cost of a re-sort; over a full bank (hundreds of items) doing it for every item
+-- on every BAG_UPDATE is what made item moves / Deposit All lag. catGen is a
+-- generation counter bumped only when categorization INPUTS change (category
+-- config, search list, professions -- every such path forces an explicit
+-- UpdateWindow(REQ_MUST); see Inv/Bank:UpdateWindow). Each slot is stamped with
+-- the gen it was categorized at; SortItmCache re-runs PickBar only when the stamp
+-- is stale (config changed) or the slot's item changed (stamp cleared in
+-- UpdateItmCache on a link change). A plain item move thus re-categorizes only the
+-- slots that actually changed, not the whole bank. The stamp table is runtime-only
+-- (NOT saved) so it can never collide with a value persisted from a past session.
+TFuBag.catGen = TFuBag.catGen or 0
+TFuBag.catStamp = TFuBag.catStamp or {}
+
+function TFuBag:BumpCatGen()
+  self.catGen = (self.catGen or 0) + 1
+end
+
+function TFuBag:GetCatStamp(playerid, bag, slot)
+  local p = self.catStamp[playerid]; if (not p) then return nil end
+  local b = p[bag]; if (not b) then return nil end
+  return b[slot]
+end
+
+function TFuBag:SetCatStamp(playerid, bag, slot, gen)
+  local p = self.catStamp[playerid]
+  if (not p) then p = {}; self.catStamp[playerid] = p end
+  local b = p[bag]
+  if (not b) then b = {}; p[bag] = b end
+  b[slot] = gen
+end
+
 function TFuBag:SortItmCache(cfg, playerid, itmcache, baritm, bagarr)
 --  UpdateAddOnMemoryUsage();
 --  self:PrintDEBUG('SortItmCache Start Memory = '..tostring(GetAddOnMemoryUsage("TFuBag")));
@@ -2988,10 +3023,16 @@ function TFuBag:SortItmCache(cfg, playerid, itmcache, baritm, bagarr)
 --        self:PrintDEBUG("Show bag "..bag);
         for slot = 1, size do
           if next(itmcache[bag][slot]) then
-            itmcache[bag][slot] = self:PickBar(cfg, playerid,
-              itmcache[bag][slot], trade1, trade2);
-
             local itm = itmcache[bag][slot];
+            -- Only re-categorize (the expensive tooltip scan) when this slot's
+            -- stamp is stale: config changed (catGen bumped) or the item changed
+            -- (stamp cleared in UpdateItmCache). Unchanged items keep their cached
+            -- I_BAR/I_CAT, collapsing a full-bank re-sort to just the moved slots.
+            if (self:GetCatStamp(playerid, bag, slot) ~= self.catGen) then
+              itm = self:PickBar(cfg, playerid, itm, trade1, trade2);
+              self:SetCatStamp(playerid, bag, slot, self.catGen);
+              itmcache[bag][slot] = itm;
+            end
             local destbar = itm[self.I_BAR];
             local isEmpty = (not itm[self.I_ITEMLINK] or itm[self.I_ITEMLINK] == "");
             if (isEmpty and collapse) then

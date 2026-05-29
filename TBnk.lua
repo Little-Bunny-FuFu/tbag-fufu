@@ -2009,6 +2009,9 @@ function Bank:UpdateWindow(resort_req)
   end
   TFuBagCfg["trades_changed"] = 0;
 
+  -- See Inv:UpdateWindow: full recat only when categorization inputs changed.
+  local force_full = (resort_req >= TFuBag.REQ_MUST)
+
   -- Setup stackarr and comparr
   local stackarr = TFuBag:CreateStackArr();
   local comparr = TFuBag:CreateCompArr();
@@ -2029,6 +2032,7 @@ function Bank:UpdateWindow(resort_req)
   end
 
   if (resort_req >= TFuBag.REQ_MUST) then
+    if (force_full) then TFuBag:BumpCatGen() end
     -- The deferred-resort debt is paid here; clear it so a one-shot CACHE_REQ = REQ_MUST
     -- (e.g. set by RebuildTabList when the tab set changes) fires exactly once and does
     -- not stick high and re-sort on every later open. (Mirrors Inv:UpdateWindow.)
