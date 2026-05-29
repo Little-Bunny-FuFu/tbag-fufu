@@ -182,6 +182,16 @@
         </Scripts>
       </Button>
 
+      <EditBox name="TFuBnk_SearchBox" inherits="TFuBag_SearchBoxTemplate">
+        <Anchors>
+          <Anchor point="BOTTOMLEFT">
+            <Offset>
+              <AbsDimension x="10" y="4"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+      </EditBox>
+
       <CheckButton name="TFuBnkFrameBagBank" inherits="TFuBag_BagButtonTemplate" id="-1">
         <Anchors>
           <Anchor point="BOTTOMLEFT" relativeTo="$parent_Total" relativePoint="BOTTOMRIGHT">
