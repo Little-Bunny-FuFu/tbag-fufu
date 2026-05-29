@@ -278,6 +278,8 @@ function TFuBag:CreateCfgOpt(cfgopt, cfg, bagarr, updatefunc, resizefunc, forcef
     cfg, "show_bag_sizes", updatefunc);
   self:MakeCheck(cfgopt, L["Show Bag Icons on Empty Slots:"],
     cfg, "show_bag_icons", forcefunc);
+  self:MakeCheck(cfgopt, L["Collapse Empty Slots (one cell + free count):"],
+    cfg, "collapse_empty", forcefunc);
   self:MakeCheck(cfgopt, L["Spotlight Open or Selected Bags:"],
     cfg, "spotlight_open", updatefunc);
   self:MakeCheck(cfgopt, L["Spotlight Mouseover:"],

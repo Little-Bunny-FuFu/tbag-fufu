@@ -479,8 +479,11 @@ function Inv:SetBottomLeftButton_Anchors()
           -- First button after search
           button:SetPoint("BOTTOMLEFT",button_left,"TOPLEFT",0,4);
         else
-          -- button following another button
-          button:SetPoint("BOTTOMLEFT",button_left,"BOTTOMRIGHT",3,-1);
+          -- button following another button. The gap after the Total is widened to
+          -- clear the free-slots cell that overlays it (~6px overhang + ~4px gap);
+          -- other following buttons keep the tight 3px spacing.
+          local gap = (button_left == _G["TFuInvFrame_Total"]) and 14 or 3;
+          button:SetPoint("BOTTOMLEFT",button_left,"BOTTOMRIGHT",gap,-1);
         end
       else
         -- First button if dropdown is hidden
@@ -1483,6 +1486,8 @@ function Inv:UpdateWindow(resort_req)
     end
 
   self:SetButton_Anchors();
+
+  TFuBag:UpdateFreeSlotsCell(TFuInvFrame);
 
   Inv.WindowIsUpdating = 0;
 --  UpdateAddOnMemoryUsage();

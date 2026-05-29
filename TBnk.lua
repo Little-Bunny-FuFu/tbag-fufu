@@ -200,37 +200,10 @@ function Bank:init(reset)
   TFuBnkFrameBagBank:Hide();
   TFuBnkFrameBagReagent:Hide();
 
-  -- Stage 2a: Character / Warband view tabs (occupy the freed classic bag-slot row).
-  -- Created once; visibility/enabled state driven by Bank:RefreshBankTypeTabs (the
-  -- active view's button is disabled = "you are here"). Clicking switches the view.
-  if (not TFuBnkFrame.CharTabButton) then
-    -- Anchored to the window TOP-LEFT (not the bottom Total): the auto-flow window
-    -- grows downward with content, so bottom-anchored controls can scroll off-screen
-    -- for a tall (warband) bank -- the top edge stays reachable. Parented to UIParent
-    -- with a high strata so the buttons sit above the bank chrome.
-    -- Parented to UIParent (NOT TFuBnkFrame): the bank window has clipChildren for
-    -- its scroll viewport, which clips any child positioned outside its bounds to
-    -- invisibility. As UIParent children anchored to the window's top-left edge they
-    -- render outside the chrome (no overlap) and stay reachable as the window grows.
-    -- Shown/hidden with the bank (RefreshBankTypeTabs on open; MainFrame:OnHide).
-    local cb = CreateFrame("Button", "TFuBnkFrame_CharTabButton", UIParent, "UIPanelButtonTemplate");
-    cb:SetSize(78, 20);
-    cb:SetText(L["Character"]);
-    cb:SetPoint("TOPRIGHT", TFuBnkFrame, "TOPLEFT", -2, -4);
-    cb:SetFrameStrata("HIGH");
-    cb:Hide();
-    cb:SetScript("OnClick", function() TFuBnkFrame:SetBankType(Enum.BankType.Character); end);
-    TFuBnkFrame.CharTabButton = cb;
-
-    local wb = CreateFrame("Button", "TFuBnkFrame_WarbandTabButton", UIParent, "UIPanelButtonTemplate");
-    wb:SetSize(78, 20);
-    wb:SetText(L["Warband"]);
-    wb:SetPoint("TOPRIGHT", cb, "BOTTOMRIGHT", 0, -4);
-    wb:SetFrameStrata("HIGH");
-    wb:Hide();
-    wb:SetScript("OnClick", function() TFuBnkFrame:SetBankType(Enum.BankType.Account); end);
-    TFuBnkFrame.WarbandTabButton = wb;
-  end
+  -- Stage 2: build the per-tab selector strip (Character/Warband switch + one button
+  -- per purchased tab + buy-tab affordance) in the bottom chrome. Created once; the
+  -- active view's tab row is (re)populated on bank open by Bank:RefreshTabStrip.
+  self:BuildTabStrip();
 
   if (cfg["show_userdropdown"] == 0) then
     TFuBnk_UserDropdown:Hide();
@@ -276,6 +249,33 @@ local function FetchTabsFor(bankType)
   return nil;
 end
 
+-- Default per-tab selection-border colors. Deliberately avoids the WoW item-rarity
+-- colors -- especially deep blue (0,0,1) = "rare" -- so the crisp tab border isn't
+-- mistaken for a rarity border on nearby items. Cycled by tab position; the user can
+-- still recolor any tab in the options (these only seed tabs with no saved color).
+local TAB_DEFAULT_COLORS = {
+  { r = 1.00, g = 0.82, b = 0.00, a = 1 },  -- gold
+  { r = 0.20, g = 0.85, b = 0.55, a = 1 },  -- teal
+  { r = 1.00, g = 0.35, b = 0.80, a = 1 },  -- pink
+  { r = 1.00, g = 0.50, b = 0.15, a = 1 },  -- amber
+  { r = 0.55, g = 0.80, b = 1.00, a = 1 },  -- pale sky (clearly lighter than rare blue)
+  { r = 0.80, g = 0.95, b = 0.30, a = 1 },  -- lime
+}
+
+-- Is this bank type SELECTABLE right now -- i.e. can the player view it (and thus
+-- switch to / buy into it), even with ZERO purchased tabs? CanViewBank is the
+-- authoritative gate; fall back to "has purchased tabs" on clients lacking it. This
+-- is what makes an empty Character bank reachable (to buy a first tab) instead of a
+-- greyed-out dead end.
+local function IsBankViewable(bankType, tabs)
+  if (bankType == nil) then return false; end
+  if (C_Bank and C_Bank.CanViewBank) then
+    local ok, can = pcall(C_Bank.CanViewBank, bankType)
+    if (ok) then return can == true; end
+  end
+  return tabs ~= nil
+end
+
 -- 12.0 read layer: build the dynamic bag list from ONE bank type at a time (the
 -- active self.bankType -- Character or Account/Warband), NOT both combined. Each is
 -- a separate switchable view (Bank:SetBankType), mirroring Baganator's split bank
@@ -291,28 +291,46 @@ function Bank:RebuildTabList()
   local CHAR = Enum.BankType and Enum.BankType.Character
   local ACCT = Enum.BankType and Enum.BankType.Account
 
-  -- Determine which bank types are available right now.
+  -- Purchased tabs per type (nil = none purchased yet -- still selectable if viewable).
   local charTabs = FetchTabsFor(CHAR)
-  if (charTabs) then available[#available + 1] = CHAR; end
-
   local warTabs = nil
+  local warViewable = false
   if (TFuBag.BANK_INCLUDE_WARBAND and ACCT ~= nil) then
     local locked = C_Bank and C_Bank.FetchBankLockedReason
       and C_Bank.FetchBankLockedReason(ACCT)
     if (locked == nil) then
       warTabs = FetchTabsFor(ACCT)
-      if (warTabs) then available[#available + 1] = ACCT; end
+      warViewable = IsBankViewable(ACCT, warTabs)
     end
   end
+  local tabsByType = {}
+  if (CHAR ~= nil) then tabsByType[CHAR] = charTabs; end
+  if (ACCT ~= nil) then tabsByType[ACCT] = warTabs; end
 
-  -- Default/validate the active type: keep current if it has tabs, else fall back
-  -- to the first available type.
-  if (self.bankType == nil) then self.bankType = CHAR; end
-  local activeTabs = (self.bankType == ACCT) and warTabs or charTabs
-  if (activeTabs == nil) then
-    self.bankType = available[1]
-    activeTabs = (self.bankType == ACCT) and warTabs or charTabs
+  -- A type is SELECTABLE (shown + clickable) if viewable, even with zero tabs -- so an
+  -- empty Character bank is reachable to buy a first tab. Order: Character, Warband.
+  if (IsBankViewable(CHAR, charTabs)) then available[#available + 1] = CHAR; end
+  if (warViewable) then available[#available + 1] = ACCT; end
+
+  local function selectable(t)
+    if (t == nil) then return false; end
+    for _, a in ipairs(available) do if (a == t) then return true; end end
+    return false
   end
+
+  -- Respect the current view if it is still selectable (even when it has 0 tabs --
+  -- e.g. the user switched to an empty Character bank to buy a tab). Only when the
+  -- current type is NOT selectable (first open, or a remote warband-only open) do we
+  -- auto-pick: prefer a selectable type that actually has tabs, else the first
+  -- selectable type (may be nil if no bank is viewable at all).
+  if (not selectable(self.bankType)) then
+    local pick = nil
+    for _, t in ipairs(available) do
+      if (tabsByType[t] ~= nil) then pick = t; break; end
+    end
+    self.bankType = pick or available[1]
+  end
+  local activeTabs = (self.bankType ~= nil) and tabsByType[self.bankType] or nil
 
   if (activeTabs) then
     for _, t in ipairs(activeTabs) do
@@ -334,14 +352,25 @@ function Bank:RebuildTabList()
   -- (TBagOpt EnableLine). Seed them here (reset=nil preserves any user change).
   local cfg = self.cfg
   if (cfg) then
-    local dbc = TFuBag.DBC
+    local pal = TAB_DEFAULT_COLORS
     for idx, bag in ipairs(ids) do
       TFuBag:SetDef(cfg, "show_Bag"..bag, 1, nil, TFuBag.NumFunc, 0, 1)
-      if (dbc and #dbc > 0) then
-        local c = dbc[((idx - 1) % #dbc) + 1]
+      if (pal and #pal > 0) then
+        local c = pal[((idx - 1) % #pal) + 1]
         if (c) then TFuBag:SetColor(cfg, "bag_"..bag, c.r, c.g, c.b, c.a, nil) end
       end
+      -- Give this tab's empty slots a real category bar (29, same as the inventory's
+      -- empty-slot bar) so they DISPLAY as drop targets. Without this the tab's
+      -- EMPTY_<name>_SLOTS category had no bar (set up at login when the tab list was
+      -- empty), so PickBar produced a nil bar and SortItmCache dropped every empty
+      -- slot -- leaving nowhere to drag items INTO, and ghost cells on right-click-out.
+      -- PickBar builds the same string from GetBagPosName (tab bagtype is 0 -> the
+      -- GetBagPosName branch), so this key matches. reset=nil preserves user changes.
+      TFuBag:SetCatBar(cfg, string.format(L["EMPTY_%s_SLOTS"], TFuBag:GetBagPosName(bag)), 29, nil)
     end
+    -- Refresh the bar->class list so the newly-mapped empty categories resolve for
+    -- edit-mode display (item placement reads cfg directly, but keep this in sync).
+    TFuBag:BuildBarClassList(self.BC_LIST, cfg)
   end
 
   -- Ensure a dummy container frame + item buttons exist for each tab in the active
@@ -367,7 +396,7 @@ function Bank:RebuildTabList()
   -- for tabs in self.bags).
   self:HideInactiveTabButtons()
 
-  self:RefreshBankTypeTabs()
+  self:RefreshTabStrip()
 end
 
 -- Hide every item button of the currently-listed tabs. Used before switching bank
@@ -397,9 +426,170 @@ function Bank:HideInactiveTabButtons()
   end
 end
 
--- Show/enable the Character/Warband view-tab buttons based on what's available and
--- which view is active (active = disabled, "you are here"; unavailable = disabled).
-function Bank:RefreshBankTypeTabs()
+-----------------------------------------------------------------------
+-- Stage 2: per-tab selector strip
+-----------------------------------------------------------------------
+-- A horizontal row in the bank window's bottom chrome (where the classic bag-slot
+-- buttons used to live): the Character/Warband view switch, one selector button per
+-- purchased tab of the active view, and a buy-tab affordance. Each per-tab button IS
+-- the bag-selector frame (named "TFuBnkTabBtn"<id>, see TFuBag:GetBagFrameName), so
+-- GetChecked()/GetCheckedTexture() drive the existing spotlight + color machinery.
+local TABBTN_SIZE = 26
+local TABBTN_GAP = 4
+local TYPEBTN_W = 74
+-- Tintable selection/hover ring (glowing square border, takes a vertex color).
+local TAB_SEL_TEX = "Interface\\Buttons\\UI-ActionButton-Border"
+local TAB_FALLBACK_ICON = 134400  -- INV_Misc_QuestionMark
+
+-- Create the strip container + the static (Character/Warband/buy) buttons once.
+function Bank:BuildTabStrip()
+  if (TFuBnkFrame.TabStrip) then return; end
+
+  -- Parented to the bank window (NOT UIParent like the interim floats): the strip
+  -- sits inside the window's reserved bottom chrome, within the frame bounds, so the
+  -- clipChildren scroll cascade doesn't clip it. Anchored to the bottom edge so it
+  -- stays put as the scroll viewport caps the window height.
+  local strip = CreateFrame("Frame", "TFuBnkFrame_TabStrip", TFuBnkFrame)
+  strip:SetSize(TABBTN_SIZE, TABBTN_SIZE)
+  -- Share the bottom Total row, flowing right from the Total text -- exactly the
+  -- freed space the classic bag-slot grid used (anchored to $parent_Total too). The
+  -- strip is just a left-anchor for the button row; its own size doesn't bound the
+  -- children (no clip on the strip; clipChildren clips at the TFuBnkFrame edge).
+  -- Start the tab row past the free-slots cell that overlays the Total: the square cell
+  -- overhangs the Total ~4.5px each side, +~4px gap (matches the Warband->tab gap).
+  strip:SetPoint("BOTTOMLEFT", TFuBnkFrame_Total, "BOTTOMRIGHT", 9, 0)
+  TFuBnkFrame.TabStrip = strip
+
+  -- Character / Warband view switch. Keep the CharTabButton/WarbandTabButton field
+  -- names (MainFrame:OnHide and /tbnk reference them); just reparent + re-anchor.
+  local cb = CreateFrame("Button", "TFuBnkFrame_CharTabButton", strip, "UIPanelButtonTemplate")
+  cb:SetSize(TYPEBTN_W, TABBTN_SIZE)
+  cb:SetText(L["Character"])
+  cb:SetPoint("LEFT", strip, "LEFT", 0, 0)
+  cb:SetScript("OnClick", function() TFuBnkFrame:SetBankType(Enum.BankType.Character); end)
+  TFuBnkFrame.CharTabButton = cb
+
+  local wb = CreateFrame("Button", "TFuBnkFrame_WarbandTabButton", strip, "UIPanelButtonTemplate")
+  wb:SetSize(TYPEBTN_W, TABBTN_SIZE)
+  wb:SetText(L["Warband"])
+  wb:SetPoint("LEFT", cb, "RIGHT", TABBTN_GAP, 0)
+  wb:SetScript("OnClick", function() TFuBnkFrame:SetBankType(Enum.BankType.Account); end)
+  TFuBnkFrame.WarbandTabButton = wb
+
+  -- Buy-tab affordance: shown only when C_Bank.CanPurchaseBankTab is true.
+  -- C_Bank.PurchaseBankTab is a PROTECTED (HasRestrictions) function: an addon-shown
+  -- CONFIRM_BUY_BANK_TAB popup runs its OnAccept tainted, so the purchase is silently
+  -- blocked (dialog just closes). The taint-safe path (per Baganator) is to inherit
+  -- Blizzard's secure BankPanelPurchaseButtonScriptTemplate -- its OnClick (Blizzard
+  -- code) shows the popup UNTAINTED -- and tell it which bank type via the
+  -- "overrideBankType" attribute (set in RefreshTabStrip). Do NOT SetScript("OnClick")
+  -- here: that would replace the secure handler. Hook it only for non-secure extras.
+  local buy = CreateFrame("Button", "TFuBnkFrame_BuyTabButton", strip,
+    "UIPanelButtonTemplate, BankPanelPurchaseButtonScriptTemplate")
+  buy:SetSize(TABBTN_SIZE, TABBTN_SIZE)
+  buy:SetText("+")
+  buy:SetScript("OnEnter", function(b)
+    GameTooltip:SetOwner(b, "ANCHOR_TOP")
+    GameTooltip:SetText(L["Buy a Bank Tab"], 1, 1, 1)
+    local nt = C_Bank and C_Bank.FetchNextPurchasableBankTabData
+      and C_Bank.FetchNextPurchasableBankTabData(TFuBnkFrame.bankType)
+    if (nt and nt.tabCost) then SetTooltipMoney(GameTooltip, nt.tabCost) end
+    GameTooltip:Show()
+  end)
+  buy:SetScript("OnLeave", function() GameTooltip:Hide() end)
+  buy:Hide()
+  TFuBnkFrame.BuyTabButton = buy
+
+  TFuBnkFrame.tabButtons = TFuBnkFrame.tabButtons or {}
+  self.tabSel = self.tabSel or {}
+end
+
+-- Get (or lazily create) the selector button for a tab id. Pooled by bag id; the
+-- name matches GetBagFrameName so GetBagFrame(bag) resolves to it.
+function Bank:GetTabButton(bag)
+  local name = "TFuBnkTabBtn"..bag
+  local btn = (TFuBnkFrame.tabButtons and TFuBnkFrame.tabButtons[bag]) or _G[name]
+  if (btn) then return btn; end
+
+  btn = CreateFrame("CheckButton", name, TFuBnkFrame.TabStrip)
+  btn:SetSize(TABBTN_SIZE, TABBTN_SIZE)
+  btn:SetID(bag)
+  btn.tfuTabButton = true
+
+  local icon = btn:CreateTexture(nil, "BACKGROUND")
+  icon:SetPoint("TOPLEFT", 1, -1)
+  icon:SetPoint("BOTTOMRIGHT", -1, 1)
+  btn.tfuIcon = icon
+
+  -- Selection = a crisp 2px SOLID colored frame around the icon (4 edge textures),
+  -- NOT a soft ADD-blended fill (which washed the whole button on light colors and
+  -- vanished on dark ones). SetColorTexture gives an exact, bright, defined border.
+  -- UpdateBagColors paints these from cfg.bag_<id> at full alpha when checked, and
+  -- clears them (alpha 0) when not -- see TFuBag:UpdateBagColors. No checked texture
+  -- is set, so the engine's default whole-button check glow never shows.
+  local function mkEdge()
+    local e = btn:CreateTexture(nil, "OVERLAY")
+    e:SetColorTexture(0, 0, 0, 0)
+    return e
+  end
+  local eT, eB, eL, eR = mkEdge(), mkEdge(), mkEdge(), mkEdge()
+  eT:SetPoint("TOPLEFT");    eT:SetPoint("TOPRIGHT");    eT:SetHeight(2)
+  eB:SetPoint("BOTTOMLEFT"); eB:SetPoint("BOTTOMRIGHT"); eB:SetHeight(2)
+  eL:SetPoint("TOPLEFT");    eL:SetPoint("BOTTOMLEFT");  eL:SetWidth(2)
+  eR:SetPoint("TOPRIGHT");   eR:SetPoint("BOTTOMRIGHT"); eR:SetWidth(2)
+  btn.tfuEdges = { eT, eB, eL, eR }
+
+  -- Subtle hover wash so the button reacts to mouseover without competing with the
+  -- selection border.
+  local hl = btn:CreateTexture(nil, "HIGHLIGHT")
+  hl:SetAllPoints()
+  hl:SetColorTexture(1, 1, 1, 0.15)
+
+  btn:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+  btn:SetScript("OnClick", function(b, mouseButton) TFuBnkFrame:TabButton_OnClick(b, mouseButton); end)
+  btn:SetScript("OnEnter", function(b)
+    GameTooltip:SetOwner(b, "ANCHOR_TOP")
+    local d = TFuBnkFrame.tabData and TFuBnkFrame.tabData[b:GetID()]
+    GameTooltip:SetText((d and d.name) or L["Bank Tab"], 1, 1, 1)
+    GameTooltip:AddLine(L["Right-click for tab settings"], 0.7, 0.7, 0.7)
+    GameTooltip:Show()
+  end)
+  btn:SetScript("OnLeave", function() GameTooltip:Hide() end)
+
+  TFuBnkFrame.tabButtons[bag] = btn
+  return btn
+end
+
+-- Left-click toggles selection (-> spotlight on that tab's slots, mirroring the
+-- inventory bag-slot buttons). Right-click opens our tab-settings dialog WITHOUT
+-- changing selection. self.tabSel is the authoritative selection state: SetChecked
+-- is driven from it so the engine's built-in checkbox toggle can't desync it.
+function Bank:TabButton_OnClick(btn, mouseButton)
+  local bag = btn:GetID()
+  self.tabSel = self.tabSel or {}
+  if (mouseButton == "RightButton") then
+    btn:SetChecked(self.tabSel[bag] == true)   -- revert any engine auto-toggle
+    self:OpenTabSettings(bag)
+    return
+  end
+  self.tabSel[bag] = not (self.tabSel[bag] == true)
+  btn:SetChecked(self.tabSel[bag])
+  TFuBag:UpdateBagColors(bag)        -- repaint the selection border immediately
+  TFuBag:UpdateButtonHighlights()    -- and the item spotlights
+end
+
+-- Right-click tab settings (rename / icon / deposit flags) via our own taint-safe
+-- dialog (C_Bank.UpdateBankTabSettings). Implemented in the next increment.
+function Bank:OpenTabSettings(bag)
+  TFuBag:Print("Tab settings (rename / icon / deposit flags) -- coming in the next increment.")
+end
+
+-- Repopulate the strip for the active view: enable/disable the type switch, lay out
+-- one selector button per purchased tab, and show the buy affordance when allowed.
+function Bank:RefreshTabStrip()
+  self:BuildTabStrip()
+  self.tabSel = self.tabSel or {}
+
   local CHAR = Enum.BankType and Enum.BankType.Character
   local ACCT = Enum.BankType and Enum.BankType.Account
   local avail = self.availableBankTypes or {}
@@ -408,16 +598,60 @@ function Bank:RefreshBankTypeTabs()
     if (t == CHAR) then hasChar = true; elseif (t == ACCT) then hasWar = true; end
   end
 
+  -- Type switch: a button shows only when its type is selectable (viewable); the
+  -- active view's button is disabled ("you are here"). Hiding the non-viewable type
+  -- avoids a greyed dead-end button. The strip is the anchor when neither shows.
   local cb = TFuBnkFrame.CharTabButton
   if (cb) then
-    cb:Show()
+    if (hasChar) then cb:Show() else cb:Hide() end
     if (hasChar and self.bankType ~= CHAR) then cb:Enable() else cb:Disable() end
   end
-
   local wb = TFuBnkFrame.WarbandTabButton
   if (wb) then
-    if (TFuBag.BANK_INCLUDE_WARBAND) then wb:Show() else wb:Hide() end
+    if (hasWar and TFuBag.BANK_INCLUDE_WARBAND) then wb:Show() else wb:Hide() end
     if (hasWar and self.bankType ~= ACCT) then wb:Enable() else wb:Disable() end
+  end
+
+  -- Hide every known per-tab button, then lay out the active view's tabs after the
+  -- rightmost visible type-switch button (or the strip's left edge if none shows).
+  for _, b in pairs(TFuBnkFrame.tabButtons or {}) do b:Hide() end
+
+  local strip = TFuBnkFrame.TabStrip
+  local prev = nil
+  if (wb and wb:IsShown()) then prev = wb elseif (cb and cb:IsShown()) then prev = cb end
+  for _, bag in ipairs(self.bags or {}) do
+    local btn = self:GetTabButton(bag)
+    local d = self.tabData and self.tabData[bag]
+    btn.tfuIcon:SetTexture((d and d.icon) or TAB_FALLBACK_ICON)
+    btn:ClearAllPoints()
+    if (prev) then
+      btn:SetPoint("LEFT", prev, "RIGHT", TABBTN_GAP, 0)
+    else
+      btn:SetPoint("LEFT", strip, "LEFT", 0, 0)
+    end
+    btn:SetChecked(self.tabSel[bag] == true)
+    TFuBag:UpdateBagColors(bag)   -- paint the selection border for the checked state
+    btn:Show()
+    prev = btn
+  end
+
+  local buy = TFuBnkFrame.BuyTabButton
+  if (buy) then
+    local canBuy = C_Bank and C_Bank.CanPurchaseBankTab and self.bankType ~= nil
+      and C_Bank.CanPurchaseBankTab(self.bankType)
+    if (canBuy) then
+      -- Tell Blizzard's secure purchase OnClick which bank type to buy into.
+      buy:SetAttribute("overrideBankType", self.bankType)
+      buy:ClearAllPoints()
+      if (prev) then
+        buy:SetPoint("LEFT", prev, "RIGHT", TABBTN_GAP, 0)
+      else
+        buy:SetPoint("LEFT", strip, "LEFT", 0, 0)
+      end
+      buy:Show()
+    else
+      buy:Hide()
+    end
   end
 end
 
@@ -1604,14 +1838,14 @@ function Bank:UpdateWindow(resort_req)
   end
   self.force_relayout = nil
 
-  -- Relink the button map
+  -- Relink the button map. Use {} (never nil) for empty slots: a nil value drops the
+  -- key from self.BUTTONS, so UpdateButtonHighlights' pairs() loop never visits that
+  -- button and can't clear a stale spotlight left over from an item that moved away
+  -- (the glow "stacking" seen when moving items via Blizzard's bank window).
   for _,bag in ipairs(self.bags) do
     for slot = 1, TFuBag:GetBagMaxItems(bag) do
-      if TFuBnkItm[self.playerid][bag] then
-        TFuBag.BUTTONS[TFuBag:GetBagItemButtonName(bag, slot)] = TFuBnkItm[self.playerid][bag][slot]
-      else
-        TFuBag.BUTTONS[TFuBag:GetBagItemButtonName(bag, slot)] = {}
-      end
+      local itm = TFuBnkItm[self.playerid][bag] and TFuBnkItm[self.playerid][bag][slot]
+      TFuBag.BUTTONS[TFuBag:GetBagItemButtonName(bag, slot)] = itm or {}
     end
   end
 
@@ -1669,6 +1903,14 @@ function Bank:UpdateWindow(resort_req)
   end
 
   TFuBnkFrame:SetButton_Anchors();
+
+  -- Refresh the per-item spotlight glows against the just-relinked button->item map.
+  -- Without this, moving items (e.g. via Blizzard's bank window -> BAG_UPDATE ->
+  -- UpdateWindow) re-sorts the buttons but leaves stale highlight textures shown on
+  -- their old buttons, so the glow appeared to "stack" until a tab click finally
+  -- recomputed it. UpdateButtonHighlights is light (show/hide/tint only, no rescan).
+  TFuBag:UpdateButtonHighlights();
+  TFuBag:UpdateFreeSlotsCell(TFuBnkFrame);
 
   Bank.WindowIsUpdating = 0;
 end

@@ -236,8 +236,15 @@ function ItemButton.Update(self)
   local playerid = mainFrame.playerid
   local hilight_new = mainFrame.hilight_new
   local itm = TFuBag:GetItmFromFrame(TFuBag.BUTTONS, self)
-  if not itm or not next(itm) then return end
+  -- Unmapped button: HIDE it (don't just bail) so it can't ghost at a stale spot.
+  if not itm or not next(itm) then self:Hide(); return end
   local bag, slot = itm[TFuBag.I_BAG], itm[TFuBag.I_SLOT]
+  -- Empty-slot collapse: when on, empty slots are pulled out of the category bars and
+  -- represented by the single bottom-right free-slots cell, so every per-slot empty
+  -- button hides here (this also kills emptied-slot ghosts when items move).
+  if cfg.collapse_empty == 1 and (not itm[TFuBag.I_ITEMLINK] or itm[TFuBag.I_ITEMLINK] == "") then
+    self:Hide(); return
+  end
   local ic_start, ic_duration, ic_enable, texture
 
   -- Get the various frames.

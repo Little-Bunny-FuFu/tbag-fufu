@@ -149,6 +149,16 @@ L["Seventh Bank Bag"] = true
 L["Empty Slot"] = true
 L["Purchasable Reagent Bank"] = true
 
+-- Bank tab strip (12.0 Stage 2)
+L["Character"] = true
+L["Warband"] = true
+L["Buy a Bank Tab"] = true
+L["Right-click for tab settings"] = true
+L["Bank Tab"] = true
+L["Collapse Empty Slots (one cell + free count):"] = true
+L["%d free slots"] = true
+L["Drop an item on the window to deposit it."] = true
+
 -----------------------------------------------------------------------
 -- CATEGORIES
 -----------------------------------------------------------------------

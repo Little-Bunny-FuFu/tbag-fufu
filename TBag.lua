@@ -1273,6 +1273,10 @@ function TFuBag:InitDefVals(cfg, bagarr, row1offset, reset)
 
   self:SetDef(cfg, "moveLock", 1, reset, self.NumFunc, 0,1);
   self:SetDef(cfg, "show_bag_icons", 0, reset, self.NumFunc, 0, 1);
+  -- Collapse all empty slots into a single cell that shows the free-slot count
+  -- (Baganator style) instead of one cell per empty slot. Cleaner, and the one cell
+  -- is a real free slot so dropping an item onto it deposits. Default on.
+  self:SetDef(cfg, "collapse_empty", 1, reset, self.NumFunc, 0, 1);
   self:SetDef(cfg, "spotlight_open", 1, reset, self.NumFunc, 0, 1);
   self:SetDef(cfg, "spotlight_hover", 1, reset, self.NumFunc, 0, 1);
   self:SetDef(cfg, "show_rarity_color", 1, reset, self.NumFunc, 0, 1);
@@ -1807,7 +1811,11 @@ function TFuBag:GetBagFrameName(bag)
   elseif self:Member(self.Inv_Bags, bag) then
     return "TFuInvacterBag"..(bag-1).."Slot";
   elseif self:Member(self.Bnk_Bags, bag) then
-    return "TFuBnkFrameBag"..(bag-4);
+    -- 12.0 Stage 2: bank tabs use dynamic per-tab selector buttons (built in
+    -- Bank:RefreshTabStrip), NOT the static XML TFuBnkFrameBag1-7 row. Each button
+    -- IS the bag-selector frame for its tab, so GetBagFrame/GetChecked/
+    -- GetCheckedTexture drive the existing spotlight + color machinery unchanged.
+    return "TFuBnkTabBtn"..bag;
   else
     return "INVALID";
   end
@@ -2215,7 +2223,17 @@ function TFuBag:UpdateBagColors(bag)
   local frame = self:GetBagFrame(bag);
   if (not frame) then return; end
   local r, g, b, a = self:GetColor(self:GetCfgFromBag(bag), "bag_"..bag);
-  frame:GetCheckedTexture():SetVertexColor(r, g, b, a);
+  -- 12.0 bank tab selector buttons paint a crisp solid edge frame (full alpha) when
+  -- selected, cleared when not -- not a soft checked-texture fill. See Bank:GetTabButton.
+  if (frame.tfuEdges) then
+    local on = frame:GetChecked();
+    for _, e in ipairs(frame.tfuEdges) do
+      if (on) then e:SetColorTexture(r, g, b, 1); else e:SetColorTexture(0, 0, 0, 0); end
+    end
+    return;
+  end
+  local chk = frame.GetCheckedTexture and frame:GetCheckedTexture();
+  if (chk) then chk:SetVertexColor(r, g, b, a); end
 end
 
 function TFuBag:GetCfgFromBag(bag)
@@ -2250,22 +2268,135 @@ function TFuBag:UpdateButtonHighlights()
   -- Then cycle through all the buttons
   for buttonname, itm in pairs(self.BUTTONS) do
     texture = _G[buttonname.."HighlightFrameTexture"];
-    if (texture) and (itm) and next(itm) then
-      bag = itm[self.I_BAG];
-      local cfg = self:GetCfgFromBag(bag);
-      local cr, cg, cb, ca = self:GetColor(cfg, "bag_"..bag);
-      texture:SetVertexColor(cr, cg, cb, ca);
+    if (texture) then
+      if (itm and next(itm)) then
+        bag = itm[self.I_BAG];
+        local cfg = self:GetCfgFromBag(bag);
+        local cr, cg, cb, ca = self:GetColor(cfg, "bag_"..bag);
+        texture:SetVertexColor(cr, cg, cb, ca);
 
-      local bagframe = self:GetBagFrame(bag)
-      if (((bagframe and bagframe:GetChecked()) or isopen[bag]) and (cfg)
-        and (cfg["spotlight_open"] == 1)) then
-        --and (cfg["show_Bag"..bag] == 1) then
-        texture:Show();
+        local bagframe = self:GetBagFrame(bag)
+        if (((bagframe and bagframe:GetChecked()) or isopen[bag]) and (cfg)
+          and (cfg["spotlight_open"] == 1)) then
+          --and (cfg["show_Bag"..bag] == 1) then
+          texture:Show();
+        else
+          texture:Hide();
+        end
       else
+        -- Empty button (item moved away / slot cleared): never leave a stale glow.
+        -- Previously this branch was skipped, so the spotlight from the departed
+        -- item lingered and appeared to "stack".
         texture:Hide();
       end
     end
   end
+end
+
+-----------------------------------------------------------------------
+-- Collapsed empty-slots indicator + whole-window deposit drop target
+-----------------------------------------------------------------------
+-- Deposit the held item into a free slot of this window's bags. SortItmCache records
+-- the target (frame.dropBag/dropSlot) -- the focused bank tab's first free slot if a
+-- single tab is selected, else the first free slot anywhere. Live player only.
+function TFuBag:DepositToFreeSlot(frame)
+  if (not CursorHasItem()) then return; end
+  if (not self:IsLive(frame)) then ClearCursor(); return; end
+  if (frame.dropBag and frame.dropSlot) then
+    PickupContainerItem(frame.dropBag, frame.dropSlot);
+  else
+    ClearCursor();
+    UIErrorsFrame:AddMessage(ERR_BAG_FULL, 1.0, 0.1, 0.1, 1.0);
+  end
+end
+
+-- One "free slots" indicator cell pinned bottom-right, created once per window. Also
+-- wires the window (main frame + scroll content) as a drop target so an item dragged
+-- onto empty window space deposits into a free slot. Empty slots are not drawn
+-- individually while collapse_empty is on, so this cell + the window drop are how you
+-- deposit / see free space.
+function TFuBag:GetFreeSlotsCell(frame)
+  if (frame.FreeCell) then return frame.FreeCell; end
+  local name = frame:GetName().."_FreeCell";
+  local c = CreateFrame("Button", name, frame, "BackdropTemplate");
+  c:SetSize(34, 34);
+  -- Position + frame level are set in UpdateFreeSlotsCell (behind the bottom-left
+  -- Total number, in front of the bars).
+  c:SetBackdrop({
+    bgFile   = "Interface\\Buttons\\WHITE8X8",
+    edgeFile = "Interface\\Buttons\\WHITE8X8", edgeSize = 1,
+  });
+  c:SetBackdropColor(0, 0, 0, 0.35);
+  c:SetBackdropBorderColor(0.55, 0.55, 0.55, 0.8);
+
+  -- Fallback count, shown ONLY when the Total display is hidden; normally the
+  -- bottom-left Total number sits on top of this cell and serves as the count.
+  local txt = c:CreateFontString(nil, "OVERLAY", "NumberFontNormalYellow");
+  txt:SetPoint("CENTER", 0, 0);
+  c.txt = txt;
+
+  c:RegisterForDrag("LeftButton");
+  c:RegisterForClicks("LeftButtonUp");
+  c:SetScript("OnReceiveDrag", function() TFuBag:DepositToFreeSlot(frame); end);
+  c:SetScript("OnClick",       function() TFuBag:DepositToFreeSlot(frame); end);
+  c:SetScript("OnEnter", function(b)
+    GameTooltip:SetOwner(b, "ANCHOR_LEFT");
+    GameTooltip:SetText(string.format(L["%d free slots"], frame.freeSlots or 0), 1, 1, 1);
+    GameTooltip:AddLine(L["Drop an item on the window to deposit it."], 0.7, 0.7, 0.7, true);
+    GameTooltip:Show();
+  end);
+  c:SetScript("OnLeave", function() GameTooltip:Hide(); end);
+
+  -- Whole-window drop. OnReceiveDrag fires on the frame under the cursor, so wire the
+  -- main frame AND the scroll content frame (which spans the item area). Item buttons
+  -- keep their own drop handling. Wired once.
+  if (not frame.tfuDropWired) then
+    local function dropHook() TFuBag:DepositToFreeSlot(frame); end
+    frame:SetScript("OnReceiveDrag", dropHook);
+    local sc = frame.Scroll and frame.Scroll.ScrollChild;
+    local cont = sc and sc.Container;
+    if (sc) then sc:SetScript("OnReceiveDrag", dropHook); end
+    if (cont) then cont:SetScript("OnReceiveDrag", dropHook); end
+    frame.tfuDropWired = true;
+  end
+
+  frame.FreeCell = c;
+  return c;
+end
+
+function TFuBag:UpdateFreeSlotsCell(frame)
+  if (not frame or not frame.cfg) then return; end
+  local c = self:GetFreeSlotsCell(frame);
+  if (frame.cfg["collapse_empty"] ~= 1) then c:Hide(); return; end
+
+  -- Place the empty-slot cell BEHIND the bottom-left "Total" free-slot number (left of
+  -- the bag icons / Character-Warband buttons) and reuse that number as the count. The
+  -- cell sits in FRONT of the category bars but BEHIND the Total number. If the Total
+  -- display is hidden, the cell shows its own fallback count instead.
+  local fn = frame:GetName();
+  local total = _G[fn.."_Total"];
+  c:ClearAllPoints();
+  if (total) then
+    -- Center the cell on the Total frame and make it wide enough for a 3-digit count
+    -- with padding (the center-justified number stays dead-center for any width). The
+    -- bag/tab row is shifted right (see SetBottomLeftButton_Anchors / BuildTabStrip) to
+    -- clear the cell's overhang. Sit one level below the Total so its number draws on top.
+    -- Square (matches the bag-button cells) and wide enough for a centered 3-digit count.
+    c:SetSize(37, 37);
+    c:SetPoint("CENTER", total, "CENTER", 0, 0);
+    local tl = total:GetFrameLevel() or 1;
+    c:SetFrameLevel(math.max(1, tl - 1));
+    if (total:IsShown()) then
+      c.txt:SetText("");          -- Total's number is the count
+    else
+      c.txt:SetText(frame.freeSlots or 0);
+    end
+  else
+    c:SetSize(34, 34);
+    c:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", self.BORDER, self.BORDER);
+    c.txt:SetText(frame.freeSlots or 0);
+  end
+  c:Show();
 end
 
 function TFuBag:MakeColorMenu(cfg, updatefunc, level, bagarr)
@@ -2776,6 +2907,26 @@ function TFuBag:SortItmCache(cfg, playerid, itmcache, baritm, bagarr)
     end
   end
 
+  -- Empty-slot collapse. With collapse_empty on, empty slots are pulled OUT of the
+  -- category bars entirely (their own thing): we just tally the free-slot count and
+  -- remember a deposit target, surfaced as a single indicator cell pinned bottom-right
+  -- (TFuBag:UpdateFreeSlotsCell) with the WHOLE window as the drop target
+  -- (TFuBag:DepositToFreeSlot). In the bank, a single selected tab routes deposits
+  -- straight into that tab. With collapse_empty off, empties fall through to their
+  -- normal bar (per-slot display). The owning frame is resolved from cfg.
+  local collapse = (cfg["collapse_empty"] == 1)
+  local frame = (TFuBnkFrame and cfg == TFuBnkFrame.cfg) and TFuBnkFrame
+    or ((TFuInvFrame and cfg == TFuInvFrame.cfg) and TFuInvFrame or nil)
+  local soloTab = nil
+  if (frame == TFuBnkFrame and TFuBnkFrame.tabSel) then
+    local n, only = 0, nil
+    for b, v in pairs(TFuBnkFrame.tabSel) do if (v) then n = n + 1; only = b; end end
+    if (n == 1) then soloTab = only; end
+  end
+  local freeCount = 0
+  local firstBag, firstSlot = nil, nil   -- first free slot anywhere in the view
+  local soloBag, soloSlot = nil, nil     -- first free slot in the focused bank tab
+
   for _, bag in ipairs(bagarr) do
 --    self:PrintDEBUG("TFuBag:MakeBarItm: bag ="..bag);
     if itmcache[bag] == nil then
@@ -2792,19 +2943,32 @@ function TFuBag:SortItmCache(cfg, playerid, itmcache, baritm, bagarr)
             itmcache[bag][slot] = self:PickBar(cfg, playerid,
               itmcache[bag][slot], trade1, trade2);
 
-            -- Only place items whose category resolved to a real bar. A nil bar
-            -- means the category isn't mapped in this window's layout -- notably a
-            -- 12.0 bank tab's EMPTY_<tab>_SLOTS category, which has no assigned bar
-            -- (Stage 1). Dropping those keeps empty bank slots from cluttering the
-            -- window and prevents table.insert(baritm[nil]).
-            local destbar = itmcache[bag][slot][self.I_BAR];
-            if (type(destbar) == "number" and baritm[destbar]) then
-              table.insert( baritm[destbar], itmcache[bag][slot]);
+            local itm = itmcache[bag][slot];
+            local destbar = itm[self.I_BAR];
+            local isEmpty = (not itm[self.I_ITEMLINK] or itm[self.I_ITEMLINK] == "");
+            if (isEmpty and collapse) then
+              -- Out of the bars: tally + remember free slots for the indicator/deposit.
+              freeCount = freeCount + 1;
+              if (not firstBag) then firstBag = bag; firstSlot = itm[self.I_SLOT]; end
+              if (soloTab and bag == soloTab and not soloBag) then
+                soloBag = bag; soloSlot = itm[self.I_SLOT];
+              end
+            elseif (type(destbar) == "number" and baritm[destbar]) then
+              -- Only place items whose category resolved to a real bar.
+              table.insert(baritm[destbar], itm);
             end
           end
         end
       end
     end
+  end
+
+  if (frame) then
+    frame.freeSlots = freeCount;
+    -- Deposit target: the focused tab's first free slot when exactly one tab is
+    -- selected, else the first free slot anywhere in the view.
+    frame.dropBag  = soloBag or firstBag;
+    frame.dropSlot = soloSlot or firstSlot;
   end
 
   -- sort the cache now
@@ -4665,7 +4829,11 @@ function TFuBag:LayoutWindow(frame)
      end
  else
     -- TFuBnkFrame
-    if (TFuBnkFrame_Total:IsVisible() or TFuBnkFrameBagBank:IsVisible() or
+    -- Stage 2: the per-tab selector strip shares the bottom Total row (the classic
+    -- bag-slot grid is gone), so reserving the normal bottom row covers it. Trigger
+    -- the reservation on the strip too, so the row is kept even if Total is hidden.
+    local strip_shown = TFuBnkFrame.TabStrip and TFuBnkFrame.TabStrip:IsShown();
+    if (TFuBnkFrame_Total:IsVisible() or TFuBnkFrameBagBank:IsVisible() or strip_shown or
         TFuBnkFrame_MoneyFrame:IsVisible() or TFuBnkFrame_TokenFrame:IsVisible()) then
       PAD_BOTTOM = PAD_BOTTOM + self.PAD_BOTTOM_NORM;
     end
