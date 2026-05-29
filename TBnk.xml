@@ -173,7 +173,7 @@
             TFuBnkFrame.Button_DepositReagent_OnClick(self, button, down);
           </OnClick>
           <OnEnter>
-            TFuBag.NewbieTip(self, REAGENTBANK_DEPOSIT, 1.0, 1.0, 1.0, TFuBag.LOCALE["Deposits all Reagents in your bag."]);
+            TFuBag.NewbieTip(self, TFuBnkFrame:GetDepositButtonLabel(), 1.0, 1.0, 1.0, TFuBag.LOCALE["Deposits all Reagents in your bag."]);
           </OnEnter>
           <OnLeave>
             GameTooltip:Hide();
