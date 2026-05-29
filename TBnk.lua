@@ -699,10 +699,40 @@ function Bank:ToggleBankType()
   end
 end
 
+-- Returns the display label for the deposit button for the given bankType.
+-- Uses the 12.0 global string tokens when present; falls back to plain strings.
+local function DepositButtonLabel(bankType)
+  local CHAR = Enum.BankType and Enum.BankType.Character
+  local ACCT = Enum.BankType and Enum.BankType.Account
+  if (bankType == ACCT) then
+    return _G.ACCOUNT_BANK_DEPOSIT_BUTTON_LABEL or "Deposit All Warbound"
+  end
+  return _G.CHARACTER_BANK_DEPOSIT_BUTTON_LABEL or "Deposit All Reagents"
+end
+
+function Bank:GetDepositButtonLabel()
+  return DepositButtonLabel(self.bankType)
+end
+
 function Bank:UpdateDepositButton()
-  -- Deposit is repointed to C_Bank.AutoDepositItemsIntoBank in a later stage;
-  -- hide the legacy reagent-deposit button for now.
-  TFuBnk_Button_DepositReagent:Hide()
+  local btn = TFuBnk_Button_DepositReagent
+  if (self.atbank ~= 1) then
+    btn:Hide()
+    return
+  end
+  if (self.cfg and self.cfg["show_depositbutton"] == 0) then
+    btn:Hide()
+    return
+  end
+  local bankType = self.bankType
+  local supported = bankType ~= nil
+    and C_Bank and C_Bank.DoesBankTypeSupportAutoDeposit
+    and C_Bank.DoesBankTypeSupportAutoDeposit(bankType)
+  if (supported) then
+    btn:Show()
+  else
+    btn:Hide()
+  end
 end
 
 function Bank:UpdateBagGfx()
@@ -799,7 +829,10 @@ function Bank.Button_Reload_OnClick()
 end
 
 function Bank.Button_DepositReagent_OnClick()
-  DepositReagentBank()
+  local bankType = TFuBnkFrame.bankType
+  if (bankType ~= nil and C_Bank and C_Bank.AutoDepositItemsIntoBank) then
+    C_Bank.AutoDepositItemsIntoBank(bankType)
+  end
 end
 
 function Bank.Button_MoveLockToggle_OnClick(self)
@@ -1120,7 +1153,11 @@ function Bank.Toggle_DepositReagentButton()
     TFuBnkFrame:SetButton_Anchors();
   else
     TFuBnkFrame.cfg["show_depositbutton"] = 1;
-    if (TFuBnkFrame.atbank == 1 and TFuBag:IsReagentBankUnlocked(TFuBnkFrame.playerid)) then
+    local bankType = TFuBnkFrame.bankType
+    local supported = TFuBnkFrame.atbank == 1 and bankType ~= nil
+      and C_Bank and C_Bank.DoesBankTypeSupportAutoDeposit
+      and C_Bank.DoesBankTypeSupportAutoDeposit(bankType)
+    if (supported) then
       TFuBnk_Button_DepositReagent:Show();
       TFuBnkFrame:SetButton_Anchors();
     end
@@ -1495,7 +1532,7 @@ function Bank.RightClickMenu_populate(self, level)
   UIDropDownMenu_AddButton(info, level);
 
     info = {
-  ["text"] = REAGENTBANK_DEPOSIT,
+  ["text"] = TFuBnkFrame:GetDepositButtonLabel(),
   ["value"] = nil,
   ["func"] = TFuBnkFrame.Button_DepositReagent_OnClick
   };
