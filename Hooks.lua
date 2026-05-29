@@ -127,7 +127,8 @@ function Hooks.OpenBag(bag)
   end
 
   if mainFrame.cfg["show_Bag"..bag] ~= 1 then
-    TFuBag:GetBagFrame(bag):SetChecked(true)
+    local bagframe = TFuBag:GetBagFrame(bag)
+    if bagframe then bagframe:SetChecked(true) end
   end
   mainFrame:Show()
   TFuBag:UpdateButtonHighlights()
@@ -165,7 +166,7 @@ function Hooks.ToggleBag(bag)
   -- toggle the shown state of the Bag.
   if not isBagShown then
     local bagFrame = TFuBag:GetBagFrame(bag)
-    bagFrame:SetChecked(not bagFrame:GetChecked())
+    if bagFrame then bagFrame:SetChecked(not bagFrame:GetChecked()) end
   end
 
   -- If the frame was already visible when we started
@@ -229,7 +230,7 @@ function Hooks.ToggleAllBags()
     for _, bag in ipairs(TFuBnkFrame.bags) do
       if TFuBnkFrame.cfg["show_Bag"..bag] ~= 1 then
         local bagframe = TFuBag:GetBagFrame(bag)
-        if bagframe:GetChecked() ~= inv_shown then
+        if bagframe and bagframe:GetChecked() ~= inv_shown then
           bagframe:SetChecked(inv_shown)
           TFuBnkFrame.CACHE_REQ = TFuBag.REQ_MUST
           bnk_bag_toggled = true

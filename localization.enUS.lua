@@ -575,6 +575,7 @@ L["Drag categories to arrange them freely. Off uses the automatic layout."] = tr
 L["Auto Stack:"] = true
 L["Stack on Re-sort:"] = true
 L["Profession Bags precede Sorting:"] = true
+L["Legacy Edit (original click editing, no drag):"] = true
 L["Free Placement (Manual Layout):"] = true
 L["Split Reagents by Profession (original TBag style):"] = true
 L["Trade Creation precedes Sorting (Reopen Window):"] = true

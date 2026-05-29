@@ -91,17 +91,40 @@ function ItemButton:OnEnter()
   end
 
   if mainFrame.cfg.spotlight_hover == 1 then
-    local r, g, b, a = TFuBag:GetColor(mainFrame.cfg, "bag_"..bag)
     local bagFrameSpot = TFuBag:GetBagFrameSpotlight(bag)
-    bagFrameSpot:SetVertexColor(r, g, b, a)
-    bagFrameSpot:Show()
+    -- 12.0 warband bank tabs have no per-tab selector/spotlight frame yet (Stage 2).
+    if bagFrameSpot then
+      local r, g, b, a = TFuBag:GetColor(mainFrame.cfg, "bag_"..bag)
+      bagFrameSpot:SetVertexColor(r, g, b, a)
+      bagFrameSpot:Show()
+    end
   end
 
   if mainFrame.edit_mode == 1 then
     GameTooltip:Show()
-    mainFrame:UpdateWindow()
+    TFuBag:RefreshEditHighlight(mainFrame)
   end
 
+end
+
+-- Lightweight edit-mode category highlight: dim displayed item buttons that aren't in
+-- the hovered/selected category (edit_hilight), full alpha for those that are. Used in
+-- place of a full UpdateWindow on hover/leave -- the old code rebuilt the entire window
+-- on every OnEnter/OnLeave, which made scrolling in edit mode lag badly on a large bank
+-- (the cursor crosses many buttons). Skips work when the highlight hasn't changed.
+function TFuBag:RefreshEditHighlight(mainFrame)
+  if (mainFrame.edit_mode ~= 1) then return end
+  local hl = mainFrame.edit_hilight or ""
+  if (mainFrame._last_hilight == hl) then return end
+  mainFrame._last_hilight = hl
+  for buttonname, itm in pairs(self.BUTTONS) do
+    if (itm and next(itm)) then
+      local b = _G[buttonname]
+      if (b and b:IsShown()) then
+        b:SetAlpha((itm[self.I_CAT] ~= hl) and 0.25 or 1)
+      end
+    end
+  end
 end
 
 function ItemButton:OnLeave()
@@ -120,11 +143,12 @@ function ItemButton:OnLeave()
 
   if itm then
     local bag = itm[TFuBag.I_BAG]
-    TFuBag:GetBagFrameSpotlight(bag):Hide()
+    local spotlight = TFuBag:GetBagFrameSpotlight(bag)
+    if spotlight then spotlight:Hide() end
   end
 
   if mainFrame.edit_mode == 1 then
-    mainFrame:UpdateWindow()
+    TFuBag:RefreshEditHighlight(mainFrame)
   end
 end
 
@@ -174,6 +198,15 @@ function ItemButton.UpdateLock(self, itm, mainFrame)
 
   -- Another player's view never appears locked
   if not TFuBag:IsLive(mainFrame) then return end
+
+  -- 12.0 bank tabs: GetContainerItemInfo reports items as "locked" when the warband
+  -- bank is opened remotely (e.g. a distance inhibitor) -- greying already-deposited
+  -- items even though they're fine. Bank tab items aren't mid-move in normal use, so
+  -- never lock-desaturate them (matches the at-banker appearance, where locked=false).
+  if TFuBag:IsBankTab(itm[TFuBag.I_BAG]) then
+    SetItemButtonDesaturated(self, false);
+    return;
+  end
 
   local _,_,locked,_,_ = GetContainerItemInfo(itm[TFuBag.I_BAG],itm[TFuBag.I_SLOT])
   SetItemButtonDesaturated(self, locked, 0.5, 0.5, 0.5);
@@ -454,7 +487,8 @@ function BagButton:OnEnter()
       GameTooltip:SetText(REAGENT_BANK, 1.0, 1.0, 1.0);
     else
       GameTooltip:SetText(L["Purchasable Reagent Bank"], 1.0, 1.0, 1.0)
-      if mainFrame.atbank == 1 then
+      -- GetReagentBankCost was removed in 12.0 (no reagent bank). Guard the call.
+      if mainFrame.atbank == 1 and GetReagentBankCost then
         SetTooltipMoney(GameTooltip, GetReagentBankCost())
       end
     end

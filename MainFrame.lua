@@ -99,7 +99,7 @@ function MainFrame:OnHide()
   -- Unhighlight any bags that are still highlighted.
   for _, bag in ipairs(self.bags) do
     local bagframe = TFuBag:GetBagFrame(bag)
-    if bagframe:GetChecked() then
+    if bagframe and bagframe:GetChecked() then
       self.CACHE_REQ = TFuBag.REQ_MUST
       bagframe:SetChecked(false)
     end
@@ -109,6 +109,13 @@ function MainFrame:OnHide()
   if self.atbank and self.atbank == 1 then
     self.atbank = 0
     CloseBankFrame()
+  end
+
+  -- Hide the bank's Character/Warband view-tab buttons (UIParent-parented, so they
+  -- don't auto-hide with the bank window).
+  if self == TFuBnkFrame then
+    if TFuBnkFrame.CharTabButton then TFuBnkFrame.CharTabButton:Hide() end
+    if TFuBnkFrame.WarbandTabButton then TFuBnkFrame.WarbandTabButton:Hide() end
   end
 
   -- Always reset to the global player for event processing

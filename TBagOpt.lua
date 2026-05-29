@@ -292,6 +292,8 @@ function TFuBag:CreateCfgOpt(cfgopt, cfg, bagarr, updatefunc, resizefunc, forcef
   self:MakeCheck(cfgopt, L["Stack on Re-sort:"],
     cfg, "stack_resort", updatefunc);
 
+  self:MakeCheck(cfgopt, L["Legacy Edit (original click editing, no drag):"],
+    cfg, "legacy_edit", forcefunc);
   self:MakeCheck(cfgopt, L["Free Placement (Manual Layout):"],
     cfg, "ml_freeplace", forcefunc);
   self:MakeCheck(cfgopt, L["Profession Bags precede Sorting:"],

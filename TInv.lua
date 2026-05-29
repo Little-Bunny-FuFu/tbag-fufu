@@ -314,13 +314,19 @@ function Inv.Button_HighlightToggle_OnClick(self)
   TFuInvFrame:UpdateWindow();
 end
 
--- Repurposed as the Manual Layout toggle (freeform draggable categories
--- replaces the old numbered-bar edit mode). Name kept to avoid churn in the XML
--- and menu references.
+-- Edit button. With Legacy Edit ON it toggles the original numbered-bar edit_mode
+-- (click an item's category, click a bar to move it). With Legacy Edit OFF it toggles
+-- Manual Layout (freeform draggable categories). Name kept to avoid XML/menu churn.
 function Inv.Button_ChangeEditMode_OnClick()
   PlaySound(PlaySoundKitID and "igMainMenuOptioncheckBoxOn" or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
   local cfg = TFuInvFrame.cfg;
-  cfg["manual_layout"] = (cfg["manual_layout"] == 1) and 0 or 1;
+  if (cfg["legacy_edit"] == 1) then
+    TFuInvFrame.edit_mode = (TFuInvFrame.edit_mode == 1) and 0 or 1;
+  else
+    TFuInvFrame.edit_mode = 0;  -- classic edit off when using Manual Layout
+    cfg["manual_layout"] = (cfg["manual_layout"] == 1) and 0 or 1;
+  end
+  TFuInvFrame._last_hilight = nil;  -- force the next edit-highlight refresh
   -- resort will force a window redraw
   TFuInvFrame:UpdateWindow(TFuBag.REQ_MUST);
 end
@@ -1460,7 +1466,15 @@ function Inv:UpdateWindow(resort_req)
       local w, h = mlbtn:GetSize();
       mlbtn.MLGlow:SetSize((w or 20) * 1.7, (h or 20) * 1.7);
     end
-    if (self.cfg["manual_layout"] == 1) then
+    -- Glow reflects whichever mode the button drives: classic edit_mode under
+    -- Legacy Edit, else Manual Layout.
+    local edit_active;
+    if (self.cfg["legacy_edit"] == 1) then
+      edit_active = (self.edit_mode == 1);
+    else
+      edit_active = (self.cfg["manual_layout"] == 1);
+    end
+    if (edit_active) then
       mlbtn.MLGlow:Show();
       mlbtn:SetAlpha(1.0);
     else

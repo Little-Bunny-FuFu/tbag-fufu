@@ -80,6 +80,13 @@ function TFuBnk_cmd(msg)
     TFuBag:DeleteCachedCharacter(char,realm);
   elseif (cmd == L["config"]) then
     TFuBnk_OptsFrame:Show();
+  elseif (cmd == "bank") then
+    -- Interim: switch between Character and Warband bank views (clickable per-type
+    -- tab buttons are the next stage).
+    TFuBnkFrame:ToggleBankType();
+  elseif (cmd == "printtypes") then
+    -- TEMP diagnostic: dump distinct item class/subclass buckets in the bags.
+    TFuBag:PrintItemTypes();
   elseif (cmd == L["getcat"] and TFuBag.GetCategory and type(TFuBag.GetCategory) == "function") then
     TFuBag:GetCategory(params);
   elseif (cmd == L["tests"] and TFuBag.RunTests and type(TFuBag.RunTests) == "function") then
@@ -136,6 +143,9 @@ function TFuInv_cmd(msg)
     TFuInvFrame.cfg.cat_layout_free = {};
     TFuBag:Print("TFuInv: Manual Layout reset; will re-snapshot from the default layout.");
     TFuInvFrame:UpdateWindow(TFuBag.REQ_MUST);
+  elseif (cmd == "printtypes") then
+    -- TEMP diagnostic: dump distinct item class/subclass buckets in the bags.
+    TFuBag:PrintItemTypes();
   elseif (cmd == L["getcat"] and TFuBag.GetCategory and type(TFuBag.GetCategory) == "function") then
     TFuBag:GetCategory(params);
   elseif (cmd == L["tests"] and TFuBag.RunTests and type(TFuBag.RunTests) == "function") then

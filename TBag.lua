@@ -187,14 +187,28 @@ local L = TFuBag.LOCALE;
 -----------------------------------------------------------------------
 
 TFuBag.BAGMIN = REAGENTBANK_CONTAINER;
-TFuBag.BAGMAX = 11;
+-- BAGMAX raised from 11 to 16 for the 12.0 bank rewrite: character bank tabs are
+-- Enum.BagIndex.CharacterBankTab_1..6 (6-11) and warband/account tabs are
+-- AccountBankTab_1..5 (12-16). Every bank helper bounds-checks against BAGMAX,
+-- so warband tab ids must be inside it.
+TFuBag.BAGMAX = 16;
 TFuBag.MAX_REAGENTBANK_ITEMS = 98 -- has to be a constant since game can't tell us in time
+TFuBag.MAX_BANKTAB_ITEMS = 98 -- 12.0 bank tabs hold 98 slots; CreateDummyBag/GetBagMaxItems need this (not the 50-slot bag cap)
 -- Reagent bag (Enum.BagIndex.ReagentBag = 5, added 10.0) appended last so the
 -- existing bag layout order is unchanged; GetContainerNumSlots(5) is 0 when no
 -- reagent bag is equipped, so the section degrades to empty/hidden cleanly.
 TFuBag.Inv_Bags = { BACKPACK_CONTAINER, 4, 3, 2, 1, 5 };
 
-TFuBag.Bnk_Bags = { BANK_CONTAINER, REAGENTBANK_CONTAINER, 5, 6, 7, 8, 9, 10, 11 };
+-- 12.0: the classic fixed bank model (BANK_CONTAINER, REAGENTBANK_CONTAINER, 7
+-- purchasable bag slots) is gone. Bnk_Bags is now built dynamically on bank open
+-- from the player's purchased tab ids (see TBnk.lua Bank:RebuildTabList). Empty
+-- until then so nothing routes to dead classic ids before the first BANKFRAME_OPENED.
+TFuBag.Bnk_Bags = {};
+
+-- A bank tab is any container id in the character (6-11) or warband (12-16) range.
+function TFuBag:IsBankTab(bag)
+  return bag and bag >= 6 and bag <= 16;
+end
 TFuBag.Body_Slots = {
   ["HeadSlot"] = 1,
   ["NeckSlot"] = 2,
@@ -1268,6 +1282,10 @@ function TFuBag:InitDefVals(cfg, bagarr, row1offset, reset)
   -- rules in DefaultSearchList, gated in PickBar).
   self:SetDef(cfg, "reagent_split", 0, reset, self.NumFunc, 0, 1);
   self:SetDef(cfg, "manual_layout", 0, reset, self.NumFunc, 0, 1);
+  -- Legacy Edit: when 1, force the original TBag edit experience (auto-flow layout +
+  -- the classic Change-Edit-Mode click-to-assign category editing) and DISABLE the
+  -- Manual Layout mouse drag/placement, regardless of the manual_layout toggle.
+  self:SetDef(cfg, "legacy_edit", 0, reset, self.NumFunc, 0, 1);
   -- Manual Layout placement mode: 0 = grid (snap to button cells, bottom-aligned
   -- rows), 1 = free placement (drag anywhere, snap/dock by the spacing settings,
   -- per-box titles). Each mode keeps its OWN saved positions (cat_layout vs
@@ -1643,17 +1661,16 @@ function TFuBag:GetBagDispName(bag)
   if (bag == 2) then return L["Third Bag"]; end
   if (bag == 3) then return L["Second Bag"]; end
   if (bag == 4) then return L["First Bag"]; end
-  -- Bag 5 is the live reagent bag (Enum.BagIndex.ReagentBag). The old bank model
-  -- also numbered its first bank bag 5, but the bank module is gated off pending
-  -- a C_Bank rewrite (which uses CharacterBankTab_* ids, not 5), so labeling 5 as
-  -- the reagent bag is correct for current behavior. Revisit in the bank rewrite.
+  -- Bag 5 is the live reagent bag (Enum.BagIndex.ReagentBag).
   if (bag == 5) then return L["Reagent Bag"]; end
-  if (bag == 6) then return L["Second Bank Bag"]; end
-  if (bag == 7) then return L["Third Bank Bag"]; end
-  if (bag == 8) then return L["Fourth Bank Bag"]; end
-  if (bag == 9) then return L["Fifth Bank Bag"]; end
-  if (bag == 10) then return L["Sixth Bank Bag"]; end
-  if (bag == 11) then return L["Seventh Bank Bag"]; end
+  -- 12.0 bank tabs (6-16): use the live tab name from C_Bank (cached in
+  -- Bank.tabData by Bank:RebuildTabList); fall back to a generic label.
+  if (self:IsBankTab(bag)) then
+    local td = TFuBnkFrame and TFuBnkFrame.tabData and TFuBnkFrame.tabData[bag];
+    if (td and td.name and td.name ~= "") then return td.name; end
+    if (bag <= 11) then return L["Bank"].." "..(bag - 5); end
+    return L["Warband"].." "..(bag - 11);
+  end
 end
 
 -- Used for EMPTY_X_SLOTS
@@ -1669,12 +1686,13 @@ function TFuBag:GetBagPosName(bag)
   -- Bag 5 = reagent bag (live). See GetBagDispName for the bank-bag-1 collision
   -- note; RBAG keeps the reagent bag's empty-slot category distinct.
   if (bag == 5) then return L["RBAG"]; end
-  if (bag == 6) then return L["BBAG2"]; end
-  if (bag == 7) then return L["BBAG3"]; end
-  if (bag == 8) then return L["BBAG4"]; end
-  if (bag == 9) then return L["BBAG5"]; end
-  if (bag == 10) then return L["BBAG6"]; end
-  if (bag == 11) then return L["BBAG7"]; end
+  -- 12.0 bank tabs (6-16): empty-slot category fragment per tab. Use the live tab
+  -- name when available, else a stable per-tab token.
+  if (self:IsBankTab(bag)) then
+    local td = TFuBnkFrame and TFuBnkFrame.tabData and TFuBnkFrame.tabData[bag];
+    if (td and td.name and td.name ~= "") then return td.name; end
+    return "BTAB"..bag;
+  end
 end
 
 function TFuBag:GetBagTypeName(bagType)
@@ -1718,7 +1736,9 @@ function TFuBag:GetBagType(playerid, bag)
   -- get the live info if we are the current player, and at the bank
   if (playerid == self.PLAYERID and (TFuBnkFrame.atbank == 1 or self:Member(TFuBag.Inv_Bags, bag))) then
     local itemlink,id,name,itemType,subType,quality;
-    if (bag > BACKPACK_CONTAINER) then
+    -- 12.0 bank tabs (6-16) are containers, not equipped bag items: they have no
+    -- ContainerIDToInventoryID slot, so skip the worn-bag-item lookup for them.
+    if (bag > BACKPACK_CONTAINER and not self:IsBankTab(bag)) then
       itemlink = GetInventoryItemLink("player", ContainerIDToInventoryID(bag));
       id, itemlink = self:GetItemID(itemlink);
       name, itemType, subType, quality = self:GetItemInfo(id);
@@ -1868,6 +1888,11 @@ end
 function TFuBag:GetBagMaxItems(bag)
   if bag == REAGENTBANK_CONTAINER then
     return self.MAX_REAGENTBANK_ITEMS
+  end
+  -- 12.0 bank tabs hold 98 slots; the 50-slot MAX_CONTAINER_ITEMS cap would
+  -- leave slots 51-98 with no item-button frames (items there never render).
+  if self:IsBankTab(bag) then
+    return self.MAX_BANKTAB_ITEMS
   end
   return MAX_CONTAINER_ITEMS
 end
@@ -2024,6 +2049,9 @@ function TFuBag:MakeFreeString(free, size, showsize)
 end
 
 function TFuBag:SetFreeStr(obj, free, size, showsize)
+  -- 12.0 bank: warband tabs have no per-tab selector/count frame yet (Stage 2),
+  -- so the count target can be nil -- skip silently.
+  if (not obj) then return; end
   obj:SetText(self:MakeFreeString(free, size, showsize));
   if (size <= 0) then
     obj:SetTextColor(1,1,1,1);
@@ -2165,9 +2193,29 @@ function TFuBag:ResetBarColors(cfg)
   end
 end
 
+-- Lightweight bar recolor: re-apply background/border colors to the already-laid-out
+-- bar frames (and bag spotlight colors) WITHOUT a full UpdateWindow (no rescan /
+-- resort / relayout). Used as the color picker's live callback so dragging the color
+-- or opacity slider doesn't rebuild the whole (large) bank window on every tick.
+function TFuBag:RecolorWindow(frame)
+  if (not frame) then return; end
+  local cfg = frame.cfg;
+  local framename = frame:GetName();
+  for bar = 1, self.BAR_MAX do
+    local bf = _G[framename.."_bar_"..bar];
+    if (bf and bf.SetBackdropColor) then
+      self:ColorFrame(cfg, bf, bar);
+    end
+  end
+  self:UpdateButtonHighlights();
+end
+
 function TFuBag:UpdateBagColors(bag)
+  -- 12.0 bank: a bank tab may have no selector button frame yet (Stage 2) -- skip.
+  local frame = self:GetBagFrame(bag);
+  if (not frame) then return; end
   local r, g, b, a = self:GetColor(self:GetCfgFromBag(bag), "bag_"..bag);
-  self:GetBagFrame(bag):GetCheckedTexture():SetVertexColor(r, g, b, a);
+  frame:GetCheckedTexture():SetVertexColor(r, g, b, a);
 end
 
 function TFuBag:GetCfgFromBag(bag)
@@ -2208,8 +2256,9 @@ function TFuBag:UpdateButtonHighlights()
       local cr, cg, cb, ca = self:GetColor(cfg, "bag_"..bag);
       texture:SetVertexColor(cr, cg, cb, ca);
 
-      if (self:GetBagFrame(bag):GetChecked() or isopen[bag]) and (cfg)
-        and (cfg["spotlight_open"] == 1) then
+      local bagframe = self:GetBagFrame(bag)
+      if (((bagframe and bagframe:GetChecked()) or isopen[bag]) and (cfg)
+        and (cfg["spotlight_open"] == 1)) then
         --and (cfg["show_Bag"..bag] == 1) then
         texture:Show();
       else
@@ -2596,8 +2645,9 @@ function TFuBag:UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, compar
           end
 
 
-          if (itm[self.I_BAR] == nil and
-              (cfg["show_Bag"..bag] == 1 or TFuBag:GetBagFrame(bag):GetChecked())) then
+          local showbag = (cfg["show_Bag"..bag] == 1) or TFuBag:IsBankTab(bag)
+            or (TFuBag:GetBagFrame(bag) and TFuBag:GetBagFrame(bag):GetChecked());
+          if (itm[self.I_BAR] == nil and showbag) then
             resort_mandatory = 1;
           end
 
@@ -2607,7 +2657,8 @@ function TFuBag:UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, compar
           if (itm[self.I_ITEMLINK] ~= itmcache[bag][slot][self.I_ITEMLINK]) then
             -- the item changed
             if (itm[self.I_TIMESTAMP] ~= nil) then
-              if (cfg["show_Bag"..bag] == 1 or TFuBag:GetBagFrame(bag):GetChecked()) then
+              if (cfg["show_Bag"..bag] == 1 or TFuBag:IsBankTab(bag)
+                  or (TFuBag:GetBagFrame(bag) and TFuBag:GetBagFrame(bag):GetChecked())) then
                 resort_suggested = 1;
               end
               itm[self.I_TIMESTAMP] = time();
@@ -2731,7 +2782,8 @@ function TFuBag:SortItmCache(cfg, playerid, itmcache, baritm, bagarr)
       return baritm;
     end
 
-    if (cfg["show_Bag"..bag] == 1 or TFuBag:GetBagFrame(bag):GetChecked()) then
+    if (cfg["show_Bag"..bag] == 1 or TFuBag:IsBankTab(bag)
+        or (TFuBag:GetBagFrame(bag) and TFuBag:GetBagFrame(bag):GetChecked())) then
       size = table.getn(itmcache[bag]);
       if (size > 0) then
 --        self:PrintDEBUG("Show bag "..bag);
@@ -2740,7 +2792,15 @@ function TFuBag:SortItmCache(cfg, playerid, itmcache, baritm, bagarr)
             itmcache[bag][slot] = self:PickBar(cfg, playerid,
               itmcache[bag][slot], trade1, trade2);
 
-            table.insert( baritm[ itmcache[bag][slot][self.I_BAR] ], itmcache[bag][slot]);
+            -- Only place items whose category resolved to a real bar. A nil bar
+            -- means the category isn't mapped in this window's layout -- notably a
+            -- 12.0 bank tab's EMPTY_<tab>_SLOTS category, which has no assigned bar
+            -- (Stage 1). Dropping those keeps empty bank slots from cluttering the
+            -- window and prevents table.insert(baritm[nil]).
+            local destbar = itmcache[bag][slot][self.I_BAR];
+            if (type(destbar) == "number" and baritm[destbar]) then
+              table.insert( baritm[destbar], itmcache[bag][slot]);
+            end
           end
         end
       end
@@ -2951,6 +3011,41 @@ function TFuBag:PickBar(cfg, playerid, itm, trade1, trade2)
 
   end
   return itm;
+end
+
+
+-- DIAGNOSTIC (temporary): dump the distinct item class/subclass buckets present
+-- in the player's bags. One line per unique (classID, subClassID) pair, with the
+-- localized type/subtype strings GetItemInfo would match against (field 4/5 of
+-- DefaultSearchList), the numeric enum IDs, a count, and one example item name.
+-- Used to author the 12.0 reagent-family category rules against ground truth
+-- (the trade-goods subclass enum + localized strings aren't in wow-ui-source).
+function TFuBag:PrintItemTypes()
+  local buckets = {};
+  local order = {};
+  for _, bag in ipairs(self.Inv_Bags) do
+    local slots = GetContainerNumSlots(bag);
+    for slot = 1, slots do
+      local link = GetContainerItemLink(bag, slot);
+      if (link) then
+        local _, itemType, itemSubType, _, _, classID, subClassID = GetItemInfoInstant(link);
+        local name = GetItemInfo(link) or string.match(link, "%[(.-)%]") or "?";
+        local key = tostring(classID).."|"..tostring(subClassID);
+        if (not buckets[key]) then
+          buckets[key] = { c = classID, s = subClassID, t = itemType, st = itemSubType, n = 0, ex = name };
+          table.insert(order, key);
+        end
+        buckets[key].n = buckets[key].n + 1;
+        buckets[key].ex = name;
+      end
+    end
+  end
+  self:Print("TBag item-type dump  (classID:subClassID  type / subtype  xCount  e.g. name):");
+  for _, key in ipairs(order) do
+    local b = buckets[key];
+    self:Print(string.format("  %s:%s  %s / %s  x%d  e.g. %s",
+      tostring(b.c), tostring(b.s), tostring(b.t), tostring(b.st), b.n, tostring(b.ex)));
+  end
 end
 
 
@@ -3398,7 +3493,7 @@ end
 
 function TFuBag:MLDragStart(frame, barnum, bf)
   local cfg = frame.cfg;
-  if (cfg.manual_layout ~= 1) then return; end
+  if (cfg.manual_layout ~= 1 or cfg.legacy_edit == 1) then return; end
   local free = (cfg.ml_freeplace == 1);
   local rec = (free and cfg.cat_layout_free or cfg.cat_layout)[barnum];
   if (not rec) then return; end
@@ -4508,6 +4603,14 @@ end
 
 function TFuBag:LayoutWindow(frame)
   local framename = frame:GetName()
+  -- Cap-to-screen + scroll for the bank: anchor the category bars into the scroll
+  -- Container (content-sized) instead of the main window frame, and cap the window
+  -- height (UpdateScrollViewport cap), so the WowScrollBox scrolls the overflow
+  -- (same machinery Manual Layout uses). Bank-only for now to avoid regressing the
+  -- inventory; extend once verified. scname is the Container's global name.
+  local scroll_cap = (frame == TFuBnkFrame)
+  local scname = framename.."_Scroll_ScrollChild_Container"
+  local bar_anchor = scroll_cap and scname or framename
   local cfg = frame.cfg
   local baritm = frame.BARITM
   local bar_x = cfg.bar_x
@@ -4606,7 +4709,8 @@ function TFuBag:LayoutWindow(frame)
   -- normal auto-flow. When already seeded, draw at the saved coords; on the first
   -- enable (no saved layout) run the auto-flow once below, then the tail snapshots
   -- it and re-lays-out freeform so enabling looks identical to ML-off.
-  local use_ml = (cfg.manual_layout == 1 and frame.playerid == TFuBag.PLAYERID);
+  -- Legacy Edit forces the original auto-flow + classic edit path (no drag/placement).
+  local use_ml = (cfg.manual_layout == 1 and cfg.legacy_edit ~= 1 and frame.playerid == TFuBag.PLAYERID);
   local ml_free = (cfg.ml_freeplace == 1);
   local ml_seed = false;
   if (use_ml) then
@@ -4636,6 +4740,11 @@ function TFuBag:LayoutWindow(frame)
 
   -- ITEM BUTTONS
   local cur_y = frame:PoolY(1) + self.BORDER + PAD_BOTTOM;
+  -- When anchoring bars to the scroll Container (scroll_cap) instead of the window,
+  -- subtract the window's bottom chrome (== cur_y's initial value, the same value
+  -- UpdateScrollViewport uses as bottom_pad): the Container spans only the content
+  -- area, so bars must be measured from the content bottom, not the window bottom.
+  local bottom_chrome = frame:PoolY(1) + self.BORDER + PAD_BOTTOM;
 
   for barnum = 1, self.BAR_MAX, bar_x do
     -- last row is partial when bar_x does not divide BAR_MAX evenly; only the
@@ -4707,10 +4816,15 @@ function TFuBag:LayoutWindow(frame)
           if (bar_rows < 1) then bar_rows = 1; end
           local bar_h = (edit_mode == 1) and calc_dat["height"] or bar_rows;
 
+          -- When anchoring to the scroll Container (scroll_cap), the cur_x offset
+          -- bakes in the window's right BORDER chrome, but the Container is the
+          -- content area (no border) -- so add BORDER back to avoid shifting every
+          -- bar left by that much (which clips the leftmost column). Mirror of the
+          -- bottom_chrome subtraction on the vertical axis.
           self:PositionFrame(framename.."_bar_"..(barnum+iBar),
-            "BOTTOMRIGHT", framename, "BOTTOMRIGHT",
-            0-cur_x-cur_width,
-            cur_y,
+            "BOTTOMRIGHT", bar_anchor, "BOTTOMRIGHT",
+            scroll_cap and (0-cur_x-cur_width + self.BORDER) or (0-cur_x-cur_width),
+            scroll_cap and (cur_y - bottom_chrome) or cur_y,
             frame:FrameX(calc_dat[iBar.."_width"]),
             frame:FrameY(bar_h));
 
@@ -4804,7 +4918,7 @@ function TFuBag:LayoutWindow(frame)
   local af_content_h = new_height - PAD_TOP - PAD_BOTTOM - self.BORDER - frame:PoolY(1);
   if (af_content_w < 1) then af_content_w = 1; end
   if (af_content_h < 1) then af_content_h = 1; end
-  self:UpdateScrollViewport(frame, PAD_TOP, PAD_BOTTOM, af_content_w, af_content_h);
+  self:UpdateScrollViewport(frame, PAD_TOP, PAD_BOTTOM, af_content_w, af_content_h, scroll_cap);
 
   -- Manual Layout first enable: the auto-flow above has positioned every box, so
   -- capture those positions and re-lay-out in the chosen Manual Layout mode.

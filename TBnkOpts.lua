@@ -118,18 +118,17 @@ function TFuBnk_Options_InitWindow()
     TFuBnk_OptsFrame:SetWidth( TFuBnk_Options_FRAME_WIDTH );
     TFuBnk_OptsFrame:SetHeight( TFuBnk_Options_FRAME_HEIGHT );
 
+    -- Colors are stored nested in cfg[COLORS]["bkgr_"/"brdr_"..bar]; use GetColor
+    -- (the flat "bar_colors_*_background_r" keys never existed -> nil -> crash). This
+    -- mirrors the working inventory options (TInvOpts.lua). Latent bug surfaced once
+    -- the bank was enabled and its options window could be opened.
+    -- Use the bank's OWN main-bar color (default alpha 0.4, same opacity as the
+    -- inventory options window). The earlier nil flat-key lookup left the backdrop
+    -- at its opaque XML default; GetColor here gives the proper lowered opacity.
     TFuBnk_OptsFrame:SetBackdropColor(
-    --  TFuBag_GetColor(TFuBnkCfg, "bkgr_"..TBAG_MAIN_BAR)
-    TFuBnkFrame.cfg["bar_colors_"..TFuBag.MAIN_BAR.."_background_r"],
-    TFuBnkFrame.cfg["bar_colors_"..TFuBag.MAIN_BAR.."_background_g"],
-    TFuBnkFrame.cfg["bar_colors_"..TFuBag.MAIN_BAR.."_background_b"],
-    TFuBnkFrame.cfg["bar_colors_"..TFuBag.MAIN_BAR.."_background_a"] );
+      TFuBag:GetColor(TFuBnkFrame.cfg, "bkgr_"..TFuBag.MAIN_BAR) );
     TFuBnk_OptsFrame:SetBackdropBorderColor(
-    --  TFuBag_GetColor(TFuBnkCfg, "brdr_"..TBAG_MAIN_BAR)
-    TFuBnkFrame.cfg["bar_colors_"..TFuBag.MAIN_BAR.."_border_r"],
-    TFuBnkFrame.cfg["bar_colors_"..TFuBag.MAIN_BAR.."_border_g"],
-    TFuBnkFrame.cfg["bar_colors_"..TFuBag.MAIN_BAR.."_border_b"],
-    TFuBnkFrame.cfg["bar_colors_"..TFuBag.MAIN_BAR.."_border_a"] );
+      TFuBag:GetColor(TFuBnkFrame.cfg, "brdr_"..TFuBag.MAIN_BAR) );
 
     TFuBnk_Options_UpdateWindow();
 end

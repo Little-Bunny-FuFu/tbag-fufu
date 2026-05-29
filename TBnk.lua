@@ -5,13 +5,18 @@ local TFuBag = _G.TFuBag
 TFuBag.Bank = {}
 local Bank = TFuBag.Bank
 
--- Bank module gated OFF for the 12.0 revival: the classic-bank API is gone and
--- the bank needs a ground-up C_Bank rewrite (see tbag-fufu-bank-rewrite-design.md).
--- While false, the Blizzard-bank hijack (SetReplaceBank, a taint risk) and the
--- TBag bank window are suppressed. Flip to true once TFuBnk is rewritten.
-TFuBag.BANK_ENABLED = false
+-- Bank module: 12.0 C_Bank rewrite (Stage 1, read layer). The classic fixed-bank
+-- API (BANK_CONTAINER, REAGENTBANK_CONTAINER, 7 purchasable bag slots) is gone;
+-- 12.0 uses a tab-as-container model (Enum.BagIndex.CharacterBankTab_1..6 = 6-11,
+-- AccountBankTab_1..5 = 12-16) read with the same C_Container calls as bags.
+-- We do NOT hijack Blizzard's BankFrame (Syndicator/Baganator don't either) -- it
+-- opens normally alongside ours; all C_Bank reads are AllowedWhenUntainted.
+-- See tbag-fufu-bank-rewrite-design.md.
+TFuBag.BANK_ENABLED = true
 
-local BankFrame_Saved = nil;
+-- Include warband/account bank tabs (12-16) alongside character tabs (6-11).
+-- Reads are taint-safe; deposit/purchase actions are deferred to later stages.
+TFuBag.BANK_INCLUDE_WARBAND = true
 
 -- Localization Support
 local L = TFuBag.LOCALE;
@@ -97,7 +102,15 @@ function Bank:init(reset)
   -- Bank switching
   self.playerid = "";
   self.atbank = 0;
-  self.bags = TFuBag.Bnk_Bags
+  -- 12.0: bag list is built dynamically from purchased tabs on BANKFRAME_OPENED
+  -- (Bank:RebuildTabList). Empty until then. tabData caches per-tab name/icon/type;
+  -- tabFramesCreated tracks which tab container frames we've already built.
+  self.bags = {}
+  self.tabData = {}
+  self.tabFramesCreated = {}
+  -- Active bank view (Character vs Account/Warband). Default Character; switched via
+  -- Bank:SetBankType / Bank:ToggleBankType. Only the active type is scanned/rendered.
+  self.bankType = Enum.BankType and Enum.BankType.Character
 
   self.CACHE_REQ = TFuBag.REQ_NONE
 
@@ -136,18 +149,15 @@ function Bank:init(reset)
   self:SetPlayer(TFuBag.PLAYERID);
 
   -- Scroll viewport (WowScrollBox single-content-frame pattern; see TInv.lua).
+  -- Cached on self so Bank:RebuildTabList can parent newly-created tab container
+  -- frames (warband tabs 12-16 have no static XML frame) into the same content frame.
   local bnkContainer = TFuBnkFrame.Scroll
     and TFuBnkFrame.Scroll.ScrollChild
     and TFuBnkFrame.Scroll.ScrollChild.Container;
+  self.bnkContainer = bnkContainer or TFuBnkFrame;
 
-  -- Make all the frames
-  for _, bag in ipairs(self.bags) do
---    if (bag == BANK_CONTAINER) then
---      TFuBag:CreateDummyBag(bag, "TFuBnk_BankItemButtonTemplate");
---    else
-      TFuBag:CreateDummyBag(bag, "TFuBag_ItemButtonTemplate");
---    end
-  end
+  -- Per-tab dummy bag frames + item buttons are created lazily on bank open
+  -- (Bank:RebuildTabList), since the tab set isn't known until BANKFRAME_OPENED.
 
   TFuBag:CreateFrame("Frame", "TFuBnkFrame_bar_", bnkContainer or TFuBnkFrame,
     "TFuBag_BarFrameTemplate", TFuBag.BAR_MAX, "");
@@ -163,12 +173,9 @@ function Bank:init(reset)
 
   self:CalcButtonSize(cfg["frameButtonSize"], cfg["framePad"]);
 
-  for _, bag in ipairs(self.bags) do
-    TFuBag:GetBagFrame(bag):SetScale(0.7);
-  end
-  self:InitBagGfx()
-
-  if TFuBag.BANK_ENABLED then self:SetReplaceBank(); end
+  -- (Static bag-slot button scaling + InitBagGfx removed: the per-tab selector
+  -- buttons are built on bank open in a later stage. We do NOT hijack Blizzard's
+  -- BankFrame -- it opens normally alongside ours, avoiding the SetReplaceBank taint.)
 
   if (cfg["moveLock"] == 0) then
     TFuBnkLockNorm:SetTexture("Interface\\AddOns\\tbag-fufu\\images\\LockButton-Locked-Up");
@@ -178,17 +185,53 @@ function Bank:init(reset)
     TFuBnkLockPush:SetTexture("Interface\\AddOns\\tbag-fufu\\images\\LockButton-Unlocked-Down");
   end
 
-  if (cfg["show_bagbuttons"] == 0) then
-    TFuBnkFrameBag1:Hide();
-    TFuBnkFrameBag2:Hide();
-    TFuBnkFrameBag3:Hide();
-    TFuBnkFrameBag4:Hide();
-    TFuBnkFrameBag5:Hide();
-    TFuBnkFrameBag6:Hide();
-    TFuBnkFrameBag7:Hide();
-    TFuBnkFrameBagBank:Hide();
-    TFuBnkFrameBagReagent:Hide();
+  -- 12.0 Stage 1: the static classic bag-slot selector buttons (7 bank bags + bank
+  -- + reagent) are not wired to the tab-as-container model and reference removed APIs
+  -- on hover (e.g. GetReagentBankCost). Per-tab selector buttons replace them in
+  -- Stage 2; until then, always hide them so they can't be hovered/clicked into the
+  -- removed classic-bank code paths.
+  TFuBnkFrameBag1:Hide();
+  TFuBnkFrameBag2:Hide();
+  TFuBnkFrameBag3:Hide();
+  TFuBnkFrameBag4:Hide();
+  TFuBnkFrameBag5:Hide();
+  TFuBnkFrameBag6:Hide();
+  TFuBnkFrameBag7:Hide();
+  TFuBnkFrameBagBank:Hide();
+  TFuBnkFrameBagReagent:Hide();
+
+  -- Stage 2a: Character / Warband view tabs (occupy the freed classic bag-slot row).
+  -- Created once; visibility/enabled state driven by Bank:RefreshBankTypeTabs (the
+  -- active view's button is disabled = "you are here"). Clicking switches the view.
+  if (not TFuBnkFrame.CharTabButton) then
+    -- Anchored to the window TOP-LEFT (not the bottom Total): the auto-flow window
+    -- grows downward with content, so bottom-anchored controls can scroll off-screen
+    -- for a tall (warband) bank -- the top edge stays reachable. Parented to UIParent
+    -- with a high strata so the buttons sit above the bank chrome.
+    -- Parented to UIParent (NOT TFuBnkFrame): the bank window has clipChildren for
+    -- its scroll viewport, which clips any child positioned outside its bounds to
+    -- invisibility. As UIParent children anchored to the window's top-left edge they
+    -- render outside the chrome (no overlap) and stay reachable as the window grows.
+    -- Shown/hidden with the bank (RefreshBankTypeTabs on open; MainFrame:OnHide).
+    local cb = CreateFrame("Button", "TFuBnkFrame_CharTabButton", UIParent, "UIPanelButtonTemplate");
+    cb:SetSize(78, 20);
+    cb:SetText(L["Character"]);
+    cb:SetPoint("TOPRIGHT", TFuBnkFrame, "TOPLEFT", -2, -4);
+    cb:SetFrameStrata("HIGH");
+    cb:Hide();
+    cb:SetScript("OnClick", function() TFuBnkFrame:SetBankType(Enum.BankType.Character); end);
+    TFuBnkFrame.CharTabButton = cb;
+
+    local wb = CreateFrame("Button", "TFuBnkFrame_WarbandTabButton", UIParent, "UIPanelButtonTemplate");
+    wb:SetSize(78, 20);
+    wb:SetText(L["Warband"]);
+    wb:SetPoint("TOPRIGHT", cb, "BOTTOMRIGHT", 0, -4);
+    wb:SetFrameStrata("HIGH");
+    wb:Hide();
+    wb:SetScript("OnClick", function() TFuBnkFrame:SetBankType(Enum.BankType.Account); end);
+    TFuBnkFrame.WarbandTabButton = wb;
   end
+
   if (cfg["show_userdropdown"] == 0) then
     TFuBnk_UserDropdown:Hide();
   end
@@ -225,89 +268,218 @@ function Bank:init(reset)
   TFuBag:LayoutWindow(self)
 end
 
-function Bank:UpdateDepositButton()
-  if (self.atbank == 1 and self.cfg["show_depositbutton"] == 1 and TFuBag:IsReagentBankUnlocked(self.playerid)) then
-    TFuBnk_Button_DepositReagent:Show()
-  else
-    TFuBnk_Button_DepositReagent:Hide()
+-- Probe whether a bank type has any purchased tabs available.
+local function FetchTabsFor(bankType)
+  if (bankType == nil or not C_Bank or not C_Bank.FetchPurchasedBankTabData) then return nil; end
+  local ok, tabs = pcall(C_Bank.FetchPurchasedBankTabData, bankType)
+  if (ok and tabs and #tabs > 0) then return tabs; end
+  return nil;
+end
+
+-- 12.0 read layer: build the dynamic bag list from ONE bank type at a time (the
+-- active self.bankType -- Character or Account/Warband), NOT both combined. Each is
+-- a separate switchable view (Bank:SetBankType), mirroring Baganator's split bank
+-- views. Rendering one type keeps the slot count (and per-open scan/layout cost) and
+-- window height roughly halved. Tab ids ARE Enum.BagIndex container ids, read with
+-- the same C_Container calls as bags. All C_Bank reads are AllowedWhenUntainted; no
+-- BankFrame hijack -> no taint. Run on BANKFRAME_OPENED + BANK_TABS_CHANGED + switch.
+function Bank:RebuildTabList()
+  local ids = {}
+  local data = {}
+  local available = {}
+
+  local CHAR = Enum.BankType and Enum.BankType.Character
+  local ACCT = Enum.BankType and Enum.BankType.Account
+
+  -- Determine which bank types are available right now.
+  local charTabs = FetchTabsFor(CHAR)
+  if (charTabs) then available[#available + 1] = CHAR; end
+
+  local warTabs = nil
+  if (TFuBag.BANK_INCLUDE_WARBAND and ACCT ~= nil) then
+    local locked = C_Bank and C_Bank.FetchBankLockedReason
+      and C_Bank.FetchBankLockedReason(ACCT)
+    if (locked == nil) then
+      warTabs = FetchTabsFor(ACCT)
+      if (warTabs) then available[#available + 1] = ACCT; end
+    end
+  end
+
+  -- Default/validate the active type: keep current if it has tabs, else fall back
+  -- to the first available type.
+  if (self.bankType == nil) then self.bankType = CHAR; end
+  local activeTabs = (self.bankType == ACCT) and warTabs or charTabs
+  if (activeTabs == nil) then
+    self.bankType = available[1]
+    activeTabs = (self.bankType == ACCT) and warTabs or charTabs
+  end
+
+  if (activeTabs) then
+    for _, t in ipairs(activeTabs) do
+      if (t and t.ID) then
+        ids[#ids + 1] = t.ID
+        data[t.ID] = { name = t.name, icon = t.icon, bankType = self.bankType }
+      end
+    end
+  end
+
+  self.bags = ids
+  self.tabData = data
+  self.availableBankTypes = available
+  TFuBag.Bnk_Bags = ids   -- keep Member(Bnk_Bags, ...) branches working
+
+  -- Per-tab config defaults. InitDefVals seeds show_Bag<id> + bag colors per bag,
+  -- but it ran at login with an empty tab list, so tab ids have none -> the options
+  -- "Show <tab>" checkbox reads cfg["show_Bag"<id>] == nil and SetValue(nil) errors
+  -- (TBagOpt EnableLine). Seed them here (reset=nil preserves any user change).
+  local cfg = self.cfg
+  if (cfg) then
+    local dbc = TFuBag.DBC
+    for idx, bag in ipairs(ids) do
+      TFuBag:SetDef(cfg, "show_Bag"..bag, 1, nil, TFuBag.NumFunc, 0, 1)
+      if (dbc and #dbc > 0) then
+        local c = dbc[((idx - 1) % #dbc) + 1]
+        if (c) then TFuBag:SetColor(cfg, "bag_"..bag, c.r, c.g, c.b, c.a, nil) end
+      end
+    end
+  end
+
+  -- Ensure a dummy container frame + item buttons exist for each tab in the active
+  -- view. Character tabs 6-11 reuse the static XML frames (TFuBnkainerFrame6..11);
+  -- warband tabs 12-16 have none, so create them under the same scroll content frame.
+  local parent = self.bnkContainer or TFuBnkFrame
+  for _, bag in ipairs(ids) do
+    local fname = TFuBag:GetDummyBagFrameName(bag)
+    if (not _G[fname]) then
+      local f = CreateFrame("Frame", fname, parent, "TFuBagainerFrameTemplate")
+      f:SetID(bag)
+    end
+    if (not self.tabFramesCreated[bag]) then
+      TFuBag:CreateDummyBag(bag, "TFuBag_ItemButtonTemplate")
+      self.tabFramesCreated[bag] = true
+    end
+  end
+
+  -- Hide item buttons of any previously-created tab that is NOT in the active view.
+  -- Without this, switching bank type (or opening warband remotely while character
+  -- tabs were rendered earlier) leaves the other type's buttons visible -- they
+  -- bleed/overlay on top of the active content (UpdateWindow only manages buttons
+  -- for tabs in self.bags).
+  self:HideInactiveTabButtons()
+
+  self:RefreshBankTypeTabs()
+end
+
+-- Hide every item button of the currently-listed tabs. Used before switching bank
+-- types so the previous view's buttons don't linger visible behind the new one.
+function Bank:HideAllTabButtons()
+  for _, bag in ipairs(self.bags or {}) do
+    for slot = 1, TFuBag:GetBagMaxItems(bag) do
+      local b = _G[TFuBag:GetBagItemButtonName(bag, slot)]
+      if (b) then b:Hide(); end
+    end
   end
 end
 
-function Bank:UpdateBagGfx()
-  local i;
-  local bag = BANK_CONTAINER;
-  local numSlots, _ = TFuBag:GetNumBankSlots(self.playerid);
-  local free, size = TFuBag:UpdateSlots(self.playerid, bag, self.cfg["show_bag_sizes"]);
-  local totalfree = free;
-  local totalsize = size;
+-- Hide item buttons for every tab we've ever created that is NOT in the current
+-- active view (self.bags). Prevents the other bank type's content from bleeding
+-- through / overlaying the active view.
+function Bank:HideInactiveTabButtons()
+  local active = {}
+  for _, bag in ipairs(self.bags or {}) do active[bag] = true end
+  for bag in pairs(self.tabFramesCreated or {}) do
+    if (not active[bag]) then
+      for slot = 1, TFuBag:GetBagMaxItems(bag) do
+        local b = _G[TFuBag:GetBagItemButtonName(bag, slot)]
+        if (b) then b:Hide(); end
+      end
+    end
+  end
+end
 
-  TFuBag:UpdateBagColors(bag);
-  TFuBag:SetPlayerBagCfg(self.playerid, bag, TFuBag.I_ITEMLINK, nil);
+-- Show/enable the Character/Warband view-tab buttons based on what's available and
+-- which view is active (active = disabled, "you are here"; unavailable = disabled).
+function Bank:RefreshBankTypeTabs()
+  local CHAR = Enum.BankType and Enum.BankType.Character
+  local ACCT = Enum.BankType and Enum.BankType.Account
+  local avail = self.availableBankTypes or {}
+  local hasChar, hasWar = false, false
+  for _, t in ipairs(avail) do
+    if (t == CHAR) then hasChar = true; elseif (t == ACCT) then hasWar = true; end
+  end
 
-  bag = REAGENTBANK_CONTAINER;
-  if TFuBag:IsReagentBankUnlocked(self.playerid) then
-    SetItemButtonTextureVertexColor(TFuBnkFrameBagReagent, 1.0, 1.0, 1.0, 1.0);
+  local cb = TFuBnkFrame.CharTabButton
+  if (cb) then
+    cb:Show()
+    if (hasChar and self.bankType ~= CHAR) then cb:Enable() else cb:Disable() end
+  end
+
+  local wb = TFuBnkFrame.WarbandTabButton
+  if (wb) then
+    if (TFuBag.BANK_INCLUDE_WARBAND) then wb:Show() else wb:Hide() end
+    if (hasWar and self.bankType ~= ACCT) then wb:Enable() else wb:Disable() end
+  end
+end
+
+-- Switch the active bank view (Character <-> Account/Warband) and re-render.
+function Bank:SetBankType(bankType)
+  if (bankType == nil or bankType == self.bankType) then return; end
+  self:HideAllTabButtons()
+  self.bankType = bankType
+  self:RebuildTabList()
+  self:UpdateWindow(TFuBag.REQ_MUST)
+end
+
+-- Toggle between the available bank types (for the interim /tbnk bank command;
+-- clickable per-type tab buttons are the next stage).
+function Bank:ToggleBankType()
+  local avail = self.availableBankTypes or {}
+  if (#avail < 2) then
+    TFuBag:Print("TFuBnk: only one bank type available.")
+    return
+  end
+  local CHAR = Enum.BankType and Enum.BankType.Character
+  local ACCT = Enum.BankType and Enum.BankType.Account
+  if (self.bankType == ACCT) then
+    self:SetBankType(CHAR)
+    TFuBag:Print("TFuBnk: showing Character bank.")
   else
-    SetItemButtonTextureVertexColor(TFuBnkFrameBagReagent, 1.0, 0.1, 0.1, 1.0);
+    self:SetBankType(ACCT)
+    TFuBag:Print("TFuBnk: showing Warband bank.")
   end
-  free, size = TFuBag:UpdateSlots(self.playerid, bag, self.cfg["show_bag_sizes"]);
-  TFuBag:UpdateBagColors(bag);
-  totalfree = totalfree + free;
-  totalsize = totalsize + size;
+end
 
-  for i=1, numSlots do
-    bag = i + 4;
-    local type = TFuBag:GetBagType(self.playerid, bag); -- needed for cacheing
-    TFuBag:GetBagFrameTexture(bag):SetVertexColor(1.0,1.0,1.0, 1.0);
-  end
-  for i=numSlots+1, NUM_BANKBAGSLOTS do
-    bag = i + 4;
-    TFuBag:SetPlayerBagCfg(self.playerid, bag, TFuBag.I_BAGTYPE, 0);
-    TFuBag:SetPlayerBagCfg(self.playerid, bag, TFuBag.I_BAGFREE, 0);
-    TFuBag:SetPlayerBagCfg(self.playerid, bag, TFuBag.I_BAGSIZE, 0);
-    TFuBag:SetPlayerBagCfg(self.playerid, bag, TFuBag.I_ITEMLINK, nil);
-    TFuBag:GetBagFrameTexture(bag):SetVertexColor(1.0,0.1,0.1, 1.0);
-  end
-  for i=1, NUM_BANKBAGSLOTS do
-    bag = i + 4;
+function Bank:UpdateDepositButton()
+  -- Deposit is repointed to C_Bank.AutoDepositItemsIntoBank in a later stage;
+  -- hide the legacy reagent-deposit button for now.
+  TFuBnk_Button_DepositReagent:Hide()
+end
 
+function Bank:UpdateBagGfx()
+  local totalfree = 0;
+  local totalsize = 0;
+
+  for _, bag in ipairs(self.bags) do
+    TFuBag:GetBagType(self.playerid, bag);   -- refresh cached bag-type for empty-slot categories
     TFuBag:UpdateBagColors(bag);
 
-    TFuBag:GetBagFrameTexture(bag):SetTexture(
-      TFuBag:GetBagTexture(self.playerid, bag));
+    local frametex = TFuBag:GetBagFrameTexture(bag);
+    if (frametex) then
+      frametex:SetVertexColor(1.0, 1.0, 1.0, 1.0);
+      frametex:SetTexture(TFuBag:GetBagTexture(self.playerid, bag));
+    end
 
     local free, size = TFuBag:UpdateSlots(self.playerid, bag, self.cfg["show_bag_sizes"]);
-
     totalfree = totalfree + free;
     totalsize = totalsize + size;
   end
+
   TFuBag:SetFreeStr(TFuBnkFrame_TotalText, totalfree, totalsize, self.cfg["show_bag_sizes"]);
 end
 
 function Bank:InitBagGfx()
-  local numSlots, _ = TFuBag:GetNumBankSlots(self.playerid);
-
-  -- Spoof the bank
-  local button = TFuBnkFrameBagBank;
-  SetItemButtonTextureVertexColor(button, 1.0,1.0,1.0, 1.0);
-  TFuBag:GetBagFrameTexture(BANK_CONTAINER):SetTexture(
-        TFuBag:GetBagTexture(TFuBnkFrame.playerid, BANK_CONTAINER));
-  TFuBag:GetBagFrameTexture(REAGENTBANK_CONTAINER):SetTexture(
-        TFuBag:GetBagTexture(TFuBnkFrame.playerid, REAGENTBANK_CONTAINER));
-
-
-  for i=1, NUM_BANKBAGSLOTS do
-    button = _G["TFuBnkFrameBag"..i];
-    if ( button ) then
-      if ( i <= numSlots ) then
-        SetItemButtonTextureVertexColor(button, 1.0,1.0,1.0, 1.0);
-        button.tooltipText = BANK_BAG;
-      else
-        SetItemButtonTextureVertexColor(button, 1.0,0.1,0.1, 1.0);
-        button.tooltipText = BANK_BAG_PURCHASE;
-      end
-    end
-  end
+  -- 12.0: per-tab selector buttons are built on bank open (Stage 2). Nothing to
+  -- init statically; the classic bank/reagent/7-bag-slot graphics are gone.
 end
 
 
@@ -349,8 +521,11 @@ function Bank.Button_ChangeEditMode_OnClick()
     TFuBnkFrame.edit_mode = 0;
   end
 
-  -- resort will force a window redraw
-  TFuBnkFrame:UpdateWindow(TFuBag.REQ_MUST);
+  -- Relayout (not resort): edit-mode only changes the layout, not categorization.
+  -- Forcing a resort here scanned every item's tooltip -> major lag on a big bank.
+  TFuBnkFrame._last_hilight = nil;  -- force the next edit-highlight refresh
+  TFuBnkFrame.force_relayout = true;
+  TFuBnkFrame:UpdateWindow(TFuBag.REQ_NONE);
 end
 
 function Bank.Button_Reload_OnClick()
@@ -1011,11 +1186,11 @@ function Bank.RightClickMenu_populate(self, level)
   UIDropDownMenu_AddButton(info, level);
 
   info = TFuBag:MakeColorPickerInfo(TFuBnkFrame.cfg, "bkgr_", bar,
-    string.format(L["Background Color for Bar %d"],bar), function () TFuBnkFramer:UpdateWindow() end);
+    string.format(L["Background Color for Bar %d"],bar), function () TFuBag:RecolorWindow(TFuBnkFrame) end);
   UIDropDownMenu_AddButton(info, level);
 
   info = TFuBag:MakeColorPickerInfo(TFuBnkFrame.cfg, "brdr_", bar,
-    string.format(L["Border Color for Bar %d"],bar), function () TFuBnkFrame:UpdateWindow() end);
+    string.format(L["Border Color for Bar %d"],bar), function () TFuBag:RecolorWindow(TFuBnkFrame) end);
   UIDropDownMenu_AddButton(info, level);
 
   -------------------------------------------------------------------------------------------------
@@ -1197,7 +1372,7 @@ function Bank.RightClickMenu_populate(self, level)
             UIDropDownMenu_AddButton(info, level);
           end
         elseif (UIDROPDOWNMENU_MENU_VALUE["opt"] == "set_colors") then
-          TFuBag:MakeColorMenu(TFuBnkFrame.cfg, function () TFuBnkFrame:UpdateWindow() end, level, TFuBnkFrame.bags);
+          TFuBag:MakeColorMenu(TFuBnkFrame.cfg, function () TFuBag:RecolorWindow(TFuBnkFrame) end, level, TFuBnkFrame.bags);
         elseif (UIDROPDOWNMENU_MENU_VALUE["opt"] == "anchor") then
           info = {
             ["text"] = L["TOPLEFT"];
@@ -1419,9 +1594,15 @@ function Bank:UpdateWindow(resort_req)
     self.BARITM = TFuBag:SortItmCache(self.cfg,
       self.playerid, TFuBnkItm[self.playerid], self.BARITM, self.bags);
     TFuBag:LayoutWindow(self)
+  elseif (self.force_relayout) then
+    -- Relayout without resort: edit-mode toggle changes layout (bar buttons, shared
+    -- height) but NOT categorization, so skip the costly SortItmCache (per-item
+    -- tooltip scan) that made toggling edit mode lag on a large bank.
+    TFuBag:LayoutWindow(self)
   elseif cache_req > self.CACHE_REQ then
     self.CACHE_REQ = cache_req
   end
+  self.force_relayout = nil
 
   -- Relink the button map
   for _,bag in ipairs(self.bags) do
@@ -1441,7 +1622,11 @@ function Bank:UpdateWindow(resort_req)
   for _, bag in ipairs(self.bags) do
     local size = TFuBag:GetPlayerBagCfg(self.playerid, bag, TFuBag.I_BAGSIZE);
     if (not size) then size = 0; end
-    if (self.cfg["show_Bag"..bag] ~= 1 and not TFuBag:GetBagFrame(bag):GetChecked()) then
+    -- 12.0 bank tabs always show in Stage 1 (per-tab selector buttons are Stage 2);
+    -- guard GetBagFrame, which is nil for tabs without a static selector button.
+    local bagframe = TFuBag:GetBagFrame(bag)
+    if (not TFuBag:IsBankTab(bag) and self.cfg["show_Bag"..bag] ~= 1
+        and bagframe and not bagframe:GetChecked()) then
       size = 0
     end
     for slot = 1, size do
@@ -1489,16 +1674,9 @@ function Bank:UpdateWindow(resort_req)
 end
 
 
-function Bank:SetReplaceBank()
-  if BankFrame_Saved == nil then
-    BankFrame_Saved = BankFrame;
-  end
-  if BankFrame_Saved:IsVisible() then
-    BankFrame_Saved:Hide();
-  end
-  BankFrame_Saved:UnregisterEvent("BANKFRAME_OPENED");
-  BankFrame_Saved:UnregisterEvent("BANKFRAME_CLOSED");
-end
+-- Bank:SetReplaceBank removed for the 12.0 rewrite: hijacking Blizzard's BankFrame
+-- (Hide + steal its events) risks taint in 12.0 (managed UIPanel/CallbackRegistry).
+-- Syndicator and Baganator never touch BankFrame; we let it open normally.
 
 
 function Bank.UserDropdown_OnLoad(self)
