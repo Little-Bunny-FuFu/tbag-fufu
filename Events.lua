@@ -22,6 +22,9 @@ function TFuBag:VARIABLES_LOADED()
   if C_EventUtils.IsEventValid("BANK_TABS_CHANGED") then
     self:RegisterEvent("BANK_TABS_CHANGED")
   end
+  if C_EventUtils.IsEventValid("BANK_TAB_SETTINGS_UPDATED") then
+    self:RegisterEvent("BANK_TAB_SETTINGS_UPDATED")
+  end
   if C_EventUtils.IsEventValid("PLAYER_ACCOUNT_BANK_TAB_SLOTS_CHANGED") then
     self:RegisterEvent("PLAYER_ACCOUNT_BANK_TAB_SLOTS_CHANGED")
   end
@@ -135,6 +138,16 @@ function TFuBag:BANK_TABS_CHANGED()
   end
 end
 
+-- 12.0 a tab's name/icon/deposit-flag settings changed (our OpenTabSettings dialog
+-- or Blizzard's own bank UI) -- rebuild the cached tab data and repaint if open.
+function TFuBag:BANK_TAB_SETTINGS_UPDATED()
+  if not TFuBag.BANK_ENABLED then return end
+  TFuBnkFrame:RebuildTabList()
+  if (TFuBnkFrame.atbank == 1) then
+    TFuBnkFrame:UpdateWindow(TFuBag.REQ_MUST)
+  end
+end
+
 -- 12.0 warband/account tab slots changed -- refresh if open.
 function TFuBag:PLAYER_ACCOUNT_BANK_TAB_SLOTS_CHANGED()
   if not TFuBag.BANK_ENABLED then return end
@@ -213,6 +226,7 @@ local events = {
   ["BANKFRAME_OPENED"] = TFuBag.BANKFRAME_OPENED,
   ["BANKFRAME_CLOSED"] = TFuBag.BANKFRAME_CLOSED,
   ["BANK_TABS_CHANGED"] = TFuBag.BANK_TABS_CHANGED,
+  ["BANK_TAB_SETTINGS_UPDATED"] = TFuBag.BANK_TAB_SETTINGS_UPDATED,
   ["PLAYER_ACCOUNT_BANK_TAB_SLOTS_CHANGED"] = TFuBag.PLAYER_ACCOUNT_BANK_TAB_SLOTS_CHANGED,
   ["PLAYERBANKSLOTS_CHANGED"] = TFuBag.PLAYERBANKSLOTS_CHANGED,
   ["PLAYERREAGENTBANKSLOTS_CHANGED"] = TFuBag.PLAYERBANKSLOTS_CHANGED,
