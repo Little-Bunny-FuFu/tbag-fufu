@@ -2437,9 +2437,10 @@ function Bank:UpdateWindow(resort_req)
     if (self.playerid == TFuBag.PLAYERID and self.bankType == ACCT and self.atbank == 1) then
       -- Warband view of the live player: show the WARBAND deposited balance, not
       -- character gold. MoneyTypeInfo["ACCOUNT"].UpdateFunc returns
-      -- C_Bank.FetchDepositedMoney(Enum.BankType.Account), and the frame already
-      -- registered ACCOUNT_MONEY in SmallMoneyFrame_OnLoad, so it self-refreshes on
-      -- deposit/withdraw. MoneyFrame_UpdateMoney populates it now (on view switch).
+      -- C_Bank.FetchDepositedMoney(Enum.BankType.Account). MoneyFrame_SetType does
+      -- not run the frame's OnLoad, so the type switch does not by itself register
+      -- ACCOUNT_MONEY; the balance stays current because MoneyFrame_UpdateMoney
+      -- populates it here and UpdateWindow re-runs on the bank money events.
       MoneyFrame_SetType(TFuBnkFrame_MoneyFrame, "ACCOUNT")
       MoneyFrame_UpdateMoney(TFuBnkFrame_MoneyFrame)
     else
