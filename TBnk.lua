@@ -516,8 +516,89 @@ function Bank:BuildTabStrip()
   buy:Hide()
   TFuBnkFrame.BuyTabButton = buy
 
+  -- Warband-money deposit / withdraw controls. These reuse Blizzard's own
+  -- StaticPopupDialogs ("BANK_MONEY_DEPOSIT" / "BANK_MONEY_WITHDRAW", defined in
+  -- Blizzard_UIPanels_Game/BankFrame.lua); their OnAccept runs Blizzard code that
+  -- calls C_Bank.DepositMoney / C_Bank.WithdrawMoney, so the protected transfer is
+  -- never invoked from tainted addon code. We only pass the bankType in the dialog
+  -- data table -- no secure frame is touched. Parented to the strip (a plain frame
+  -- we own), anchored next to the MoneyFrame in UpdateMoneyControls.
+  local dep = CreateFrame("Button", "TFuBnkFrame_MoneyDepositButton", strip, "UIPanelButtonTemplate")
+  dep:SetSize(TYPEBTN_W, TABBTN_SIZE)
+  dep:SetText(BANK_DEPOSIT_MONEY_BUTTON_LABEL or L["Deposit"])
+  dep:SetScript("OnClick", function()
+    StaticPopup_Hide("BANK_MONEY_WITHDRAW")
+    if (StaticPopup_Visible("BANK_MONEY_DEPOSIT")) then
+      StaticPopup_Hide("BANK_MONEY_DEPOSIT")
+      return
+    end
+    StaticPopup_Show("BANK_MONEY_DEPOSIT", nil, nil, { bankType = Enum.BankType.Account })
+  end)
+  dep:Hide()
+  TFuBnkFrame.MoneyDepositButton = dep
+
+  local wdr = CreateFrame("Button", "TFuBnkFrame_MoneyWithdrawButton", strip, "UIPanelButtonTemplate")
+  wdr:SetSize(TYPEBTN_W, TABBTN_SIZE)
+  wdr:SetText(BANK_WITHDRAW_MONEY_BUTTON_LABEL or L["Withdraw"])
+  wdr:SetScript("OnClick", function()
+    StaticPopup_Hide("BANK_MONEY_DEPOSIT")
+    if (StaticPopup_Visible("BANK_MONEY_WITHDRAW")) then
+      StaticPopup_Hide("BANK_MONEY_WITHDRAW")
+      return
+    end
+    StaticPopup_Show("BANK_MONEY_WITHDRAW", nil, nil, { bankType = Enum.BankType.Account })
+  end)
+  wdr:Hide()
+  TFuBnkFrame.MoneyWithdrawButton = wdr
+
   TFuBnkFrame.tabButtons = TFuBnkFrame.tabButtons or {}
   self.tabSel = self.tabSel or {}
+end
+
+-- Show/position the warband deposit + withdraw buttons. They appear only when the
+-- Warband (Account) view is active, the window shows the current player, and the
+-- bank is open (the C_Bank money-transfer API requires an open bank session).
+-- Anchored to the left of the MoneyFrame so they ride the same bottom-right chrome.
+function Bank:UpdateMoneyControls()
+  local dep = TFuBnkFrame.MoneyDepositButton
+  local wdr = TFuBnkFrame.MoneyWithdrawButton
+  if (not dep or not wdr) then return; end
+
+  local ACCT = Enum.BankType and Enum.BankType.Account
+  local isAcct = (self.bankType == ACCT)
+  local isLive = (self.playerid == TFuBag.PLAYERID) and (self.atbank == 1)
+  local moneyShown = (self.cfg["show_money"] == 1) and TFuBnkFrame_MoneyFrame:IsShown()
+
+  local supported = false
+  if (isAcct and isLive and moneyShown and C_Bank and C_Bank.DoesBankTypeSupportMoneyTransfer) then
+    local ok, can = pcall(C_Bank.DoesBankTypeSupportMoneyTransfer, ACCT)
+    supported = ok and can
+  end
+
+  if (not supported) then
+    dep:Hide()
+    wdr:Hide()
+    return
+  end
+
+  local canDep, canWdr = false, false
+  if (C_Bank.CanDepositMoney) then
+    local ok, v = pcall(C_Bank.CanDepositMoney, ACCT)
+    canDep = ok and v
+  end
+  if (C_Bank.CanWithdrawMoney) then
+    local ok, v = pcall(C_Bank.CanWithdrawMoney, ACCT)
+    canWdr = ok and v
+  end
+  dep:SetEnabled(canDep and true or false)
+  wdr:SetEnabled(canWdr and true or false)
+
+  wdr:ClearAllPoints()
+  wdr:SetPoint("RIGHT", TFuBnkFrame_MoneyFrame, "LEFT", -6, 0)
+  dep:ClearAllPoints()
+  dep:SetPoint("RIGHT", wdr, "LEFT", -4, 0)
+  dep:Show()
+  wdr:Show()
 end
 
 -- Get (or lazily create) the selector button for a tab id. Pooled by bag id; the
@@ -1149,6 +1230,7 @@ function Bank.Toggle_Money()
     TFuBnkFrame_MoneyFrame:Show();
     TFuBnkFrame:SetButton_Anchors();
   end
+  TFuBnkFrame:UpdateMoneyControls();
 end
 
 function Bank.Toggle_Token()
@@ -1893,14 +1975,26 @@ function Bank:UpdateWindow(resort_req)
 
   -- MONEY
   if (self.cfg["show_money"] == 1) then
-    local type = "STATIC"
-    if (self.playerid == TFuBag.PLAYERID) then
-      type = "PLAYER"
+    local ACCT = Enum.BankType and Enum.BankType.Account
+    if (self.playerid == TFuBag.PLAYERID and self.bankType == ACCT and self.atbank == 1) then
+      -- Warband view of the live player: show the WARBAND deposited balance, not
+      -- character gold. MoneyTypeInfo["ACCOUNT"].UpdateFunc returns
+      -- C_Bank.FetchDepositedMoney(Enum.BankType.Account), and the frame already
+      -- registered ACCOUNT_MONEY in SmallMoneyFrame_OnLoad, so it self-refreshes on
+      -- deposit/withdraw. MoneyFrame_UpdateMoney populates it now (on view switch).
+      MoneyFrame_SetType(TFuBnkFrame_MoneyFrame, "ACCOUNT")
+      MoneyFrame_UpdateMoney(TFuBnkFrame_MoneyFrame)
+    else
+      local type = "STATIC"
+      if (self.playerid == TFuBag.PLAYERID) then
+        type = "PLAYER"
+      end
+      MoneyFrame_SetType(TFuBnkFrame_MoneyFrame,type)
+      MoneyFrame_Update("TFuBnkFrame_MoneyFrame", TFuBag:GetMoney(self.playerid));
     end
-    MoneyFrame_SetType(TFuBnkFrame_MoneyFrame,type)
-    MoneyFrame_Update("TFuBnkFrame_MoneyFrame", TFuBag:GetMoney(self.playerid));
   end
 
+  frame:UpdateMoneyControls();
   frame:UpdateDepositButton();
 
   -- Don't snap-anchor while the user is mid-drag (see TInv.lua for rationale).
