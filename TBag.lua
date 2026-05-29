@@ -860,6 +860,7 @@ function TFuBag:ClearSearch()
     TFuBnkFrame:UpdateWindow();
   end
   TFuInv_SearchBox:SetText(SEARCH);
+  TFuBnk_SearchBox:SetText(SEARCH);
 end
 
 -----------------------------------------------------------------------
@@ -4886,6 +4887,12 @@ function TFuBag:LayoutWindow(frame)
     end
     if (edit_mode == 1) then
       PAD_BOTTOM = PAD_BOTTOM + self.PAD_BOTTOM_EDIT;
+    end
+
+    -- Search box adds a row below the Total/strip row (same logic as inventory).
+    if (TFuBnk_SearchBox:IsVisible() and
+        (TFuBnkFrame_Total:IsVisible() or strip_shown)) then
+      PAD_BOTTOM = PAD_BOTTOM + self.PAD_BOTTOM_SEARCH;
     end
 
     -- Do we need an extra row

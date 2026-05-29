@@ -66,6 +66,7 @@ function Bank:InitDefVals(reset)
 
   TFuBag:SetDef(cfg, "show_purchase_button", 0, reset, TFuBag.NumFunc, 0, 1);
   TFuBag:SetDef(cfg, "show_purchasetoggle", 1, reset, TFuBag.NumFunc, 0, 1);
+  TFuBag:SetDef(cfg, "show_searchbox", 1, reset, TFuBag.NumFunc, 0, 1);
 
   -- Colors
   TFuBag:SetColor(cfg, "bkgr_"..TFuBag.MAIN_BAR, 0.3, 0.1, 0.0, 0.4, reset);
@@ -185,6 +186,8 @@ function Bank:init(reset)
     TFuBnkLockPush:SetTexture("Interface\\AddOns\\tbag-fufu\\images\\LockButton-Unlocked-Down");
   end
 
+  TFuBnk_SearchBox:SetMaxLetters(25);
+
   -- 12.0 Stage 1: the static classic bag-slot selector buttons (7 bank bags + bank
   -- + reagent) are not wired to the tab-as-container model and reference removed APIs
   -- on hover (e.g. GetReagentBankCost). Per-tab selector buttons replace them in
@@ -205,6 +208,9 @@ function Bank:init(reset)
   -- active view's tab row is (re)populated on bank open by Bank:RefreshTabStrip.
   self:BuildTabStrip();
 
+  if (cfg["show_searchbox"] == 0) then
+    TFuBnk_SearchBox:Hide();
+  end
   if (cfg["show_userdropdown"] == 0) then
     TFuBnk_UserDropdown:Hide();
   end
@@ -1463,13 +1469,30 @@ function Bank:SetBottomLeftButton_Anchors()
   }
   local button_left = nil;
 
+  -- Handle search box separately (mirrors Inv:SetBottomLeftButton_Anchors).
+  local search = TFuBnk_SearchBox;
+  if (search and search:IsVisible()) then
+    local y = 4;
+    if (self.edit_mode == 1) then
+      y = y + 30;
+    end
+    search:ClearAllPoints();
+    search:SetPoint("BOTTOMLEFT",TFuBnkFrame,"BOTTOMLEFT",10,y);
+    button_left = search;
+  end
+
   for _,button_name in ipairs(buttons) do
     button = _G[button_name];
     if (button) then
       button:ClearAllPoints();
       if (button_left) then
-        -- button following another button
-        button:SetPoint("BOTTOMLEFT",button_left,"BOTTOMRIGHT",3,-1);
+        if (button_left == search) then
+          -- First button after search box
+          button:SetPoint("BOTTOMLEFT",button_left,"TOPLEFT",0,4);
+        else
+          -- button following another button
+          button:SetPoint("BOTTOMLEFT",button_left,"BOTTOMRIGHT",3,-1);
+        end
       else
         -- First button
         local y = 12;
@@ -1695,6 +1718,18 @@ function Bank.Toggle_Total()
   else
     TFuBnkFrame.cfg["show_total"] = 1;
     TFuBnkFrame_Total:Show();
+    TFuBnkFrame:SetButton_Anchors();
+  end
+end
+
+function Bank.Toggle_SearchBox()
+  if (TFuBnkFrame.cfg["show_searchbox"] == 1) then
+    TFuBnkFrame.cfg["show_searchbox"] = 0;
+    TFuBnk_SearchBox:Hide();
+    TFuBnkFrame:SetButton_Anchors();
+  else
+    TFuBnkFrame.cfg["show_searchbox"] = 1;
+    TFuBnk_SearchBox:Show();
     TFuBnkFrame:SetButton_Anchors();
   end
 end
@@ -2224,6 +2259,15 @@ function Bank.RightClickMenu_populate(self, level)
             ["keepShownOnClick"] = 1;
             };
           if (TFuBnkFrame.cfg["show_closebutton"] == 0) then
+            info["checked"] = 1;
+          end
+          UIDropDownMenu_AddButton(info, level);
+          info = {
+            ["text"] = L["Hide Search Box"];
+            ["func"] = TFuBnkFrame.Toggle_SearchBox;
+            ["keepShownOnClick"] = 1;
+            };
+          if (TFuBnkFrame.cfg["show_searchbox"] == 0) then
             info["checked"] = 1;
           end
           UIDropDownMenu_AddButton(info, level);
