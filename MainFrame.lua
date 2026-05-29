@@ -83,6 +83,15 @@ end
 
 function MainFrame:OnMouseDown(button)
   if button == "LeftButton" then
+    -- A cursor-carried item (stack split, right-click pickup) is dropped with a plain
+    -- left-click, not a drag. Under empty-collapse there are no empty item buttons to
+    -- click onto, so the window body is the drop target: deposit into a free slot
+    -- instead of starting a window move. Only intercept when collapse is on and the
+    -- cursor holds an item -- otherwise fall through to the normal drag-move.
+    if self.cfg and self.cfg.collapse_empty == 1 and CursorHasItem() then
+      TFuBag:DepositToFreeSlot(self)
+      return
+    end
     self:DragStart()
   elseif button == "RightButton" then
     HideDropDownMenu(1)

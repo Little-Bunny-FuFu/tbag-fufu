@@ -32,6 +32,9 @@ function TFuBag:VARIABLES_LOADED()
   if C_EventUtils.IsEventValid("PLAYERBANKBAGSLOTS_CHANGED") then
     self:RegisterEvent("PLAYERBANKBAGSLOTS_CHANGED")
   end
+  if C_EventUtils.IsEventValid("GET_ITEM_INFO_RECEIVED") then
+    self:RegisterEvent("GET_ITEM_INFO_RECEIVED")
+  end
   self:RegisterEvent("PLAYER_LEVEL_UP")
   self:RegisterEvent("SKILL_LINES_CHANGED")
   self:RegisterEvent("QUEST_ACCEPTED")
@@ -168,6 +171,32 @@ function TFuBag:PLAYER_ENTERING_WORLD(event)
   self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 end
 
+-- Item data can arrive AFTER a window is already open -- notably right after a /reload
+-- at the bank, when the client item cache is cold. SortItmCache runs PickBar (which
+-- needs GetItemInfo + a tooltip scan) on every item, so that first categorizing sort
+-- buckets cold items as UNKNOWN -- the "bank opens not fully sorted, switch tabs to fix
+-- it" symptom (switching tabs just re-sorts a moment later, once the data has streamed
+-- in). As the server delivers item info, re-sort the open window(s) so categories
+-- settle on their own. Debounced via a single pending flag + timer so a reload burst of
+-- hundreds of these events collapses into one re-sort instead of one sort per item.
+function TFuBag:GET_ITEM_INFO_RECEIVED(event, itemID, success)
+  if (success == false) then return end
+  local invVis = TFuInvFrame and TFuInvFrame:IsVisible()
+  local bnkVis = TFuBnkFrame and TFuBnkFrame:IsVisible()
+  if (not (invVis or bnkVis)) then return end
+  if (self.iteminfo_resort_pending) then return end
+  self.iteminfo_resort_pending = true
+  C_Timer.After(0.3, function()
+    TFuBag.iteminfo_resort_pending = nil
+    if (TFuInvFrame and TFuInvFrame:IsVisible()) then
+      TFuInvFrame:UpdateWindow(TFuBag.REQ_MUST)
+    end
+    if (TFuBnkFrame and TFuBnkFrame:IsVisible()) then
+      TFuBnkFrame:UpdateWindow(TFuBag.REQ_MUST)
+    end
+  end)
+end
+
 
 local events = {
   ["VARIABLES_LOADED"] = TFuBag.VARIABLES_LOADED,
@@ -193,6 +222,7 @@ local events = {
   ["QUEST_ACCEPTED"] = TFuBag.QUEST_ACCEPTED,
   ["UNIT_QUEST_LOG_CHANGED"] = TFuBag.UNIT_QUEST_LOG_CHANGED,
   ["PLAYER_ENTERING_WORLD"] = TFuBag.PLAYER_ENTERING_WORLD,
+  ["GET_ITEM_INFO_RECEIVED"] = TFuBag.GET_ITEM_INFO_RECEIVED,
 }
 
 function TFuBag:OnEvent(event, ...)

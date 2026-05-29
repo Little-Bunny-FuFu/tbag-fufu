@@ -2301,9 +2301,22 @@ end
 -- single tab is selected, else the first free slot anywhere. Live player only.
 function TFuBag:DepositToFreeSlot(frame)
   if (not CursorHasItem()) then return; end
+  -- Whole-window deposit only exists under empty-collapse (no per-slot empty buttons).
+  -- With collapse off, frame.dropBag/dropSlot are never set, so bail WITHOUT touching
+  -- the cursor -- the item stays on the cursor for the user to place on a real empty
+  -- button, and we never spuriously ClearCursor / flash "bag full".
+  if (not (frame and frame.cfg and frame.cfg["collapse_empty"] == 1)) then return; end
   if (not self:IsLive(frame)) then ClearCursor(); return; end
   if (frame.dropBag and frame.dropSlot) then
     PickupContainerItem(frame.dropBag, frame.dropSlot);
+    -- A stack split sets STACKSPLIT, so the PickupContainerItem hook (which just ran,
+    -- synchronously) blacklisted this destination slot from auto-stacking -- that skip
+    -- otherwise persists until a reload, leaving a deposited split portion un-merged.
+    -- Clear it here so the BAG_UPDATE that follows this deposit can auto-stack the slot
+    -- with a matching partial stack. (The split SOURCE keeps its skip, so a split kept
+    -- in the same bag still won't immediately re-merge.)
+    self:SetStackSkip(frame.dropBag, frame.dropSlot, nil);
+    self:SetCompSkip(frame.dropBag, frame.dropSlot, nil);
   else
     ClearCursor();
     UIErrorsFrame:AddMessage(ERR_BAG_FULL, 1.0, 0.1, 0.1, 1.0);
@@ -2350,13 +2363,38 @@ function TFuBag:GetFreeSlotsCell(frame)
   -- Whole-window drop. OnReceiveDrag fires on the frame under the cursor, so wire the
   -- main frame AND the scroll content frame (which spans the item area). Item buttons
   -- keep their own drop handling. Wired once.
+  --
+  -- Two drop gestures, two events: a DRAG-and-release fires OnReceiveDrag, but a
+  -- CURSOR-carried item (from a stack split, or a right-click pickup) is placed with a
+  -- plain LEFT-CLICK -> OnMouseDown, never OnReceiveDrag. Wire OnMouseDown too so split
+  -- portions can be deposited onto empty window space (under empty-collapse there are no
+  -- empty item buttons to click). DepositToFreeSlot no-ops when the cursor is empty, so
+  -- a normal click in the item area is harmless.
   if (not frame.tfuDropWired) then
+    -- A drag-release fires OnReceiveDrag; a cursor-carried item (stack split, right-click
+    -- pickup) is placed with a plain click -> OnMouseDown. The scroll content covers the
+    -- item area and is mouse-enabled (for OnReceiveDrag); a frame with NO OnMouseDown
+    -- handler lets a click fall through to the main frame underneath (that is how the
+    -- window stays draggable by its body), but adding a handler would swallow it. So
+    -- FORWARD the content's mouse to the main frame's own OnMouseDown/DragStop, which
+    -- already does deposit-on-cursor-else-drag. Keep OnReceiveDrag on the content for
+    -- drag-deposits. DepositToFreeSlot self-guards (no cursor / collapse off -> no-op).
     local function dropHook() TFuBag:DepositToFreeSlot(frame); end
+    local function bodyDown(_, button) frame:OnMouseDown(button); end
+    local function bodyUp() frame:DragStop(); end
     frame:SetScript("OnReceiveDrag", dropHook);
     local sc = frame.Scroll and frame.Scroll.ScrollChild;
     local cont = sc and sc.Container;
-    if (sc) then sc:SetScript("OnReceiveDrag", dropHook); end
-    if (cont) then cont:SetScript("OnReceiveDrag", dropHook); end
+    if (sc) then
+      sc:SetScript("OnReceiveDrag", dropHook);
+      sc:SetScript("OnMouseDown", bodyDown);
+      sc:SetScript("OnMouseUp", bodyUp);
+    end
+    if (cont) then
+      cont:SetScript("OnReceiveDrag", dropHook);
+      cont:SetScript("OnMouseDown", bodyDown);
+      cont:SetScript("OnMouseUp", bodyUp);
+    end
     frame.tfuDropWired = true;
   end
 
@@ -2790,7 +2828,16 @@ function TFuBag:UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, compar
             if (itm[self.I_TIMESTAMP] ~= nil) then
               if (cfg["show_Bag"..bag] == 1 or TFuBag:IsBankTab(bag)
                   or (TFuBag:GetBagFrame(bag) and TFuBag:GetBagFrame(bag):GetChecked())) then
-                resort_suggested = 1;
+                -- A real item move into/out of (or swap within) a shown slot must
+                -- re-categorize NOW: REQ_MUST forces SortItmCache + LayoutWindow on
+                -- this same BAG_UPDATE. The old REQ_PART ("suggested") only stashed
+                -- CACHE_REQ and deferred the resort, so under empty-collapse the moved
+                -- item landed in a slot the layout still treated as empty (pulled out
+                -- of the bars) and stayed invisible until a full reopen. This branch
+                -- only fires when the link actually changed AND a prior timestamp
+                -- existed (an observed move), so warm-cache reopens stay REQ_NONE -- no
+                -- return of the per-open bank lag.
+                resort_mandatory = 1;
               end
               itm[self.I_TIMESTAMP] = time();
               itm[self.I_NEWSTR] = self.V_NEWON;

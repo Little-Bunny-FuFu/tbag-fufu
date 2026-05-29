@@ -284,6 +284,7 @@ end
 -- the same C_Container calls as bags. All C_Bank reads are AllowedWhenUntainted; no
 -- BankFrame hijack -> no taint. Run on BANKFRAME_OPENED + BANK_TABS_CHANGED + switch.
 function Bank:RebuildTabList()
+  local prevBags = self.bags or {}
   local ids = {}
   local data = {}
   local available = {}
@@ -345,6 +346,21 @@ function Bank:RebuildTabList()
   self.tabData = data
   self.availableBankTypes = available
   TFuBag.Bnk_Bags = ids   -- keep Member(Bnk_Bags, ...) branches working
+
+  -- If the active tab set changed (first open after a reload: empty -> real tab IDs;
+  -- or a Character<->Warband switch), the runtime BARITM is stale for the new set.
+  -- A warm persisted TFuBnkItm makes UpdateItmCache report "no change" -> REQ_PART,
+  -- which would skip the resort and leave categories unsorted until something else
+  -- forced REQ_MUST (the "switch tabs to make it sort" symptom). Flag a one-shot full
+  -- sort; CACHE_REQ is consumed + reset by the next UpdateWindow. An unchanged set
+  -- (a same-session reopen) does NOT set this, so there is no per-open re-sort lag.
+  local changed = (#prevBags ~= #ids)
+  if (not changed) then
+    for i = 1, #ids do
+      if (prevBags[i] ~= ids[i]) then changed = true; break; end
+    end
+  end
+  if (changed) then self.CACHE_REQ = TFuBag.REQ_MUST; end
 
   -- Per-tab config defaults. InitDefVals seeds show_Bag<id> + bag colors per bag,
   -- but it ran at login with an empty tab list, so tab ids have none -> the options
@@ -1825,6 +1841,10 @@ function Bank:UpdateWindow(resort_req)
   end
 
   if (resort_req >= TFuBag.REQ_MUST) then
+    -- The deferred-resort debt is paid here; clear it so a one-shot CACHE_REQ = REQ_MUST
+    -- (e.g. set by RebuildTabList when the tab set changes) fires exactly once and does
+    -- not stick high and re-sort on every later open. (Mirrors Inv:UpdateWindow.)
+    self.CACHE_REQ = TFuBag.REQ_NONE
     self.BARITM = TFuBag:SortItmCache(self.cfg,
       self.playerid, TFuBnkItm[self.playerid], self.BARITM, self.bags);
     TFuBag:LayoutWindow(self)
