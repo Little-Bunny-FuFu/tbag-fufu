@@ -125,6 +125,9 @@ function MainFrame:OnHide()
   if self == TFuBnkFrame then
     if TFuBnkFrame.CharTabButton then TFuBnkFrame.CharTabButton:Hide() end
     if TFuBnkFrame.WarbandTabButton then TFuBnkFrame.WarbandTabButton:Hide() end
+    -- The tab settings dialog is parented to UIParent (its own window), so it does
+    -- not auto-hide with the bank -- close it explicitly.
+    if TFuBnk_TabSettingsDialog then TFuBnk_TabSettingsDialog:Hide() end
   end
 
   -- Always reset to the global player for event processing

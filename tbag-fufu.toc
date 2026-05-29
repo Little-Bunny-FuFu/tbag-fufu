@@ -27,3 +27,4 @@ TInv.xml
 TInvOpts.xml
 TBnk.xml
 TBnkOpts.xml
+TBnkTabSettings.xml
