@@ -115,10 +115,11 @@ function MainFrame:OnHide()
   end
   TFuBag:UpdateButtonHighlights()
 
-  if self.atbank and self.atbank == 1 then
-    self.atbank = 0
+  if self.physAtBank and self.physAtBank == 1 then
+    self.physAtBank = 0
     CloseBankFrame()
   end
+  self.atbank = 0
 
   -- Hide the bank's Character/Warband view-tab buttons (UIParent-parented, so they
   -- don't auto-hide with the bank window).
@@ -143,6 +144,10 @@ function MainFrame:OnShow()
 
   if self == TFuBnkFrame then
     TFuInvFrame:Show()
+    -- Rebuild the bank view for the current player/type on every show path (/tbnk, the
+    -- inventory "show bank" toggle, a dropdown switch), not only on BANKFRAME_OPENED, so
+    -- the tab strip + tab containers render from cache when away from the bank.
+    TFuBnkFrame:RebuildTabList()
   end
 
   self:UpdateWindow(TFuBag.REQ_PART)

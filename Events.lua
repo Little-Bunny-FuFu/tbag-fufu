@@ -167,7 +167,7 @@ end
 
 function TFuBag:BANKFRAME_OPENED()
   if not TFuBag.BANK_ENABLED then return end  -- bank gated off; let Blizzard's bank show
-  TFuBnkFrame.atbank = 1
+  TFuBnkFrame.physAtBank = 1
   -- 12.0: rebuild the dynamic tab list (char + warband) before showing/scanning.
   -- Called on the frame so self == TFuBnkFrame (Bank methods bind via metatable).
   TFuBnkFrame:RebuildTabList()
@@ -180,6 +180,7 @@ function TFuBag:BANKFRAME_OPENED()
 end
 
 function TFuBag:BANKFRAME_CLOSED()
+  TFuBnkFrame.physAtBank = 0
   TFuBnkFrame.atbank = 0
   TFuBnkFrame:Hide()
 end
@@ -188,7 +189,7 @@ end
 function TFuBag:BANK_TABS_CHANGED()
   if not TFuBag.BANK_ENABLED then return end
   TFuBnkFrame:RebuildTabList()
-  if (TFuBnkFrame.atbank == 1) then
+  if (TFuBnkFrame.physAtBank == 1) then
     TFuBag:RequestUpdate(TFuBnkFrame, TFuBag.REQ_MUST)
   end
 end
@@ -198,7 +199,7 @@ end
 function TFuBag:BANK_TAB_SETTINGS_UPDATED()
   if not TFuBag.BANK_ENABLED then return end
   TFuBnkFrame:RebuildTabList()
-  if (TFuBnkFrame.atbank == 1) then
+  if (TFuBnkFrame.physAtBank == 1) then
     TFuBag:RequestUpdate(TFuBnkFrame, TFuBag.REQ_MUST)
   end
 end
@@ -206,7 +207,7 @@ end
 -- 12.0 warband/account tab slots changed -- refresh if open.
 function TFuBag:PLAYER_ACCOUNT_BANK_TAB_SLOTS_CHANGED()
   if not TFuBag.BANK_ENABLED then return end
-  if (TFuBnkFrame.atbank == 1) then
+  if (TFuBnkFrame.physAtBank == 1) then
     -- REQ_NONE (not REQ_MUST): warband item moves are frequent; UpdateItmCache
     -- detects the changed slots and drives the sort, recategorizing only those
     -- slots. Forcing REQ_MUST here would re-run the per-item tooltip scan over the

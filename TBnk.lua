@@ -103,6 +103,7 @@ function Bank:init(reset)
   -- Bank switching
   self.playerid = "";
   self.atbank = 0;
+  self.physAtBank = 0;
   -- 12.0: bag list is built dynamically from purchased tabs on BANKFRAME_OPENED
   -- (Bank:RebuildTabList). Empty until then. tabData caches per-tab name/icon/type;
   -- tabFramesCreated tracks which tab container frames we've already built.
@@ -142,6 +143,7 @@ function Bank:init(reset)
   self.cfg = TFuBagCfg["Bnk"]
   local cfg = self.cfg
   self.atbank = 0
+  self.physAtBank = 0
 
   if ( TFuBnk_WIPECONFIGONLOAD == 1 ) then
     cfg = {};
@@ -289,8 +291,105 @@ end
 -- window height roughly halved. Tab ids ARE Enum.BagIndex container ids, read with
 -- the same C_Container calls as bags. All C_Bank reads are AllowedWhenUntainted; no
 -- BankFrame hijack -> no taint. Run on BANKFRAME_OPENED + BANK_TABS_CHANGED + switch.
+-- Live = physically standing at our OWN bank, viewing our own character. Only then do
+-- the C_Bank reads return real data and the live controls (deposit / money transfer /
+-- buy tab / tab settings) apply. Viewing another character, or our own bank away from a
+-- banker, is a cache-only (read-only) view. Recomputed whenever the player selection or
+-- physical bank state changes (RebuildTabList, dropdown switch).
+function Bank:RefreshLiveFlag()
+  if (self.physAtBank == 1 and self.playerid == TFuBag.PLAYERID) then
+    self.atbank = 1
+  else
+    self.atbank = 0
+  end
+end
+
+-- Persist a character's purchased character-bank tab layout (ids + name/icon) so it can
+-- be rendered from cache when that character's bank is viewed remotely. Stored per
+-- character in TFuBagInfo. viewable mirrors C_Bank.CanViewBank (an empty-but-viewable
+-- bank still snapshots, so it stays reachable). tabs == nil means "no purchased tabs".
+function Bank:SaveCharTabSnapshot(playerid, tabs, viewable)
+  if (not playerid) then return; end
+  local info = TFuBagInfo and TFuBagInfo[playerid]
+  if (not info) then return; end
+  local snap = { viewable = (viewable == true), tabs = {} }
+  if (tabs) then
+    for _, t in ipairs(tabs) do
+      if (t and t.ID) then
+        snap.tabs[#snap.tabs + 1] = { ID = t.ID, name = t.name, icon = t.icon }
+      end
+    end
+  end
+  info.bankTabs_char = snap
+end
+
+-- Returns (tabs, viewable) for a character's persisted character-bank layout, or
+-- (nil, false) if never snapshotted. An empty tab list is returned as nil so the
+-- "pick a type that actually has tabs" logic in RebuildTabList matches the live path.
+function Bank:LoadCharTabSnapshot(playerid)
+  local info = playerid and TFuBagInfo and TFuBagInfo[playerid]
+  local snap = info and info.bankTabs_char
+  if (not snap) then return nil, false; end
+  local tabs = snap.tabs
+  if (not tabs or #tabs == 0) then tabs = nil; end
+  return tabs, (snap.viewable == true)
+end
+
+-- Warband bank is account-wide, so its tab layout snapshot is shared across all
+-- characters (TFuBagCfg), refreshed whenever any character views the warband bank live.
+function Bank:SaveWarbandTabSnapshot(tabs, viewable)
+  local snap = { viewable = (viewable == true), tabs = {} }
+  if (tabs) then
+    for _, t in ipairs(tabs) do
+      if (t and t.ID) then
+        snap.tabs[#snap.tabs + 1] = { ID = t.ID, name = t.name, icon = t.icon }
+      end
+    end
+  end
+  TFuBagCfg["bankTabs_warband"] = snap
+end
+
+function Bank:LoadWarbandTabSnapshot()
+  local snap = TFuBagCfg and TFuBagCfg["bankTabs_warband"]
+  if (not snap) then return nil, false; end
+  local tabs = snap.tabs
+  if (not tabs or #tabs == 0) then tabs = nil; end
+  return tabs, (snap.viewable == true)
+end
+
+-- Fallback for a character that has a persisted bank item cache but no saved tab
+-- snapshot (cached under an older build, before SaveCharTabSnapshot existed). Build a
+-- tab list from whatever tab bags in [lo, hi] actually hold cached slots, so that
+-- character's bank still renders remotely instead of silently dropping to the wrong
+-- view (e.g. the account-wide warband bank, whose tabs are shared + viewable for every
+-- character). Names are placeholders; the real snapshot overwrites this the next time
+-- that character visits its bank live. Returns nil when no bag in the range is cached.
+function Bank:DeriveTabsFromCache(playerid, lo, hi)
+  local itm = playerid and TFuBnkItm and TFuBnkItm[playerid]
+  if (not itm) then return nil; end
+  local tabs = nil
+  for bag = lo, hi do
+    local b = itm[bag]
+    if (b and #b > 0) then
+      tabs = tabs or {}
+      tabs[#tabs + 1] = { ID = bag, name = string.format("Tab %d", #tabs + 1) }
+    end
+  end
+  return tabs
+end
+
 function Bank:RebuildTabList()
+  self:RefreshLiveFlag()
+  local live = (self.atbank == 1)
   local prevBags = self.bags or {}
+  -- Clear the currently-shown item buttons before rebuilding. Every character reuses the
+  -- same character-bank bag ids (6-11), so a dropdown switch to another character keeps
+  -- the same self.bags and the previous character's buttons would otherwise linger at
+  -- stale positions until a full re-layout. The bank-type switch (SetBankType) already
+  -- did this clear, which is why clicking a tab "fixed" the corruption; do it for every
+  -- rebuild so the dropdown switch is clean too. UpdateWindow re-shows the active tabs'
+  -- buttons immediately after; HideInactiveTabButtons (tail) covers tabs dropped here.
+  self:HideAllTabButtons()
   local ids = {}
   local data = {}
   local available = {}
@@ -298,16 +397,41 @@ function Bank:RebuildTabList()
   local CHAR = Enum.BankType and Enum.BankType.Character
   local ACCT = Enum.BankType and Enum.BankType.Account
 
-  -- Purchased tabs per type (nil = none purchased yet -- still selectable if viewable).
-  local charTabs = FetchTabsFor(CHAR)
-  local warTabs = nil
-  local warViewable = false
-  if (TFuBag.BANK_INCLUDE_WARBAND and ACCT ~= nil) then
-    local locked = C_Bank and C_Bank.FetchBankLockedReason
-      and C_Bank.FetchBankLockedReason(ACCT)
-    if (locked == nil) then
-      warTabs = FetchTabsFor(ACCT)
-      warViewable = IsBankViewable(ACCT, warTabs)
+  -- Tab sources. When physically at our OWN bank (live), read the authoritative C_Bank
+  -- tab data AND persist a snapshot so other characters / away-from-bank views can
+  -- render the same layout from cache. Otherwise (viewing another character, or our own
+  -- bank remotely) rebuild from that snapshot; item contents come from the persisted
+  -- TFuBnkItm cache. Warband is account-wide, so its snapshot is shared (TFuBagCfg).
+  local charTabs, warTabs = nil, nil
+  local charViewable, warViewable = false, false
+  if (live) then
+    charTabs = FetchTabsFor(CHAR)
+    charViewable = IsBankViewable(CHAR, charTabs)
+    if (TFuBag.BANK_INCLUDE_WARBAND and ACCT ~= nil) then
+      local locked = C_Bank and C_Bank.FetchBankLockedReason
+        and C_Bank.FetchBankLockedReason(ACCT)
+      if (locked == nil) then
+        warTabs = FetchTabsFor(ACCT)
+        warViewable = IsBankViewable(ACCT, warTabs)
+      end
+    end
+    self:SaveCharTabSnapshot(self.playerid, charTabs, charViewable)
+    if (TFuBag.BANK_INCLUDE_WARBAND and ACCT ~= nil) then
+      self:SaveWarbandTabSnapshot(warTabs, warViewable)
+    end
+  else
+    -- Viewing another character (or our own bank away from a banker): CHARACTER bank
+    -- ONLY. The warband bank is account-wide and only meaningful live at the banker, so
+    -- it is never offered in a cached view -- switching characters always lands on the
+    -- character bank (warTabs / warViewable stay nil / false, so the Warband type-switch
+    -- button is hidden and a stale Warband selection cannot carry over from the previous
+    -- character). The character bank comes from the saved snapshot, or is synthesized
+    -- from the persisted item cache when a character was last cached under an older
+    -- build (before tab snapshotting existed).
+    charTabs, charViewable = self:LoadCharTabSnapshot(self.playerid)
+    if (charTabs == nil) then
+      charTabs = self:DeriveTabsFromCache(self.playerid, 6, 11)
+      if (charTabs ~= nil) then charViewable = true; end
     end
   end
   local tabsByType = {}
@@ -316,7 +440,7 @@ function Bank:RebuildTabList()
 
   -- A type is SELECTABLE (shown + clickable) if viewable, even with zero tabs -- so an
   -- empty Character bank is reachable to buy a first tab. Order: Character, Warband.
-  if (IsBankViewable(CHAR, charTabs)) then available[#available + 1] = CHAR; end
+  if (charViewable) then available[#available + 1] = CHAR; end
   if (warViewable) then available[#available + 1] = ACCT; end
 
   local function selectable(t)
@@ -324,6 +448,12 @@ function Bank:RebuildTabList()
     for _, a in ipairs(available) do if (a == t) then return true; end end
     return false
   end
+
+  -- When not live (viewing another character, or our own bank remotely), always default
+  -- to the Character bank rather than inheriting the previously-shown character's view
+  -- (e.g. a Warband selection that should never appear for an alt), so switching
+  -- characters is consistent and lands on the character bank every time.
+  if (not live) then self.bankType = CHAR; end
 
   -- Respect the current view if it is still selectable (even when it has 0 tabs --
   -- e.g. the user switched to an empty Character bank to buy a tab). Only when the
@@ -599,10 +729,13 @@ function Bank:UpdateMoneyControls()
   dep:SetEnabled(canDep and true or false)
   wdr:SetEnabled(canWdr and true or false)
 
+  -- Bottom-align the transfer buttons to the money frame's bottom edge so they share
+  -- the gold display's spacing from the window bottom. Center-anchoring to the (shorter)
+  -- money text let these taller buttons hang down onto the window's bottom edge.
   wdr:ClearAllPoints()
-  wdr:SetPoint("RIGHT", TFuBnkFrame_MoneyFrame, "LEFT", -6, 0)
+  wdr:SetPoint("BOTTOMRIGHT", TFuBnkFrame_MoneyFrame, "BOTTOMLEFT", -6, 0)
   dep:ClearAllPoints()
-  dep:SetPoint("RIGHT", wdr, "LEFT", -4, 0)
+  dep:SetPoint("BOTTOMRIGHT", wdr, "BOTTOMLEFT", -4, 0)
   dep:Show()
   wdr:Show()
 end
@@ -697,6 +830,9 @@ end
 -- Right-click tab settings: open our own taint-safe dialog pre-filled from the tab's
 -- live BankTabData, apply via the public C_Bank.UpdateBankTabSettings on OK.
 function Bank:OpenTabSettings(bag)
+  -- Tab settings modify the LIVE bank; only valid at our own banker. (No-op in a cached
+  -- / other-character view, where the dialog's C_Bank writes would not apply.)
+  if (self.atbank ~= 1) then return end
   local bankType = (self.tabData and self.tabData[bag] and self.tabData[bag].bankType)
     or self.bankType
   if (not C_Bank or not C_Bank.UpdateBankTabSettings) then
@@ -1994,8 +2130,10 @@ function Bank:UpdateWindow(resort_req)
 
   if (resort_req == nil) then resort_req = TFuBag.REQ_NONE; end
 
-  -- Show some things only when we are at then bank
-  if (self.atbank == 1 or self.cfg["show_userdropdown"] == 0) then
+  -- Character-select dropdown: show whenever enabled (parity with the inventory window)
+  -- so other characters' banks can be browsed from cache -- including while standing at
+  -- your own banker. Live-only controls stay gated on atbank elsewhere.
+  if (self.cfg["show_userdropdown"] == 0) then
     TFuBnk_UserDropdown:Hide();
   else
     TFuBnk_UserDropdown:Show();
@@ -2173,7 +2311,9 @@ function Bank.UserDropdown_OnClick(self)
     return;
   end
   TFuBag:PrintDEBUG("Selected Player "..TFuBnkFrame.playerid);
-  -- Show in whatever state the cache was in before
-  TFuBnkFrame.atbank = 0;
+  -- Switching characters: rebuild the tab layout for the newly selected player from
+  -- cache. RebuildTabList -> RefreshLiveFlag recomputes atbank (live only when the
+  -- selection is our own character AND we are physically at a banker).
+  TFuBnkFrame:RebuildTabList();
   TFuBnkFrame:UpdateWindow(TFuBag.REQ_MUST);
 end
