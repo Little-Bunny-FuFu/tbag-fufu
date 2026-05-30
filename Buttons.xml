@@ -54,6 +54,9 @@
           battlepay:Hide();
         end
       </OnLoad>
+      <OnClick>
+        TFuBag.ItemButton.NormalClick(self, button);
+      </OnClick>
       <OnEnter>
         TFuBag.ItemButton.OnEnter(self, motion);
       </OnEnter>

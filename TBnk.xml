@@ -182,6 +182,32 @@
         </Scripts>
       </Button>
 
+      <Button name="TFuBnk_Button_Filter">
+        <Size><AbsDimension x="20" y="20"/></Size>
+        <NormalTexture file="Interface\Icons\INV_Misc_Note_05" />
+        <PushedTexture file="Interface\Icons\INV_Misc_Note_05" />
+        <HighlightTexture file="Interface\Icons\INV_Misc_Note_05" alphaMode="ADD" />
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="TFuBnk_Button_DepositReagent" relativePoint="TOPRIGHT">
+            <Offset>
+              <AbsDimension x="2" y="0"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+        <Scripts>
+          <OnClick>
+            TFuBnkFrame.Button_Filter_OnClick(self, button, down);
+          </OnClick>
+          <OnEnter>
+            TFuBag.NewbieTip(self, TFuBag.LOCALE["Filter Items"], 1.0, 1.0, 1.0, TFuBag.LOCALE["Show only items matching the selected rarity, type, usable, or expansion filters."]);
+          </OnEnter>
+          <OnLeave>
+            GameTooltip:Hide();
+            ResetCursor();
+          </OnLeave>
+        </Scripts>
+      </Button>
+
       <EditBox name="TFuBnk_SearchBox" inherits="TFuBag_SearchBoxTemplate">
         <Anchors>
           <Anchor point="BOTTOMLEFT">

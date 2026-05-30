@@ -45,7 +45,17 @@ TFuBag.REALM = GetRealmName();
 TFuBag.BUTTONS = {};
 
 -- GFX settings
-TFuBag.BAR_MAX = 32;
+-- 48 (was 32): the category uplift gives each per-material trade-goods category and
+-- each new 12.0 item class its OWN bar (a bar is one display box; sharing a bar merges
+-- categories into one box). Bar frames are created dynamically from BAR_MAX and empty
+-- bars don't render, so the higher cap costs nothing until those categories are used.
+TFuBag.BAR_MAX = 48;
+-- Dedicated bar for empty slots: SortItmCache collects every empty slot here and
+-- LayoutWindow draws it as ONE box at the very BOTTOM of the window (below all
+-- categories), so empties are a single "Empty" category instead of tiling mid-window.
+-- It is the top bar index (BAR_MAX); the normal category rows iterate 1..BAR_MAX-1 and
+-- skip it. Category defaults (SetDefLayout) use up to 46, so this reserves no in-use bar.
+TFuBag.EMPTY_BAR = 48;
 TFuBag.MAIN_BAR = 0;
 
 TFuBag.USERDD_WIDTH = 90;
@@ -94,6 +104,10 @@ TFuBag.I_SOULBOUND = "sb";
 TFuBag.I_ACCTBOUND = "ab";
 TFuBag.I_CHARGES         = "ch";
 TFuBag.I_LINKSUFFIX = "ls"
+-- Cached for the item filter (captured from GetItemInfo at scan time so the
+-- Expansion / Bind-on-Equip filters work for cached cross-character views too):
+TFuBag.I_EXPANSION = "xp";  -- expansionID (15th GetItemInfo return)
+TFuBag.I_BINDTYPE  = "bd";  -- bindType (14th GetItemInfo return; 2 = Bind on Equip)
 -- Reforging was removed in 6.0,
 -- entry left here commented out to remember that
 -- rf has been used
@@ -562,12 +576,14 @@ end
 function TFuBag:GetItemInfo(itemid)
   if itemid then
     if tostring(itemid):sub(1,10) ~= "battlepet:" then
-      local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, iconFileDataID = GetItemInfo(itemid);
-      return itemName, itemType, itemSubType, itemRarity, itemLink, itemStackCount;
+      local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, iconFileDataID, sellPrice, classID, subclassID, bindType, expacID = GetItemInfo(itemid);
+      -- bindType / expacID appended for the item filter; existing callers that
+      -- capture only the first six returns are unaffected.
+      return itemName, itemType, itemSubType, itemRarity, itemLink, itemStackCount, bindType, expacID;
     else
       local _,species,_,quality = strsplit(":", itemid)
       local itemName = C_PetJournal.GetPetInfoBySpeciesID(species)
-      return itemName, "Miscellaneous", "Companion Pets", quality, itemid, 1
+      return itemName, "Miscellaneous", "Companion Pets", quality, itemid, 1, nil, nil
     end
   else
     return;
@@ -864,6 +880,507 @@ function TFuBag:ClearSearch()
 end
 
 -----------------------------------------------------------------------
+-- Item filter (Blizzard-style: hide non-matching items, reflow the rest)
+-----------------------------------------------------------------------
+-- Unlike the search box (which only DIMS non-matches), the filter hides them
+-- completely: SortItmCache skips placing a non-matching item into a bar, so
+-- LayoutWindow reflows the survivors with no gaps. State is per-window and held
+-- in memory only (resets on /reload, same as the search box).
+--
+-- Rarity / item-type test cached item fields, so they work for cross-character
+-- (cached) views. "Usable Only" / "Current Expansion Only" use live APIs that
+-- only know the logged-in character, and an item not yet in the client cache has
+-- no expansion info -- both degrade to "do not hide" rather than wrongly hiding.
+
+-- Profession -> trade-goods material subtype(s), from the in-game taxonomy dump
+-- (12.0 / enUS localized subtype strings, matched against itm[I_SUBTYPE]). Shared
+-- by the Profession filter and (later) the per-material category uplift. Professions
+-- that share a material family overlap by design (Mining & Blacksmithing -> Metal &
+-- Stone; Herbalism & Alchemy -> Herb; Skinning & Leatherworking -> Leather).
+TFuBag.PROFESSION_SUBTYPES = {
+  Alchemy        = { "Herb", "Elemental" },
+  Blacksmithing  = { "Metal & Stone" },
+  Cooking        = { "Cooking" },
+  Enchanting     = { "Enchanting" },
+  Engineering    = { "Parts", "Metal & Stone" },
+  Herbalism      = { "Herb" },
+  Inscription    = { "Inscription" },
+  Jewelcrafting  = { "Jewelcrafting" },
+  Leatherworking = { "Leather" },
+  Mining         = { "Metal & Stone" },
+  Skinning       = { "Leather" },
+  Tailoring      = { "Cloth" },
+};
+-- Menu order for the Profession filter submenu.
+TFuBag.FILTER_PROFESSIONS = {
+  "Alchemy", "Blacksmithing", "Cooking", "Enchanting", "Engineering", "Herbalism",
+  "Inscription", "Jewelcrafting", "Leatherworking", "Mining", "Skinning", "Tailoring",
+};
+
+-----------------------------------------------------------------------
+-- Material grouping (Categories panel). Each trade-goods subtype routes to a
+-- group CATEGORY (cfg.mat_group[subtype]); pointing several subtypes at the same
+-- category merges them onto one bar. sub = the game subtype string (matched
+-- against I_SUBTYPE); cat = the default per-material category. Order = menu order.
+-----------------------------------------------------------------------
+TFuBag.MATERIAL_SUBTYPES = {
+  { sub = "Herb",              cat = "Herbs" },
+  { sub = "Metal & Stone",     cat = "Ore & Stone" },
+  { sub = "Cloth",             cat = "CLOTH" },
+  { sub = "Leather",           cat = "Leather" },
+  { sub = "Cooking",           cat = "Cooking Mats" },
+  { sub = "Enchanting",        cat = "Enchanting Mats" },
+  { sub = "Inscription",       cat = "Inscription Mats" },
+  { sub = "Jewelcrafting",     cat = "Jewelcrafting Mats" },
+  { sub = "Elemental",         cat = "Elemental" },
+  { sub = "Parts",             cat = "Engineering Parts" },
+  { sub = "Optional Reagents", cat = "Optional Reagents" },
+  { sub = "Finishing Reagents",cat = "Finishing Reagents" },
+};
+
+-- Read the current group target for a subtype (from the inventory cfg).
+function TFuBag:GetMaterialGroup(subtype)
+  local cfg = TFuInvFrame and TFuInvFrame.cfg;
+  return cfg and cfg.mat_group and cfg.mat_group[subtype];
+end
+
+-- Route a subtype to a target group category in BOTH windows. defer = skip the
+-- (heavy) recat+relayout so a preset can batch many changes into one refresh.
+function TFuBag:SetMaterialGroup(subtype, target, defer)
+  for _, frame in ipairs({ TFuInvFrame, TFuBnkFrame }) do
+    if (frame and frame.cfg) then
+      frame.cfg.mat_group = frame.cfg.mat_group or {};
+      frame.cfg.mat_group[subtype] = target;
+    end
+  end
+  if (not defer) then
+    self:BumpCatGen();
+    if (TFuInvFrame) then TFuInvFrame:UpdateWindow(self.REQ_MUST); end
+    if (TFuBnkFrame) then TFuBnkFrame:UpdateWindow(self.REQ_MUST); end
+  end
+end
+
+-- Apply a grouping preset: "separate" = each subtype to its own category;
+-- "onebar" = all subtypes into the single Trade Goods category.
+function TFuBag:ApplyGroupPreset(preset)
+  for _, m in ipairs(self.MATERIAL_SUBTYPES) do
+    local target = (preset == "onebar") and self.LOCALE["TRADE_GOODS"] or m.cat;
+    self:SetMaterialGroup(m.sub, target, true);
+  end
+  self:BumpCatGen();
+  if (TFuInvFrame) then TFuInvFrame:UpdateWindow(self.REQ_MUST); end
+  if (TFuBnkFrame) then TFuBnkFrame:UpdateWindow(self.REQ_MUST); end
+end
+
+function TFuBag:GetItemFilter(frame)
+  if (not frame.itemFilter) then
+    frame.itemFilter = {
+      rarity = {},      -- keyed by quality number
+      itype = {},       -- keyed by localized item type
+      isubtype = {},    -- keyed by localized item subtype
+      expansion = {},   -- keyed by expansionID
+      profession = {},  -- keyed by English profession name (matched via PROFESSION_SUBTYPES)
+      bound = {},       -- keyed by "soulbound" / "warbound" / "boe"
+      usable = false,
+      curExp = false,
+      active = false,
+    };
+  end
+  return frame.itemFilter;
+end
+
+-- True when at least one filter dimension is set. Cached on f.active so the
+-- per-item PassesItemFilter hot path can early-out with a single boolean read.
+function TFuBag:ItemFilterActive(f)
+  if (not f) then return false; end
+  return (next(f.rarity) ~= nil) or (next(f.itype) ~= nil)
+    or (next(f.isubtype) ~= nil) or (next(f.expansion) ~= nil)
+    or (next(f.profession) ~= nil) or (next(f.bound) ~= nil)
+    or f.usable or f.curExp;
+end
+
+function TFuBag:PassesItemFilter(frame, itm)
+  local f = frame and frame.itemFilter;
+  if (not f or not f.active) then return true; end   -- no active filter: show everything
+
+  local link = itm[self.I_ITEMLINK];
+  -- An active filter shows only matching ITEMS, so empty slots are always hidden.
+  if (not link or link == "") then return false; end
+
+  if (next(f.rarity) ~= nil) then
+    local q = itm[self.I_RARITY];
+    if (q == nil or not f.rarity[q]) then return false; end
+  end
+
+  if (next(f.itype) ~= nil) then
+    local t = itm[self.I_TYPE];
+    if (t == nil or not f.itype[t]) then return false; end
+  end
+
+  if (next(f.isubtype) ~= nil) then
+    local st = itm[self.I_SUBTYPE];
+    if (st == nil or not f.isubtype[st]) then return false; end
+  end
+
+  if (next(f.expansion) ~= nil) then
+    local xp = itm[self.I_EXPANSION];
+    -- nil = unknown (item not cached with expansion yet, e.g. an alt last scanned
+    -- under an older build): leave it visible rather than wrongly hiding it.
+    if (xp ~= nil and not f.expansion[xp]) then return false; end
+  end
+
+  if (next(f.profession) ~= nil) then
+    -- Match the item's material subtype against the selected professions' families,
+    -- but ONLY for crafting materials (trade goods). Some subtype strings ("Cloth",
+    -- "Leather") are shared with Armor, so without the type guard cloth/leather
+    -- armor (incl. BoE) would wrongly match Tailoring/Leatherworking.
+    local st = itm[self.I_SUBTYPE];
+    local hit = false;
+    if (st and itm[self.I_TYPE] == self.LOCALE["Tradeskill"]) then
+      for trade in pairs(f.profession) do
+        local subs = self.PROFESSION_SUBTYPES[trade];
+        if (subs) then
+          for _, s in ipairs(subs) do
+            if (st == s) then hit = true; break; end
+          end
+        end
+        if (hit) then break; end
+      end
+    end
+    if (not hit) then return false; end
+  end
+
+  if (next(f.bound) ~= nil) then
+    local hit = false;
+    if (f.bound.soulbound and itm[self.I_SOULBOUND] == 1) then hit = true; end
+    if (f.bound.warbound and itm[self.I_ACCTBOUND]) then hit = true; end
+    if (f.bound.boe and itm[self.I_BINDTYPE] == 2) then hit = true; end  -- 2 = Bind on Equip
+    if (not hit) then return false; end
+  end
+
+  if (f.usable) then
+    -- C_Item.IsUsableItem (returns usable, noMana) can only judge an item whose data
+    -- is loaded client-side. Inventory items are always loaded; BANK items often are
+    -- not (a remote/cached bank view, or freshly-opened tabs), and IsUsableItem then
+    -- returns falsy -- which previously hid usable items (e.g. food) in the bank.
+    -- Only hide when the item is LOADED and positively not usable; treat unknown
+    -- (uncached) as "do not hide", same as the Expansion / Current-Expansion checks.
+    local iid = link and link:match("^item:(%d+)");
+    iid = iid and tonumber(iid);
+    if (iid and GetItemInfo(iid) and not C_Item.IsUsableItem(iid)) then
+      return false;
+    end
+  end
+
+  if (f.curExp) then
+    -- 15th return of GetItemInfo = expansionID; nil when the item is not yet in
+    -- the client cache -- treat unknown as "do not hide".
+    local exp = select(15, GetItemInfo(link));
+    if (exp ~= nil and exp ~= LE_EXPANSION_LEVEL_CURRENT) then return false; end
+  end
+
+  return true;
+end
+
+-- Called whenever a filter checkbox toggles: recompute the active flag, then ask
+-- the window to rebuild its item placement and relayout WITHOUT a full category
+-- rescan (force_resort, handled in Inv/Bank:UpdateWindow).
+function TFuBag:OnFilterChanged(frame)
+  local f = self:GetItemFilter(frame);
+  f.active = self:ItemFilterActive(f);
+  frame.force_resort = true;
+  if (frame.UpdateFilterButton) then frame:UpdateFilterButton(); end
+  frame:UpdateWindow();
+end
+
+-- The set of item classes offered in the "Item Type" submenu is built from the
+-- types actually present in the view (so labels exactly match the stored
+-- I_TYPE string and no empty categories are listed). Returns a sorted array.
+-- Distinct values of a cached item field (I_TYPE / I_SUBTYPE) present in the
+-- view, sorted. Used to build the Item Type / Item Subtype submenus from what is
+-- actually in the bags so labels exactly match the stored string (no empty rows).
+function TFuBag:CollectItemField(frame, field)
+  local cache = (frame == TFuBnkFrame) and TFuBnkItm or TFuInvItm;
+  local pcache = frame.playerid and cache and cache[frame.playerid];
+  local seen, names = {}, {};
+  if (pcache and frame.bags) then
+    for _, bag in ipairs(frame.bags) do
+      local b = pcache[bag];
+      if (b) then
+        for _, slot in pairs(b) do
+          local t = slot[field];
+          if (t and t ~= "" and not seen[t]) then
+            seen[t] = true;
+            names[#names + 1] = t;
+          end
+        end
+      end
+    end
+  end
+  table.sort(names);
+  return names;
+end
+
+function TFuBag:CollectItemTypes(frame)
+  return self:CollectItemField(frame, self.I_TYPE);
+end
+
+function TFuBag:CollectItemSubtypes(frame)
+  return self:CollectItemField(frame, self.I_SUBTYPE);
+end
+
+-- Populate a Blizzard menu (rootDescription from MenuUtil.CreateContextMenu) with
+-- the filter controls. Mirrors the auction-house filter layout: titles + checkboxes.
+function TFuBag:BuildFilterMenu(frame, rootDescription)
+  local f = self:GetItemFilter(frame);
+  local L = self.LOCALE;
+
+  -- Toggle a key in a filter set (e.g. f.rarity[q]) from a checkbox, then refresh.
+  local function setCheckbox(parent, label, set, key)
+    parent:CreateCheckbox(label,
+      function() return set[key] == true; end,
+      function()
+        if (set[key]) then set[key] = nil; else set[key] = true; end
+        self:OnFilterChanged(frame);
+      end);
+  end
+
+  -- Submenu that lists checkboxes from a sorted array of values (matched by the
+  -- value itself), with a disabled "(none)" row when the view has none of them.
+  local function valueSubmenu(titleKey, values, set)
+    local sub = rootDescription:CreateButton(titleKey);
+    if (#values == 0) then
+      sub:CreateButton(L["(none)"]):SetEnabled(false);
+    else
+      for _, v in ipairs(values) do setCheckbox(sub, v, set, v); end
+    end
+    return sub;
+  end
+
+  rootDescription:CreateTitle(L["Filter Items"]);
+
+  rootDescription:CreateButton(L["Clear All Filters"], function()
+    wipe(f.rarity); wipe(f.itype); wipe(f.isubtype);
+    wipe(f.expansion); wipe(f.profession); wipe(f.bound);
+    f.usable = false;
+    f.curExp = false;
+    self:OnFilterChanged(frame);
+  end);
+
+  rootDescription:CreateCheckbox(L["Usable Only"],
+    function() return f.usable; end,
+    function() f.usable = not f.usable; self:OnFilterChanged(frame); end);
+
+  rootDescription:CreateCheckbox(L["Current Expansion Only"],
+    function() return f.curExp; end,
+    function() f.curExp = not f.curExp; self:OnFilterChanged(frame); end);
+
+  -- Rarity submenu (Poor .. Heirloom), each label tinted with its quality color.
+  local rarity = rootDescription:CreateButton(L["Rarity"]);
+  for q = Enum.ItemQuality.Poor, Enum.ItemQuality.Heirloom do
+    local name = _G["ITEM_QUALITY"..q.."_DESC"];
+    if (name) then
+      local col = ITEM_QUALITY_COLORS[q];
+      setCheckbox(rarity, (col and col.hex or "")..name.."|r", f.rarity, q);
+    end
+  end
+
+  -- Item Type / Item Subtype submenus, built from values present in this view.
+  valueSubmenu(L["Item Type"], self:CollectItemTypes(frame), f.itype);
+  valueSubmenu(L["Item Subtype"], self:CollectItemSubtypes(frame), f.isubtype);
+
+  -- Expansion submenu (Classic .. current), matched on the item's expansionID.
+  local expSub = rootDescription:CreateButton(L["Expansion"]);
+  local maxExp = LE_EXPANSION_LEVEL_CURRENT or GetExpansionLevel() or 0;
+  for i = 0, maxExp do
+    local name = _G["EXPANSION_NAME"..i];
+    if (name) then setCheckbox(expSub, name, f.expansion, i); end
+  end
+
+  -- Profession submenu: matches an item's material subtype against the profession's
+  -- family (PROFESSION_SUBTYPES), e.g. Herbalism -> Herb, Mining -> Metal & Stone.
+  local profSub = rootDescription:CreateButton(L["Profession"]);
+  for _, trade in ipairs(self.FILTER_PROFESSIONS) do
+    setCheckbox(profSub, L[trade], f.profession, trade);
+  end
+
+  -- Bound status.
+  local boundSub = rootDescription:CreateButton(L["Bound"]);
+  setCheckbox(boundSub, L["Soulbound"], f.bound, "soulbound");
+  setCheckbox(boundSub, L["Account Bound"], f.bound, "warbound");
+  setCheckbox(boundSub, L["Bind on Equip"], f.bound, "boe");
+
+  -- User-defined saved filters (account-wide, TFuBagCfg.user_filters). Clicking a
+  -- saved entry loads its spec as the active filter; "Save current filter as..."
+  -- snapshots the current selection (name-entry popup); "Delete saved filter" removes one.
+  local saved = self:GetUserFilters();
+  local userSub = rootDescription:CreateButton(L["User Filters"]);
+  if (#saved == 0) then
+    userSub:CreateButton(L["(none saved)"]):SetEnabled(false);
+  else
+    for _, entry in ipairs(saved) do
+      local e = entry;
+      userSub:CreateButton(e.name, function() self:ApplyUserFilter(frame, e); end);
+    end
+  end
+  userSub:CreateDivider();
+  userSub:CreateButton(L["Save current filter as..."], function()
+    StaticPopup_Show("TBAG_SAVE_FILTER", nil, nil, frame);
+  end);
+  if (#saved > 0) then
+    local del = userSub:CreateButton(L["Delete saved filter"]);
+    for _, entry in ipairs(saved) do
+      local e = entry;
+      del:CreateButton(e.name, function() self:DeleteUserFilter(e.name); end);
+    end
+  end
+end
+
+-- Shared OnClick for a window's filter button: opens the menu anchored to it.
+function TFuBag:OpenFilterMenu(frame, button)
+  MenuUtil.CreateContextMenu(button, function(owner, rootDescription)
+    TFuBag:BuildFilterMenu(frame, rootDescription);
+  end);
+end
+
+-----------------------------------------------------------------------
+-- User-defined saved filters (account-wide, in TFuBagCfg.user_filters)
+-----------------------------------------------------------------------
+-- A saved filter is a named snapshot of the live filter spec. Stored in TFuBagCfg
+-- so the same named filters are available on every character and in both windows.
+
+-- Deep-copy a filter spec (sets are copied so a saved filter can't be mutated by
+-- later edits to the live filter, and vice versa).
+function TFuBag:CopyFilterSpec(src)
+  local function copyset(s)
+    local t = {};
+    if (s) then for k, v in pairs(s) do t[k] = v; end end
+    return t;
+  end
+  return {
+    rarity     = copyset(src.rarity),
+    itype      = copyset(src.itype),
+    isubtype   = copyset(src.isubtype),
+    expansion  = copyset(src.expansion),
+    profession = copyset(src.profession),
+    bound      = copyset(src.bound),
+    usable     = src.usable and true or false,
+    curExp     = src.curExp and true or false,
+  };
+end
+
+function TFuBag:GetUserFilters()
+  if (not TFuBagCfg) then return {}; end
+  TFuBagCfg.user_filters = TFuBagCfg.user_filters or {};
+  return TFuBagCfg.user_filters;
+end
+
+-- Snapshot the window's current filter selection under a name (overwrites an
+-- existing entry with the same name). Kept sorted by name for a stable menu.
+function TFuBag:SaveCurrentFilter(frame, name)
+  if (not name) then return; end
+  name = strtrim(name);
+  if (name == "") then return; end
+  local spec = self:CopyFilterSpec(self:GetItemFilter(frame));
+  local list = self:GetUserFilters();
+  for _, e in ipairs(list) do
+    if (e.name == name) then e.spec = spec; return; end
+  end
+  list[#list + 1] = { name = name, spec = spec };
+  table.sort(list, function(a, b) return a.name < b.name; end);
+end
+
+function TFuBag:UserFilterExists(name)
+  for _, e in ipairs(self:GetUserFilters()) do
+    if (e.name == name) then return true; end
+  end
+  return false;
+end
+
+-- Save entry point used by the menu: confirm before overwriting an existing
+-- same-named filter; otherwise save directly.
+function TFuBag:SaveCurrentFilterPrompt(frame, name)
+  if (not name) then return; end
+  name = strtrim(name);
+  if (name == "") then return; end
+  if (self:UserFilterExists(name)) then
+    StaticPopup_Show("TBAG_CONFIRM_OVERWRITE_FILTER", name, nil, { frame = frame, name = name });
+  else
+    self:SaveCurrentFilter(frame, name);
+  end
+end
+
+-- Load a saved filter's spec as the window's active filter, then reflow.
+function TFuBag:ApplyUserFilter(frame, entry)
+  if (not entry or not entry.spec) then return; end
+  local f = self:GetItemFilter(frame);
+  local c = self:CopyFilterSpec(entry.spec);
+  f.rarity, f.itype, f.isubtype = c.rarity, c.itype, c.isubtype;
+  f.expansion, f.profession, f.bound = c.expansion, c.profession, c.bound;
+  f.usable, f.curExp = c.usable, c.curExp;
+  self:OnFilterChanged(frame);
+end
+
+function TFuBag:DeleteUserFilter(name)
+  local list = self:GetUserFilters();
+  for i, e in ipairs(list) do
+    if (e.name == name) then table.remove(list, i); return; end
+  end
+end
+
+-- Name-entry popup for "Save current filter as...". data = the window frame.
+StaticPopupDialogs["TBAG_SAVE_FILTER"] = {
+  text = TFuBag.LOCALE["Name this filter:"],
+  button1 = SAVE,
+  button2 = CANCEL,
+  hasEditBox = true,
+  maxLetters = 32,
+  OnAccept = function(dialog, data)
+    local eb = dialog.GetEditBox and dialog:GetEditBox();
+    TFuBag:SaveCurrentFilterPrompt(data, eb and eb:GetText() or "");
+  end,
+  EditBoxOnEnterPressed = function(editBox, data)
+    editBox:GetParent():Hide();
+    TFuBag:SaveCurrentFilterPrompt(data, editBox:GetText());
+  end,
+  EditBoxOnEscapePressed = function(editBox)
+    editBox:GetParent():Hide();
+  end,
+  timeout = 0,
+  whileDead = true,
+  hideOnEscape = true,
+};
+
+-- Confirm before overwriting an existing same-named saved filter.
+-- data = { frame = <window>, name = <filter name> }.
+StaticPopupDialogs["TBAG_CONFIRM_OVERWRITE_FILTER"] = {
+  text = TFuBag.LOCALE["A filter named \"%s\" already exists. Overwrite it?"],
+  button1 = YES,
+  button2 = NO,
+  OnAccept = function(dialog, data)
+    if (data) then TFuBag:SaveCurrentFilter(data.frame, data.name); end
+  end,
+  timeout = 0,
+  whileDead = true,
+  hideOnEscape = true,
+};
+
+-- Trim the dark 1-2px border baked into every Interface\Icons\ texture, so the
+-- 20x20 title-bar icon buttons show a clean icon to their edges instead of a hard
+-- inner border ("edge issues around the icon"). Idempotent (cached on the button)
+-- and applied to Normal/Pushed/Highlight so the look stays consistent on press/hover.
+function TFuBag:TrimButtonIcon(button)
+  if (not button or button.iconTrimmed) then return; end
+  button.iconTrimmed = true;
+  local function trim(tex)
+    if (tex) then tex:SetTexCoord(0.07, 0.93, 0.07, 0.93); end
+  end
+  trim(button:GetNormalTexture());
+  trim(button:GetPushedTexture());
+  trim(button:GetHighlightTexture());
+end
+
+-----------------------------------------------------------------------
 -- Configuration
 -----------------------------------------------------------------------
 
@@ -1039,7 +1556,10 @@ function TFuBag:SetDefLayout(cfg, bagarr, row1offset, reset)
 -- Fifth default line - To Sell
   self:SetCatBar(cfg, L["REAGENT"], 20, reset);
 
-  self:SetCatBar(cfg, L["TRADE_GOODS"], 19, reset);
+  -- Trade Goods catch-all on its OWN bar (32), not shared with the vestigial
+  -- profession categories below (which kept it visually merged into an "Alchemy"
+  -- box). Unclassified "Other"-subtype reagents land here in a clean Trade Goods box.
+  self:SetCatBar(cfg, L["TRADE_GOODS"], 32, reset);
   self:SetCatBar(cfg, L["ALCHEMY"], 19, reset);
   self:SetCatBar(cfg, L["BLACKSMITHING"], 19, reset);
   self:SetCatBar(cfg, L["ENCHANTING"], 19, reset);
@@ -1049,6 +1569,25 @@ function TFuBag:SetDefLayout(cfg, bagarr, row1offset, reset)
   self:SetCatBar(cfg, L["MINING"], 19, reset);
   self:SetCatBar(cfg, L["TAILORING"], 19, reset);
   self:SetCatBar(cfg, L["INSCRIPTION"], 19, reset);
+
+-- Category uplift: each per-material trade-goods category and each new 12.0 class
+-- gets its OWN bar (33-46) so they render as separate boxes instead of merging into
+-- one. (A bar is a single box; categories sharing a bar are drawn together with a
+-- joined label.) Placed in the high range; rearrange to taste in-game.
+  self:SetCatBar(cfg, L["Herbs"], 46, reset);
+  self:SetCatBar(cfg, L["Ore & Stone"], 45, reset);
+  self:SetCatBar(cfg, L["Leather"], 44, reset);
+  self:SetCatBar(cfg, L["Cooking Mats"], 43, reset);
+  self:SetCatBar(cfg, L["Enchanting Mats"], 42, reset);
+  self:SetCatBar(cfg, L["Inscription Mats"], 41, reset);
+  self:SetCatBar(cfg, L["Jewelcrafting Mats"], 40, reset);
+  self:SetCatBar(cfg, L["Elemental"], 39, reset);
+  self:SetCatBar(cfg, L["Engineering Parts"], 38, reset);
+  self:SetCatBar(cfg, L["Optional Reagents"], 37, reset);
+  self:SetCatBar(cfg, L["Finishing Reagents"], 36, reset);
+  self:SetCatBar(cfg, L["Gems"], 35, reset);
+  self:SetCatBar(cfg, L["Housing"], 34, reset);
+  self:SetCatBar(cfg, L["Mount Equipment"], 33, reset);
 
   self:SetCatBar(cfg, L["RING"], 18, reset);
   self:SetCatBar(cfg, L["TRINKET"], 18, reset);
@@ -1286,6 +1825,26 @@ function TFuBag:InitDefVals(cfg, bagarr, row1offset, reset)
   -- on = original TBag per-profession reagent/trade-good split (the "psplit"
   -- rules in DefaultSearchList, gated in PickBar).
   self:SetDef(cfg, "reagent_split", 0, reset, self.NumFunc, 0, 1);
+  -- Material grouping (Categories panel): subtype -> group category. Default maps
+  -- each trade-goods subtype to its own per-material category; the user can point
+  -- several subtypes at the same category to merge them onto one bar. Seeded when
+  -- absent (or on reset); user edits persist.
+  if (reset == 1 or cfg.mat_group == nil) then
+    cfg.mat_group = {
+      [L["Herb"]]              = L["Herbs"],
+      [L["Metal & Stone"]]     = L["Ore & Stone"],
+      [L["Cloth"]]             = L["CLOTH"],
+      [L["Leather"]]           = L["Leather"],
+      [L["Cooking"]]           = L["Cooking Mats"],
+      [L["Enchanting"]]        = L["Enchanting Mats"],
+      [L["Inscription"]]       = L["Inscription Mats"],
+      [L["Jewelcrafting"]]     = L["Jewelcrafting Mats"],
+      [L["Elemental"]]         = L["Elemental"],
+      [L["Parts"]]             = L["Engineering Parts"],
+      [L["Optional Reagents"]] = L["Optional Reagents"],
+      [L["Finishing Reagents"]]= L["Finishing Reagents"],
+    };
+  end
   self:SetDef(cfg, "manual_layout", 0, reset, self.NumFunc, 0, 1);
   -- Legacy Edit: when 1, force the original TBag edit experience (auto-flow layout +
   -- the classic Change-Edit-Mode click-to-assign category editing) and DISABLE the
@@ -1350,6 +1909,24 @@ function TFuBag:InitDefVals(cfg, bagarr, row1offset, reset)
   self:SetDef(cfg, "show_bagbuttons", 1, reset, self.NumFunc, 0, 1);
   self:SetDef(cfg, "show_money", 1, reset, self.NumFunc, 0, 1);
   self:SetDef(cfg, "show_tokens", 1, reset, self.NumFunc, 0, 1);
+
+  -- Category-uplift bar migration: an earlier build placed these categories on
+  -- shared bars (so they merged into one box). Clear their saved slots so the
+  -- SetDefLayout call below reassigns them to their new per-category bars without
+  -- needing a full /reset. Bump UPLIFT_BAR_V whenever these default bars change again.
+  local UPLIFT_BAR_V = 2;
+  if (reset ~= 1 and cfg[self.CAT_BAR] and cfg.catbar_uplift_v ~= UPLIFT_BAR_V) then
+    local cb = cfg[self.CAT_BAR];
+    local moved = {
+      L["Herbs"], L["Ore & Stone"], L["Leather"], L["Cooking Mats"],
+      L["Enchanting Mats"], L["Inscription Mats"], L["Jewelcrafting Mats"],
+      L["Elemental"], L["Engineering Parts"], L["Optional Reagents"],
+      L["Finishing Reagents"], L["Gems"], L["Housing"], L["Mount Equipment"],
+      L["TRADE_GOODS"],  -- v2: relocate the catch-all off the merged bar 19
+    };
+    for _, c in ipairs(moved) do cb[c] = nil; end
+    cfg.catbar_uplift_v = UPLIFT_BAR_V;
+  end
 
   -- Do the layout
   self:SetDefLayout(cfg, bagarr, row1offset, reset);
@@ -2300,13 +2877,16 @@ end
 -- Deposit the held item into a free slot of this window's bags. SortItmCache records
 -- the target (frame.dropBag/dropSlot) -- the focused bank tab's first free slot if a
 -- single tab is selected, else the first free slot anywhere. Live player only.
+-- Deposit the held item into this window's first free slot (for the bank, the focused
+-- tab when exactly one is selected). NOT gated on collapse_empty: it backs the
+-- whole-window drop, the right-click deposit, and the click-place, all of which must
+-- work in BOTH collapse modes. dropBag/dropSlot are set by SortItmCache from this
+-- window's (active bank type's) bags, so the destination always matches the view --
+-- fixing right-click/drag landing in the wrong bank and the collapse-off "only an
+-- empty slot accepts the drop" gap.
 function TFuBag:DepositToFreeSlot(frame)
   if (not CursorHasItem()) then return; end
-  -- Whole-window deposit only exists under empty-collapse (no per-slot empty buttons).
-  -- With collapse off, frame.dropBag/dropSlot are never set, so bail WITHOUT touching
-  -- the cursor -- the item stays on the cursor for the user to place on a real empty
-  -- button, and we never spuriously ClearCursor / flash "bag full".
-  if (not (frame and frame.cfg and frame.cfg["collapse_empty"] == 1)) then return; end
+  if (not (frame and frame.cfg)) then return; end
   if (not self:IsLive(frame)) then ClearCursor(); return; end
   if (frame.dropBag and frame.dropSlot) then
     PickupContainerItem(frame.dropBag, frame.dropSlot);
@@ -2324,42 +2904,15 @@ function TFuBag:DepositToFreeSlot(frame)
   end
 end
 
--- One "free slots" indicator cell pinned bottom-right, created once per window. Also
--- wires the window (main frame + scroll content) as a drop target so an item dragged
--- onto empty window space deposits into a free slot. Empty slots are not drawn
--- individually while collapse_empty is on, so this cell + the window drop are how you
--- deposit / see free space.
+-- Hidden drop-target holder: wires the WHOLE window (main frame + scroll content) as a
+-- deposit drop target so an item dragged onto empty window space deposits into a free
+-- slot. The cell itself is never shown -- empty slots are tiled in the dedicated "Empty"
+-- box at the bottom of the window, and the bottom-left Total number shows the free count.
 function TFuBag:GetFreeSlotsCell(frame)
   if (frame.FreeCell) then return frame.FreeCell; end
   local name = frame:GetName().."_FreeCell";
   local c = CreateFrame("Button", name, frame, "BackdropTemplate");
-  c:SetSize(34, 34);
-  -- Position + frame level are set in UpdateFreeSlotsCell (behind the bottom-left
-  -- Total number, in front of the bars).
-  c:SetBackdrop({
-    bgFile   = "Interface\\Buttons\\WHITE8X8",
-    edgeFile = "Interface\\Buttons\\WHITE8X8", edgeSize = 1,
-  });
-  c:SetBackdropColor(0, 0, 0, 0.35);
-  c:SetBackdropBorderColor(0.55, 0.55, 0.55, 0.8);
-
-  -- Fallback count, shown ONLY when the Total display is hidden; normally the
-  -- bottom-left Total number sits on top of this cell and serves as the count.
-  local txt = c:CreateFontString(nil, "OVERLAY", "NumberFontNormalYellow");
-  txt:SetPoint("CENTER", 0, 0);
-  c.txt = txt;
-
-  c:RegisterForDrag("LeftButton");
-  c:RegisterForClicks("LeftButtonUp");
-  c:SetScript("OnReceiveDrag", function() TFuBag:DepositToFreeSlot(frame); end);
-  c:SetScript("OnClick",       function() TFuBag:DepositToFreeSlot(frame); end);
-  c:SetScript("OnEnter", function(b)
-    GameTooltip:SetOwner(b, "ANCHOR_LEFT");
-    GameTooltip:SetText(string.format(L["%d free slots"], frame.freeSlots or 0), 1, 1, 1);
-    GameTooltip:AddLine(L["Drop an item on the window to deposit it."], 0.7, 0.7, 0.7, true);
-    GameTooltip:Show();
-  end);
-  c:SetScript("OnLeave", function() GameTooltip:Hide(); end);
+  c:Hide();
 
   -- Whole-window drop. OnReceiveDrag fires on the frame under the cursor, so wire the
   -- main frame AND the scroll content frame (which spans the item area). Item buttons
@@ -2384,17 +2937,34 @@ function TFuBag:GetFreeSlotsCell(frame)
     local function bodyDown(_, button) frame:OnMouseDown(button); end
     local function bodyUp() frame:DragStop(); end
     frame:SetScript("OnReceiveDrag", dropHook);
-    local sc = frame.Scroll and frame.Scroll.ScrollChild;
+    local sb = frame.Scroll;
+    local sc = sb and sb.ScrollChild;
     local cont = sc and sc.Container;
+    -- The ScrollChild / Container hold the bars + item buttons and span the whole item
+    -- area. They must be EnableMouse(true) for OnReceiveDrag to fire on the gaps between
+    -- item buttons (a SetScript alone is inert on a mouse-disabled frame) -- without this
+    -- a drag-release that lands on empty bar space (or anywhere over the inventory, whose
+    -- bars sit inside the same content frames) was swallowed, so the deposit only worked
+    -- when the cursor happened to be over a real empty item button. Item buttons are
+    -- descendants at a higher level, so they still capture their own slot (swap/place).
+    if (cont) then
+      cont:EnableMouse(true);
+      cont:SetScript("OnReceiveDrag", dropHook);
+      cont:SetScript("OnMouseDown", bodyDown);
+      cont:SetScript("OnMouseUp", bodyUp);
+    end
     if (sc) then
+      sc:EnableMouse(true);
       sc:SetScript("OnReceiveDrag", dropHook);
       sc:SetScript("OnMouseDown", bodyDown);
       sc:SetScript("OnMouseUp", bodyUp);
     end
-    if (cont) then
-      cont:SetScript("OnReceiveDrag", dropHook);
-      cont:SetScript("OnMouseDown", bodyDown);
-      cont:SetScript("OnMouseUp", bodyUp);
+    -- The WowScrollBox is the outermost content frame and already handles mouse (wheel /
+    -- click propagation). Add a drag-receive so a drop over the viewport (not on a child)
+    -- deposits too; leave its OnMouseDown to the framework -- SetPropagateMouseClicks(true)
+    -- forwards a body click to the main frame's OnMouseDown (deposit-on-cursor-else-drag).
+    if (sb) then
+      sb:SetScript("OnReceiveDrag", dropHook);
     end
     frame.tfuDropWired = true;
   end
@@ -2405,37 +2975,10 @@ end
 
 function TFuBag:UpdateFreeSlotsCell(frame)
   if (not frame or not frame.cfg) then return; end
-  local c = self:GetFreeSlotsCell(frame);
-  if (frame.cfg["collapse_empty"] ~= 1) then c:Hide(); return; end
-
-  -- Place the empty-slot cell BEHIND the bottom-left "Total" free-slot number (left of
-  -- the bag icons / Character-Warband buttons) and reuse that number as the count. The
-  -- cell sits in FRONT of the category bars but BEHIND the Total number. If the Total
-  -- display is hidden, the cell shows its own fallback count instead.
-  local fn = frame:GetName();
-  local total = _G[fn.."_Total"];
-  c:ClearAllPoints();
-  if (total) then
-    -- Center the cell on the Total frame and make it wide enough for a 3-digit count
-    -- with padding (the center-justified number stays dead-center for any width). The
-    -- bag/tab row is shifted right (see SetBottomLeftButton_Anchors / BuildTabStrip) to
-    -- clear the cell's overhang. Sit one level below the Total so its number draws on top.
-    -- Square (matches the bag-button cells) and wide enough for a centered 3-digit count.
-    c:SetSize(37, 37);
-    c:SetPoint("CENTER", total, "CENTER", 0, 0);
-    local tl = total:GetFrameLevel() or 1;
-    c:SetFrameLevel(math.max(1, tl - 1));
-    if (total:IsShown()) then
-      c.txt:SetText("");          -- Total's number is the count
-    else
-      c.txt:SetText(frame.freeSlots or 0);
-    end
-  else
-    c:SetSize(34, 34);
-    c:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", self.BORDER, self.BORDER);
-    c.txt:SetText(frame.freeSlots or 0);
-  end
-  c:Show();
+  -- Ensure the whole-window drop target is wired (lives in GetFreeSlotsCell). The cell
+  -- itself stays hidden: empty slots are tiled in the dedicated "Empty" box at the bottom
+  -- of the window, and the bottom-left Total number shows the free count.
+  self:GetFreeSlotsCell(frame):Hide();
 end
 
 function TFuBag:MakeColorMenu(cfg, updatefunc, level, bagarr)
@@ -2634,6 +3177,8 @@ function TFuBag:MakeEmptySlot(itm)
     itm[self.I_RARITY] = nil;
     itm[self.I_TYPE] = "";
     itm[self.I_SUBTYPE] = "";
+    itm[self.I_EXPANSION] = nil;
+    itm[self.I_BINDTYPE] = nil;
     itm[self.I_COUNT] = 0;
     itm[self.I_NEED] = 0;
   end
@@ -2785,7 +3330,7 @@ function TFuBag:UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, compar
 
 
             local stacksize;
-            _, itm[self.I_TYPE], itm[self.I_SUBTYPE], _, _, stacksize = self:GetItemInfo(itm[self.I_ITEMLINK]);
+            _, itm[self.I_TYPE], itm[self.I_SUBTYPE], _, _, stacksize, itm[self.I_BINDTYPE], itm[self.I_EXPANSION] = self:GetItemInfo(itm[self.I_ITEMLINK]);
             _, itm[self.I_COUNT], _, itm[self.I_RARITY], itm[self.I_READABLE], _, _, itm[self.I_NOVALUE] = GetContainerItemInfo(bag, slot);
             if (stacksize) then
               itm[self.I_NEED] = stacksize - itm[self.I_COUNT];
@@ -2990,13 +3535,14 @@ function TFuBag:SortItmCache(cfg, playerid, itmcache, baritm, bagarr)
     end
   end
 
-  -- Empty-slot collapse. With collapse_empty on, empty slots are pulled OUT of the
-  -- category bars entirely (their own thing): we just tally the free-slot count and
-  -- remember a deposit target, surfaced as a single indicator cell pinned bottom-right
-  -- (TFuBag:UpdateFreeSlotsCell) with the WHOLE window as the drop target
-  -- (TFuBag:DepositToFreeSlot). In the bank, a single selected tab routes deposits
-  -- straight into that tab. With collapse_empty off, empties fall through to their
-  -- normal bar (per-slot display). The owning frame is resolved from cfg.
+  -- Empty slots are their own category: collected into the dedicated EMPTY_BAR, which
+  -- LayoutWindow draws as ONE box at the very BOTTOM of the window (instead of tiling
+  -- mid-window in their per-bag category). We also tally the free-slot count and a
+  -- deposit target for the whole-window drop (TFuBag:DepositToFreeSlot); in the bank, a
+  -- single selected tab routes deposits straight into that tab. (collapse_empty is now
+  -- inert -- empties always use the dedicated box.) The owning frame is resolved from cfg.
+  -- collapse_empty ON collapses the box to ONE representative empty button (+ free count);
+  -- OFF tiles every empty slot. Either way the box is drawn at the bottom by LayoutWindow.
   local collapse = (cfg["collapse_empty"] == 1)
   local frame = (TFuBnkFrame and cfg == TFuBnkFrame.cfg) and TFuBnkFrame
     or ((TFuInvFrame and cfg == TFuInvFrame.cfg) and TFuInvFrame or nil)
@@ -3035,16 +3581,32 @@ function TFuBag:SortItmCache(cfg, playerid, itmcache, baritm, bagarr)
             end
             local destbar = itm[self.I_BAR];
             local isEmpty = (not itm[self.I_ITEMLINK] or itm[self.I_ITEMLINK] == "");
-            if (isEmpty and collapse) then
-              -- Out of the bars: tally + remember free slots for the indicator/deposit.
+            if (isEmpty) then
+              -- Tally + remember free slots for the empty-slot widget and the deposit
+              -- target. The target follows the currently-VIEWED bank (bagarr only spans
+              -- the active bankType's bags, so firstBag/soloBag resolve to that bank --
+              -- char vs warband -- automatically).
               freeCount = freeCount + 1;
               if (not firstBag) then firstBag = bag; firstSlot = itm[self.I_SLOT]; end
               if (soloTab and bag == soloTab and not soloBag) then
                 soloBag = bag; soloSlot = itm[self.I_SLOT];
               end
+            end
+            if (isEmpty) then
+              -- Empties go to the dedicated EMPTY_BAR (one box, drawn at the bottom).
+              -- collapse_empty OFF: tile every empty here. ON: insert nothing now -- a
+              -- single representative is added after the loop (collapse-to-one-button).
+              -- An active item filter hides empties (PassesItemFilter is false then).
+              if (not collapse and self:PassesItemFilter(frame, itm)) then
+                table.insert(baritm[self.EMPTY_BAR], itm);
+              end
             elseif (type(destbar) == "number" and baritm[destbar]) then
-              -- Only place items whose category resolved to a real bar.
-              table.insert(baritm[destbar], itm);
+              -- Only place items whose category resolved to a real bar, and that
+              -- pass the active item filter. A filtered-out item gets no slot, so
+              -- LayoutWindow reflows the survivors with no gaps.
+              if (self:PassesItemFilter(frame, itm)) then
+                table.insert(baritm[destbar], itm);
+              end
             end
           end
         end
@@ -3058,6 +3620,17 @@ function TFuBag:SortItmCache(cfg, playerid, itmcache, baritm, bagarr)
     -- selected, else the first free slot anywhere in the view.
     frame.dropBag  = soloBag or firstBag;
     frame.dropSlot = soloSlot or firstSlot;
+    -- Collapse-to-one-button: put a SINGLE representative empty (the deposit-target slot)
+    -- into the bottom Empty box; ItemButton.Update hides all other empties and shows the
+    -- free count on this one. Tiled mode (collapse off) added them in the loop above.
+    frame._emptyRep = nil;
+    if (collapse and frame.dropBag and itmcache[frame.dropBag]) then
+      local repItm = itmcache[frame.dropBag][frame.dropSlot];
+      if (repItm and self:PassesItemFilter(frame, repItm)) then
+        table.insert(baritm[self.EMPTY_BAR], repItm);
+        frame._emptyRep = { bag = frame.dropBag, slot = frame.dropSlot };
+      end
+    end
   end
 
   -- sort the cache now
@@ -3206,12 +3779,32 @@ function TFuBag:PickBar(cfg, playerid, itm, trade1, trade2)
     end
   end
 
+  -- step 1.5, configurable material grouping. Trade goods route to the group
+  -- category assigned to their subtype in cfg.mat_group (default: each subtype to
+  -- its own per-material category). This supersedes the static per-material rules
+  -- and the psplit profession split for trade goods, and is what the Categories
+  -- options panel edits. Subtypes with no mapping (or whose group has no bar yet)
+  -- fall through to the search list / Trade Goods catch-all below.
+  if (itm[self.I_CAT] == nil and cfg.mat_group and itm[self.I_TYPE] == self.LOCALE["Tradeskill"]) then
+    local grp = cfg.mat_group[itm[self.I_SUBTYPE]];
+    if (grp and grp ~= "") then
+      itm[self.I_CAT] = grp;
+      itm[self.I_BAR] = self:GetCat(cfg, grp);
+      while ((itm[self.I_BAR] ~= nil) and (type(itm[self.I_BAR]) ~= "number")) do
+        itm[self.I_BAR] = self:GetCat(cfg, itm[self.I_BAR]);
+      end
+      if (type(itm[self.I_BAR]) ~= "number") then itm[self.I_CAT] = nil; end
+    end
+  end
+
   if (itm[self.I_CAT] == nil) then
     for i = 1, table.getn(cfg["item_search_list"]) do
       local value = cfg["item_search_list"][i];
       -- "psplit" rules are the optional per-profession reagent/trade-good split;
       -- skip them unless reagent_split is enabled (see DefaultSearchList).
-      if (value[1] ~= "" and not (value[6] == "psplit" and cfg["reagent_split"] ~= 1)) then
+      -- value.off = the rule is disabled (Categories panel Enabled checkbox);
+      -- skip it so its items fall through to the next matching rule.
+      if (value[1] ~= "" and not value.off and not (value[6] == "psplit" and cfg["reagent_split"] ~= 1)) then
         local found = 1;
 
         -- value[1] == category to place it in
@@ -3273,32 +3866,169 @@ end
 -- DefaultSearchList), the numeric enum IDs, a count, and one example item name.
 -- Used to author the 12.0 reagent-family category rules against ground truth
 -- (the trade-goods subclass enum + localized strings aren't in wow-ui-source).
-function TFuBag:PrintItemTypes()
-  local buckets = {};
-  local order = {};
-  for _, bag in ipairs(self.Inv_Bags) do
-    local slots = GetContainerNumSlots(bag);
-    for slot = 1, slots do
-      local link = GetContainerItemLink(bag, slot);
-      if (link) then
-        local _, itemType, itemSubType, _, _, classID, subClassID = GetItemInfoInstant(link);
-        local name = GetItemInfo(link) or string.match(link, "%[(.-)%]") or "?";
-        local key = tostring(classID).."|"..tostring(subClassID);
-        if (not buckets[key]) then
-          buckets[key] = { c = classID, s = subClassID, t = itemType, st = itemSubType, n = 0, ex = name };
-          table.insert(order, key);
+-- Ground-truth taxonomy dump for the category uplift. Walks EVERY cached item
+-- store (all characters) and records, per distinct (classID, subClassID):
+--   * the stored I_TYPE / I_SUBTYPE strings -- the exact text the DefaultSearchList
+--     rules match against (PickBar: value[4]==I_TYPE, value[5]==I_SUBTYPE)
+--   * the canonical GetItemClassInfo / GetItemSubClassInfo strings for that class
+--   * which expansionIDs appear, a count, and an example item name
+-- The result is both printed (summary) and PERSISTED to TFuBagCfg.__taxonomy so it
+-- can be read straight off the SavedVariables file after a /reload or logout. This
+-- is the data the uplift needs: it reveals which Legion-era type strings (e.g.
+-- "Tradeskill") no longer match what 12.0 returns (e.g. "Trade Goods").
+-- Diagnostic: dump each cached item's resolved category + bar, with its type/
+-- subtype, so we can see exactly WHERE an item sorts and WHY. Optional arg filters
+-- to items whose category OR name contains the (case-insensitive) substring.
+-- Invoke with /tinv printcat [filter] (inventory) or /tbnk printcat [filter] (bank).
+function TFuBag:PrintCategoryContents(which, filter)
+  local cache = (which == "bank") and TFuBnkItm or TFuInvItm;
+  local pcache = cache and cache[self.PLAYERID];
+  if (not pcache) then self:Print("No "..(which or "inventory").." cache for this character."); return; end
+  local frame = (which == "bank") and TFuBnkFrame or TFuInvFrame;
+  local cb = frame and frame.cfg and frame.cfg[self.CAT_BAR] or {};
+  -- Show which bags the CURRENT view actually renders (the dump itself scans the
+  -- whole cache). For the bank this reveals whether the active Character/Warband
+  -- view even includes the bag an item lives in.
+  if (frame and frame.bags) then
+    local bl = {};
+    for _, b in ipairs(frame.bags) do bl[#bl + 1] = tostring(b); end
+    self:Print("Current view bags: { "..table.concat(bl, ", ").." }"
+      ..(frame.bankType and ("  bankType="..tostring(frame.bankType)) or ""));
+  end
+  -- What the view ACTUALLY placed for rendering (BARITM), vs the cache above.
+  if (frame and frame.BARITM) then
+    local br = {};
+    for bar = 1, self.BAR_MAX do
+      local list = frame.BARITM[bar];
+      if (list and #list > 0) then br[#br + 1] = bar..":"..#list; end
+    end
+    self:Print("Rendered bars (bar:count): "..(#br > 0 and table.concat(br, "  ") or "(none)"));
+  end
+  filter = filter and strtrim(filter);
+  if (filter == "") then filter = nil; end
+  -- Normalize for matching: lowercase + strip anything non-alphanumeric, so
+  -- "Trade Goods", "TRADE_GOODS", and quoted forms all match the same category.
+  local function norm(s) return (string.gsub(string.lower(tostring(s)), "[^%a%d]", "")); end
+  local fl = filter and norm(filter) or nil;
+
+  -- Bucket every cached item by its resolved category.
+  local byCat = {};
+  for bag, slots in pairs(pcache) do
+    if (type(slots) == "table") then
+      for slot, itm in pairs(slots) do
+        local link = type(itm) == "table" and itm[self.I_ITEMLINK];
+        if (link and link ~= "") then
+          local cat = tostring(itm[self.I_CAT]);
+          byCat[cat] = byCat[cat] or {};
+          local id = tostring(link):match("item:(%d+)") or "?";
+          table.insert(byCat[cat], string.format("    %s  [%s / %s]  id=%s bag=%s bar=%s",
+            tostring(itm[self.I_NAME]), tostring(itm[self.I_TYPE]),
+            tostring(itm[self.I_SUBTYPE]), id, tostring(bag), tostring(itm[self.I_BAR])));
         end
-        buckets[key].n = buckets[key].n + 1;
-        buckets[key].ex = name;
       end
     end
   end
-  self:Print("TBag item-type dump  (classID:subClassID  type / subtype  xCount  e.g. name):");
+
+  if (fl) then
+    -- Detailed: every item in each category whose NAME contains the filter.
+    local hits = 0;
+    for cat, list in pairs(byCat) do
+      if (string.find(norm(cat), fl, 1, true)) then
+        table.sort(list);
+        self:Print(string.format("%s  (bar=%s, %d items):", cat, tostring(cb[cat]), #list));
+        for _, l in ipairs(list) do self:Print(l); hits = hits + 1; end
+      end
+    end
+    if (hits == 0) then self:Print("No items in a category matching '"..filter.."'. (Run with no filter for the full per-category summary.)"); end
+  else
+    -- Summary: every known category with its bar + item count (0 = empty, so a
+    -- category that is configured but receiving nothing is visible too).
+    local seen, names = {}, {};
+    for cat in pairs(cb) do if (not seen[cat]) then seen[cat] = true; names[#names + 1] = cat; end end
+    for cat in pairs(byCat) do if (not seen[cat]) then seen[cat] = true; names[#names + 1] = cat; end end
+    table.sort(names);
+    self:Print(string.format("Category summary (%s) -- name : bar : item count:", which or "inventory"));
+    for _, cat in ipairs(names) do
+      local n = byCat[cat] and #byCat[cat] or 0;
+      self:Print(string.format("  %s : bar=%s : %d", cat, tostring(cb[cat]), n));
+    end
+  end
+end
+
+-- Invoke with /tinv printtypes or /tbnk printtypes.
+function TFuBag:PrintItemTypes()
+  -- 12.0: these live in C_Item (the bare globals are gone).
+  local function classInfo(cid)
+    if (cid == nil or not C_Item.GetItemClassInfo) then return "?"; end
+    return C_Item.GetItemClassInfo(cid) or "?";
+  end
+  local function subInfo(cid, sid)
+    if (cid == nil or sid == nil or not C_Item.GetItemSubClassInfo) then return "?"; end
+    return C_Item.GetItemSubClassInfo(cid, sid) or "?";
+  end
+
+  local buckets, order = {}, {};
+  local function note(link, itype, isubtype, expansion)
+    if (not link or link == "") then return; end
+    local _, giType, giSub, _, _, classID, subClassID = GetItemInfoInstant(link);
+    local key = tostring(classID).."|"..tostring(subClassID);
+    local b = buckets[key];
+    if (not b) then
+      b = { c = classID, s = subClassID,
+            t = itype or giType, st = isubtype or giSub,
+            cls = classInfo(classID), scls = subInfo(classID, subClassID),
+            n = 0, ex = nil, exps = {} };
+      buckets[key] = b;
+      order[#order + 1] = key;
+    end
+    b.n = b.n + 1;
+    b.ex = (GetItemInfo(link)) or (link:match("%[(.-)%]")) or b.ex or "?";
+    if (expansion ~= nil) then b.exps[expansion] = true; end
+  end
+
+  -- Walk every cached store so the dump covers all characters, not just open bags.
+  local caches = { TFuInvItm, TFuBnkItm, TFuContItm, TFuBodyItm, TFuMailItm };
+  for _, cache in ipairs(caches) do
+    if (type(cache) == "table") then
+      for _, byplayer in pairs(cache) do
+        if (type(byplayer) == "table") then
+          for _, bag in pairs(byplayer) do
+            if (type(bag) == "table") then
+              for _, slot in pairs(bag) do
+                if (type(slot) == "table") then
+                  note(slot[self.I_ITEMLINK], slot[self.I_TYPE], slot[self.I_SUBTYPE], slot[self.I_EXPANSION]);
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+
+  table.sort(order, function(a, b)
+    local ba, bb = buckets[a], buckets[b];
+    local ka = (ba.c or -1) * 1000 + (ba.s or -1);
+    local kb = (bb.c or -1) * 1000 + (bb.s or -1);
+    return ka < kb;
+  end);
+
+  local lines = {};
+  lines[#lines + 1] = "tbag taxonomy  (classID:subID  storedType/storedSub | classInfo/subClassInfo  exp=[..]  xN  e.g.)";
   for _, key in ipairs(order) do
     local b = buckets[key];
-    self:Print(string.format("  %s:%s  %s / %s  x%d  e.g. %s",
-      tostring(b.c), tostring(b.s), tostring(b.t), tostring(b.st), b.n, tostring(b.ex)));
+    local exps = {};
+    for e in pairs(b.exps) do exps[#exps + 1] = tostring(e); end
+    table.sort(exps);
+    lines[#lines + 1] = string.format("%s:%s  %s / %s | %s / %s  exp=[%s]  x%d  e.g. %s",
+      tostring(b.c), tostring(b.s), tostring(b.t), tostring(b.st),
+      tostring(b.cls), tostring(b.scls), table.concat(exps, ","), b.n, tostring(b.ex));
   end
+
+  if (TFuBagCfg) then TFuBagCfg.__taxonomy = lines; end
+  self:Print(string.format(
+    "TBag taxonomy: %d class/subclass buckets saved to TFuBagCfg.__taxonomy. /reload (or logout) to flush, then it can be read from the SavedVariables file.",
+    #order));
 end
 
 
@@ -5009,10 +5739,10 @@ function TFuBag:LayoutWindow(frame)
   -- area, so bars must be measured from the content bottom, not the window bottom.
   local bottom_chrome = frame:PoolY(1) + self.BORDER + PAD_BOTTOM;
 
-  for barnum = 1, self.BAR_MAX, bar_x do
-    -- last row is partial when bar_x does not divide BAR_MAX evenly; only the
-    -- bars that actually exist (<= BAR_MAX) are touched.
-    local nbars = math.min(bar_x, self.BAR_MAX - barnum + 1)
+  -- Draw one row of up to bar_x consecutive bars starting at `barnum`. Reads/writes the
+  -- cur_y / drew_row upvalues, so it serves both the dedicated bottom Empty row and the
+  -- normal category rows below.
+  local function drawRow(barnum, nbars)
     for iBar = 0, nbars - 1 do
       barframe[iBar] = _G[framename.."_bar_"..(barnum+iBar)];
       tmpframe = _G[framename.."_BarButton_"..(barnum+iBar)];
@@ -5158,8 +5888,19 @@ function TFuBag:LayoutWindow(frame)
     end
   end
 
-  -- (No leftover frames to hide: the loop above lays out all BAR_MAX bars,
-  -- including a partial final row when bar_x does not divide BAR_MAX evenly.)
+  -- Empty slots are one category drawn as a single box at the VERY bottom (below all
+  -- categories). Draw it FIRST in the bottom-up flow; with no empties (and not in edit
+  -- mode) CalcBarLayout reports height 0 and it is hidden, adding no bottom gap.
+  drawRow(self.EMPTY_BAR, 1);
+
+  -- Normal category rows (excludes EMPTY_BAR = BAR_MAX, which was drawn above).
+  for barnum = 1, self.BAR_MAX - 1, bar_x do
+    -- last row is partial when bar_x does not divide evenly; only existing bars touched.
+    drawRow(barnum, math.min(bar_x, (self.BAR_MAX - 1) - barnum + 1));
+  end
+
+  -- (No leftover frames to hide: the rows above lay out every bar, including EMPTY_BAR
+  -- and a partial final row when bar_x does not divide evenly.)
 
   local new_height;
   new_height = cur_y + PAD_TOP + frame:SpaceY(1) + frame:PoolY(1) + self.BORDER;

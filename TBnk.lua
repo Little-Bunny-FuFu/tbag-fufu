@@ -531,9 +531,20 @@ function Bank:RebuildTabList()
   local parent = self.bnkContainer or TFuBnkFrame
   for _, bag in ipairs(ids) do
     local fname = TFuBag:GetDummyBagFrameName(bag)
-    if (not _G[fname]) then
-      local f = CreateFrame("Frame", fname, parent, "TFuBagainerFrameTemplate")
+    local f = _G[fname]
+    if (not f) then
+      f = CreateFrame("Frame", fname, parent, "TFuBagainerFrameTemplate")
       f:SetID(bag)
+    elseif (f:GetParent() ~= parent) then
+      -- Character-tab container frames (6-11) are defined in XML as children of the
+      -- MAIN frame, not the scroll content (Container). Reparent them into Container --
+      -- the same place the warband tabs (12-16) are created above -- so their item
+      -- buttons are descendants of the WowScrollBox and get clipped at the scroll
+      -- viewport. Without this an overflowing CHARACTER bank's items aren't clipped at
+      -- the viewport bottom and bleed over the bottom chrome (Slots/Bags/Currency);
+      -- the warband tabs looked fine only because they were already in Container.
+      -- (Item buttons are children of this frame, so they follow the reparent.)
+      f:SetParent(parent)
     end
     if (not self.tabFramesCreated[bag]) then
       TFuBag:CreateDummyBag(bag, "TFuBag_ItemButtonTemplate")
@@ -607,9 +618,10 @@ function Bank:BuildTabStrip()
   -- freed space the classic bag-slot grid used (anchored to $parent_Total too). The
   -- strip is just a left-anchor for the button row; its own size doesn't bound the
   -- children (no clip on the strip; clipChildren clips at the TFuBnkFrame edge).
-  -- Start the tab row past the free-slots cell that overlays the Total: the square cell
-  -- overhangs the Total ~4.5px each side, +~4px gap (matches the Warband->tab gap).
-  strip:SetPoint("BOTTOMLEFT", TFuBnkFrame_Total, "BOTTOMRIGHT", 9, 0)
+  -- Flow the tab row right from the Total with a normal gap. (The old wider gap that
+  -- cleared the bottom-left free-slots cell is gone -- that cell moved to the bottom of
+  -- the item area as the single empty-slot widget.)
+  strip:SetPoint("BOTTOMLEFT", TFuBnkFrame_Total, "BOTTOMRIGHT", 4, 0)
   TFuBnkFrame.TabStrip = strip
 
   -- Character / Warband view switch. Keep the CharTabButton/WarbandTabButton field
@@ -1083,6 +1095,27 @@ function Bank.Button_DepositReagent_OnClick()
   end
 end
 
+function Bank.Button_Filter_OnClick(self)
+  TFuBag:OpenFilterMenu(TFuBnkFrame, self);
+end
+
+-- Glow the filter button while any filter dimension is active (mirrors Inv).
+function Bank:UpdateFilterButton()
+  local btn = TFuBnk_Button_Filter;
+  if (not btn) then return; end
+  if (not btn.FilterGlow) then
+    btn.FilterGlow = btn:CreateTexture(nil, "OVERLAY");
+    btn.FilterGlow:SetTexture("Interface\\Buttons\\UI-ActionButton-Border");
+    btn.FilterGlow:SetBlendMode("ADD");
+    btn.FilterGlow:SetVertexColor(0.2, 0.8, 1);  -- light blue
+    btn.FilterGlow:SetPoint("CENTER", btn, "CENTER", 0, 0);
+    local w, h = btn:GetSize();
+    btn.FilterGlow:SetSize((w or 20) * 1.7, (h or 20) * 1.7);
+  end
+  local f = self.itemFilter;
+  if (f and f.active) then btn.FilterGlow:Show(); else btn.FilterGlow:Hide(); end
+end
+
 function Bank.Button_MoveLockToggle_OnClick(self)
   PlaySound(PlaySoundKitID and "igMainMenuOptioncheckBoxOn" or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
   if (TFuBnkFrame.cfg["moveLock"] == 0) then
@@ -1189,6 +1222,7 @@ function Bank:SetTopLeftButton_Anchors()
     "TFuBnk_Button_HighlightToggle",
     "TFuBnk_Button_ChangeEditMode",
     "TFuBnk_Button_Reload",
+    "TFuBnk_Button_Filter",
     "TFuBnk_Button_DepositReagent",
   };
   local button_left = nil;
@@ -1204,6 +1238,7 @@ function Bank:SetTopLeftButton_Anchors()
   for _,button_name in ipairs(buttons) do
     button = _G[button_name];
     if (button) then
+      TFuBag:TrimButtonIcon(button);
       button:ClearAllPoints();
       if (button_left) then
         if (button_left == dropdown) then
@@ -2178,6 +2213,17 @@ function Bank:UpdateWindow(resort_req)
     self.BARITM = TFuBag:SortItmCache(self.cfg,
       self.playerid, TFuBnkItm[self.playerid], self.BARITM, self.bags);
     TFuBag:LayoutWindow(self)
+    self.sortGen = TFuBag.catGen   -- mark categorization current (OnShow dirty check)
+  elseif (self.force_resort) then
+    -- Item-filter toggle: re-apply PassesItemFilter via SortItmCache and relayout,
+    -- but WITHOUT a catGen bump (the filter reads cached fields, so the costly
+    -- per-item tooltip recat is unnecessary -- same reasoning as force_relayout
+    -- below, but the filter changes which items are placed, so a resort is needed).
+    self.CACHE_REQ = TFuBag.REQ_NONE
+    self.BARITM = TFuBag:SortItmCache(self.cfg,
+      self.playerid, TFuBnkItm[self.playerid], self.BARITM, self.bags);
+    TFuBag:LayoutWindow(self)
+    self.sortGen = TFuBag.catGen
   elseif (self.force_relayout) then
     -- Relayout without resort: edit-mode toggle changes layout (bar buttons, shared
     -- height) but NOT categorization, so skip the costly SortItmCache (per-item
@@ -2187,6 +2233,7 @@ function Bank:UpdateWindow(resort_req)
     self.CACHE_REQ = cache_req
   end
   self.force_relayout = nil
+  self.force_resort = nil
 
   -- Relink the button map. Use {} (never nil) for empty slots: a nil value drops the
   -- key from self.BUTTONS, so UpdateButtonHighlights' pairs() loop never visits that

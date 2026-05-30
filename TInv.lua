@@ -352,6 +352,28 @@ function Inv.Button_ShowBank_OnClick()
   TFuBnkFrame:Toggle()
 end
 
+function Inv.Button_Filter_OnClick(self)
+  TFuBag:OpenFilterMenu(TFuInvFrame, self);
+end
+
+-- Glow the filter button while any filter dimension is active, so it is obvious
+-- why items are hidden. Glow texture is created lazily (mirrors the ML button).
+function Inv:UpdateFilterButton()
+  local btn = TFuInv_Button_Filter;
+  if (not btn) then return; end
+  if (not btn.FilterGlow) then
+    btn.FilterGlow = btn:CreateTexture(nil, "OVERLAY");
+    btn.FilterGlow:SetTexture("Interface\\Buttons\\UI-ActionButton-Border");
+    btn.FilterGlow:SetBlendMode("ADD");
+    btn.FilterGlow:SetVertexColor(0.2, 0.8, 1);  -- light blue
+    btn.FilterGlow:SetPoint("CENTER", btn, "CENTER", 0, 0);
+    local w, h = btn:GetSize();
+    btn.FilterGlow:SetSize((w or 20) * 1.7, (h or 20) * 1.7);
+  end
+  local f = self.itemFilter;
+  if (f and f.active) then btn.FilterGlow:Show(); else btn.FilterGlow:Hide(); end
+end
+
 function Inv.Button_MoveLockToggle_OnClick(self)
   PlaySound(PlaySoundKitID and "igMainMenuOptioncheckBoxOn" or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
   if (TFuInvFrame.cfg["moveLock"] == 0) then
@@ -395,6 +417,7 @@ function Inv:SetTopLeftButton_Anchors()
     "TFuInv_Button_ChangeEditMode",
     "TFuInv_Button_ShowBank",
     "TFuInv_Button_Reload",
+    "TFuInv_Button_Filter",
   };
   local button_left = nil;
 
@@ -409,6 +432,7 @@ function Inv:SetTopLeftButton_Anchors()
   for _,button_name in ipairs(buttons) do
     button = _G[button_name];
     if (button) then
+      TFuBag:TrimButtonIcon(button);
       button:ClearAllPoints();
       if (button_left) then
         if (button_left == dropdown) then
@@ -479,11 +503,10 @@ function Inv:SetBottomLeftButton_Anchors()
           -- First button after search
           button:SetPoint("BOTTOMLEFT",button_left,"TOPLEFT",0,4);
         else
-          -- button following another button. The gap after the Total is widened to
-          -- clear the free-slots cell that overlays it (~6px overhang + ~4px gap);
-          -- other following buttons keep the tight 3px spacing.
-          local gap = (button_left == _G["TFuInvFrame_Total"]) and 14 or 3;
-          button:SetPoint("BOTTOMLEFT",button_left,"BOTTOMRIGHT",gap,-1);
+          -- button following another button (tight spacing). The old extra gap after
+          -- the Total to clear the bottom-left free-slots cell is gone -- that cell moved
+          -- to the bottom of the item area (the single empty-slot widget).
+          button:SetPoint("BOTTOMLEFT",button_left,"BOTTOMRIGHT",3,-1);
         end
       else
         -- First button if dropdown is hidden
@@ -1394,10 +1417,23 @@ function Inv:UpdateWindow(resort_req)
     self.BARITM = TFuBag:SortItmCache(self.cfg,
       self.playerid, TFuInvItm[self.playerid], self.BARITM, self.bags);
     TFuBag:LayoutWindow(self)
+    self.sortGen = TFuBag.catGen   -- mark categorization current (OnShow dirty check)
+  elseif (self.force_resort) then
+    -- Item-filter toggle: rebuild bar placement (so PassesItemFilter is re-applied)
+    -- and relayout, but WITHOUT a catGen bump -- the filter reads cached item fields,
+    -- so a full per-item tooltip recat is unnecessary and would lag a large view.
+    -- SortItmCache still recats any individually-stale slot, so the deferred-resort
+    -- debt is paid; clear it like the REQ_MUST branch.
+    self.CACHE_REQ = TFuBag.REQ_NONE
+    self.BARITM = TFuBag:SortItmCache(self.cfg,
+      self.playerid, TFuInvItm[self.playerid], self.BARITM, self.bags);
+    TFuBag:LayoutWindow(self)
+    self.sortGen = TFuBag.catGen
   else if (cache_req > self.CACHE_REQ) then
       self.CACHE_REQ = cache_req
     end
   end
+  self.force_resort = nil
 
   -- Relink the button map. A cached character (selected from the dropdown) may not
   -- have every bag in its cache, so guard the per-bag table -- otherwise switching

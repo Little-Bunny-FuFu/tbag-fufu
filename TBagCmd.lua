@@ -68,6 +68,7 @@ function TFuBnk_cmd(msg)
     TFuBag:ResetSorts(TFuBnkFrame.cfg);
     TFuBag:AssignCats(TFuBnkFrame.cfg, 0);
     TFuBag:BuildBarClassList(TFuBnkFrame.BC_LIST, TFuBnkFrame.cfg);
+    TFuBag:BumpCatGen();  -- rules changed: force a recat (and a re-sort on next open if hidden)
     TFuBag:Print("TFuBnk: Sort rules reset to defaults.");
     TFuBnkFrame:UpdateWindow(TFuBag.REQ_MUST);
   elseif (cmd == L["resetpos"]) then
@@ -87,6 +88,9 @@ function TFuBnk_cmd(msg)
   elseif (cmd == "printtypes") then
     -- TEMP diagnostic: dump distinct item class/subclass buckets in the bags.
     TFuBag:PrintItemTypes();
+  elseif (cmd == "printcat") then
+    -- TEMP diagnostic: dump each item's resolved category/bar (optional filter).
+    TFuBag:PrintCategoryContents("bank", params);
   elseif (cmd == L["getcat"] and TFuBag.GetCategory and type(TFuBag.GetCategory) == "function") then
     TFuBag:GetCategory(params);
   elseif (cmd == L["tests"] and TFuBag.RunTests and type(TFuBag.RunTests) == "function") then
@@ -124,6 +128,7 @@ function TFuInv_cmd(msg)
     TFuBag:ResetSorts(TFuInvFrame.cfg);
     TFuBag:AssignCats(TFuInvFrame.cfg, 0);
     TFuBag:BuildBarClassList(TFuInvFrame.BC_LIST, TFuInvFrame.cfg);
+    TFuBag:BumpCatGen();  -- rules changed: force a recat (and a re-sort on next open if hidden)
     TFuBag:Print("TFuInv: Sort rules reset to defaults.");
     TFuInvFrame:UpdateWindow(TFuBag.REQ_MUST);
   elseif (cmd == L["resetpos"]) then
@@ -146,6 +151,9 @@ function TFuInv_cmd(msg)
   elseif (cmd == "printtypes") then
     -- TEMP diagnostic: dump distinct item class/subclass buckets in the bags.
     TFuBag:PrintItemTypes();
+  elseif (cmd == "printcat") then
+    -- TEMP diagnostic: dump each item's resolved category/bar (optional filter).
+    TFuBag:PrintCategoryContents("inv", params);
   elseif (cmd == L["getcat"] and TFuBag.GetCategory and type(TFuBag.GetCategory) == "function") then
     TFuBag:GetCategory(params);
   elseif (cmd == L["tests"] and TFuBag.RunTests and type(TFuBag.RunTests) == "function") then
@@ -154,3 +162,14 @@ function TFuInv_cmd(msg)
     TFuBag:ShowHelp(TFuINV_HELP);
   end
 end
+
+-- Combined command: run the same subcommand on BOTH the inventory and bank windows
+-- at once (e.g. /tball resetsorts, /tball show, /tball printcat herb). The separate
+-- /tinv and /tbnk commands remain available.
+function TFuBag_cmd_both(msg)
+  TFuInv_cmd(msg);
+  TFuBnk_cmd(msg);
+end
+SLASH_TFUBALL1 = "/tball";
+SLASH_TFUBALL2 = "/tbagboth";
+SlashCmdList["TFUBALL"] = TFuBag_cmd_both;

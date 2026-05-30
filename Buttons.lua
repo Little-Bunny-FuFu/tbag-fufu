@@ -188,6 +188,34 @@ function ItemButton:OnClick(button)
   end
 end
 
+-- Normal-mode click handler (the edit-mode overlay handles clicks in edit mode).
+-- Default behavior is Blizzard's ContainerFrameItemButtonMixin:OnClick (insecure),
+-- EXCEPT: a plain right-click deposit from the bags while our bank window is open at
+-- the bank must follow the bank view WE are showing. Blizzard's default deposits to
+-- whichever bank its own (replaced) UI thinks is active -- which lands character-bank
+-- items in the warband bank, especially with collapse off. We redirect to the
+-- currently-viewed bank (Character OR Account/Warband) via the SortItmCache free-slot
+-- target, which is computed from that bank type's bags in both collapse modes.
+function ItemButton.NormalClick(self, button)
+  if (button == "RightButton"
+      and not (IsShiftKeyDown() or IsControlKeyDown() or IsAltKeyDown())
+      and TFuBnkFrame and TFuBnkFrame:IsShown()
+      and TFuBag:IsLive(TFuBnkFrame)
+      and TFuBnkFrame.dropBag and TFuBnkFrame.dropSlot) then
+    local mainFrame = TFuBag:GetButtonMainFrame(self)
+    if (mainFrame == TFuInvFrame) then
+      local itm = TFuBag:GetItmFromFrame(TFuBag.BUTTONS, self)
+      if (itm and next(itm) and itm[TFuBag.I_ITEMLINK]) then
+        PickupContainerItem(itm[TFuBag.I_BAG], itm[TFuBag.I_SLOT])
+        TFuBag:DepositToFreeSlot(TFuBnkFrame)   -- routes to the VIEWED bank
+        return
+      end
+    end
+  end
+  -- Everything else: Blizzard's default container-item click behavior.
+  ContainerFrameItemButtonMixin.OnClick(self, button)
+end
+
 -- Handles lock updates.  Takes an itm and mainFrame parameter
 -- which allows it to short circuit getting the frames itm and mainFrame
 -- such as when it is called from ItemButton.Update.
@@ -239,10 +267,23 @@ function ItemButton.Update(self)
   -- Unmapped button: HIDE it (don't just bail) so it can't ghost at a stale spot.
   if not itm or not next(itm) then self:Hide(); return end
   local bag, slot = itm[TFuBag.I_BAG], itm[TFuBag.I_SLOT]
-  -- Empty-slot collapse: when on, empty slots are pulled out of the category bars and
-  -- represented by the single bottom-right free-slots cell, so every per-slot empty
-  -- button hides here (this also kills emptied-slot ghosts when items move).
-  if cfg.collapse_empty == 1 and (not itm[TFuBag.I_ITEMLINK] or itm[TFuBag.I_ITEMLINK] == "") then
+  local isEmptySlot = (not itm[TFuBag.I_ITEMLINK] or itm[TFuBag.I_ITEMLINK] == "")
+  -- Empty slots are collected into the dedicated EMPTY_BAR and drawn as one "Empty" box
+  -- at the bottom of the window (SortItmCache). collapse_empty OFF tiles every empty
+  -- there (real per-slot buttons, shown as dim slot icons). collapse_empty ON shows only
+  -- the single representative empty (mainFrame._emptyRep) with the free-slot count; every
+  -- other empty button hides here (also kills emptied-slot ghosts when items move).
+  if (isEmptySlot and cfg.collapse_empty == 1) then
+    local rep = mainFrame._emptyRep
+    if not (rep and rep.bag == bag and rep.slot == slot) then
+      self:Hide(); return
+    end
+  end
+  -- Item filter: when a filter is active, hide the items it excludes. SortItmCache
+  -- already skipped them (no layout slot), so this also stops a filtered-out item
+  -- from ghosting at its previous position when the always-run button pass would
+  -- otherwise Show() it. (No-op when no filter is active: PassesItemFilter -> true.)
+  if not TFuBag:PassesItemFilter(mainFrame, itm) then
     self:Hide(); return
   end
   local ic_start, ic_duration, ic_enable, texture
@@ -305,6 +346,11 @@ function ItemButton.Update(self)
   end
 
   SetItemButtonCount(self, itm[TFuBag.I_COUNT])
+  -- Collapsed empty representative (the only empty button shown): overlay the free-slot
+  -- count so the single bottom box reads as "N free slots".
+  if (isEmptySlot and cfg.collapse_empty == 1) then
+    SetItemButtonCount(self, mainFrame.freeSlots or 0)
+  end
 
   if mainFrame.edit_mode == 1 then
     -- we should be hilighting an entire class of item

@@ -214,6 +214,33 @@ L["PVP"] = true
 L["REAGENT"] = true
 L["TRADE_GOODS"] = true
 L["CLOTH"] = true
+-- Category uplift (2026-05-30): per-material trade-goods categories + the new 12.0
+-- item classes. Display name == key (category names are off by default anyway).
+L["Herbs"] = true
+L["Ore & Stone"] = true
+L["Leather"] = true
+L["Cooking Mats"] = true
+L["Enchanting Mats"] = true
+L["Inscription Mats"] = true
+L["Jewelcrafting Mats"] = true
+L["Engineering Parts"] = true
+L["Optional Reagents"] = true
+L["Finishing Reagents"] = true
+L["Gems"] = true
+L["Housing"] = true
+L["Mount Equipment"] = true
+-- Item type/subtype match strings used by the new rules (registered so dev builds
+-- don't print the "please localize" notice; on enUS the value is the key itself).
+L["Herb"] = true
+L["Metal & Stone"] = true
+L["Cloth"] = true
+L["Gem"] = true
+L["Profession"] = true
+L["Other"] = true
+L["Lumber"] = true
+L["Thread"] = true
+L["Name this filter:"] = true
+L["A filter named \"%s\" already exists. Overwrite it?"] = true
 L["FOLLOWERS"] = true
 L["MINIPET"] = true
 L["COMBATPETS"] = true

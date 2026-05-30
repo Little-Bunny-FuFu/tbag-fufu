@@ -344,6 +344,24 @@ TFuBag.DefaultSearchList = {
   { L["KEY_QUEST"], L[""], L[" Key"], L["Key"], L[""] },
 
 
+-- 12.0 per-material trade-goods categories (category uplift). Match Trade Goods
+-- (item type "Tradeskill") by their subtype family, sourced from the in-game item
+-- taxonomy. Placed before the older name/psplit profession rules below so materials
+-- sort by family by default; the opt-in psplit rules still apply when reagent_split
+-- is enabled (PickBar skips psplit rules otherwise, falling through to these).
+  { L["Herbs"], L[""], L[""], L["Tradeskill"], L["Herb"] },
+  { L["Ore & Stone"], L[""], L[""], L["Tradeskill"], L["Metal & Stone"] },
+  { L["CLOTH"], L[""], L[""], L["Tradeskill"], L["Cloth"] },
+  { L["Leather"], L[""], L[""], L["Tradeskill"], L["Leather"] },
+  { L["Cooking Mats"], L[""], L[""], L["Tradeskill"], L["Cooking"] },
+  { L["Enchanting Mats"], L[""], L[""], L["Tradeskill"], L["Enchanting"] },
+  { L["Inscription Mats"], L[""], L[""], L["Tradeskill"], L["Inscription"] },
+  { L["Jewelcrafting Mats"], L[""], L[""], L["Tradeskill"], L["Jewelcrafting"] },
+  { L["Elemental"], L[""], L[""], L["Tradeskill"], L["Elemental"] },
+  { L["Engineering Parts"], L[""], L[""], L["Tradeskill"], L["Parts"] },
+  { L["Optional Reagents"], L[""], L[""], L["Tradeskill"], L["Optional Reagents"] },
+  { L["Finishing Reagents"], L[""], L[""], L["Tradeskill"], L["Finishing Reagents"] },
+
 -- Reagents that aren't really specific to a trade
 -- but are used by a variety so special case them.
   { L["REAGENT"], L[""], L["Elemental %a+"], L["Tradeskill"], L["Elemental"]},
@@ -417,7 +435,20 @@ TFuBag.DefaultSearchList = {
   { L["ARCHAEOLOGY"], L[""], L["digsite"], L[""], L[""] },
 
   { L["REAGENT"], L[""], L[""], L["Reagent"], L[""] },
+
+-- "Other"-subtype trade goods (the large unclassified reagent bucket) can't be
+-- routed by subtype, so route notable families by name before the catch-all. Add
+-- more here as needed (field 3 = name/tooltip substring, field 5 = "Other").
+  { L["Housing"], L[""], L["Lumber"], L["Tradeskill"], L["Other"] },  -- housing wood
+  { L["CLOTH"], L[""], L["Thread"], L["Tradeskill"], L["Other"] },    -- tailoring thread
+
   { L["TRADE_GOODS"], L[""], L[""], L["Tradeskill"], L[""] },
+
+-- 12.0 item classes that did not exist in the Legion-era list (else -> UNKNOWN/Misc).
+  { L["Gems"], L[""], L[""], L["Gem"], L[""] },
+  { L["Housing"], L[""], L[""], L["Housing"], L[""] },
+  { L["TRADE_TOOL"], L[""], L[""], L["Profession"], L[""] },  -- modern profession tools (class 19)
+  { L["Mount Equipment"], L[""], L[""], L["Miscellaneous"], L["Mount Equipment"] },
 
 -- Random catchalls
   { L["CONSUMABLE"], L[""], L[""], L["Consumable"], L[""] },

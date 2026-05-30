@@ -83,12 +83,12 @@ end
 
 function MainFrame:OnMouseDown(button)
   if button == "LeftButton" then
-    -- A cursor-carried item (stack split, right-click pickup) is dropped with a plain
-    -- left-click, not a drag. Under empty-collapse there are no empty item buttons to
-    -- click onto, so the window body is the drop target: deposit into a free slot
-    -- instead of starting a window move. Only intercept when collapse is on and the
-    -- cursor holds an item -- otherwise fall through to the normal drag-move.
-    if self.cfg and self.cfg.collapse_empty == 1 and CursorHasItem() then
+    -- A cursor-carried item (stack split, right-click pickup, or a drag-release that
+    -- landed on the window body rather than a slot) is placed with a plain left-click.
+    -- Treat the window body as a drop target in BOTH collapse modes: deposit into a
+    -- free slot instead of starting a window move. (DepositToFreeSlot no-ops when the
+    -- cursor is empty, so a normal body click still starts a drag-move.)
+    if self.cfg and CursorHasItem() then
       TFuBag:DepositToFreeSlot(self)
       return
     end
@@ -150,7 +150,15 @@ function MainFrame:OnShow()
     TFuBnkFrame:RebuildTabList()
   end
 
-  self:UpdateWindow(TFuBag.REQ_PART)
+  -- Force a full re-sort on show when categorization changed since this window
+  -- last sorted (catGen bumps on any rule/grouping/category change) or it was
+  -- explicitly flagged. Item categories are persisted in the cache, so without
+  -- this a reopened window keeps stale categories until a manual resort.
+  local req = TFuBag.REQ_PART
+  if (self.needsResort or self.sortGen ~= TFuBag.catGen) then
+    req = TFuBag.REQ_MUST; self.needsResort = nil;
+  end
+  self:UpdateWindow(req)
 
   -- Bring ourselves to the top
   self:Raise()
