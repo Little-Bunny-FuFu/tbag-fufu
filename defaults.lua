@@ -456,5 +456,8 @@ TFuBag.DefaultSearchList = {
 
 -- Who knows?
   { string.format(L["SOULBOUND_%s"],L["OTHER"]), L["SOULBOUND"], L[""], L[""], L[""] },
-  { L["UNKNOWN"], L[""], L[""], L[""], L[""] }
+  -- (Removed the all-empty { UNKNOWN } catch-all rule: it matched EVERY item and
+  -- short-circuited the loop so any later/appended category never ran. PickBar's
+  -- hardcoded post-loop UNKNOWN fallback already buckets anything no rule matched, and
+  -- PickBar now also skips any all-empty rule left in an existing saved config.)
 };

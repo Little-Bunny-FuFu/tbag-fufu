@@ -990,7 +990,10 @@ function TFuBag:GetCategoryList()
   if (not list) then return out; end
   for _, rule in ipairs(list) do
     local name = rule[1];
-    if (name and name ~= "") then
+    -- Skip the all-empty catch-all (the redundant UNKNOWN rule): it isn't a manageable
+    -- category and is surfaced separately as the pinned read-only "Unsorted" row.
+    local allEmpty = (rule[2] == "" and rule[3] == "" and rule[4] == "" and rule[5] == "");
+    if (name and name ~= "" and not allEmpty) then
       local e = seen[name];
       if (not e) then
         e = { name = name, enabled = false };
@@ -1032,6 +1035,75 @@ function TFuBag:SetCategoryEnabled(name, enabled, defer)
     if (TFuInvFrame) then TFuInvFrame:UpdateWindow(self.REQ_MUST); end
     if (TFuBnkFrame) then TFuBnkFrame:UpdateWindow(self.REQ_MUST); end
   end
+end
+
+-- Smallest category bar (1..BAR_MAX-1) not assigned to any category, so a new category
+-- gets its own box. EMPTY_BAR (=BAR_MAX) is reserved for empty slots. Falls back to bar 1
+-- (the catch-all) when every bar is taken.
+function TFuBag:FindFreeBar(cfg)
+  local used = {};
+  for _, v in pairs(self:GetCatBar(cfg)) do
+    if (type(v) == "number") then used[v] = true; end
+  end
+  for b = 1, self.BAR_MAX - 1 do
+    if (not used[b]) then return b; end
+  end
+  return 1;
+end
+
+-- Add a user-defined category: one tooltip-match rule {name,"",matchText,"","","ci"} on
+-- its own free bar, in BOTH windows. matchText matches as a CASE-INSENSITIVE substring of
+-- the item tooltip (which includes the item name) -- the "ci" flag in slot 6 tells PickBar
+-- to lower both sides -- so name "Potions" / match "restores" buckets healing potions.
+-- The rule is APPENDED (end of the list = lowest priority): built-in categories match
+-- first, and the user category catches whatever falls through to it. This works now that
+-- PickBar skips the redundant all-empty UNKNOWN catch-all rule (which previously swallowed
+-- every item before any appended rule could run). Match fields beyond tooltip are the
+-- deferred field-editor layer. Returns true on success.
+function TFuBag:AddCategory(name, matchText)
+  name = name and strtrim(name) or "";
+  matchText = matchText and strtrim(matchText) or "";
+  if (name == "" or matchText == "") then return false; end
+  for _, frame in ipairs({ TFuInvFrame, TFuBnkFrame }) do
+    local cfg = frame and frame.cfg;
+    local list = cfg and cfg["item_search_list"];
+    if (list) then
+      if (type(self:GetCat(cfg, name)) ~= "number") then
+        self:SetCatBar(cfg, name, self:FindFreeBar(cfg));
+      end
+      table.insert(list, { name, "", matchText, "", "", "ci" });
+    end
+  end
+  self:BumpCatGen();
+  if (TFuInvFrame) then TFuInvFrame:UpdateWindow(self.REQ_MUST); end
+  if (TFuBnkFrame) then TFuBnkFrame:UpdateWindow(self.REQ_MUST); end
+  return true;
+end
+
+-- Delete a category: remove every rule with this name from BOTH windows' rule lists, plus
+-- any per-item overrides pointing at it. Its items fall back to type sorting. The CAT_BAR
+-- bar assignment is left (harmless; no rule references it) so a later re-add reuses it.
+-- /tinv resetsorts restores the default rule list.
+function TFuBag:DeleteCategory(name)
+  if (not name or name == "") then return; end
+  for _, frame in ipairs({ TFuInvFrame, TFuBnkFrame }) do
+    local cfg = frame and frame.cfg;
+    local list = cfg and cfg["item_search_list"];
+    if (list) then
+      for i = #list, 1, -1 do
+        if (list[i][1] == name) then table.remove(list, i); end
+      end
+    end
+    local ov = cfg and cfg["item_overrides"];
+    if (ov) then
+      for id, c in pairs(ov) do
+        if (c == name) then ov[id] = nil; end
+      end
+    end
+  end
+  self:BumpCatGen();
+  if (TFuInvFrame) then TFuInvFrame:UpdateWindow(self.REQ_MUST); end
+  if (TFuBnkFrame) then TFuBnkFrame:UpdateWindow(self.REQ_MUST); end
 end
 
 function TFuBag:GetItemFilter(frame)
@@ -2335,11 +2407,16 @@ function TFuBag:WireCatTitleClick(frame, bf, baritmbar, show)
   btn:SetAllPoints(label);
   btn:SetFrameLevel(bf:GetFrameLevel() + 12);
   btn.which = (frame == TFuBnkFrame) and "bank" or "inv";
-  -- Split a merged-bar title ("A / B") so each category is dumped separately.
-  local names = {};
-  for piece in string.gmatch(self:GetBarCategoryName(baritmbar), "[^/]+") do
-    local t = strtrim(piece);
-    if (t ~= "") then names[#names + 1] = t; end
+  -- Dump by the INTERNAL category token(s) on this bar, not the display label:
+  -- PrintCategoryContents matches itm[I_CAT] (e.g. "TRADE_TOOL"), which often differs
+  -- from the shown name (e.g. "Profession Tools"). Collect the distinct tokens of the
+  -- bar's items (a merged bar holds more than one).
+  local names, seen = {}, {};
+  for _, itm in ipairs(baritmbar) do
+    local cat = itm[self.I_CAT];
+    if (cat and cat ~= "" and not seen[cat]) then
+      seen[cat] = true; names[#names + 1] = cat;
+    end
   end
   btn.catNames = names;
   btn:Show();
@@ -3916,7 +3993,14 @@ function TFuBag:PickBar(cfg, playerid, itm, trade1, trade2)
       -- skip them unless reagent_split is enabled (see DefaultSearchList).
       -- value.off = the rule is disabled (Categories panel Enabled checkbox);
       -- skip it so its items fall through to the next matching rule.
-      if (value[1] ~= "" and not value.off and not (value[6] == "psplit" and cfg["reagent_split"] ~= 1)) then
+      -- An all-empty rule (no keyword/tooltip/type/subtype) matches EVERY item, so it
+      -- short-circuits the loop and starves every later/appended rule (the old
+      -- "UNKNOWN" catch-all bug -- a user category added to the end never got a turn).
+      -- It is redundant with the hardcoded UNKNOWN fallback after this loop, so skip it:
+      -- unmatched items still land in UNKNOWN, but real rules at any position run first.
+      local allEmpty = (value[2] == "" and value[3] == "" and value[4] == "" and value[5] == "");
+      if (value[1] ~= "" and not allEmpty and not value.off
+          and not (value[6] == "psplit" and cfg["reagent_split"] ~= 1)) then
         local found = 1;
 
         -- value[1] == category to place it in
@@ -3925,9 +4009,14 @@ function TFuBag:PickBar(cfg, playerid, itm, trade1, trade2)
         if ( (value[2] ~= "") and (itm[self.I_KEYWORD][value[2]] == nil) ) then
           found = nil;
         end
-        -- check tooltip
-        if ( (value[3] ~= "") and (not (string.find(tooltip, value[3]))) ) then
-          found = nil;
+        -- check tooltip. value[6]=="ci" (user-added categories) matches case-insensitively
+        -- by lowering both sides; built-in rules keep their exact case-sensitive patterns.
+        if (value[3] ~= "") then
+          local hay = (value[6] == "ci") and string.lower(tooltip) or tooltip;
+          local needle = (value[6] == "ci") and string.lower(value[3]) or value[3];
+          if (not string.find(hay, needle)) then
+            found = nil;
+          end
         end
         -- check itemType
         if ( (value[4] ~= "") and (itm[self.I_TYPE] ~= value[4]) ) then
@@ -4065,6 +4154,63 @@ function TFuBag:PrintCategoryContents(which, filter)
       self:Print(string.format("  %s : bar=%s : %d", cat, tostring(cb[cat]), n));
     end
   end
+end
+
+-- Diagnostic: dump everything about one category -- its rules (match fields + .off), its
+-- CAT_BAR bar assignment, and which live items its tooltip rule(s) actually match at
+-- runtime. Pinpoints why a (user-added) category isn't catching items. /tinv catdiag <name>.
+function TFuBag:CatDiag(which, name)
+  name = name and strtrim(name) or "";
+  if (name == "") then self:Print("Usage: catdiag <category name>"); return; end
+  local frame = (which == "bank") and TFuBnkFrame or TFuInvFrame;
+  local cfg = frame and frame.cfg;
+  if (not cfg) then self:Print("catdiag: no cfg for "..(which or "inv")); return; end
+  local list = cfg["item_search_list"] or {};
+  local nl = string.lower(name);
+  self:Print(string.format("=== catdiag '%s' (%s) ===", name, which or "inv"));
+
+  -- 1. Rules with this exact (case-insensitive) category name + their list position.
+  local ruleRows = {};
+  for i = 1, table.getn(list) do
+    local v = list[i];
+    if (v and v[1] and string.lower(v[1]) == nl) then
+      ruleRows[#ruleRows + 1] = i;
+      self:Print(string.format("  rule #%d: kw='%s' tip='%s' type='%s' sub='%s' off=%s",
+        i, tostring(v[2]), tostring(v[3]), tostring(v[4]), tostring(v[5]), tostring(v.off)));
+    end
+  end
+  if (#ruleRows == 0) then self:Print("  (NO rules with this exact name in item_search_list)"); end
+
+  -- 2. Bar assignment (must resolve to a NUMBER or PickBar rejects the match -> UNKNOWN).
+  self:Print(string.format("  CAT_BAR['%s'] = %s", name, tostring(self:GetCat(cfg, name))));
+
+  -- 3. Live-item match test for this category's tooltip rules.
+  local cache = (which == "bank") and TFuBnkItm or TFuInvItm;
+  local pcache = cache and cache[self.PLAYERID];
+  if (not pcache) then self:Print("  (no item cache for this character)"); return; end
+  local hits = 0;
+  for bag, slots in pairs(pcache) do
+    if (type(slots) == "table") then
+      for slot, itm in pairs(slots) do
+        local link = type(itm) == "table" and itm[self.I_ITEMLINK];
+        if (link and link ~= "") then
+          for _, i in ipairs(ruleRows) do
+            local v = list[i];
+            if (v[3] and v[3] ~= "") then
+              local tt = self:MakeToolTipStr(self.PLAYERID, link, bag, slot, itm[self.I_LINKSUFFIX]);
+              if (tt and string.find(tt, v[3])) then
+                hits = hits + 1;
+                self:Print(string.format("  MATCH tip '%s' <- %s  (current cat=%s)",
+                  v[3], tostring(itm[self.I_NAME]), tostring(itm[self.I_CAT])));
+                break;
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+  self:Print(string.format("  -> %d live item(s) match this category's tooltip rule(s).", hits));
 end
 
 -- Invoke with /tinv printtypes or /tbnk printtypes.

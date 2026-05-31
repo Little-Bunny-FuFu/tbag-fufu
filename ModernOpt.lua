@@ -17,6 +17,21 @@ local ROW_GAP = 8         -- vertical gap between stacked controls
 local NAV_WIDTH = 150
 local WIN_W, WIN_H = 720, 520
 
+-- Confirm before deleting a category (recoverable via /tinv resetsorts, but destructive
+-- enough to confirm). %s = category name; data = { name=, after=rebuildList }.
+StaticPopupDialogs["TBAG_DELETE_CATEGORY"] = {
+  text = "Delete category \"%s\"?\nIts sorting rules are removed and its items fall back to type sorting. (/tinv resetsorts restores the defaults.)",
+  button1 = YES,
+  button2 = NO,
+  OnAccept = function(_, data)
+    if (data and data.name) then TFuBag:DeleteCategory(data.name) end
+    if (data and data.after) then data.after() end
+  end,
+  timeout = 0,
+  whileDead = true,
+  hideOnEscape = true,
+}
+
 -----------------------------------------------------------------------
 -- Control factory. Each builder takes (parent, y, ...) and returns the
 -- control plus the next y cursor (controls stack top-down; y grows downward
@@ -298,42 +313,104 @@ end)
 MO:RegisterSection("categories", "Categories", function(sf, MO)
   local function track(c) sf.controls[#sf.controls + 1] = c; return c end
 
-  local _, y = MO:Header(sf, 8, "Enable / Disable Categories")
-  MO:Label(sf, y, "Uncheck a category to turn off its sorting rules; its items then fall")
+  local _, y = MO:Header(sf, 8, "Categories")
+  MO:Label(sf, y, "Uncheck to disable a category (its items fall back to type sorting).")
   y = y + 16
-  MO:Label(sf, y, "back to plain item-type sorting. Applies to both bag and bank windows.")
-  y = y + 20
+  MO:Label(sf, y, "Delete removes it; Add makes a category from text found in the tooltip.")
+  y = y + 24
 
-  -- Scrollable checkbox list, one row per distinct category (first-occurrence order).
-  local listW, listH, rowH = 520, 360, 24
+  local rebuildList   -- forward declaration (Add/Delete refresh the list)
+
+  -- Add-category form: name + tooltip-match text + Add button (one row).
+  local nameEB = CreateFrame("EditBox", nil, sf, "InputBoxTemplate")
+  nameEB:SetSize(130, 20); nameEB:SetAutoFocus(false)
+  nameEB:SetPoint("TOPLEFT", sf, "TOPLEFT", PAD + 6, -y)
+  local nlab = sf:CreateFontString(nil, "ARTWORK", "GameFontDisableSmall")
+  nlab:SetPoint("BOTTOMLEFT", nameEB, "TOPLEFT", -4, 2); nlab:SetText("New category")
+
+  local matchEB = CreateFrame("EditBox", nil, sf, "InputBoxTemplate")
+  matchEB:SetSize(180, 20); matchEB:SetAutoFocus(false)
+  matchEB:SetPoint("LEFT", nameEB, "RIGHT", 16, 0)
+  local mlab = sf:CreateFontString(nil, "ARTWORK", "GameFontDisableSmall")
+  mlab:SetPoint("BOTTOMLEFT", matchEB, "TOPLEFT", -4, 2); mlab:SetText("Match text (in tooltip)")
+
+  local addBtn = CreateFrame("Button", nil, sf, "UIPanelButtonTemplate")
+  addBtn:SetSize(60, 22); addBtn:SetText("Add")
+  addBtn:SetPoint("LEFT", matchEB, "RIGHT", 12, 0)
+  addBtn:SetScript("OnClick", function()
+    if (TFuBag:AddCategory(nameEB:GetText(), matchEB:GetText())) then
+      nameEB:SetText(""); matchEB:SetText(""); nameEB:ClearFocus(); matchEB:ClearFocus()
+      if (rebuildList) then rebuildList() end
+    else
+      UIErrorsFrame:AddMessage("Enter a category name and match text.", 1, 0.3, 0.3)
+    end
+  end)
+  y = y + 30
+
+  -- Scrollable list: checkbox + name + Delete per distinct category.
+  local listW, listH, rowH = 520, 300, 24
   local sfl, child = MO:ScrollList(sf, PAD, y, listW, listH)
   track(sfl)
 
-  local cats = TFuBag:GetCategoryList()
-  local rows = {}
-  for i, c in ipairs(cats) do
-    local name = c.name
-    local cb = CreateFrame("CheckButton", nil, child, "UICheckButtonTemplate")
-    cb:SetSize(22, 22)
-    cb:SetPoint("TOPLEFT", child, "TOPLEFT", 4, -((i - 1) * rowH))
-    local fs = cb:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
-    fs:SetPoint("LEFT", cb, "RIGHT", 4, 0)
-    fs:SetText(name)
-    cb:SetChecked(TFuBag:IsCategoryEnabled(name))
-    cb:SetScript("OnClick", function(self)
-      TFuBag:SetCategoryEnabled(name, self:GetChecked() and true or false)
-    end)
-    cb.tfuCat = name
-    rows[#rows + 1] = cb
-  end
-  child:SetHeight(math.max(listH, #cats * rowH + 8))
-
-  -- Re-sync every checkbox when the section is re-shown (e.g. after a /reset).
-  sfl.tfuRefresh = function()
-    for _, cb in ipairs(rows) do
-      cb:SetChecked(TFuBag:IsCategoryEnabled(cb.tfuCat))
+  -- Reusable row pool (rebuilt on Add/Delete and on section re-show).
+  local pool = {}
+  local unsortedRow   -- pinned catch-all row, created lazily below
+  local function getRow(i)
+    local r = pool[i]
+    if (not r) then
+      r = {}
+      r.cb = CreateFrame("CheckButton", nil, child, "UICheckButtonTemplate")
+      r.cb:SetSize(22, 22)
+      r.fs = r.cb:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
+      r.fs:SetPoint("LEFT", r.cb, "RIGHT", 4, 0)
+      r.del = CreateFrame("Button", nil, child, "UIPanelButtonTemplate")
+      r.del:SetSize(54, 20); r.del:SetText("Delete")
+      pool[i] = r
     end
+    return r
   end
+
+  rebuildList = function()
+    local cats = TFuBag:GetCategoryList()
+    for i, c in ipairs(cats) do
+      local r = getRow(i)
+      local yoff = -((i - 1) * rowH) - 2
+      r.cb:ClearAllPoints(); r.cb:SetPoint("TOPLEFT", child, "TOPLEFT", 4, yoff)
+      r.fs:SetText(c.name)
+      r.cb.tfuCat = c.name
+      r.cb:SetChecked(c.enabled)
+      r.cb:SetScript("OnClick", function(self)
+        TFuBag:SetCategoryEnabled(self.tfuCat, self:GetChecked() and true or false)
+      end)
+      r.del:ClearAllPoints(); r.del:SetPoint("TOPLEFT", child, "TOPLEFT", listW - 90, yoff)
+      r.del.tfuCat = c.name
+      r.del:SetScript("OnClick", function(self)
+        StaticPopup_Show("TBAG_DELETE_CATEGORY", self.tfuCat, nil,
+          { name = self.tfuCat, after = rebuildList })
+      end)
+      r.cb:Show(); r.fs:Show(); r.del:Show()
+    end
+    for i = #cats + 1, #pool do
+      pool[i].cb:Hide(); pool[i].del:Hide()
+    end
+    -- Pinned catch-all row (read-only): UNKNOWN is the hardcoded fallback applied only
+    -- when no rule matches, so it can't be disabled, deleted, or reordered -- always last.
+    if (not unsortedRow) then
+      unsortedRow = CreateFrame("CheckButton", nil, child, "UICheckButtonTemplate")
+      unsortedRow:SetSize(22, 22)
+      unsortedRow:SetChecked(true); unsortedRow:Disable()
+      local fs = unsortedRow:CreateFontString(nil, "ARTWORK", "GameFontDisable")
+      fs:SetPoint("LEFT", unsortedRow, "RIGHT", 4, 0)
+      fs:SetText((L["UNKNOWN"] or "Unsorted") .. "  (catch-all \226\128\148 always last)")
+    end
+    unsortedRow:ClearAllPoints()
+    unsortedRow:SetPoint("TOPLEFT", child, "TOPLEFT", 4, -(#cats * rowH) - 2)
+    unsortedRow:Show()
+    child:SetHeight(math.max(listH, (#cats + 1) * rowH + 8))
+  end
+
+  rebuildList()
+  sfl.tfuRefresh = rebuildList
 end)
 
 MO:RegisterSection("grouping", "Grouping", function(sf, MO)

@@ -91,6 +91,9 @@ function TFuBnk_cmd(msg)
   elseif (cmd == "printcat") then
     -- TEMP diagnostic: dump each item's resolved category/bar (optional filter).
     TFuBag:PrintCategoryContents("bank", params);
+  elseif (cmd == "catdiag") then
+    -- TEMP diagnostic: dump a category's rules + bar + live tooltip matches.
+    TFuBag:CatDiag("bank", params);
   elseif (cmd == L["getcat"] and TFuBag.GetCategory and type(TFuBag.GetCategory) == "function") then
     TFuBag:GetCategory(params);
   elseif (cmd == L["tests"] and TFuBag.RunTests and type(TFuBag.RunTests) == "function") then
@@ -154,6 +157,9 @@ function TFuInv_cmd(msg)
   elseif (cmd == "printcat") then
     -- TEMP diagnostic: dump each item's resolved category/bar (optional filter).
     TFuBag:PrintCategoryContents("inv", params);
+  elseif (cmd == "catdiag") then
+    -- TEMP diagnostic: dump a category's rules + bar + live tooltip matches.
+    TFuBag:CatDiag("inv", params);
   elseif (cmd == L["getcat"] and TFuBag.GetCategory and type(TFuBag.GetCategory) == "function") then
     TFuBag:GetCategory(params);
   elseif (cmd == L["tests"] and TFuBag.RunTests and type(TFuBag.RunTests) == "function") then
