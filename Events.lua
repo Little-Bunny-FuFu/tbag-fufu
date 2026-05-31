@@ -177,12 +177,17 @@ function TFuBag:BANKFRAME_OPENED()
   -- every open even when nothing changed -> the per-open lag. First open still
   -- populates because an empty/stale cache reads as "changed".
   TFuBnkFrame:Show()
+  -- Repaint the inventory window so its bag items pick up the bank-deposit eligibility
+  -- greying (bag contents didn't change -> a light REQ_NONE repaint, no re-sort).
+  TFuBag:RequestUpdate(TFuInvFrame)
 end
 
 function TFuBag:BANKFRAME_CLOSED()
   TFuBnkFrame.physAtBank = 0
   TFuBnkFrame.atbank = 0
   TFuBnkFrame:Hide()
+  -- Clear the deposit-eligibility greying now that no bank is open.
+  TFuBag:RequestUpdate(TFuInvFrame)
 end
 
 -- 12.0 bank tab set changed (purchase / settings) -- rebuild and refresh if open.

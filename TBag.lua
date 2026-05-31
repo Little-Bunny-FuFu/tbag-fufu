@@ -227,6 +227,24 @@ TFuBag.Bnk_Bags = {};
 function TFuBag:IsBankTab(bag)
   return bag and bag >= 6 and bag <= 16;
 end
+
+-- True when a LIVE bank session is open and the item at bag/slot is NOT allowed in the
+-- active bank type -- i.e. it should be greyed as deposit-ineligible (e.g. soulbound
+-- gear while the Warband bank is open; warbound consumables/reagents stay eligible).
+-- Mirrors Blizzard's bag "BankDepositing" item-context dimming (ItemUtil.lua), which our
+-- custom bag window otherwise loses. Returns false (no greying) when no bank is open or
+-- the 12.0 API isn't present. Read-only -- C_Bank.IsItemAllowedInBankType + ItemLocation
+-- are safe queries (no taint).
+function TFuBag:IsItemBankIneligible(bag, slot)
+  local bnk = TFuBnkFrame;
+  if (not bnk or bnk.atbank ~= 1 or bnk.bankType == nil) then return false; end
+  if (not C_Bank or not C_Bank.IsItemAllowedInBankType or not ItemLocation) then return false; end
+  local loc = ItemLocation:CreateFromBagAndSlot(bag, slot);
+  if (not loc or not loc:IsValid()) then return false; end
+  local ok, allowed = pcall(C_Bank.IsItemAllowedInBankType, bnk.bankType, loc);
+  if (not ok) then return false; end
+  return not allowed;
+end
 TFuBag.Body_Slots = {
   ["HeadSlot"] = 1,
   ["NeckSlot"] = 2,

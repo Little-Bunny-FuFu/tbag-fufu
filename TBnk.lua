@@ -961,6 +961,9 @@ function Bank:SetBankType(bankType)
   self.bankType = bankType
   self:RebuildTabList()
   self:UpdateWindow(TFuBag.REQ_MUST)
+  -- Character vs Warband changes which bag items are deposit-eligible: repaint the
+  -- inventory window so its greying tracks the active bank type.
+  TFuBag:RequestUpdate(TFuInvFrame)
 end
 
 -- Toggle between the available bank types (for the interim /tbnk bank command;
@@ -995,6 +998,19 @@ end
 
 function Bank:GetDepositButtonLabel()
   return DepositButtonLabel(self.bankType)
+end
+
+-- Tooltip body for the deposit button, matched to the active bank type: the Warband
+-- (Account) bank deposits all warbound-ELIGIBLE items (reagents, consumables like
+-- flasks/potions/food/runes, warbound gear, ...), while the Character bank deposits
+-- reagents only. The button label (above) already says "Deposit All Warbound" vs
+-- "Deposit All Reagents"; this keeps the description honest too.
+function Bank:GetDepositButtonDesc()
+  local ACCT = Enum.BankType and Enum.BankType.Account
+  if (self.bankType == ACCT) then
+    return TFuBag.LOCALE["Deposits all Warbound-eligible items in your bags."]
+  end
+  return TFuBag.LOCALE["Deposits all Reagents in your bag."]
 end
 
 function Bank:UpdateDepositButton()

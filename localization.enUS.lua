@@ -600,6 +600,7 @@ L["BOTTOMRIGHT"] = true
 L["Show on TBag"] = "Show on TBag-fufu"
 L["Checking this option will allow you to track this currency type in TBag for this character.\n\nYou can also Shift-click a currency to add or remove it from being tracked in TBag."] = "Checking this option will allow you to track this currency type in TBag-fufu for this character.\n\nYou can also Shift-click a currency to add or remove it from being tracked in TBag-fufu."
 L["Deposits all Reagents in your bag."] = true
+L["Deposits all Warbound-eligible items in your bags."] = true
 
 -- Option Window Strings
 L["Main Sizing Preferences"] = true

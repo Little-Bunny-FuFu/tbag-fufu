@@ -219,13 +219,32 @@ end
 -- Handles lock updates.  Takes an itm and mainFrame parameter
 -- which allows it to short circuit getting the frames itm and mainFrame
 -- such as when it is called from ItemButton.Update.
+-- Dramatic dark wash over the whole button for deposit-ineligible items (mirrors
+-- Blizzard's bag "item context" dim: a ~0.8 black overlay), so ineligible vs eligible is
+-- obvious -- icon desaturation alone was too subtle. The overlay sits on ARTWORK (above
+-- the icon, below the OVERLAY-layer count/stock text) so the stack count stays readable.
+function ItemButton.SetDepositDim(self, on)
+  local ov = self.tfuDimOverlay
+  if (not ov) then
+    if (not on) then return end
+    ov = self:CreateTexture(nil, "ARTWORK", nil, 7)
+    ov:SetColorTexture(0, 0, 0, 0.8)
+    ov:SetAllPoints(self)
+    self.tfuDimOverlay = ov
+  end
+  ov:SetShown(on and true or false)
+end
+
 function ItemButton.UpdateLock(self, itm, mainFrame)
   if not itm then itm = TFuBag:GetItmFromFrame(TFuBag.BUTTONS, self) end
   if not itm or not next(itm) then return end
   if not mainFrame then mainFrame = TFuBag:GetButtonMainFrame(self) end
 
-  -- Another player's view never appears locked
-  if not TFuBag:IsLive(mainFrame) then return end
+  -- Another player's view never appears locked or deposit-dimmed.
+  if not TFuBag:IsLive(mainFrame) then
+    TFuBag.ItemButton.SetDepositDim(self, false);
+    return;
+  end
 
   -- 12.0 bank tabs: GetContainerItemInfo reports items as "locked" when the warband
   -- bank is opened remotely (e.g. a distance inhibitor) -- greying already-deposited
@@ -233,11 +252,18 @@ function ItemButton.UpdateLock(self, itm, mainFrame)
   -- never lock-desaturate them (matches the at-banker appearance, where locked=false).
   if TFuBag:IsBankTab(itm[TFuBag.I_BAG]) then
     SetItemButtonDesaturated(self, false);
+    TFuBag.ItemButton.SetDepositDim(self, false);
     return;
   end
 
   local _,_,locked,_,_ = GetContainerItemInfo(itm[TFuBag.I_BAG],itm[TFuBag.I_SLOT])
-  SetItemButtonDesaturated(self, locked, 0.5, 0.5, 0.5);
+  -- While a live bank session is open, dim bag items that can't go into the active bank
+  -- type (e.g. soulbound gear when the Warband bank is open). Warbound-eligible items
+  -- (reagents, flasks/potions/food/runes, warbound gear, etc.) stay full-colour. Restores
+  -- the stock "deposit eligibility" shading our custom bag window otherwise loses.
+  local ineligible = TFuBag:IsItemBankIneligible(itm[TFuBag.I_BAG], itm[TFuBag.I_SLOT])
+  SetItemButtonDesaturated(self, (locked or ineligible) and true or false, 0.5, 0.5, 0.5);
+  TFuBag.ItemButton.SetDepositDim(self, ineligible);
 end
 
 -- Handles cooldown updates.  Takes an itm and mainFrame paramenter
