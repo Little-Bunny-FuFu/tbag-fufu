@@ -108,6 +108,11 @@ TFuBag.I_LINKSUFFIX = "ls"
 -- Expansion / Bind-on-Equip filters work for cached cross-character views too):
 TFuBag.I_EXPANSION = "xp";  -- expansionID (15th GetItemInfo return)
 TFuBag.I_BINDTYPE  = "bd";  -- bindType (14th GetItemInfo return; 2 = Bind on Equip)
+-- Equipment sub-group display label (armor slot or weapon type). Set in PickBar
+-- for armor/weapon items when armor grouping is on; nil otherwise. The within-bar
+-- sort orders by it (so a slot/type clusters), and the auto-flow layout draws a
+-- sub-header row whenever it changes inside a box (see EquipSubPlan / drawRow).
+TFuBag.I_SUBGROUP  = "sg";
 -- Reforging was removed in 6.0,
 -- entry left here commented out to remember that
 -- rf has been used
@@ -960,26 +965,50 @@ TFuBag.MATERIAL_SUBTYPES = {
   { sub = "Finishing Reagents",cat = "Finishing Reagents" },
 };
 
--- Read the current group target for a subtype (from the inventory cfg).
+-- ===== Options target window =================================================
+-- The Categories / Grouping / Armor options panels edit ONE window at a time
+-- (Inventory or Bank), selected by an in-panel toggle. Each window keeps its own
+-- independent cfg (search list, mat_group, armor_group, ...), so the two can
+-- diverge. self.optTarget ("inv"/"bank") chooses which; the helpers below read
+-- and write only that window. (General settings already work this way.)
+TFuBag.optTarget = "inv";
+function TFuBag:SetOptTarget(which)
+  self.optTarget = (which == "bank") and "bank" or "inv";
+end
+-- The targeted window frame (falls back to whichever window exists).
+function TFuBag:OptFrame()
+  if (self.optTarget == "bank" and TFuBnkFrame and TFuBnkFrame.cfg) then return TFuBnkFrame; end
+  if (TFuInvFrame and TFuInvFrame.cfg) then return TFuInvFrame; end
+  return (TFuBnkFrame and TFuBnkFrame.cfg) and TFuBnkFrame or nil;
+end
+function TFuBag:OptCfg()
+  local f = self:OptFrame();
+  return f and f.cfg;
+end
+-- Recategorize + relayout after a config edit. catGen is global (both windows
+-- re-pick), but only the edited window's cfg changed, so only it is repainted
+-- here; the other window re-picks to its own (unchanged) result on its next update.
+function TFuBag:OptRefresh()
+  self:BumpCatGen();
+  local f = self:OptFrame();
+  if (f) then f:UpdateWindow(self.REQ_MUST); end
+end
+
+-- Read the current group target for a subtype (from the targeted window's cfg).
 function TFuBag:GetMaterialGroup(subtype)
-  local cfg = TFuInvFrame and TFuInvFrame.cfg;
+  local cfg = self:OptCfg();
   return cfg and cfg.mat_group and cfg.mat_group[subtype];
 end
 
--- Route a subtype to a target group category in BOTH windows. defer = skip the
--- (heavy) recat+relayout so a preset can batch many changes into one refresh.
+-- Route a subtype to a target group category in the TARGETED window. defer = skip
+-- the (heavy) recat+relayout so a preset can batch many changes into one refresh.
 function TFuBag:SetMaterialGroup(subtype, target, defer)
-  for _, frame in ipairs({ TFuInvFrame, TFuBnkFrame }) do
-    if (frame and frame.cfg) then
-      frame.cfg.mat_group = frame.cfg.mat_group or {};
-      frame.cfg.mat_group[subtype] = target;
-    end
+  local cfg = self:OptCfg();
+  if (cfg) then
+    cfg.mat_group = cfg.mat_group or {};
+    cfg.mat_group[subtype] = target;
   end
-  if (not defer) then
-    self:BumpCatGen();
-    if (TFuInvFrame) then TFuInvFrame:UpdateWindow(self.REQ_MUST); end
-    if (TFuBnkFrame) then TFuBnkFrame:UpdateWindow(self.REQ_MUST); end
-  end
+  if (not defer) then self:OptRefresh(); end
 end
 
 -- Apply a grouping preset: "separate" = each subtype to its own category;
@@ -989,9 +1018,264 @@ function TFuBag:ApplyGroupPreset(preset)
     local target = (preset == "onebar") and self.LOCALE["TRADE_GOODS"] or m.cat;
     self:SetMaterialGroup(m.sub, target, true);
   end
-  self:BumpCatGen();
-  if (TFuInvFrame) then TFuInvFrame:UpdateWindow(self.REQ_MUST); end
-  if (TFuBnkFrame) then TFuBnkFrame:UpdateWindow(self.REQ_MUST); end
+  self:OptRefresh();
+end
+
+-----------------------------------------------------------------------
+-- Armor grouping (Armor panel). Equipment routes to a per-slot category by its
+-- itemEquipLoc (INVTYPE_*, locale-independent) instead of scanning the tooltip
+-- for an English slot line, optionally prefixed by bind state so Bind-on-Equip,
+-- Soulbound, and Account-Bound (Warbound) gear each cluster on their own bar
+-- while the within-bar sort keeps the slots (Head, Shoulder, ...) grouped.
+-- ARMOR_INVTYPE_SLOT maps the engine INVTYPE_* to the existing per-slot category
+-- KEY (01_HEAD ... 13_OFFHAND, RING, TRINKET); those keys already carry default
+-- bars + collapsed header labels (see SetDef / BuildCatLabels). This supersedes
+-- the fragile tooltip-line armor rules in the search list when armor grouping is
+-- enabled; with it off, those rules still run (backward compatible).
+-----------------------------------------------------------------------
+TFuBag.ARMOR_INVTYPE_SLOT = {
+  INVTYPE_HEAD      = "01_HEAD",
+  INVTYPE_NECK      = "02_NECK",
+  INVTYPE_SHOULDER  = "03_SHOULDER",
+  INVTYPE_CLOAK     = "04_BACK",
+  INVTYPE_CHEST     = "05_CHEST",
+  INVTYPE_ROBE      = "05_CHEST",
+  INVTYPE_BODY      = "06_SHIRT",
+  INVTYPE_TABARD    = "07_TABARD",
+  INVTYPE_WRIST     = "08_WRIST",
+  INVTYPE_HAND      = "09_HANDS",
+  INVTYPE_WAIST     = "10_WAIST",
+  INVTYPE_LEGS      = "11_LEGS",
+  INVTYPE_FEET      = "12_FEET",
+  INVTYPE_HOLDABLE  = "13_OFFHAND",
+  INVTYPE_SHIELD    = "13_OFFHAND",
+  INVTYPE_FINGER    = "RING",
+  INVTYPE_TRINKET   = "TRINKET",
+};
+
+-- Ordered slot list for the Armor grouping panel. label = human-readable text
+-- (L["01_HEAD"] resolves to the raw "01_HEAD" key, so the menu needs its own
+-- readable string). The default group target for each slot is the slot itself
+-- (each slot on its own group, matching the carried/soulbound defaults).
+TFuBag.ARMOR_SLOTS = {
+  { sub = "01_HEAD",     label = "Head" },
+  { sub = "02_NECK",     label = "Neck" },
+  { sub = "03_SHOULDER", label = "Shoulder" },
+  { sub = "04_BACK",     label = "Back" },
+  { sub = "05_CHEST",    label = "Chest" },
+  { sub = "06_SHIRT",    label = "Shirt" },
+  { sub = "07_TABARD",   label = "Tabard" },
+  { sub = "08_WRIST",    label = "Wrist" },
+  { sub = "09_HANDS",    label = "Hands" },
+  { sub = "10_WAIST",    label = "Waist" },
+  { sub = "11_LEGS",     label = "Legs" },
+  { sub = "12_FEET",     label = "Feet" },
+  { sub = "13_OFFHAND",  label = "Off-hand / Shield" },
+  { sub = "RING",        label = "Ring" },
+  { sub = "TRINKET",     label = "Trinket" },
+};
+
+-- slot KEY -> readable sub-header label (built from ARMOR_SLOTS once).
+TFuBag.ARMOR_SLOT_LABEL = {};
+for _, m in ipairs(TFuBag.ARMOR_SLOTS) do
+  TFuBag.ARMOR_SLOT_LABEL[m.sub] = m.label;
+end
+
+-- Weapon INVTYPE_* set. Weapons route to the WEAPON category (per bind state) and
+-- sub-header by their weapon TYPE (itm[I_SUBTYPE]: Swords, Axes, Daggers, ...).
+TFuBag.WEAPON_INVTYPE = {
+  INVTYPE_WEAPON        = true,
+  INVTYPE_2HWEAPON      = true,
+  INVTYPE_WEAPONMAINHAND= true,
+  INVTYPE_WEAPONOFFHAND = true,
+  INVTYPE_RANGED        = true,
+  INVTYPE_RANGEDRIGHT   = true,
+  INVTYPE_THROWN        = true,
+};
+
+-- Resolve an equippable item's (category, sub-header label), or nil if it is not
+-- armor/weapon (so it falls through to the search list). Armor routes per slot
+-- (cfg.armor_group can merge slots; "" opts a slot out); weapons route to the
+-- WEAPON category. cfg.armor_bind_split (default on) prefixes Soulbound /
+-- Account-Bound so each bind state gets its own bar. The second return is the
+-- sub-header label (the original slot name, or the weapon type), kept distinct
+-- from the group so merged slots still sub-header by their own slot.
+function TFuBag:EquipCat(cfg, itm)
+  local link = itm[self.I_ITEMLINK];
+  if (not link or link == "") then return nil; end
+  if (type(C_Item) ~= "table" or type(C_Item.GetItemInfoInstant) ~= "function") then
+    return nil;
+  end
+  local equipLoc = select(4, C_Item.GetItemInfoInstant(link));
+  if (not equipLoc or equipLoc == "") then return nil; end
+
+  local slot = self.ARMOR_INVTYPE_SLOT[equipLoc];
+  local subLabel, grp;
+  if (slot) then
+    -- Armor piece: sub-header by slot; route through the merge map.
+    subLabel = self.ARMOR_SLOT_LABEL[slot] or L[slot];
+    grp = slot;
+    if (cfg.armor_group and cfg.armor_group[slot] ~= nil) then
+      grp = cfg.armor_group[slot];
+    end
+    if (grp == "") then return nil; end  -- slot opted out
+  elseif (self.WEAPON_INVTYPE[equipLoc]) then
+    -- Weapon: one WEAPON group, sub-headered by weapon type.
+    grp = "WEAPON";
+    subLabel = itm[self.I_SUBTYPE];
+    if (not subLabel or subLabel == "") then subLabel = L["WEAPON"]; end
+  else
+    return nil;
+  end
+
+  local cat;
+  if (cfg.armor_bind_split == 1 and itm[self.I_SOULBOUND] == 1) then
+    cat = string.format(L["SOULBOUND_%s"], L[grp]);
+  elseif (cfg.armor_bind_split == 1 and itm[self.I_ACCTBOUND]) then
+    cat = string.format(L["ACCOUNTBOUND_%s"], L[grp]);
+  else
+    cat = L[grp];
+  end
+  return cat, subLabel;
+end
+
+-- True if a bar's item list carries any sub-group label (equipment), so the
+-- auto-flow layout should render it with sub-headers. Items are already sorted so
+-- same-label items are contiguous (see SortItmCache + EquipSubPlan).
+function TFuBag:BarHasSubgroups(items)
+  if (not items) then return false; end
+  for _, itm in ipairs(items) do
+    local sg = itm[self.I_SUBGROUP];
+    if (sg and sg ~= "") then return true; end
+  end
+  return false;
+end
+
+-- Plan a sub-headered box across the FULL content width `colmax` (Baganator-style
+-- shelf flow). Each sub-group is an inline cluster (header on top, its items in a
+-- block beneath); clusters pack left-to-right and wrap to a new shelf when the
+-- width fills, so small slots sit side by side instead of one-per-row. A small
+-- gap (SUBGROUP_GAP) sits between clusters; each shelf reserves only a short band
+-- (SUBGROUP_HEADER_H) for its titles instead of a full item-row, so the titles
+-- sit close above their items. All measurements are in CELL (button-pitch) units.
+-- Returns:
+--   height     -- total vertical extent in cells (header bands + item rows)
+--   headers    -- { {label=, w=, firstItm=}, ... }  (anchored above firstItm's button)
+--   placements -- { {itm=, ytop=, xcell=}, ... }  (ytop = cells from TOP, xcell from LEFT)
+-- Deterministic in (items, colmax) so the size pass and the draw pass agree.
+TFuBag.SUBGROUP_GAP = 0.125;     -- gap between adjacent clusters, in cell units
+TFuBag.SUBGROUP_HEADER_H = 0.5;  -- header band height per shelf, in cell units
+TFuBag.SUBGROUP_MAX_COLS = 5;    -- max columns a cluster spreads before wrapping into a block
+function TFuBag:EquipSubPlan(items, colmax)
+  if (not colmax or colmax < 1) then colmax = 1; end
+  local gap = self.SUBGROUP_GAP or 0;
+  local hb = self.SUBGROUP_HEADER_H or 1;
+
+  -- 1) Contiguous same-label runs become clusters (items are pre-sorted so a
+  -- slot/type is already adjacent). A nil/"" label = a header-less cluster.
+  local clusters = {};
+  local i, n = 1, #items;
+  while (i <= n) do
+    local label = items[i][self.I_SUBGROUP];
+    local c = { label = label, items = {} };
+    while (i <= n and items[i][self.I_SUBGROUP] == label) do
+      c.items[#c.items + 1] = items[i]; i = i + 1;
+    end
+    clusters[#clusters + 1] = c;
+  end
+
+  -- 2) Shelf-pack the clusters within colmax columns. cx (cells) is fractional so
+  -- the inter-cluster gap is a fraction of a button; shelfTopY (cells from top)
+  -- advances by the short header band + the shelf's tallest item block.
+  local headers, placements = {}, {};
+  local shelfTopY, cx, shelfItemRows = 0, 0, 0;
+  -- A cluster spreads up to maxCols wide, then WRAPS into a multi-row block
+  -- (rather than one long row spanning the whole shelf), so big sub-groups stay
+  -- compact and leave room for neighbours. Never wider than the box.
+  local maxCols = self.SUBGROUP_MAX_COLS or colmax;
+  if (maxCols > colmax) then maxCols = colmax; end
+  if (maxCols < 1) then maxCols = 1; end
+  for _, c in ipairs(clusters) do
+    local cnt = #c.items;
+    local w = cnt; if (w > maxCols) then w = maxCols; end; if (w < 1) then w = 1; end
+    local rows = math.ceil(cnt / w);
+    local pre = (cx > 0) and gap or 0;
+    if (cx > 0 and cx + pre + w > colmax + 0.001) then
+      shelfTopY = shelfTopY + hb + shelfItemRows;   -- close shelf
+      cx, shelfItemRows, pre = 0, 0, 0;
+    end
+    local startCell = cx + pre;
+    local itemsTopY = shelfTopY + hb;
+    if (c.label and c.label ~= "") then
+      headers[#headers + 1] = { label = c.label, w = w, firstItm = c.items[1] };
+    end
+    for idx, itm in ipairs(c.items) do
+      placements[#placements + 1] = {
+        itm = itm,
+        ytop = itemsTopY + math.floor((idx - 1) / w),
+        xcell = startCell + ((idx - 1) % w),
+      };
+    end
+    if (rows > shelfItemRows) then shelfItemRows = rows; end
+    cx = startCell + w;
+  end
+  local height = shelfTopY + hb + shelfItemRows;
+  return height, headers, placements;
+end
+
+-- Read an armor slot's group target from the targeted window (default = identity).
+function TFuBag:GetArmorGroup(slot)
+  local cfg = self:OptCfg();
+  if (cfg and cfg.armor_group and cfg.armor_group[slot] ~= nil) then
+    return cfg.armor_group[slot];
+  end
+  return slot;
+end
+
+-- Route a slot to a target group in the TARGETED window. defer = skip the heavy
+-- recat+relayout so a preset can batch many changes.
+function TFuBag:SetArmorGroup(slot, target, defer)
+  local cfg = self:OptCfg();
+  if (cfg) then
+    cfg.armor_group = cfg.armor_group or {};
+    cfg.armor_group[slot] = target;
+  end
+  if (not defer) then self:OptRefresh(); end
+end
+
+-- Master enable for slot-based armor grouping (targeted window).
+function TFuBag:GetArmorGroupEnabled()
+  local cfg = self:OptCfg();
+  return cfg and cfg.armor_group_enabled == 1;
+end
+
+function TFuBag:SetArmorGroupEnabled(on)
+  local cfg = self:OptCfg();
+  if (cfg) then cfg.armor_group_enabled = on and 1 or 0; end
+  self:OptRefresh();
+end
+
+-- Bind-split toggle: on = separate Soulbound / Account-Bound / BoE bars; off =
+-- all bind states share the carried per-slot category (targeted window).
+function TFuBag:GetArmorBindSplit()
+  local cfg = self:OptCfg();
+  return cfg and cfg.armor_bind_split == 1;
+end
+
+function TFuBag:SetArmorBindSplit(on)
+  local cfg = self:OptCfg();
+  if (cfg) then cfg.armor_bind_split = on and 1 or 0; end
+  self:OptRefresh();
+end
+
+-- Apply an armor grouping preset: "separate" = each slot to its own group;
+-- "onebar" = every slot into the single ARMOR group.
+function TFuBag:ApplyArmorPreset(preset)
+  for _, m in ipairs(self.ARMOR_SLOTS) do
+    local target = (preset == "onebar") and "ARMOR" or m.sub;
+    self:SetArmorGroup(m.sub, target, true);
+  end
+  self:OptRefresh();
 end
 
 -- ===== Category enable/disable (Categories options panel) =====
@@ -1006,7 +1290,7 @@ end
 -- the inventory list (both windows are kept in sync by SetCategoryEnabled); falls back
 -- to the bank list when the inventory window is not initialised yet.
 function TFuBag:GetCategoryList()
-  local cfg = (TFuInvFrame and TFuInvFrame.cfg) or (TFuBnkFrame and TFuBnkFrame.cfg);
+  local cfg = self:OptCfg();
   local list = cfg and cfg["item_search_list"];
   local out, seen = {}, {};
   if (not list) then return out; end
@@ -1029,7 +1313,7 @@ function TFuBag:GetCategoryList()
 end
 
 function TFuBag:IsCategoryEnabled(name)
-  local cfg = (TFuInvFrame and TFuInvFrame.cfg) or (TFuBnkFrame and TFuBnkFrame.cfg);
+  local cfg = self:OptCfg();
   local list = cfg and cfg["item_search_list"];
   if (not list) then return true; end
   for _, rule in ipairs(list) do
@@ -1044,19 +1328,13 @@ end
 -- recat + relayout unless deferred.
 function TFuBag:SetCategoryEnabled(name, enabled, defer)
   local off = (not enabled) or nil;
-  for _, frame in ipairs({ TFuInvFrame, TFuBnkFrame }) do
-    local list = frame and frame.cfg and frame.cfg["item_search_list"];
-    if (list) then
-      for _, rule in ipairs(list) do
-        if (rule[1] == name) then rule.off = off; end
-      end
+  local list = self:OptCfg() and self:OptCfg()["item_search_list"];
+  if (list) then
+    for _, rule in ipairs(list) do
+      if (rule[1] == name) then rule.off = off; end
     end
   end
-  if (not defer) then
-    self:BumpCatGen();
-    if (TFuInvFrame) then TFuInvFrame:UpdateWindow(self.REQ_MUST); end
-    if (TFuBnkFrame) then TFuBnkFrame:UpdateWindow(self.REQ_MUST); end
-  end
+  if (not defer) then self:OptRefresh(); end
 end
 
 -- Smallest category bar (1..BAR_MAX-1) not assigned to any category, so a new category
@@ -1086,19 +1364,15 @@ function TFuBag:AddCategory(name, matchText)
   name = name and strtrim(name) or "";
   matchText = matchText and strtrim(matchText) or "";
   if (name == "" or matchText == "") then return false; end
-  for _, frame in ipairs({ TFuInvFrame, TFuBnkFrame }) do
-    local cfg = frame and frame.cfg;
-    local list = cfg and cfg["item_search_list"];
-    if (list) then
-      if (type(self:GetCat(cfg, name)) ~= "number") then
-        self:SetCatBar(cfg, name, self:FindFreeBar(cfg));
-      end
-      table.insert(list, { name, "", matchText, "", "", "ci" });
+  local cfg = self:OptCfg();
+  local list = cfg and cfg["item_search_list"];
+  if (list) then
+    if (type(self:GetCat(cfg, name)) ~= "number") then
+      self:SetCatBar(cfg, name, self:FindFreeBar(cfg));
     end
+    table.insert(list, { name, "", matchText, "", "", "ci" });
   end
-  self:BumpCatGen();
-  if (TFuInvFrame) then TFuInvFrame:UpdateWindow(self.REQ_MUST); end
-  if (TFuBnkFrame) then TFuBnkFrame:UpdateWindow(self.REQ_MUST); end
+  self:OptRefresh();
   return true;
 end
 
@@ -1108,24 +1382,20 @@ end
 -- /tinv resetsorts restores the default rule list.
 function TFuBag:DeleteCategory(name)
   if (not name or name == "") then return; end
-  for _, frame in ipairs({ TFuInvFrame, TFuBnkFrame }) do
-    local cfg = frame and frame.cfg;
-    local list = cfg and cfg["item_search_list"];
-    if (list) then
-      for i = #list, 1, -1 do
-        if (list[i][1] == name) then table.remove(list, i); end
-      end
-    end
-    local ov = cfg and cfg["item_overrides"];
-    if (ov) then
-      for id, c in pairs(ov) do
-        if (c == name) then ov[id] = nil; end
-      end
+  local cfg = self:OptCfg();
+  local list = cfg and cfg["item_search_list"];
+  if (list) then
+    for i = #list, 1, -1 do
+      if (list[i][1] == name) then table.remove(list, i); end
     end
   end
-  self:BumpCatGen();
-  if (TFuInvFrame) then TFuInvFrame:UpdateWindow(self.REQ_MUST); end
-  if (TFuBnkFrame) then TFuBnkFrame:UpdateWindow(self.REQ_MUST); end
+  local ov = cfg and cfg["item_overrides"];
+  if (ov) then
+    for id, c in pairs(ov) do
+      if (c == name) then ov[id] = nil; end
+    end
+  end
+  self:OptRefresh();
 end
 
 -- ===== Category rule editor (ModernOpt Categories detail view) ================
@@ -1141,7 +1411,7 @@ end
 -- GetCategoryList it skips the redundant all-empty catch-all rule, but it keeps
 -- disabled categories (ordering is independent of the enabled flag).
 function TFuBag:GetCategoryOrderList(cfg)
-  cfg = cfg or (TFuInvFrame and TFuInvFrame.cfg) or (TFuBnkFrame and TFuBnkFrame.cfg);
+  cfg = cfg or self:OptCfg();
   local out, seen = {}, {};
   local list = cfg and cfg["item_search_list"];
   if (not list) then return out; end
@@ -1157,9 +1427,9 @@ end
 
 -- Snapshot of one category's rules for the editor: ordered array of
 -- { idx=<pos in item_search_list>, [1..6]=field copies, off=bool }. Reads the
--- inventory list (bank fallback); idx is valid for BOTH lists (they're synced).
+-- targeted window's list; idx is valid for that same list (the one the editor mutates).
 function TFuBag:GetCategoryRules(name)
-  local cfg = (TFuInvFrame and TFuInvFrame.cfg) or (TFuBnkFrame and TFuBnkFrame.cfg);
+  local cfg = self:OptCfg();
   local list = cfg and cfg["item_search_list"];
   local out = {};
   if (not list or not name or name == "") then return out; end
@@ -1176,21 +1446,15 @@ function TFuBag:GetCategoryRules(name)
   return out;
 end
 
--- Return { list, list, ... } for every initialised window, but only if each
--- present window's rule at idx still carries expectName (a drift guard so a
--- destructive write never hits the wrong rule). Returns nil to make the caller
--- abort.
+-- Return { list } for the TARGETED window, but only if its rule at idx still
+-- carries expectName (a drift guard so a destructive write never hits the wrong
+-- rule). Returns nil to make the caller abort. (One-element array so the existing
+-- callers' `for _, list in ipairs(...)` loops are unchanged.)
 function TFuBag:RuleListsAt(idx, expectName)
-  local lists = {};
-  for _, frame in ipairs({ TFuInvFrame, TFuBnkFrame }) do
-    local list = frame and frame.cfg and frame.cfg["item_search_list"];
-    if (list) then
-      if (not list[idx] or list[idx][1] ~= expectName) then return nil; end
-      lists[#lists + 1] = list;
-    end
-  end
-  if (#lists == 0) then return nil; end
-  return lists;
+  local list = self:OptCfg() and self:OptCfg()["item_search_list"];
+  if (not list) then return nil; end
+  if (not list[idx] or list[idx][1] ~= expectName) then return nil; end
+  return { list };
 end
 
 -- Edit one rule's MATCH fields (its category name is fixed -- use RenameCategory).
@@ -1212,9 +1476,7 @@ function TFuBag:UpdateRule(idx, expectName, fields, ci)
     r[2] = kw; r[3] = tt; r[4] = ity; r[5] = sty;
     if (r[6] ~= "psplit") then r[6] = ci and "ci" or ""; end
   end
-  self:BumpCatGen();
-  if (TFuInvFrame) then TFuInvFrame:UpdateWindow(self.REQ_MUST); end
-  if (TFuBnkFrame) then TFuBnkFrame:UpdateWindow(self.REQ_MUST); end
+  self:OptRefresh();
   return true;
 end
 
@@ -1225,9 +1487,7 @@ function TFuBag:DeleteRule(idx, expectName)
   local lists = self:RuleListsAt(idx, expectName);
   if (not lists) then return false; end
   for _, list in ipairs(lists) do table.remove(list, idx); end
-  self:BumpCatGen();
-  if (TFuInvFrame) then TFuInvFrame:UpdateWindow(self.REQ_MUST); end
-  if (TFuBnkFrame) then TFuBnkFrame:UpdateWindow(self.REQ_MUST); end
+  self:OptRefresh();
   return true;
 end
 
@@ -1238,20 +1498,15 @@ end
 -- rule's index, or nil if the category isn't present.
 function TFuBag:AddRuleToCategory(name)
   if (not name or name == "") then return nil; end
-  local newIdx;
-  for _, frame in ipairs({ TFuInvFrame, TFuBnkFrame }) do
-    local list = frame and frame.cfg and frame.cfg["item_search_list"];
-    if (list) then
-      local last;
-      for i, rule in ipairs(list) do
-        if (rule[1] == name) then last = i; end
-      end
-      if (not last) then return nil; end
-      table.insert(list, last + 1, { name, "", "", "", "", "ci" });
-      newIdx = last + 1;
-    end
+  local list = self:OptCfg() and self:OptCfg()["item_search_list"];
+  if (not list) then return nil; end
+  local last;
+  for i, rule in ipairs(list) do
+    if (rule[1] == name) then last = i; end
   end
-  return newIdx;
+  if (not last) then return nil; end
+  table.insert(list, last + 1, { name, "", "", "", "", "ci" });
+  return last + 1;
 end
 
 -- Rename a category everywhere: every rule[1] in both lists, its CAT_BAR bar key +
@@ -1262,46 +1517,37 @@ function TFuBag:RenameCategory(oldName, newName)
   oldName = oldName and strtrim(oldName) or "";
   newName = newName and strtrim(newName) or "";
   if (oldName == "" or newName == "" or newName == oldName) then return false; end
-  for _, frame in ipairs({ TFuInvFrame, TFuBnkFrame }) do
-    local list = frame and frame.cfg and frame.cfg["item_search_list"];
-    if (list) then
-      for _, rule in ipairs(list) do
-        if (rule[1] == newName) then return false; end
+  local cfg = self:OptCfg();
+  local list = cfg and cfg["item_search_list"];
+  if (list) then
+    for _, rule in ipairs(list) do
+      if (rule[1] == newName) then return false; end
+    end
+    for _, rule in ipairs(list) do
+      if (rule[1] == oldName) then rule[1] = newName; end
+    end
+    local cb = cfg[self.CAT_BAR];
+    if (cb) then
+      if (cb[oldName] ~= nil and cb[newName] == nil) then
+        cb[newName] = cb[oldName]; cb[oldName] = nil;
+      end
+      for k, v in pairs(cb) do
+        if (v == oldName) then cb[k] = newName; end
+      end
+    end
+    if (cfg.mat_group) then
+      for k, v in pairs(cfg.mat_group) do
+        if (v == oldName) then cfg.mat_group[k] = newName; end
+      end
+    end
+    local ov = cfg["item_overrides"];
+    if (ov) then
+      for id, c in pairs(ov) do
+        if (c == oldName) then ov[id] = newName; end
       end
     end
   end
-  for _, frame in ipairs({ TFuInvFrame, TFuBnkFrame }) do
-    local cfg = frame and frame.cfg;
-    local list = cfg and cfg["item_search_list"];
-    if (list) then
-      for _, rule in ipairs(list) do
-        if (rule[1] == oldName) then rule[1] = newName; end
-      end
-      local cb = cfg[self.CAT_BAR];
-      if (cb) then
-        if (cb[oldName] ~= nil and cb[newName] == nil) then
-          cb[newName] = cb[oldName]; cb[oldName] = nil;
-        end
-        for k, v in pairs(cb) do
-          if (v == oldName) then cb[k] = newName; end
-        end
-      end
-      if (cfg.mat_group) then
-        for k, v in pairs(cfg.mat_group) do
-          if (v == oldName) then cfg.mat_group[k] = newName; end
-        end
-      end
-      local ov = cfg["item_overrides"];
-      if (ov) then
-        for id, c in pairs(ov) do
-          if (c == oldName) then ov[id] = newName; end
-        end
-      end
-    end
-  end
-  self:BumpCatGen();
-  if (TFuInvFrame) then TFuInvFrame:UpdateWindow(self.REQ_MUST); end
-  if (TFuBnkFrame) then TFuBnkFrame:UpdateWindow(self.REQ_MUST); end
+  self:OptRefresh();
   return true;
 end
 
@@ -1367,27 +1613,21 @@ end
 function TFuBag:MoveCategory(name, dir)
   if (not name or name == "" or (dir ~= -1 and dir ~= 1)) then return false; end
   local moved = false;
-  for _, frame in ipairs({ TFuInvFrame, TFuBnkFrame }) do
-    local list = frame and frame.cfg and frame.cfg["item_search_list"];
-    if (list) then
-      local order = self:GetCategoryOrderInList(list);
-      local pos;
-      for i, nm in ipairs(order) do if (nm == name) then pos = i; break; end end
-      if (pos) then
-        local target = pos + dir;
-        if (target >= 1 and target <= #order) then
-          order[pos], order[target] = order[target], order[pos];
-          self:ReorderCategoriesInList(list, order);
-          moved = true;
-        end
+  local list = self:OptCfg() and self:OptCfg()["item_search_list"];
+  if (list) then
+    local order = self:GetCategoryOrderInList(list);
+    local pos;
+    for i, nm in ipairs(order) do if (nm == name) then pos = i; break; end end
+    if (pos) then
+      local target = pos + dir;
+      if (target >= 1 and target <= #order) then
+        order[pos], order[target] = order[target], order[pos];
+        self:ReorderCategoriesInList(list, order);
+        moved = true;
       end
     end
   end
-  if (moved) then
-    self:BumpCatGen();
-    if (TFuInvFrame) then TFuInvFrame:UpdateWindow(self.REQ_MUST); end
-    if (TFuBnkFrame) then TFuBnkFrame:UpdateWindow(self.REQ_MUST); end
-  end
+  if (moved) then self:OptRefresh(); end
   return moved;
 end
 
@@ -1397,32 +1637,26 @@ function TFuBag:MoveCategoryToPosition(name, pos)
   if (not name or name == "" or type(pos) ~= "number") then return false; end
   pos = math.floor(pos);
   local moved = false;
-  for _, frame in ipairs({ TFuInvFrame, TFuBnkFrame }) do
-    local list = frame and frame.cfg and frame.cfg["item_search_list"];
-    if (list) then
-      local order = self:GetCategoryOrderInList(list);
-      local n = #order;
-      if (n > 0) then
-        local cur;
-        for i, nm in ipairs(order) do if (nm == name) then cur = i; break; end end
-        if (cur) then
-          local target = pos;
-          if (target < 1) then target = 1; elseif (target > n) then target = n; end
-          if (target ~= cur) then
-            table.remove(order, cur);
-            table.insert(order, target, name);
-            self:ReorderCategoriesInList(list, order);
-            moved = true;
-          end
+  local list = self:OptCfg() and self:OptCfg()["item_search_list"];
+  if (list) then
+    local order = self:GetCategoryOrderInList(list);
+    local n = #order;
+    if (n > 0) then
+      local cur;
+      for i, nm in ipairs(order) do if (nm == name) then cur = i; break; end end
+      if (cur) then
+        local target = pos;
+        if (target < 1) then target = 1; elseif (target > n) then target = n; end
+        if (target ~= cur) then
+          table.remove(order, cur);
+          table.insert(order, target, name);
+          self:ReorderCategoriesInList(list, order);
+          moved = true;
         end
       end
     end
   end
-  if (moved) then
-    self:BumpCatGen();
-    if (TFuInvFrame) then TFuInvFrame:UpdateWindow(self.REQ_MUST); end
-    if (TFuBnkFrame) then TFuBnkFrame:UpdateWindow(self.REQ_MUST); end
-  end
+  if (moved) then self:OptRefresh(); end
   return moved;
 end
 
@@ -2298,6 +2532,20 @@ function TFuBag:InitDefVals(cfg, bagarr, row1offset, reset)
       [L["Optional Reagents"]] = L["Optional Reagents"],
       [L["Finishing Reagents"]]= L["Finishing Reagents"],
     };
+  end
+  -- Armor grouping (Armor panel): equipment routes to a per-slot category by
+  -- itemEquipLoc (see ArmorSlotCat). Default ON + bind-split ON reproduces the
+  -- existing BoE/Soulbound/Account-Bound + per-slot grouping, but via robust
+  -- equip-slot detection rather than tooltip-line scanning. armor_group maps each
+  -- slot KEY to a group target (default identity: each slot on its own group);
+  -- point several slots at the same target to merge them onto one bar.
+  self:SetDef(cfg, "armor_group_enabled", 1, reset, self.NumFunc, 0, 1);
+  self:SetDef(cfg, "armor_bind_split", 1, reset, self.NumFunc, 0, 1);
+  if (reset == 1 or cfg.armor_group == nil) then
+    cfg.armor_group = {};
+    for _, m in ipairs(self.ARMOR_SLOTS) do
+      cfg.armor_group[m.sub] = m.sub;
+    end
   end
   self:SetDef(cfg, "manual_layout", 0, reset, self.NumFunc, 0, 1);
   -- Legacy Edit: when 1, force the original TBag edit experience (auto-flow layout +
@@ -3860,6 +4108,12 @@ function TFuBag:UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, compar
           itm[self.I_TIMESTAMP] = itmcache[bag][slot][self.I_TIMESTAMP];
           itm[self.I_NEWSTR] = itmcache[bag][slot][self.I_NEWSTR];
           itm[self.I_CAT] = itmcache[bag][slot][self.I_CAT];
+          -- Carry the equipment sub-group label across cache rebuilds. PickBar
+          -- only re-runs (and re-derives I_SUBGROUP) when the cat stamp is stale;
+          -- on a stamp-current BAG_UPDATE it is skipped, so without this the fresh
+          -- itm loses I_SUBGROUP and the box silently reverts to a flat (no
+          -- sub-header) render even though I_CAT still holds the per-slot category.
+          itm[self.I_SUBGROUP] = itmcache[bag][slot][self.I_SUBGROUP];
           itm[self.I_KEYWORD] = itmcache[bag][slot][self.I_KEYWORD];
           itm[self.I_SOULBOUND] = itmcache[bag][slot][self.I_SOULBOUND];
           itm[self.I_CHARGES] = itmcache[bag][slot][self.I_CHARGES];
@@ -4190,11 +4444,13 @@ function TFuBag:SortItmCache(cfg, playerid, itmcache, baritm, bagarr)
       table.sort(baritm[barnum],
         function(a,b) return
           a[TFuBag.I_CAT]..
+          (a[TFuBag.I_SUBGROUP] or "")..
           TFuBag:ReverseString(a[TFuBag.I_NAME],toggle)..
           string.format("%04s",a[TFuBag.I_COUNT])..string.format("%02s",a[TFuBag.I_SLOT])
 
           >
           b[TFuBag.I_CAT]..
+          (b[TFuBag.I_SUBGROUP] or "")..
           TFuBag:ReverseString(b[TFuBag.I_NAME],toggle)..
           string.format("%04s",b[TFuBag.I_COUNT])..string.format("%02s",b[TFuBag.I_SLOT])
         end
@@ -4309,6 +4565,7 @@ function TFuBag:PickBar(cfg, playerid, itm, trade1, trade2)
   -- self:PrintDEBUG("Tooltip Text: "..tooltip);
 
   itm[self.I_CAT] = nil;
+  itm[self.I_SUBGROUP] = nil;
 
   -- step 1, check item overrides
   itm[self.I_CAT] = cfg["item_overrides"][itemid];
@@ -4337,6 +4594,29 @@ function TFuBag:PickBar(cfg, playerid, itm, trade1, trade2)
         itm[self.I_BAR] = self:GetCat(cfg, itm[self.I_BAR]);
       end
       if (type(itm[self.I_BAR]) ~= "number") then itm[self.I_CAT] = nil; end
+    end
+  end
+
+  -- step 1.6, configurable armor + weapon grouping. Equipment routes by its
+  -- itemEquipLoc (robust, locale-independent): armor per slot, weapons to the
+  -- WEAPON category, each prefixed by bind state when armor_bind_split is on.
+  -- I_SUBGROUP carries the sub-header label (slot name / weapon type) so the
+  -- auto-flow layout can break the box into labeled sub-groups. Supersedes the
+  -- tooltip-line armor/weapon rules in the search list below; off
+  -- (armor_group_enabled ~= 1) falls through to those rules unchanged.
+  if (itm[self.I_CAT] == nil and cfg.armor_group_enabled == 1) then
+    local eqCat, eqSub = self:EquipCat(cfg, itm);
+    if (eqCat) then
+      itm[self.I_CAT] = eqCat;
+      itm[self.I_BAR] = self:GetCat(cfg, eqCat);
+      while ((itm[self.I_BAR] ~= nil) and (type(itm[self.I_BAR]) ~= "number")) do
+        itm[self.I_BAR] = self:GetCat(cfg, itm[self.I_BAR]);
+      end
+      if (type(itm[self.I_BAR]) ~= "number") then
+        itm[self.I_CAT] = nil;
+      else
+        itm[self.I_SUBGROUP] = eqSub;
+      end
     end
   end
 
@@ -4785,40 +5065,128 @@ function TFuBag:CalcBarLayout(calc_dat, baritm, barnum, numbars, colmax, edit_mo
   end
 end
 
+-- Position one item button at grid cell (cur_x = column from RIGHT, cur_y = row
+-- from BOTTOM) inside the box `frame`. Shared by the flat and sub-headered paths.
+function TFuBag:PlaceItemButton(mainFrame, frame, itm, cur_x, cur_y)
+  local buttonname = TFuBag:GetBagItemButtonName(itm[TFuBag.I_BAG], itm[TFuBag.I_SLOT])
+
+  -- -BF_X_PAD (instead of +) centers the button cluster in the box: the frame
+  -- is 2*BF_X_PAD wider than the buttons need, so this splits that slack evenly
+  -- left/right (a slight edge on both sides) rather than leaving the rightmost
+  -- button flush against the box edge.
+  self:PositionFrame(buttonname, "BOTTOMRIGHT", frame, "BOTTOMRIGHT",
+    0-mainFrame:FrameX(cur_x)-mainFrame.BF_X_PAD,
+    mainFrame:FrameY(cur_y)+mainFrame.BF_Y_PAD,
+    mainFrame.BF_WIDTH, mainFrame.BF_HEIGHT)
+
+  self:PositionFrame(buttonname.."_bkgr", "TOPLEFT", buttonname, "TOPLEFT",
+    0-mainFrame.BF_X_PAD, mainFrame.BF_Y_PAD,
+    mainFrame.BGF_WIDTH, mainFrame.BGF_HEIGHT)
+
+  -- resize frame texture (this is the little border)
+  -- 12.0: intrinsic ItemButton children have no $parent global name; get the
+  -- NormalTexture via the button method instead of _G[name.."NormalTexture"].
+  local frame_normaltexture = _G[buttonname] and _G[buttonname]:GetNormalTexture()
+  if frame_normaltexture then
+    frame_normaltexture:SetWidth(mainFrame.BGF_WIDTH)
+    frame_normaltexture:SetHeight(mainFrame.BGF_HEIGHT)
+  end
+
+  -- Relink the button map
+  self.BUTTONS[buttonname] = itm
+end
+
+-- Position one item button LEFT-anchored at a fractional column xcell (0 = left
+-- edge) and row cur_y from the BOTTOM. Used by the sub-headered shelf flow so the
+-- inter-cluster gap can be a fraction of a button.
+function TFuBag:PlaceItemButtonAtCell(mainFrame, frame, itm, xcell, cur_y)
+  local buttonname = TFuBag:GetBagItemButtonName(itm[TFuBag.I_BAG], itm[TFuBag.I_SLOT])
+  local cellpitch = mainFrame:FrameX(1) - mainFrame:FrameX(0)
+
+  self:PositionFrame(buttonname, "BOTTOMLEFT", frame, "BOTTOMLEFT",
+    mainFrame.BF_X_PAD + xcell * cellpitch,
+    mainFrame:FrameY(cur_y) + mainFrame.BF_Y_PAD,
+    mainFrame.BF_WIDTH, mainFrame.BF_HEIGHT)
+
+  self:PositionFrame(buttonname.."_bkgr", "TOPLEFT", buttonname, "TOPLEFT",
+    0-mainFrame.BF_X_PAD, mainFrame.BF_Y_PAD,
+    mainFrame.BGF_WIDTH, mainFrame.BGF_HEIGHT)
+
+  local frame_normaltexture = _G[buttonname] and _G[buttonname]:GetNormalTexture()
+  if frame_normaltexture then
+    frame_normaltexture:SetWidth(mainFrame.BGF_WIDTH)
+    frame_normaltexture:SetHeight(mainFrame.BGF_HEIGHT)
+  end
+
+  self.BUTTONS[buttonname] = itm
+end
+
 -- mainFrame = The parent frame of everything
 -- barnum == current bar
 -- frame == name of background frame to be relative to
 -- width/height == max number of buttons to place into frame
-function TFuBag:AssignButtonsToFrame(mainFrame, barnum, frame, width, height)
+-- useSub == auto-flow path: render equipment boxes with per-sub-group headers
+function TFuBag:AssignButtonsToFrame(mainFrame, barnum, frame, width, height, useSub)
+  local items = mainFrame.BARITM[barnum]
+  local boxFrame = _G[frame]
+
+  -- Hide any sub-headers from a previous layout; the sub-headered path re-shows
+  -- the ones it needs. Keeps flat boxes (feature off / non-equipment) clean.
+  if (boxFrame and boxFrame.SubHeaders) then
+    for _, fs in ipairs(boxFrame.SubHeaders) do fs:Hide() end
+  end
+
+  local sub = useSub and mainFrame.edit_mode ~= 1 and self:BarHasSubgroups(items)
+
+  if (sub) then
+    if (not width or width < 1) then width = 1 end
+    -- width is the full content column budget (colmax). Items are LEFT-anchored
+    -- at their fractional column; ytop is cells from the TOP, so flip to a
+    -- from-BOTTOM row (height - ytop - 1) since the box fills bottom-up.
+    local H, headers, placements = self:EquipSubPlan(items, width)
+    for _, p in ipairs(placements) do
+      self:PlaceItemButtonAtCell(mainFrame, frame, p.itm, p.xcell, H - p.ytop - 1)
+    end
+    -- Sub-group headers: anchored just above their cluster's first item button
+    -- (left-aligned over the cluster), truncated to the cluster width.
+    if (boxFrame) then
+      boxFrame.SubHeaders = boxFrame.SubHeaders or {}
+      for i, h in ipairs(headers) do
+        local fs = boxFrame.SubHeaders[i]
+        if (not fs) then
+          fs = boxFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+          boxFrame.SubHeaders[i] = fs
+        end
+        fs:ClearAllPoints()
+        local btn = h.firstItm
+          and _G[TFuBag:GetBagItemButtonName(h.firstItm[TFuBag.I_BAG], h.firstItm[TFuBag.I_SLOT])]
+        if (btn) then
+          -- Sit in the short header band, CENTERED over the cluster's items (like
+          -- the main category title bars). Width is clamped to the cluster so a
+          -- long title truncates (ellipsis) instead of overlapping its neighbours.
+          local bandPx = (mainFrame:FrameY(1) - mainFrame:FrameY(0)) * (self.SUBGROUP_HEADER_H or 1)
+          local cellpitch = mainFrame:FrameX(1) - mainFrame:FrameX(0)
+          local clusterW = (h.w - 1) * cellpitch + mainFrame.BF_WIDTH
+          fs:SetPoint("BOTTOMLEFT", btn, "TOPLEFT", 0, 1)
+          fs:SetWidth(clusterW)
+          fs:SetHeight(bandPx)
+          fs:SetJustifyH("CENTER")
+          fs:SetJustifyV("BOTTOM")
+          fs:SetWordWrap(false)
+          fs:SetText(h.label)
+          fs:Show()
+        else
+          fs:Hide()
+        end
+      end
+    end
+    return
+  end
+
   local cur_x, cur_y = 0, 0
 
-  for position, itm in pairs(mainFrame.BARITM[barnum]) do
-    local buttonname = TFuBag:GetBagItemButtonName(itm[TFuBag.I_BAG], itm[TFuBag.I_SLOT])
-
-    -- -BF_X_PAD (instead of +) centers the button cluster in the box: the frame
-    -- is 2*BF_X_PAD wider than the buttons need, so this splits that slack evenly
-    -- left/right (a slight edge on both sides) rather than leaving the rightmost
-    -- button flush against the box edge.
-    self:PositionFrame(buttonname, "BOTTOMRIGHT", frame, "BOTTOMRIGHT",
-      0-mainFrame:FrameX(cur_x)-mainFrame.BF_X_PAD,
-      mainFrame:FrameY(cur_y)+mainFrame.BF_Y_PAD,
-      mainFrame.BF_WIDTH, mainFrame.BF_HEIGHT)
-
-    self:PositionFrame(buttonname.."_bkgr", "TOPLEFT", buttonname, "TOPLEFT",
-      0-mainFrame.BF_X_PAD, mainFrame.BF_Y_PAD,
-      mainFrame.BGF_WIDTH, mainFrame.BGF_HEIGHT)
-
-    -- resize frame texture (this is the little border)
-    -- 12.0: intrinsic ItemButton children have no $parent global name; get the
-    -- NormalTexture via the button method instead of _G[name.."NormalTexture"].
-    local frame_normaltexture = _G[buttonname] and _G[buttonname]:GetNormalTexture()
-    if frame_normaltexture then
-      frame_normaltexture:SetWidth(mainFrame.BGF_WIDTH)
-      frame_normaltexture:SetHeight(mainFrame.BGF_HEIGHT)
-    end
-
-    -- Relink the button map
-    self.BUTTONS[buttonname] = itm
+  for position, itm in pairs(items) do
+    self:PlaceItemButton(mainFrame, frame, itm, cur_x, cur_y)
     cur_x = cur_x + 1
     if cur_x == width then
       cur_x = 0
@@ -6559,6 +6927,16 @@ function TFuBag:LayoutWindow(frame)
     self:CalcBarLayout(calc_dat, baritm, barnum, nbars,
       colmax, edit_mode);
 
+    -- Sub-headered (equipment) bars draw SOLO and FULL-WIDTH (Baganator-style
+    -- shelf flow): override the flat optimizer so the box spans the whole content
+    -- width and EquipSubPlan packs its sub-groups across it. The main category
+    -- loop only ever calls these with nbars == 1.
+    if (nbars == 1 and edit_mode ~= 1 and self:BarHasSubgroups(baritm[barnum])) then
+      calc_dat[0] = table.getn(baritm[barnum]);
+      calc_dat["0_width"] = colmax;
+      calc_dat["height"] = (self:EquipSubPlan(baritm[barnum], colmax));
+    end
+
     --- now we know the size and height of all bars for this line
 
     if (calc_dat["height"] == 0) then
@@ -6607,7 +6985,14 @@ function TFuBag:LayoutWindow(frame)
           -- button on the shared-height top row, which a shrunk box would clip.
           local bar_w = calc_dat[iBar.."_width"];
           if (bar_w < 1) then bar_w = 1; end
-          local bar_rows = math.ceil(calc_dat[iBar] / bar_w);
+          -- Sub-headered equipment boxes take their height from the full-width
+          -- shelf plan (header rows + wrapped clusters), not the flat ceil(N/cols).
+          local bar_rows;
+          if (edit_mode ~= 1 and self:BarHasSubgroups(baritm[barnum+iBar])) then
+            bar_rows = (self:EquipSubPlan(baritm[barnum+iBar], colmax));
+          else
+            bar_rows = math.ceil(calc_dat[iBar] / bar_w);
+          end
           if (bar_rows < 1) then bar_rows = 1; end
           local bar_h = (edit_mode == 1) and calc_dat["height"] or bar_rows;
 
@@ -6630,7 +7015,7 @@ function TFuBag:LayoutWindow(frame)
           self:ColorFrame(cfg, barframe[iBar], (barnum+iBar));
 
           TFuBag:AssignButtonsToFrame(frame,(barnum+iBar), framename.."_bar_"..(barnum+iBar),
-            calc_dat[iBar.."_width"], calc_dat["height"] );
+            calc_dat[iBar.."_width"], calc_dat["height"], true );
             barframe[iBar]:Show();
 
           -- Category name label, in the reserved gap above the box. Buttons are
@@ -6699,9 +7084,25 @@ function TFuBag:LayoutWindow(frame)
   drawRow(self.EMPTY_BAR, 1);
 
   -- Normal category rows (excludes EMPTY_BAR = BAR_MAX, which was drawn above).
-  for barnum = 1, self.BAR_MAX - 1, bar_x do
-    -- last row is partial when bar_x does not divide evenly; only existing bars touched.
-    drawRow(barnum, math.min(bar_x, (self.BAR_MAX - 1) - barnum + 1));
+  -- Sub-headered equipment bars are peeled out and drawn SOLO + full-width
+  -- (Baganator-style); runs of ordinary bars between them still pack bar_x-wide.
+  local function isSubBar(bn)
+    return edit_mode ~= 1 and table.getn(baritm[bn]) > 0 and self:BarHasSubgroups(baritm[bn]);
+  end
+  local barnum = 1;
+  while (barnum <= self.BAR_MAX - 1) do
+    if (isSubBar(barnum)) then
+      drawRow(barnum, 1);
+      barnum = barnum + 1;
+    else
+      local n = 0;
+      while (n < bar_x and (barnum + n) <= self.BAR_MAX - 1 and not isSubBar(barnum + n)) do
+        n = n + 1;
+      end
+      if (n < 1) then n = 1; end
+      drawRow(barnum, n);
+      barnum = barnum + n;
+    end
   end
 
   -- (No leftover frames to hide: the rows above lay out every bar, including EMPTY_BAR

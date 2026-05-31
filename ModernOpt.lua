@@ -125,6 +125,30 @@ function MO:Button(parent, y, text, width, onClick)
   return b, y + 22 + ROW_GAP
 end
 
+-- Inventory | Bank target toggle for the Categories / Grouping / Armor panels.
+-- Reflects the shared TFuBag.optTarget; the selected window's button is disabled.
+-- onSwitch() runs after the target changes (rebuild/refresh the section). Returns
+-- the sync closure so callers can register it for re-sync on section show.
+function MO:WindowToggle(parent, y, onSwitch)
+  local invBtn = CreateFrame("Button", nil, parent, "UIPanelButtonTemplate")
+  invBtn:SetSize(90, 20); invBtn:SetText("Inventory")
+  invBtn:SetPoint("TOPLEFT", parent, "TOPLEFT", PAD, -y)
+  local bankBtn = CreateFrame("Button", nil, parent, "UIPanelButtonTemplate")
+  bankBtn:SetSize(90, 20); bankBtn:SetText("Bank")
+  bankBtn:SetPoint("LEFT", invBtn, "RIGHT", 6, 0)
+  local function sync()
+    local hasBank = (TFuBnkFrame and TFuBnkFrame.cfg ~= nil)
+    if (TFuBag.optTarget == "bank" and not hasBank) then TFuBag:SetOptTarget("inv") end
+    local bank = (TFuBag.optTarget == "bank")
+    invBtn:SetEnabled(bank)
+    bankBtn:SetEnabled(not bank and hasBank)
+  end
+  invBtn:SetScript("OnClick", function() TFuBag:SetOptTarget("inv"); sync(); if (onSwitch) then onSwitch() end end)
+  bankBtn:SetScript("OnClick", function() TFuBag:SetOptTarget("bank"); sync(); if (onSwitch) then onSwitch() end end)
+  sync()
+  return invBtn, bankBtn, sync
+end
+
 -- Scrollable list region (classic ScrollFrameTemplate: built-in scrollbar + mouse wheel).
 -- Returns (scrollFrame, scrollChild). Callers lay rows out top-down in the child and set
 -- child:SetHeight(totalContentHeight) to enable scrolling. width/height size the viewport.
@@ -281,6 +305,9 @@ end
 function MO:OpenTo(sectionKey, which)
   self:CreateWindow()
   self.requestedWindow = which
+  -- Also point the per-window Categories/Grouping/Armor panels at the originating
+  -- window, so opening Options from the bank edits the bank's config.
+  if (which) then TFuBag:SetOptTarget(which) end
   if (not self.frame:IsShown()) then self.frame:Show() end
   self:ShowSection(sectionKey or (self.sections[1] and self.sections[1].key))
 end
@@ -461,13 +488,18 @@ end)
 MO:RegisterSection("categories", "Categories", function(sf, MO)
   local function track(c) sf.controls[#sf.controls + 1] = c; return c end
 
-  -- Two stacked sub-frames filling the content area: the category LIST view and
-  -- the per-category rule EDIT view. Exactly one is shown at a time.
+  -- Inventory | Bank target toggle (categories are per-window). Sits above both
+  -- sub-views; switching rebuilds the list for the newly selected window.
+  local _, _, syncTgl = MO:WindowToggle(sf, 6, function() MO:ShowSection("categories") end)
+  track({ tfuRefresh = syncTgl })
+
+  -- Two stacked sub-frames filling the content area BELOW the toggle: the category
+  -- LIST view and the per-category rule EDIT view. Exactly one is shown at a time.
   local listView = CreateFrame("Frame", nil, sf); track(listView)
-  listView:SetPoint("TOPLEFT", sf, "TOPLEFT", 0, 0)
+  listView:SetPoint("TOPLEFT", sf, "TOPLEFT", 0, -28)
   listView:SetPoint("BOTTOMRIGHT", sf, "BOTTOMRIGHT", 0, 0)
   local editView = CreateFrame("Frame", nil, sf); track(editView)
-  editView:SetPoint("TOPLEFT", sf, "TOPLEFT", 0, 0)
+  editView:SetPoint("TOPLEFT", sf, "TOPLEFT", 0, -28)
   editView:SetPoint("BOTTOMRIGHT", sf, "BOTTOMRIGHT", 0, 0)
   editView:Hide()
 
@@ -840,6 +872,9 @@ MO:RegisterSection("grouping", "Grouping", function(sf, MO)
   targets[#targets + 1] = { text = "Trade Goods", value = L["TRADE_GOODS"] }
 
   local y = 8  -- the content-title (top) already shows "Grouping"
+  local _, _, syncTgl = MO:WindowToggle(sf, y, function() MO:ShowSection("grouping") end)
+  track({ tfuRefresh = syncTgl })
+  y = y + 26
   MO:Label(sf, y, "Point several materials at the same group to merge them onto one bar.")
   y = y + 22
 
@@ -871,6 +906,70 @@ MO:RegisterSection("grouping", "Grouping", function(sf, MO)
     track(dd)
     colY[col] = ny
   end
+end)
+
+MO:RegisterSection("armor", "Armor", function(sf, MO)
+  local function track(c) sf.controls[#sf.controls + 1] = c; return c end
+
+  local y = 8  -- the content-title (top) already shows "Armor"
+  local _, _, syncTgl = MO:WindowToggle(sf, y, function() MO:ShowSection("armor") end)
+  track({ tfuRefresh = syncTgl })
+  y = y + 26
+
+  local enable = MO:Checkbox(sf, y, "Group armor by equip slot",
+    function() return TFuBag:GetArmorGroupEnabled() end,
+    function(v) TFuBag:SetArmorGroupEnabled(v) end)
+  track(enable); y = y + 26 + ROW_GAP
+
+  local split = MO:Checkbox(sf, y, "Separate by bind (BoE / Soulbound / Warbound)",
+    function() return TFuBag:GetArmorBindSplit() end,
+    function(v) TFuBag:SetArmorBindSplit(v) end)
+  track(split); y = y + 26 + ROW_GAP
+
+  MO:Label(sf, y, "Point several slots at the same group to merge them onto one bar.")
+  y = y + 22
+
+  -- Presets.
+  local b1 = MO:Button(sf, y, "All Separate", 110, function()
+    TFuBag:ApplyArmorPreset("separate"); MO:ShowSection("armor")
+  end)
+  track(b1)
+  local b2 = CreateFrame("Button", nil, sf, "UIPanelButtonTemplate")
+  b2:SetPoint("TOPLEFT", sf, "TOPLEFT", PAD + 120, -y)
+  b2:SetSize(140, 22)
+  b2:SetText("All in One Bar")
+  b2:SetScript("OnClick", function()
+    TFuBag:ApplyArmorPreset("onebar"); MO:ShowSection("armor")
+  end)
+  track(b2)
+  y = y + 22 + ROW_GAP + 6
+
+  -- Per-slot group dropdowns. 15 slots overflow the panel, so they live in a
+  -- scroll region. Targets = every slot (merge onto another slot's group) plus a
+  -- single combined "All Armor" bar.
+  local targets = {}
+  for _, m in ipairs(TFuBag.ARMOR_SLOTS) do
+    targets[#targets + 1] = { text = m.label, value = m.sub }
+  end
+  targets[#targets + 1] = { text = "All Armor (one bar)", value = "ARMOR" }
+
+  local listW, listH = 540, 300
+  local sfl, child = MO:ScrollList(sf, PAD, y, listW, listH)
+  track(sfl)
+
+  local colX = { 6, 6 + 268 }
+  local colY = { 6, 6 }
+  for i, m in ipairs(TFuBag.ARMOR_SLOTS) do
+    local col = (i <= 8) and 1 or 2
+    local sub = m.sub
+    local dd, ny = MO:Dropdown(child, colY[col], m.label, 170, targets,
+      function() return TFuBag:GetArmorGroup(sub) end,
+      function(v) TFuBag:SetArmorGroup(sub, v) end,
+      colX[col])
+    track(dd)
+    colY[col] = ny
+  end
+  child:SetHeight(math.max(colY[1], colY[2]) + 8)
 end)
 
 MO:RegisterSection("filters", "Filters", function(sf, MO)
