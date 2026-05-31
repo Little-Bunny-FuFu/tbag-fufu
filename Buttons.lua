@@ -266,6 +266,22 @@ function ItemButton.UpdateLock(self, itm, mainFrame)
   TFuBag.ItemButton.SetDepositDim(self, ineligible);
 end
 
+-- Crafting-quality tier badge (the small Tier 1/2/3 atlas Blizzard shows top-left on
+-- reagents/crafted items with a profession quality). Blizzard's SetItemCraftingQualityOverlay
+-- (Blizzard_ItemButton) does the work: it queries C_TradeSkillUI for the item's reagent/
+-- crafted quality, lazily creates self.ProfessionQualityOverlay, sets the tier atlas, and
+-- (via UpdateCraftedProfessionsQualityShown) shows reagent quality always + crafted-gear
+-- quality when the professions UI is open -- exactly the default-bag behaviour. It manages
+-- ONLY that badge, not the rarity border, so it leaves our own rarity colouring alone. We
+-- hide a stale badge on non-quality items / empty slots so a pooled button can't keep one.
+function ItemButton.UpdateQualityOverlay(self, itemlink)
+  if (type(SetItemCraftingQualityOverlay) ~= "function") then return end
+  SetItemCraftingQualityOverlay(self, itemlink)  -- itemlink nil for an empty slot -> isProfessionItem=false
+  if (self.ProfessionQualityOverlay and not self.isProfessionItem) then
+    self.ProfessionQualityOverlay:Hide()
+  end
+end
+
 -- Handles cooldown updates.  Takes an itm and mainFrame paramenter
 -- which allows it to short circuit getting the frames itm and mainFrame
 -- such as when it is called from ItemButton.Update.
@@ -352,6 +368,9 @@ function ItemButton.Update(self)
     frame_texture:SetAlpha(0.35)
   end
   SetItemButtonTexture(self, texture)
+
+  -- Crafting-quality tier badge (top-left), like the default bag UI.
+  TFuBag.ItemButton.UpdateQualityOverlay(self, itemlink)
 
   -- Handle quest overlays
   if itm[TFuBag.I_QUEST_ID] and not itm[TFuBag.I_QUEST_ACTIVE] then
