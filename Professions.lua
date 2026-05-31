@@ -211,6 +211,16 @@ end
 function Professions.ScanRecipes()
   if not Professions.RECIPE_SCAN_ENABLED then return end
 
+  -- Data-readiness gate. TRADE_SKILL_SHOW fires before the recipe list is built,
+  -- so an early scan finds nothing. Blizzard's own 12.0 code (Blizzard_ProfessionsFrame
+  -- TRADE_SKILL_LIST_UPDATE handler) yields while the data source is still changing;
+  -- mirror that here. We also drive this from TRADE_SKILL_LIST_UPDATE (the data-ready
+  -- event) so a deferred re-fire catches the populated list. (IsDataSourceChanging /
+  -- IsTradeSkillReady are doc-omitted C_TradeSkillUI fns but live in 12.0 — guard for
+  -- existence anyway.)
+  if C_TradeSkillUI.IsDataSourceChanging and C_TradeSkillUI.IsDataSourceChanging() then return end
+  if C_TradeSkillUI.IsTradeSkillReady and not C_TradeSkillUI.IsTradeSkillReady() then return end
+
   -- 12.0 rewrite: walk the open profession's recipes via C_TradeSkillUI (the old
   -- GetTradeSkill* window-scrape API is gone) and record, keyed by English
   -- profession name: every item the profession creates (created cache) and every
@@ -241,6 +251,12 @@ function Professions.ScanRecipes()
                     or C_TradeSkillUI.GetFilteredRecipeIDs()
   if not recipeIDs then return end
 
+  -- Track whether this scan actually learned anything new. The created/reagent
+  -- caches persist in SavedVariables, so re-scanning a known profession adds
+  -- nothing -> no relayout churn. Only a genuinely new recipe flips `changed`,
+  -- which then re-categorizes so the new keywords reach already-cached bag items.
+  local changed = false
+
   for _, recipeID in ipairs(recipeIDs) do
     local ri = C_TradeSkillUI.GetRecipeInfo(recipeID)
     if ri and ri.learned then
@@ -248,7 +264,10 @@ function Professions.ScanRecipes()
       local outputID = schematic and schematic.outputItemID
       if outputID then
         local createdKey = tostring(outputID)
-        created[createdKey] = 1
+        if not created[createdKey] then
+          created[createdKey] = 1
+          changed = true
+        end
 
         for _, slot in ipairs(schematic.reagentSlotSchematics) do
           if slot.reagentType == Enum.CraftingReagentType.Basic then
@@ -257,13 +276,26 @@ function Professions.ScanRecipes()
                 local reagentKey = tostring(r.itemID)
                 reagent[reagentKey] = reagent[reagentKey] or {}
                 reagent[reagentKey][tradeskillName] = reagent[reagentKey][tradeskillName] or {}
-                reagent[reagentKey][tradeskillName][createdKey] = 1
+                if not reagent[reagentKey][tradeskillName][createdKey] then
+                  reagent[reagentKey][tradeskillName][createdKey] = 1
+                  changed = true
+                end
               end
             end
           end
         end
       end
     end
+  end
+
+  -- New recipe data won't reach already-cached bag items on its own: PickBar only
+  -- re-runs when catGen advances. Bump it and repaint any open window so the fresh
+  -- profession keywords feed search/sort immediately (matches the rule-change path
+  -- in TBagCmd.lua). No-op when nothing changed.
+  if changed then
+    TFuBag:BumpCatGen()
+    if TFuInvFrame and TFuInvFrame:IsVisible() then TFuInvFrame:UpdateWindow(TFuBag.REQ_MUST) end
+    if TFuBnkFrame and TFuBnkFrame:IsVisible() then TFuBnkFrame:UpdateWindow(TFuBag.REQ_MUST) end
   end
 end
 

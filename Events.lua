@@ -67,6 +67,10 @@ function TFuBag:VARIABLES_LOADED()
   self:RegisterEvent("PLAYER_LEAVING_WORLD")
   self:RegisterEvent("MAIL_INBOX_UPDATE")
   self:RegisterEvent("TRADE_SKILL_SHOW")
+  -- TRADE_SKILL_LIST_UPDATE is the data-ready event: TRADE_SKILL_SHOW fires before
+  -- the recipe list is populated, so scan on both (ScanRecipes self-gates on
+  -- IsDataSourceChanging / IsTradeSkillReady).
+  self:RegisterEvent("TRADE_SKILL_LIST_UPDATE")
   self:RegisterEvent("AUCTION_HOUSE_SHOW")
   self:RegisterEvent("MAIL_SHOW")
   self:RegisterEvent("MERCHANT_SHOW")
@@ -285,6 +289,7 @@ local events = {
   ["MAIL_SHOW"] = TFuBag.UIFRAME_SHOW,
   ["MERCHANT_SHOW"] = TFuBag.UIFRAME_SHOW,
   ["TRADE_SKILL_SHOW"] = TFuBag.Professions.ScanRecipes,
+  ["TRADE_SKILL_LIST_UPDATE"] = TFuBag.Professions.ScanRecipes,
   ["UNIT_INVENTORY_CHANGED"] = TFuBag.ScanEquipped,
   ["MAIL_INBOX_UPDATE"] = TFuBag.ScanMail,
   ["PLAYER_LEAVING_WORLD"] = TFuBag.PLAYER_LEAVING_WORLD,

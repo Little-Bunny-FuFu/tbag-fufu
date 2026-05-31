@@ -782,6 +782,28 @@ function TFuBag:AddSearchResult(itm, playername, place, playerid)
   end
 end
 
+-- A search match = item NAME or any of its category keywords contains the search
+-- text (self.SrchText, already lowercased + pattern-escaped by DoSearch). The
+-- keyword pass is what makes profession reagents/created items findable by
+-- profession name (e.g. "enchanting" -> the ENCHANTING / ENCHANTING_CREATED
+-- keywords from the recipe scan) and also catches bound/reagent/rarity tags,
+-- even when the item NAME has no such word.
+function TFuBag:ItemMatchesSearch(itm)
+  local srch = self.SrchText;
+  if (not srch) or (srch == "") then return true end
+  local name = itm[self.I_NAME];
+  if (name) and (string.find(string.lower(name), srch)) then return true end
+  local keywords = itm[self.I_KEYWORD];
+  if (keywords) then
+    for key in pairs(keywords) do
+      if (type(key) == "string") and (string.find(string.lower(key), srch)) then
+        return true;
+      end
+    end
+  end
+  return false;
+end
+
 function TFuBag:GatherSearchResults(itmcache, place)
   local playername, realm
 
@@ -795,8 +817,8 @@ function TFuBag:GatherSearchResults(itmcache, place)
         for _, itm in pairs(slotarr) do
           -- Exclude empty slots
           if (itm[self.I_ITEMLINK]) and (itm[self.I_NAME]) then
-            -- Do case insensitive searches
-            if (string.find(string.lower(itm[self.I_NAME]), self.SrchText)) then
+            -- Match by name or category keyword (case insensitive)
+            if (self:ItemMatchesSearch(itm)) then
               self:AddSearchResult(itm, playername, place, playerid);
             end
           end
@@ -891,7 +913,20 @@ function TFuBag:DoSearch(srch)
       DEFAULT_CHAT_FRAME:AddMessage(self.SCP..SC_NONE..string.format(L["No results|r for %q"],srch));
     end
 
+    self:SearchUpdateWindows();
+  end
+end
+
+-- Repaint both windows after a search-state change. A window with search-hide on
+-- needs a resort so SortItmCache (re-)applies the hide; ClearSearch likewise needs
+-- it to bring the hidden survivors back. A window in dim mode just repaints.
+function TFuBag:SearchUpdateWindows()
+  if (TFuInvFrame) then
+    if (TFuInvFrame.cfg and TFuInvFrame.cfg.search_hide == 1) then TFuInvFrame.force_resort = true; end
     TFuInvFrame:UpdateWindow();
+  end
+  if (TFuBnkFrame) then
+    if (TFuBnkFrame.cfg and TFuBnkFrame.cfg.search_hide == 1) then TFuBnkFrame.force_resort = true; end
     TFuBnkFrame:UpdateWindow();
   end
 end
@@ -899,8 +934,7 @@ end
 function TFuBag:ClearSearch()
   if (self.SrchText) then
     self.SrchText = nil;
-    TFuInvFrame:UpdateWindow();
-    TFuBnkFrame:UpdateWindow();
+    self:SearchUpdateWindows();
   end
   TFuInv_SearchBox:SetText(SEARCH);
   TFuBnk_SearchBox:SetText(SEARCH);
@@ -1688,6 +1722,15 @@ function TFuBag:ItemFilterActive(f)
 end
 
 function TFuBag:PassesItemFilter(frame, itm)
+  -- Search-hide (opt-in, per window): when the search box is active AND this window
+  -- has "hide non-matching items during search" on, drop non-matches entirely so
+  -- LayoutWindow reflows the survivors -- same hide-and-reflow as a filter. When the
+  -- option is off, search just dims non-matches (Buttons.lua) and this is skipped.
+  -- Runs BEFORE the f.active early-out so it works even with no filter set.
+  if (self.SrchText and frame and frame.cfg and frame.cfg.search_hide == 1) then
+    if (not self:ItemMatchesSearch(itm)) then return false; end
+  end
+
   local f = frame and frame.itemFilter;
   if (not f or not f.active) then return true; end   -- no active filter: show everything
 
@@ -2574,6 +2617,9 @@ function TFuBag:InitDefVals(cfg, bagarr, row1offset, reset)
   -- button strip and the bottom search/money/total chrome from the category space;
   -- 0 = hide them for the cleaner, legacy-TBag look. Default on.
   self:SetDef(cfg, "show_chrome_lines", 1, reset, self.NumFunc, 0, 1);
+  -- Search behavior. 1 = an active search box HIDES non-matching items (the survivors
+  -- reflow, like a filter); 0 = non-matches are only dimmed. Default on (hide).
+  self:SetDef(cfg, "search_hide", 1, reset, self.NumFunc, 0, 1);
   -- GRID positions. Keyed by bar index: cat_layout[barnum] = { gx, gy, cols }.
   -- Integer GRID COORDS (cells) so placements scale with button size/window scale.
   -- Per-window (Inv vs Bnk each get their own). Preserved across loads; wiped only

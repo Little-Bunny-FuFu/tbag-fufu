@@ -84,6 +84,7 @@
         self:ClearFocus();
       </OnTabPressed>
       <OnEscapePressed>
+        TFuBag:ClearSearch();
         self:ClearFocus();
       </OnEscapePressed>
       <OnEnterPressed>

@@ -434,12 +434,13 @@ function ItemButton.Update(self)
     end
 
     if TFuBag.SrchText then
-      if string.match(string.lower(itm[TFuBag.I_NAME]), TFuBag.SrchText) then
-        -- Matched to normal alpha
+      if TFuBag:ItemMatchesSearch(itm) then
+        -- Matched to normal alpha (name OR category keyword, e.g. profession)
         self:SetAlpha(1)
       else
-        -- No match so make it partly transparent
-        self:SetAlpha(0.25)
+        -- No match: dim hard so matches stand out (heavier than the 0.25 used
+        -- for new-item / edit-mode dimming, since a search wants strong contrast)
+        self:SetAlpha(0.1)
       end
     end
 
