@@ -5903,6 +5903,39 @@ function TFuBag:LayoutWindowFreePlace(frame, PAD_TOP, PAD_BOTTOM, show_cat_names
   return frame:GetHeight();
 end
 
+-- DYNAMIC sizing (Stage 3): given the user-dragged window width, return the column
+-- budget (colmax) and bars-per-row (bar_x) that make the auto-flow content fill that
+-- width. `density` is the desired columns-per-category-bar (taken from the user's
+-- legacy slider ratio). We solve for the largest colmax whose resulting
+-- `available_width` still fits inside the window's content area (win_w minus the two
+-- borders and the reserved vertical-scrollbar column), so the layout fills the window
+-- without spilling into a horizontal scrollbar. Two passes: estimate colmax ignoring
+-- the per-row gaps, derive bars-per-row, then re-solve colmax with those gaps charged.
+function TFuBag:ComputeDynColumns(frame, win_w, density)
+  local cfg = frame.cfg;
+  local cat_spacing = cfg.cat_spacing or 0;
+  local unit = frame.BF_PADWIDTH + cfg.frameXSpace;   -- width added per extra item column
+  if (unit < 1) then unit = 1; end
+  -- Content area to fill (FrameX baseline +frameXSpace charged once, like available_width).
+  local budget = win_w - self.SB_COL - 2 * self.BORDER - cfg.frameXSpace;
+
+  local cols = math.floor((budget) / unit);
+  if (cols < 1) then cols = 1; end
+
+  local bx = math.floor(cols / density + 0.5);
+  if (bx < 1) then bx = 1; end
+  if (bx > cols) then bx = cols; end
+
+  -- Charge the per-row gaps that scale with bars-per-row (same terms available_width
+  -- adds) and re-solve, so the content stays within the window.
+  local gaps = frame:SpaceX(bx - 1) + frame:PoolX(bx + 1) + (bx - 1) * cat_spacing;
+  cols = math.floor((budget - gaps) / unit);
+  if (cols < 1) then cols = 1; end
+  if (bx > cols) then bx = cols; end
+
+  return cols, bx;
+end
+
 function TFuBag:LayoutWindow(frame)
   local framename = frame:GetName()
   -- Stage 2 resize grip: ensure it exists and reflect the current sizing mode
@@ -5923,12 +5956,27 @@ function TFuBag:LayoutWindow(frame)
   local bar_anchor = scroll_cap and scname or framename
   local cfg = frame.cfg
   local baritm = frame.BARITM
+  -- Column budget + bars-per-row. LEGACY: the user's sliders. DYNAMIC (Stage 3):
+  -- derived from the dragged window width below, so categories reflow to fill it.
   local bar_x = cfg.bar_x
+  local colmax = cfg["maxColumns"]
   local edit_mode = frame.edit_mode
   local assignfunc = frame.AssignButtonsToFrame
   -- Category Spacing: extra hard gap between adjacent category bars (both axes),
   -- on top of the existing Space/Pool budgets. Default 0 leaves layout unchanged.
   local cat_spacing = cfg.cat_spacing or 0
+  -- DYNAMIC sizing (Stage 3): when the user has dragged a window size, derive the
+  -- effective column budget + bars-per-row from that width so the auto-flow fills it.
+  -- Density (columns per category bar) is taken from the user's legacy slider ratio so
+  -- the look stays familiar. Only the AUTO-FLOW path reflows -- Manual Layout (where
+  -- IsDynamicResize is false) keeps its freely-placed boxes. When win_w is unset (never
+  -- dragged) we fall through to the legacy maxColumns so the window auto-grows to a
+  -- sensible default width.
+  if (frame.IsDynamicResize and frame:IsDynamicResize() and cfg.win_w and cfg.win_w > 0) then
+    local density = colmax / bar_x
+    if (density < 1) then density = 1 end
+    colmax, bar_x = self:ComputeDynColumns(frame, cfg.win_w, density)
+  end
   -- Category Names: when on, each drawn bar shows its category name in a label
   -- above it. We reserve CATNAME_H of vertical room per bar (in the inter-row gap
   -- and the window top) so the labels never overlap the bar above.
@@ -5944,7 +5992,7 @@ function TFuBag:LayoutWindow(frame)
   local drew_row = false;
   -- Grow the window by the horizontal gaps a full row needs (bar_x-1 gaps); the
   -- bars below are shifted left by the same total, so the left border is kept.
-  local available_width = frame:FrameX(cfg["maxColumns"])
+  local available_width = frame:FrameX(colmax)
       + frame:SpaceX(bar_x-1) + frame:PoolX(bar_x+1) + (2 * self.BORDER)
       + ((bar_x - 1) * cat_spacing);
   local width_in_between;
@@ -6004,7 +6052,7 @@ function TFuBag:LayoutWindow(frame)
     if TFuBnkFrame_MoneyFrame:IsVisible() or TFuBnkFrame_TokenFrame:IsVisible() then
       bags_row = bags_row + 4;
     end
-    if (cfg["maxColumns"] <= bags_row or
+    if (colmax <= bags_row or
        (TFuBnkFrame_MoneyFrame:IsVisible() and TFuBnkFrame_TokenFrame:IsVisible())) then
       PAD_BOTTOM = PAD_BOTTOM + self.PAD_BOTTOM_NORM;
     end
@@ -6082,7 +6130,7 @@ function TFuBag:LayoutWindow(frame)
     end
 
     self:CalcBarLayout(calc_dat, baritm, barnum, nbars,
-      cfg["maxColumns"], edit_mode);
+      colmax, edit_mode);
 
     --- now we know the size and height of all bars for this line
 
@@ -6101,7 +6149,7 @@ function TFuBag:LayoutWindow(frame)
       local cur_width = 0;
 
       -- Find the space left over
-      width_in_between = frame:FrameX(cfg["maxColumns"])
+      width_in_between = frame:FrameX(colmax)
         + frame:SpaceX(bar_x-1) + frame:PoolX(bar_x-1);
       for iBar = 0, nbars - 1 do
         width_in_between = width_in_between - frame:FrameX(calc_dat[iBar.."_width"]);
