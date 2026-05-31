@@ -1110,6 +1110,304 @@ function TFuBag:DeleteCategory(name)
   if (TFuBnkFrame) then TFuBnkFrame:UpdateWindow(self.REQ_MUST); end
 end
 
+-- ===== Category rule editor (ModernOpt Categories detail view) ================
+-- These operate on BOTH windows' item_search_list (kept in sync like
+-- SetCategoryEnabled / AddCategory / DeleteCategory) plus the CAT_BAR map,
+-- mat_group targets and item_overrides, then BumpCatGen + relayout. The two
+-- windows' lists begin as independent deep copies of the same DefaultSearchList
+-- and every mutator here addresses rules by category NAME (recomputing positions
+-- per list), so the two lists cannot drift out of sync. PickBar is first-match-
+-- wins, so a rule's POSITION is its priority -- hence the up/down reorder.
+
+-- Distinct category names in first-occurrence (priority) order. Like
+-- GetCategoryList it skips the redundant all-empty catch-all rule, but it keeps
+-- disabled categories (ordering is independent of the enabled flag).
+function TFuBag:GetCategoryOrderList(cfg)
+  cfg = cfg or (TFuInvFrame and TFuInvFrame.cfg) or (TFuBnkFrame and TFuBnkFrame.cfg);
+  local out, seen = {}, {};
+  local list = cfg and cfg["item_search_list"];
+  if (not list) then return out; end
+  for _, rule in ipairs(list) do
+    local name = rule[1];
+    local allEmpty = (rule[2] == "" and rule[3] == "" and rule[4] == "" and rule[5] == "");
+    if (name and name ~= "" and not allEmpty and not seen[name]) then
+      seen[name] = true; out[#out + 1] = name;
+    end
+  end
+  return out;
+end
+
+-- Snapshot of one category's rules for the editor: ordered array of
+-- { idx=<pos in item_search_list>, [1..6]=field copies, off=bool }. Reads the
+-- inventory list (bank fallback); idx is valid for BOTH lists (they're synced).
+function TFuBag:GetCategoryRules(name)
+  local cfg = (TFuInvFrame and TFuInvFrame.cfg) or (TFuBnkFrame and TFuBnkFrame.cfg);
+  local list = cfg and cfg["item_search_list"];
+  local out = {};
+  if (not list or not name or name == "") then return out; end
+  for i, rule in ipairs(list) do
+    if (rule[1] == name) then
+      out[#out + 1] = {
+        idx = i,
+        rule[1], rule[2] or "", rule[3] or "",
+        rule[4] or "", rule[5] or "", rule[6] or "",
+        off = rule.off and true or false,
+      };
+    end
+  end
+  return out;
+end
+
+-- Return { list, list, ... } for every initialised window, but only if each
+-- present window's rule at idx still carries expectName (a drift guard so a
+-- destructive write never hits the wrong rule). Returns nil to make the caller
+-- abort.
+function TFuBag:RuleListsAt(idx, expectName)
+  local lists = {};
+  for _, frame in ipairs({ TFuInvFrame, TFuBnkFrame }) do
+    local list = frame and frame.cfg and frame.cfg["item_search_list"];
+    if (list) then
+      if (not list[idx] or list[idx][1] ~= expectName) then return nil; end
+      lists[#lists + 1] = list;
+    end
+  end
+  if (#lists == 0) then return nil; end
+  return lists;
+end
+
+-- Edit one rule's MATCH fields (its category name is fixed -- use RenameCategory).
+-- fields = { keyword, tooltip, itype, subtype } (strings; "" = unused); ci = bool
+-- (case-insensitive tooltip match -> slot 6 "ci"). A rule with all four match
+-- fields blank is the dangerous "matches everything" catch-all that starves later
+-- rules, so it is REJECTED. A rule already flagged "psplit" keeps that flag (the
+-- ci toggle is ignored for it). Returns true on success.
+function TFuBag:UpdateRule(idx, expectName, fields, ci)
+  local kw  = fields[1] and strtrim(fields[1]) or "";
+  local tt  = fields[2] and strtrim(fields[2]) or "";
+  local ity = fields[3] and strtrim(fields[3]) or "";
+  local sty = fields[4] and strtrim(fields[4]) or "";
+  if (kw == "" and tt == "" and ity == "" and sty == "") then return false; end
+  local lists = self:RuleListsAt(idx, expectName);
+  if (not lists) then return false; end
+  for _, list in ipairs(lists) do
+    local r = list[idx];
+    r[2] = kw; r[3] = tt; r[4] = ity; r[5] = sty;
+    if (r[6] ~= "psplit") then r[6] = ci and "ci" or ""; end
+  end
+  self:BumpCatGen();
+  if (TFuInvFrame) then TFuInvFrame:UpdateWindow(self.REQ_MUST); end
+  if (TFuBnkFrame) then TFuBnkFrame:UpdateWindow(self.REQ_MUST); end
+  return true;
+end
+
+-- Delete one rule by position. If it was the category's only rule the category
+-- disappears (its CAT_BAR bar is left for reuse, like DeleteCategory). Returns
+-- true on success.
+function TFuBag:DeleteRule(idx, expectName)
+  local lists = self:RuleListsAt(idx, expectName);
+  if (not lists) then return false; end
+  for _, list in ipairs(lists) do table.remove(list, idx); end
+  self:BumpCatGen();
+  if (TFuInvFrame) then TFuInvFrame:UpdateWindow(self.REQ_MUST); end
+  if (TFuBnkFrame) then TFuBnkFrame:UpdateWindow(self.REQ_MUST); end
+  return true;
+end
+
+-- Append a new (initially inert) rule to an existing category, placed right after
+-- the category's current last rule so it shares the category's priority. The new
+-- rule has no match fields, so PickBar skips it (the all-empty guard) until the
+-- user fills a field via UpdateRule -- no accidental catch-all. Returns the new
+-- rule's index, or nil if the category isn't present.
+function TFuBag:AddRuleToCategory(name)
+  if (not name or name == "") then return nil; end
+  local newIdx;
+  for _, frame in ipairs({ TFuInvFrame, TFuBnkFrame }) do
+    local list = frame and frame.cfg and frame.cfg["item_search_list"];
+    if (list) then
+      local last;
+      for i, rule in ipairs(list) do
+        if (rule[1] == name) then last = i; end
+      end
+      if (not last) then return nil; end
+      table.insert(list, last + 1, { name, "", "", "", "", "ci" });
+      newIdx = last + 1;
+    end
+  end
+  return newIdx;
+end
+
+-- Rename a category everywhere: every rule[1] in both lists, its CAT_BAR bar key +
+-- any CAT_BAR alias values pointing at it, mat_group targets, and item_overrides
+-- values. Rejects an empty new name or a collision with a DIFFERENT existing
+-- category. Returns true on success.
+function TFuBag:RenameCategory(oldName, newName)
+  oldName = oldName and strtrim(oldName) or "";
+  newName = newName and strtrim(newName) or "";
+  if (oldName == "" or newName == "" or newName == oldName) then return false; end
+  for _, frame in ipairs({ TFuInvFrame, TFuBnkFrame }) do
+    local list = frame and frame.cfg and frame.cfg["item_search_list"];
+    if (list) then
+      for _, rule in ipairs(list) do
+        if (rule[1] == newName) then return false; end
+      end
+    end
+  end
+  for _, frame in ipairs({ TFuInvFrame, TFuBnkFrame }) do
+    local cfg = frame and frame.cfg;
+    local list = cfg and cfg["item_search_list"];
+    if (list) then
+      for _, rule in ipairs(list) do
+        if (rule[1] == oldName) then rule[1] = newName; end
+      end
+      local cb = cfg[self.CAT_BAR];
+      if (cb) then
+        if (cb[oldName] ~= nil and cb[newName] == nil) then
+          cb[newName] = cb[oldName]; cb[oldName] = nil;
+        end
+        for k, v in pairs(cb) do
+          if (v == oldName) then cb[k] = newName; end
+        end
+      end
+      if (cfg.mat_group) then
+        for k, v in pairs(cfg.mat_group) do
+          if (v == oldName) then cfg.mat_group[k] = newName; end
+        end
+      end
+      local ov = cfg["item_overrides"];
+      if (ov) then
+        for id, c in pairs(ov) do
+          if (c == oldName) then ov[id] = newName; end
+        end
+      end
+    end
+  end
+  self:BumpCatGen();
+  if (TFuInvFrame) then TFuInvFrame:UpdateWindow(self.REQ_MUST); end
+  if (TFuBnkFrame) then TFuBnkFrame:UpdateWindow(self.REQ_MUST); end
+  return true;
+end
+
+-- Distinct manageable category names of ONE list, in first-occurrence (priority)
+-- order -- the same order GetCategoryList shows and numbers. Skips the redundant
+-- all-empty catch-all; keeps disabled categories.
+function TFuBag:GetCategoryOrderInList(list)
+  local seen, out = {}, {};
+  for _, rule in ipairs(list) do
+    local nm = rule[1];
+    local allEmpty = (rule[2] == "" and rule[3] == "" and rule[4] == "" and rule[5] == "");
+    if (nm and nm ~= "" and not allEmpty and not seen[nm]) then
+      seen[nm] = true; out[#out + 1] = nm;
+    end
+  end
+  return out;
+end
+
+-- Rebuild one list so its rules appear grouped by category in the given category
+-- order. Each category's rules keep their internal order; rules of a category are
+-- emitted as one contiguous block (consolidating any that had drifted apart). No
+-- rule is ever dropped: categories present in the list but absent from newOrder are
+-- appended in their original order, and non-manageable rows (blank name or the
+-- all-empty catch-all) are appended last. This is the single primitive behind every
+-- reorder, so a move can neither lose a rule nor land at the wrong position.
+function TFuBag:ReorderCategoriesInList(list, newOrder)
+  local buckets, other = {}, {};
+  for _, rule in ipairs(list) do
+    local nm = rule[1];
+    local allEmpty = (rule[2] == "" and rule[3] == "" and rule[4] == "" and rule[5] == "");
+    if (nm and nm ~= "" and not allEmpty) then
+      local b = buckets[nm];
+      if (not b) then b = {}; buckets[nm] = b; end
+      b[#b + 1] = rule;
+    else
+      other[#other + 1] = rule;
+    end
+  end
+  local out = {};
+  for _, nm in ipairs(newOrder) do
+    local b = buckets[nm];
+    if (b) then
+      for _, rule in ipairs(b) do out[#out + 1] = rule; end
+      buckets[nm] = nil;  -- consumed
+    end
+  end
+  -- safety: append any category not named in newOrder, in original order
+  for _, rule in ipairs(list) do
+    local nm = rule[1];
+    local b = buckets[nm];
+    if (b) then
+      for _, r in ipairs(b) do out[#out + 1] = r; end
+      buckets[nm] = nil;
+    end
+  end
+  for _, rule in ipairs(other) do out[#out + 1] = rule; end
+  for i = #list, 1, -1 do list[i] = nil; end
+  for i, r in ipairs(out) do list[i] = r; end
+end
+
+-- Move a category's priority up (dir -1) or down (dir +1) by one position in both
+-- windows' lists. Returns true if it moved.
+function TFuBag:MoveCategory(name, dir)
+  if (not name or name == "" or (dir ~= -1 and dir ~= 1)) then return false; end
+  local moved = false;
+  for _, frame in ipairs({ TFuInvFrame, TFuBnkFrame }) do
+    local list = frame and frame.cfg and frame.cfg["item_search_list"];
+    if (list) then
+      local order = self:GetCategoryOrderInList(list);
+      local pos;
+      for i, nm in ipairs(order) do if (nm == name) then pos = i; break; end end
+      if (pos) then
+        local target = pos + dir;
+        if (target >= 1 and target <= #order) then
+          order[pos], order[target] = order[target], order[pos];
+          self:ReorderCategoriesInList(list, order);
+          moved = true;
+        end
+      end
+    end
+  end
+  if (moved) then
+    self:BumpCatGen();
+    if (TFuInvFrame) then TFuInvFrame:UpdateWindow(self.REQ_MUST); end
+    if (TFuBnkFrame) then TFuBnkFrame:UpdateWindow(self.REQ_MUST); end
+  end
+  return moved;
+end
+
+-- Move a category to a 1-based priority position (clamped to the category count),
+-- renumbering the rest, in both windows' lists. Returns true if it moved.
+function TFuBag:MoveCategoryToPosition(name, pos)
+  if (not name or name == "" or type(pos) ~= "number") then return false; end
+  pos = math.floor(pos);
+  local moved = false;
+  for _, frame in ipairs({ TFuInvFrame, TFuBnkFrame }) do
+    local list = frame and frame.cfg and frame.cfg["item_search_list"];
+    if (list) then
+      local order = self:GetCategoryOrderInList(list);
+      local n = #order;
+      if (n > 0) then
+        local cur;
+        for i, nm in ipairs(order) do if (nm == name) then cur = i; break; end end
+        if (cur) then
+          local target = pos;
+          if (target < 1) then target = 1; elseif (target > n) then target = n; end
+          if (target ~= cur) then
+            table.remove(order, cur);
+            table.insert(order, target, name);
+            self:ReorderCategoriesInList(list, order);
+            moved = true;
+          end
+        end
+      end
+    end
+  end
+  if (moved) then
+    self:BumpCatGen();
+    if (TFuInvFrame) then TFuInvFrame:UpdateWindow(self.REQ_MUST); end
+    if (TFuBnkFrame) then TFuBnkFrame:UpdateWindow(self.REQ_MUST); end
+  end
+  return moved;
+end
+
 function TFuBag:GetItemFilter(frame)
   if (not frame.itemFilter) then
     frame.itemFilter = {

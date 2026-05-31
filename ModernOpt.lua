@@ -461,104 +461,372 @@ end)
 MO:RegisterSection("categories", "Categories", function(sf, MO)
   local function track(c) sf.controls[#sf.controls + 1] = c; return c end
 
-  local y = 8  -- the content-title (top) already shows "Categories"
-  MO:Label(sf, y, "Uncheck to disable a category (its items fall back to type sorting).")
-  y = y + 16
-  MO:Label(sf, y, "Delete removes it; Add makes a category from text found in the tooltip.")
-  y = y + 24
+  -- Two stacked sub-frames filling the content area: the category LIST view and
+  -- the per-category rule EDIT view. Exactly one is shown at a time.
+  local listView = CreateFrame("Frame", nil, sf); track(listView)
+  listView:SetPoint("TOPLEFT", sf, "TOPLEFT", 0, 0)
+  listView:SetPoint("BOTTOMRIGHT", sf, "BOTTOMRIGHT", 0, 0)
+  local editView = CreateFrame("Frame", nil, sf); track(editView)
+  editView:SetPoint("TOPLEFT", sf, "TOPLEFT", 0, 0)
+  editView:SetPoint("BOTTOMRIGHT", sf, "BOTTOMRIGHT", 0, 0)
+  editView:Hide()
 
-  local rebuildList   -- forward declaration (Add/Delete refresh the list)
+  local rebuildList     -- forward decls
+  local openEditor
 
-  -- Add-category form: name + tooltip-match text + Add button (one row).
-  local nameEB = CreateFrame("EditBox", nil, sf, "InputBoxTemplate")
-  nameEB:SetSize(130, 20); nameEB:SetAutoFocus(false)
-  nameEB:SetPoint("TOPLEFT", sf, "TOPLEFT", PAD + 6, -y)
-  local nlab = sf:CreateFontString(nil, "ARTWORK", "GameFontDisableSmall")
-  nlab:SetPoint("BOTTOMLEFT", nameEB, "TOPLEFT", -4, 2); nlab:SetText("New category")
+  -- Compact one-line summary of a rule's match fields for the editor list.
+  -- r = { [1]=name,[2]=keyword,[3]=tooltip,[4]=type,[5]=subtype,[6]=special }.
+  local function fmtRule(r)
+    local parts = {}
+    if (r[3] ~= "") then parts[#parts + 1] = 'tip:"' .. r[3] .. '"' end
+    if (r[4] ~= "") then parts[#parts + 1] = "type:" .. r[4] end
+    if (r[5] ~= "") then parts[#parts + 1] = "sub:" .. r[5] end
+    if (r[2] ~= "") then parts[#parts + 1] = "kw:" .. r[2] end
+    local s = (#parts > 0) and table.concat(parts, "   ") or "(no match fields \226\128\148 inert)"
+    if (r[6] == "ci") then s = s .. "  (ci)"
+    elseif (r[6] == "psplit") then s = s .. "  (psplit)" end
+    return s
+  end
 
-  local matchEB = CreateFrame("EditBox", nil, sf, "InputBoxTemplate")
-  matchEB:SetSize(180, 20); matchEB:SetAutoFocus(false)
-  matchEB:SetPoint("LEFT", nameEB, "RIGHT", 16, 0)
-  local mlab = sf:CreateFontString(nil, "ARTWORK", "GameFontDisableSmall")
-  mlab:SetPoint("BOTTOMLEFT", matchEB, "TOPLEFT", -4, 2); mlab:SetText("Match text (in tooltip)")
+  ------------------------------------------------------------------ LIST VIEW
+  do
+    local y = 8  -- the content-title (top) already shows "Categories"
+    MO:Label(listView, y, "Uncheck to disable a category; Edit to rename, reorder, or change its rules.")
+    y = y + 16
+    MO:Label(listView, y, "Delete removes it; Add makes a category from text found in the tooltip.")
+    y = y + 24
 
-  local addBtn = CreateFrame("Button", nil, sf, "UIPanelButtonTemplate")
-  addBtn:SetSize(60, 22); addBtn:SetText("Add")
-  addBtn:SetPoint("LEFT", matchEB, "RIGHT", 12, 0)
-  addBtn:SetScript("OnClick", function()
-    if (TFuBag:AddCategory(nameEB:GetText(), matchEB:GetText())) then
-      nameEB:SetText(""); matchEB:SetText(""); nameEB:ClearFocus(); matchEB:ClearFocus()
-      if (rebuildList) then rebuildList() end
+    -- Add-category form: name + tooltip-match text + Add button (one row).
+    local nameEB = CreateFrame("EditBox", nil, listView, "InputBoxTemplate")
+    nameEB:SetSize(130, 20); nameEB:SetAutoFocus(false)
+    nameEB:SetPoint("TOPLEFT", listView, "TOPLEFT", PAD + 6, -y)
+    local nlab = listView:CreateFontString(nil, "ARTWORK", "GameFontDisableSmall")
+    nlab:SetPoint("BOTTOMLEFT", nameEB, "TOPLEFT", -4, 2); nlab:SetText("New category")
+
+    local matchEB = CreateFrame("EditBox", nil, listView, "InputBoxTemplate")
+    matchEB:SetSize(180, 20); matchEB:SetAutoFocus(false)
+    matchEB:SetPoint("LEFT", nameEB, "RIGHT", 16, 0)
+    local mlab = listView:CreateFontString(nil, "ARTWORK", "GameFontDisableSmall")
+    mlab:SetPoint("BOTTOMLEFT", matchEB, "TOPLEFT", -4, 2); mlab:SetText("Match text (in tooltip)")
+
+    local addBtn = CreateFrame("Button", nil, listView, "UIPanelButtonTemplate")
+    addBtn:SetSize(60, 22); addBtn:SetText("Add")
+    addBtn:SetPoint("LEFT", matchEB, "RIGHT", 12, 0)
+    addBtn:SetScript("OnClick", function()
+      if (TFuBag:AddCategory(nameEB:GetText(), matchEB:GetText())) then
+        nameEB:SetText(""); matchEB:SetText(""); nameEB:ClearFocus(); matchEB:ClearFocus()
+        rebuildList()
+      else
+        UIErrorsFrame:AddMessage("Enter a category name and match text.", 1, 0.3, 0.3)
+      end
+    end)
+    y = y + 30
+
+    -- Scrollable list: checkbox + name + Edit + Delete per distinct category.
+    local listW, listH, rowH = 520, 300, 24
+    local sfl, child = MO:ScrollList(listView, PAD, y, listW, listH)
+
+    -- Scroll the list so the row for `name` is visible (roughly centred). Used after a
+    -- type-a-number move so the category doesn't appear to vanish when it jumps to a
+    -- position outside the current scroll window. maxS is computed from the child height
+    -- directly (GetVerticalScrollRange can lag a frame behind a rebuild).
+    local function scrollToCat(name)
+      local cats = TFuBag:GetCategoryList()
+      local idx
+      for i, c in ipairs(cats) do if (c.name == name) then idx = i; break end end
+      if (not idx) then return end
+      local s = (idx - 1) * rowH - (listH / 2) + rowH
+      local maxS = math.max(0, child:GetHeight() - listH)
+      if (s < 0) then s = 0 elseif (s > maxS) then s = maxS end
+      sfl:SetVerticalScroll(s)
+    end
+
+    -- Move a category one step and scroll the list by one row in the same direction,
+    -- so the moved category stays under the cursor and repeated clicks walk it through
+    -- the list (otherwise the swapped neighbour slides under the stationary cursor and
+    -- the next click moves it back).
+    local function nudge(name, dir)
+      if (not name) then return end
+      local before = sfl:GetVerticalScroll()
+      if (TFuBag:MoveCategory(name, dir)) then
+        rebuildList()
+        local s = before + dir * rowH
+        local maxS = sfl:GetVerticalScrollRange()
+        if (s < 0) then s = 0 elseif (s > maxS) then s = maxS end
+        sfl:SetVerticalScroll(s)
+      end
+    end
+
+    local pool = {}
+    local unsortedRow   -- pinned catch-all row, created lazily below
+    local function getRow(i)
+      local r = pool[i]
+      if (not r) then
+        r = {}
+        -- Editable priority number: type a new position + Enter to move the category
+        -- there (everything below renumbers); the up/down arrows nudge it one step.
+        r.num = CreateFrame("EditBox", nil, child, "InputBoxTemplate")
+        r.num:SetSize(30, 20); r.num:SetAutoFocus(false)
+        r.num:SetNumeric(true); r.num:SetMaxLetters(3); r.num:SetJustifyH("CENTER")
+        r.num:SetScript("OnEscapePressed", function(self) self:ClearFocus(); rebuildList() end)
+        r.num:SetScript("OnEnterPressed", function(self)
+          local n = tonumber(self:GetText())
+          local cat = r.tfuCat
+          self:ClearFocus()
+          if (n and cat) then TFuBag:MoveCategoryToPosition(cat, n) end
+          rebuildList()
+          if (cat) then scrollToCat(cat) end  -- reveal it at its new position
+        end)
+        r.cb = CreateFrame("CheckButton", nil, child, "UICheckButtonTemplate")
+        r.cb:SetSize(22, 22)
+        r.fs = r.cb:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
+        r.fs:SetPoint("LEFT", r.cb, "RIGHT", 4, 0)
+        r.fs:SetWidth(listW - 310); r.fs:SetJustifyH("LEFT")
+        -- Scroll-arrow templates carry real up/down arrow art (the plain button font
+        -- has no glyph for the triangle characters, so they rendered blank).
+        r.up = CreateFrame("Button", nil, child, "UIPanelScrollUpButtonTemplate")
+        r.up:SetSize(24, 24)
+        r.up:SetScript("OnClick", function() nudge(r.tfuCat, -1) end)
+        r.down = CreateFrame("Button", nil, child, "UIPanelScrollDownButtonTemplate")
+        r.down:SetSize(24, 24)
+        r.down:SetScript("OnClick", function() nudge(r.tfuCat, 1) end)
+        r.edit = CreateFrame("Button", nil, child, "UIPanelButtonTemplate")
+        r.edit:SetSize(44, 20); r.edit:SetText("Edit")
+        r.del = CreateFrame("Button", nil, child, "UIPanelButtonTemplate")
+        r.del:SetSize(54, 20); r.del:SetText("Delete")
+        pool[i] = r
+      end
+      return r
+    end
+
+    rebuildList = function()
+      local cats = TFuBag:GetCategoryList()
+      for i, c in ipairs(cats) do
+        local r = getRow(i)
+        local yoff = -((i - 1) * rowH) - 2
+        r.tfuCat = c.name
+        r.num:ClearAllPoints(); r.num:SetPoint("TOPLEFT", child, "TOPLEFT", 8, yoff - 1)
+        r.num:SetText(tostring(i)); r.num:SetCursorPosition(0)
+        r.cb:ClearAllPoints(); r.cb:SetPoint("TOPLEFT", child, "TOPLEFT", 44, yoff)
+        r.fs:SetText(c.name)
+        r.cb.tfuCat = c.name
+        r.cb:SetChecked(c.enabled)
+        r.cb:SetScript("OnClick", function(self)
+          TFuBag:SetCategoryEnabled(self.tfuCat, self:GetChecked() and true or false)
+        end)
+        r.up:ClearAllPoints();   r.up:SetPoint("TOPLEFT", child, "TOPLEFT", listW - 206, yoff)
+        r.down:ClearAllPoints(); r.down:SetPoint("TOPLEFT", child, "TOPLEFT", listW - 180, yoff)
+        r.edit:ClearAllPoints(); r.edit:SetPoint("TOPLEFT", child, "TOPLEFT", listW - 150, yoff)
+        r.edit.tfuCat = c.name
+        r.edit:SetScript("OnClick", function(self) openEditor(self.tfuCat) end)
+        r.del:ClearAllPoints(); r.del:SetPoint("TOPLEFT", child, "TOPLEFT", listW - 90, yoff)
+        r.del.tfuCat = c.name
+        r.del:SetScript("OnClick", function(self)
+          StaticPopup_Show("TBAG_DELETE_CATEGORY", self.tfuCat, nil,
+            { name = self.tfuCat, after = rebuildList })
+        end)
+        r.num:Show(); r.cb:Show(); r.fs:Show(); r.up:Show(); r.down:Show(); r.edit:Show(); r.del:Show()
+      end
+      for i = #cats + 1, #pool do
+        pool[i].num:Hide(); pool[i].cb:Hide(); pool[i].up:Hide()
+        pool[i].down:Hide(); pool[i].edit:Hide(); pool[i].del:Hide()
+      end
+      -- Pinned catch-all row (read-only): UNKNOWN is the hardcoded fallback applied only
+      -- when no rule matches, so it can't be disabled, deleted, or reordered -- always last.
+      if (not unsortedRow) then
+        unsortedRow = CreateFrame("CheckButton", nil, child, "UICheckButtonTemplate")
+        unsortedRow:SetSize(22, 22)
+        unsortedRow:SetChecked(true); unsortedRow:Disable()
+        local fs = unsortedRow:CreateFontString(nil, "ARTWORK", "GameFontDisable")
+        fs:SetPoint("LEFT", unsortedRow, "RIGHT", 4, 0)
+        fs:SetText((L["UNKNOWN"] or "Unsorted") .. "  (catch-all \226\128\148 always last)")
+      end
+      unsortedRow:ClearAllPoints()
+      unsortedRow:SetPoint("TOPLEFT", child, "TOPLEFT", 4, -(#cats * rowH) - 2)
+      unsortedRow:Show()
+      child:SetHeight(math.max(listH, (#cats + 1) * rowH + 8))
+    end
+  end
+
+  ------------------------------------------------------------------ EDIT VIEW
+  local curName              -- category currently being edited
+  local editingIdx           -- rule index open in the field editor (nil = closed)
+  local rebuildEditor        -- forward decl (reorder / rule changes refresh it)
+
+  -- Header row: Back (left). Priority reorder lives on the main category list.
+  local backBtn = CreateFrame("Button", nil, editView, "UIPanelButtonTemplate")
+  backBtn:SetSize(70, 22); backBtn:SetText("< Back")
+  backBtn:SetPoint("TOPLEFT", editView, "TOPLEFT", PAD, -4)
+  backBtn:SetScript("OnClick", function()
+    editView:Hide(); rebuildList(); listView:Show()
+  end)
+
+  -- Category title + rename row.
+  local titleFS = editView:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+  titleFS:SetPoint("TOPLEFT", editView, "TOPLEFT", PAD, -34)
+
+  local nameLbl = editView:CreateFontString(nil, "ARTWORK", "GameFontDisableSmall")
+  nameLbl:SetPoint("TOPLEFT", editView, "TOPLEFT", PAD + 6, -58)
+  nameLbl:SetText("Rename category")
+  local renameEB = CreateFrame("EditBox", nil, editView, "InputBoxTemplate")
+  renameEB:SetSize(180, 20); renameEB:SetAutoFocus(false)
+  renameEB:SetPoint("TOPLEFT", editView, "TOPLEFT", PAD + 6, -72)
+  local renameBtn = CreateFrame("Button", nil, editView, "UIPanelButtonTemplate")
+  renameBtn:SetSize(70, 22); renameBtn:SetText("Rename")
+  renameBtn:SetPoint("LEFT", renameEB, "RIGHT", 10, 1)
+  renameBtn:SetScript("OnClick", function()
+    local newName = renameEB:GetText()
+    if (TFuBag:RenameCategory(curName, newName)) then
+      curName = strtrim(newName); renameEB:ClearFocus(); rebuildEditor()
     else
-      UIErrorsFrame:AddMessage("Enter a category name and match text.", 1, 0.3, 0.3)
+      UIErrorsFrame:AddMessage("Rename failed: name is blank, unchanged, or already in use.", 1, 0.3, 0.3)
     end
   end)
-  y = y + 30
 
-  -- Scrollable list: checkbox + name + Delete per distinct category.
-  local listW, listH, rowH = 520, 300, 24
-  local sfl, child = MO:ScrollList(sf, PAD, y, listW, listH)
-  track(sfl)
+  local rulesLbl = editView:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
+  rulesLbl:SetPoint("TOPLEFT", editView, "TOPLEFT", PAD, -102)
+  rulesLbl:SetText("Match rules (first match wins; all route items to this category):")
 
-  -- Reusable row pool (rebuilt on Add/Delete and on section re-show).
-  local pool = {}
-  local unsortedRow   -- pinned catch-all row, created lazily below
-  local function getRow(i)
-    local r = pool[i]
+  -- Scrollable rule list.
+  local rlW, rlH, rrowH = 510, 150, 24
+  local rsf, rchild = MO:ScrollList(editView, PAD, 120, rlW, rlH)
+
+  local addRuleBtn = CreateFrame("Button", nil, editView, "UIPanelButtonTemplate")
+  addRuleBtn:SetSize(90, 22); addRuleBtn:SetText("+ Add rule")
+  addRuleBtn:SetPoint("TOPLEFT", editView, "TOPLEFT", PAD, -(120 + rlH + 8))
+
+  -- Rule field editor (hidden until a rule's Edit is clicked).
+  local fe = CreateFrame("Frame", nil, editView)
+  fe:SetPoint("TOPLEFT", editView, "TOPLEFT", PAD, -(120 + rlH + 38))
+  fe:SetPoint("RIGHT", editView, "RIGHT", -PAD, 0)
+  fe:SetHeight(110)
+  fe:Hide()
+  local feTitle = fe:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
+  feTitle:SetPoint("TOPLEFT", fe, "TOPLEFT", 0, 0)
+  feTitle:SetText("Edit rule (fill at least one match field):")
+
+  local function field(label, x, yy, w)
+    local lab = fe:CreateFontString(nil, "ARTWORK", "GameFontDisableSmall")
+    lab:SetPoint("TOPLEFT", fe, "TOPLEFT", x, -yy)
+    lab:SetText(label)
+    local eb = CreateFrame("EditBox", nil, fe, "InputBoxTemplate")
+    eb:SetSize(w, 20); eb:SetAutoFocus(false)
+    eb:SetPoint("TOPLEFT", fe, "TOPLEFT", x + 6, -(yy + 14))
+    return eb
+  end
+  local kwEB  = field("Keyword", 0,   18, 90)
+  local ttEB  = field("Tooltip text", 130, 18, 320)
+  local tyEB  = field("Item type", 0,   58, 130)
+  local stEB  = field("Item subtype", 200, 58, 200)
+
+  local ciChk = CreateFrame("CheckButton", nil, fe, "UICheckButtonTemplate")
+  ciChk:SetSize(22, 22)
+  ciChk:SetPoint("TOPLEFT", fe, "TOPLEFT", 0, -94)
+  local ciLbl = ciChk:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
+  ciLbl:SetPoint("LEFT", ciChk, "RIGHT", 2, 0)
+  ciLbl:SetText("Tooltip match is case-insensitive")
+
+  local saveRuleBtn = CreateFrame("Button", nil, fe, "UIPanelButtonTemplate")
+  saveRuleBtn:SetSize(70, 22); saveRuleBtn:SetText("Save")
+  saveRuleBtn:SetPoint("TOPRIGHT", fe, "TOPRIGHT", -84, -92)
+  local cancelRuleBtn = CreateFrame("Button", nil, fe, "UIPanelButtonTemplate")
+  cancelRuleBtn:SetSize(70, 22); cancelRuleBtn:SetText("Cancel")
+  cancelRuleBtn:SetPoint("LEFT", saveRuleBtn, "RIGHT", 8, 0)
+
+  local function closeFieldEditor()
+    editingIdx = nil; fe:Hide()
+  end
+  cancelRuleBtn:SetScript("OnClick", closeFieldEditor)
+  saveRuleBtn:SetScript("OnClick", function()
+    if (not editingIdx) then return end
+    local ok = TFuBag:UpdateRule(editingIdx, curName,
+      { kwEB:GetText(), ttEB:GetText(), tyEB:GetText(), stEB:GetText() },
+      ciChk:GetChecked() and true or false)
+    if (ok) then closeFieldEditor(); rebuildEditor()
+    else UIErrorsFrame:AddMessage("Rule needs at least one match field (tooltip/type/subtype/keyword).", 1, 0.3, 0.3) end
+  end)
+
+  local function openFieldEditor(rule)
+    editingIdx = rule.idx
+    kwEB:SetText(rule[2]); ttEB:SetText(rule[3]); tyEB:SetText(rule[4]); stEB:SetText(rule[5])
+    ciChk:SetChecked(rule[6] == "ci")
+    feTitle:SetText("Edit rule " .. (rule[6] == "psplit" and "(profession split \226\128\148 case flag locked):" or ":"))
+    fe:Show()
+  end
+
+  addRuleBtn:SetScript("OnClick", function()
+    local newIdx = TFuBag:AddRuleToCategory(curName)
+    if (newIdx) then
+      rebuildEditor()
+      -- open the field editor on the freshly added (inert) rule so the user fills it in
+      for _, r in ipairs(TFuBag:GetCategoryRules(curName)) do
+        if (r.idx == newIdx) then openFieldEditor(r); break end
+      end
+    end
+  end)
+
+  -- Rule-row pool for the editor list.
+  local rpool = {}
+  local function getRRow(i)
+    local r = rpool[i]
     if (not r) then
       r = {}
-      r.cb = CreateFrame("CheckButton", nil, child, "UICheckButtonTemplate")
-      r.cb:SetSize(22, 22)
-      r.fs = r.cb:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
-      r.fs:SetPoint("LEFT", r.cb, "RIGHT", 4, 0)
-      r.del = CreateFrame("Button", nil, child, "UIPanelButtonTemplate")
-      r.del:SetSize(54, 20); r.del:SetText("Delete")
-      pool[i] = r
+      r.fs = rchild:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
+      r.fs:SetPoint("TOPLEFT", rchild, "TOPLEFT", 4, 0)  -- repositioned per rebuild
+      r.fs:SetWidth(rlW - 130); r.fs:SetJustifyH("LEFT")
+      r.edit = CreateFrame("Button", nil, rchild, "UIPanelButtonTemplate")
+      r.edit:SetSize(44, 20); r.edit:SetText("Edit")
+      r.del = CreateFrame("Button", nil, rchild, "UIPanelButtonTemplate")
+      r.del:SetSize(24, 20); r.del:SetText("X")
+      rpool[i] = r
     end
     return r
   end
 
-  rebuildList = function()
-    local cats = TFuBag:GetCategoryList()
-    for i, c in ipairs(cats) do
-      local r = getRow(i)
-      local yoff = -((i - 1) * rowH) - 2
-      r.cb:ClearAllPoints(); r.cb:SetPoint("TOPLEFT", child, "TOPLEFT", 4, yoff)
-      r.fs:SetText(c.name)
-      r.cb.tfuCat = c.name
-      r.cb:SetChecked(c.enabled)
-      r.cb:SetScript("OnClick", function(self)
-        TFuBag:SetCategoryEnabled(self.tfuCat, self:GetChecked() and true or false)
+  rebuildEditor = function()
+    titleFS:SetText('Editing category: "' .. (curName or "") .. '"')
+    renameEB:SetText(curName or "")
+    local rules = TFuBag:GetCategoryRules(curName)
+    for i, rule in ipairs(rules) do
+      local r = getRRow(i)
+      local yoff = -((i - 1) * rrowH) - 2
+      r.fs:ClearAllPoints(); r.fs:SetPoint("TOPLEFT", rchild, "TOPLEFT", 4, yoff)
+      r.fs:SetText(fmtRule(rule))
+      r.edit:ClearAllPoints(); r.edit:SetPoint("TOPLEFT", rchild, "TOPLEFT", rlW - 110, yoff)
+      r.edit:SetScript("OnClick", function() openFieldEditor(rule) end)
+      r.del:ClearAllPoints(); r.del:SetPoint("TOPLEFT", rchild, "TOPLEFT", rlW - 56, yoff)
+      r.del:SetScript("OnClick", function()
+        if (TFuBag:DeleteRule(rule.idx, curName)) then
+          closeFieldEditor()
+          if (#TFuBag:GetCategoryRules(curName) == 0) then
+            -- category emptied (no rules left): drop back to the list
+            editView:Hide(); rebuildList(); listView:Show()
+          else
+            rebuildEditor()
+          end
+        end
       end)
-      r.del:ClearAllPoints(); r.del:SetPoint("TOPLEFT", child, "TOPLEFT", listW - 90, yoff)
-      r.del.tfuCat = c.name
-      r.del:SetScript("OnClick", function(self)
-        StaticPopup_Show("TBAG_DELETE_CATEGORY", self.tfuCat, nil,
-          { name = self.tfuCat, after = rebuildList })
-      end)
-      r.cb:Show(); r.fs:Show(); r.del:Show()
+      r.fs:Show(); r.edit:Show(); r.del:Show()
     end
-    for i = #cats + 1, #pool do
-      pool[i].cb:Hide(); pool[i].del:Hide()
+    for i = #rules + 1, #rpool do
+      rpool[i].fs:Hide(); rpool[i].edit:Hide(); rpool[i].del:Hide()
     end
-    -- Pinned catch-all row (read-only): UNKNOWN is the hardcoded fallback applied only
-    -- when no rule matches, so it can't be disabled, deleted, or reordered -- always last.
-    if (not unsortedRow) then
-      unsortedRow = CreateFrame("CheckButton", nil, child, "UICheckButtonTemplate")
-      unsortedRow:SetSize(22, 22)
-      unsortedRow:SetChecked(true); unsortedRow:Disable()
-      local fs = unsortedRow:CreateFontString(nil, "ARTWORK", "GameFontDisable")
-      fs:SetPoint("LEFT", unsortedRow, "RIGHT", 4, 0)
-      fs:SetText((L["UNKNOWN"] or "Unsorted") .. "  (catch-all \226\128\148 always last)")
-    end
-    unsortedRow:ClearAllPoints()
-    unsortedRow:SetPoint("TOPLEFT", child, "TOPLEFT", 4, -(#cats * rowH) - 2)
-    unsortedRow:Show()
-    child:SetHeight(math.max(listH, (#cats + 1) * rowH + 8))
+    rchild:SetHeight(math.max(rlH, #rules * rrowH + 8))
+  end
+
+  openEditor = function(name)
+    curName = name
+    closeFieldEditor()
+    rebuildEditor()
+    listView:Hide(); editView:Show()
   end
 
   rebuildList()
-  sfl.tfuRefresh = rebuildList
+  -- On section re-show, always return to the list view (the editor's indices may be
+  -- stale after other panels changed the rule list) and rebuild it. Attached to a
+  -- TRACKED control (listView) because ShowSection only calls tfuRefresh on the
+  -- frame's registered controls, not on the section frame itself.
+  listView.tfuRefresh = function() closeFieldEditor(); editView:Hide(); listView:Show(); rebuildList() end
 end)
 
 MO:RegisterSection("grouping", "Grouping", function(sf, MO)
