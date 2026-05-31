@@ -565,6 +565,7 @@ L["Close Inventory"] = true
 L["Highlight New Items"] = true
 L["Reset NEW tag"] = true
 L["Advanced Configuration"] = true
+L["Options"] = true
 L["Set Size"] = true
 L["Set Colors"] = true
 L["Hide"] = true

@@ -227,15 +227,17 @@ function MO:CreateWindow()
   tinsert(UISpecialFrames, "TFuModernOptFrame")  -- closable with Escape
   self.frame = f
 
-  -- Left nav column.
+  -- Left nav column. Start below the template's portrait icon (top-left) so the first
+  -- nav button is not covered by it.
   local nav = CreateFrame("Frame", nil, f)
-  nav:SetPoint("TOPLEFT", f, "TOPLEFT", 8, -28)
-  nav:SetSize(NAV_WIDTH, WIN_H - 60)
+  nav:SetPoint("TOPLEFT", f, "TOPLEFT", 8, -64)
+  nav:SetSize(NAV_WIDTH, WIN_H - 96)
   self.nav = nav
 
-  -- Content panel (right of nav).
+  -- Content panel: anchored to the frame (not the nav) so it stays at the top regardless
+  -- of where the nav column starts.
   local content = CreateFrame("Frame", nil, f)
-  content:SetPoint("TOPLEFT", nav, "TOPRIGHT", 8, 0)
+  content:SetPoint("TOPLEFT", f, "TOPLEFT", NAV_WIDTH + 16, -28)
   content:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -12, 12)
   self.content = content
 
@@ -272,48 +274,193 @@ function MO:Toggle()
   end
 end
 
+-- Open (not toggle) to a specific section, optionally pre-selecting the General Inv|Bank
+-- tab. Used by the bag windows' right-click "Options" so the bank opens to General/Bank
+-- and the inventory to General/Inv. requestedWindow is consumed by the General section's
+-- refresh.
+function MO:OpenTo(sectionKey, which)
+  self:CreateWindow()
+  self.requestedWindow = which
+  if (not self.frame:IsShown()) then self.frame:Show() end
+  self:ShowSection(sectionKey or (self.sections[1] and self.sections[1].key))
+end
+
 -----------------------------------------------------------------------
--- Proof-of-concept "General" section (smoke test of the controls).
--- Ports a few inventory settings so the modern look can be validated in-game
--- before the full section build-out. Uses TFuInvFrame.cfg.
+-- General section: full parity with the old Advanced Configuration panel,
+-- per-window (an Inventory|Bank toggle shows one of two scroll panels, each
+-- built against that window's cfg). Grouped under Sizing / Bag Contents /
+-- Display / Behavior sub-headers.
 -----------------------------------------------------------------------
 
-MO:RegisterSection("general", "General", function(sf, MO)
-  local cfg = TFuInvFrame and TFuInvFrame.cfg
-  local function track(c) sf.controls[#sf.controls + 1] = c; return c end
-  local y = 8
+-- Build every General control for one window's cfg into a scrollable panel.
+-- Returns the ScrollFrame; its .controls list is re-synced on show.
+function MO:GeneralContent(parent, x, y, w, h, frame)
+  local sfl, child = self:ScrollList(parent, x, y, w, h)
+  local cfg = frame.cfg
+  local controls = {}
+  sfl.controls = controls
+  local function track(c) controls[#controls + 1] = c; return c end
+  local function force() frame:UpdateWindow(TFuBag.REQ_MUST) end
+  local function resize()
+    frame:CalcButtonSize(cfg.frameButtonSize, cfg.framePad)
+    frame:UpdateWindow(TFuBag.REQ_MUST)
+  end
+  local yy = 6
 
-  if (not cfg) then
-    MO:Label(sf, y, "Inventory window not initialised yet."); return
+  local function chk(label, key, apply)
+    local c, ny = self:Checkbox(child, yy, label,
+      function() return cfg[key] == 1 end,
+      function(v) cfg[key] = v and 1 or 0; (apply or force)() end)
+    track(c); yy = ny
+  end
+  local function sld(label, key, mn, mx, st, apply)
+    local c, ny = self:Slider(child, yy, label, mn, mx, st,
+      function() return cfg[key] or mn end,
+      function(v) cfg[key] = v; (apply or force)() end)
+    track(c); yy = ny
+    return c
   end
 
-  local _, ny = MO:Header(sf, y, "Inventory \226\128\148 General"); y = ny
+  local _, ny = self:Header(child, yy, "Sizing"); yy = ny
 
-  local sc; sc, ny = MO:Slider(sf, y, "Window Scale", 10, 100, 5,
-    function() return math.floor((cfg.scale or 1) * 100 + 0.5) end,
-    function(v) cfg.scale = v / 100; TFuInvFrame:UpdateWindow(TFuBag.REQ_MUST) end)
-  track(sc); y = ny
+  -- Legacy column/row sizing toggle. ON = the two sliders below drive the layout (the
+  -- window grows vertically only and never exceeds the column count). OFF = dynamic:
+  -- the window is resizable and categories reflow to fill it, so the sliders are inert
+  -- (greyed). [Stage 1: the toggle + gating; the resize grip + reflow follow.]
+  local colSlider, barSlider
+  local function gateSliders()
+    local on = (cfg.legacy_sizing == 1)
+    for _, s in ipairs({ colSlider, barSlider }) do
+      if (s) then
+        if (s.SetEnabled) then s:SetEnabled(on) end
+        s:SetAlpha(on and 1 or 0.4)
+      end
+    end
+  end
+  local lc; lc, ny = self:Checkbox(child, yy,
+    "Legacy column/row sizing (off = resizable, auto-arranged window)",
+    function() return cfg.legacy_sizing == 1 end,
+    function(v) cfg.legacy_sizing = v and 1 or 0; gateSliders(); force() end)
+  track(lc); yy = ny
 
-  local col; col, ny = MO:Slider(sf, y, "Item Columns", TFuBag.NUMCOL_MIN or 1, TFuBag.NUMCOL_MAX or 20, 1,
-    function() return cfg.maxColumns or 8 end,
-    function(v) cfg.maxColumns = v; TFuInvFrame:UpdateWindow(TFuBag.REQ_MUST) end)
-  track(col); y = ny
+  colSlider = sld("Item Columns", "maxColumns", TFuBag.NUMCOL_MIN, TFuBag.NUMCOL_MAX, 1)
+  barSlider = sld("Horizontal Bars", "bar_x", 1, TFuBag.NUMCOL_MAX, 1)
+  gateSliders()
+  track({ tfuRefresh = gateSliders })  -- re-grey the sliders whenever the panel is shown
+  do  -- scale is stored 0-1; expose as a 10-100% slider
+    local c; c, ny = self:Slider(child, yy, "Window Scale (%)", 10, 100, 5,
+      function() return math.floor((cfg.scale or 1) * 100 + 0.5) end,
+      function(v) cfg.scale = v / 100; force() end)
+    track(c); yy = ny
+  end
+  sld("Item Button Size", "frameButtonSize", TFuBag.N_BUTTON_MIN, TFuBag.N_BUTTON_MAX, 1, resize)
+  sld("Item Button Padding", "framePad", 0, TFuBag.N_SPACE_MAX, 1, resize)
+  sld("Spacing - X Button", "frameXSpace", 0, TFuBag.N_SPACE_MAX, 1, resize)
+  sld("Spacing - Y Button", "frameYSpace", 0, TFuBag.N_SPACE_MAX, 1, resize)
+  sld("Spacing - X Pool", "frameXPool", 0, TFuBag.N_SPACE_MAX, 1, resize)
+  sld("Spacing - Y Pool", "frameYPool", 0, TFuBag.N_SPACE_MAX, 1, resize)
+  sld("Category Spacing", "cat_spacing", 0, TFuBag.N_CATSPACE_MAX, 1, resize)
+  sld("Count Font Size", "count_font", TFuBag.N_FONT_MIN, TFuBag.N_FONT_MAX, 1, resize)
+  sld("Count Placement - X", "count_font_x", 0, TFuBag.N_BUTTON_MAX, 1, resize)
+  sld("Count Placement - Y", "count_font_y", 0, TFuBag.N_BUTTON_MAX, 1, resize)
+  sld("New Tag Font Size", "new_font", TFuBag.N_FONT_MIN, TFuBag.N_FONT_MAX, 1, resize)
 
-  local cb; cb, ny = MO:Checkbox(sf, y, "Collapse empty slots into one cell",
-    function() return cfg.collapse_empty == 1 end,
-    function(v) cfg.collapse_empty = v and 1 or 0; TFuInvFrame:UpdateWindow(TFuBag.REQ_MUST) end)
-  track(cb); y = ny
+  _, ny = self:Header(child, yy, "Bag Contents"); yy = ny
+  for _, bag in ipairs(frame.bags or {}) do
+    chk(string.format("Show %s", TFuBag:GetBagDispName(bag)), "show_Bag" .. bag)
+  end
 
-  local cb2; cb2, ny = MO:Checkbox(sf, y, "Show rarity color border",
-    function() return cfg.show_rarity_color == 1 end,
-    function(v) cfg.show_rarity_color = v and 1 or 0; TFuInvFrame:UpdateWindow(TFuBag.REQ_MUST) end)
-  track(cb2); y = ny
+  _, ny = self:Header(child, yy, "Display"); yy = ny
+  chk("Show Size on Bag Count", "show_bag_sizes")
+  chk("Show Bag Icons on Empty Slots", "show_bag_icons")
+  chk("Collapse Empty Slots (one cell + free count)", "collapse_empty")
+  chk("Spotlight Open or Selected Bags", "spotlight_open")
+  chk("Spotlight Mouseover", "spotlight_hover")
+  chk("Show Item Rarity Color", "show_rarity_color")
+  chk("Show Category Names", "show_cat_names")
+
+  _, ny = self:Header(child, yy, "Behavior"); yy = ny
+  chk("Auto Stack", "stack_auto")
+  chk("Stack on Re-sort", "stack_resort")
+  -- One toggle for the arrange mode. ON = drag-to-arrange (manual layout via the gear);
+  -- OFF = legacy click editing. This is the legacy_edit flag inverted -- exposing it and
+  -- ml_freeplace as two peer boxes let an inconsistent combo (legacy_edit=1) silently
+  -- break drag, which is what "drag to arrange doesn't work" was. (Free-vs-grid placement,
+  -- ml_freeplace, stays on the legacy /config panel.)
+  do
+    local c, ny = self:Checkbox(child, yy, "Drag to arrange categories (off = legacy click editing)",
+      function() return cfg.legacy_edit ~= 1 end,
+      function(v) cfg.legacy_edit = v and 0 or 1; force() end)
+    track(c); yy = ny
+  end
+  chk("Profession Bags precede Sorting", "special_bag_sort")
+  chk("Split Reagents by Profession (original TBag style)", "reagent_split")
+  chk("Trade Creation precedes Sorting (reopen window)", "trade_created_sort")
+
+  if (frame == TFuInvFrame) then
+    chk("Alt Key Auto-Pickup", "alt_pickup")
+    chk("Alt Key Auto-Panel", "alt_panel")
+  end
+
+  child:SetHeight(math.max(h, yy + 8))
+  return sfl
+end
+
+MO:RegisterSection("general", "General", function(sf, MO)
+  if (not (TFuInvFrame and TFuInvFrame.cfg)) then
+    MO:Label(sf, 8, "Inventory window not initialised yet."); return
+  end
+  local y = 8  -- the content-title (top) already shows "General"
+
+  -- Inventory | Bank toggle.
+  local invBtn = CreateFrame("Button", nil, sf, "UIPanelButtonTemplate")
+  invBtn:SetSize(110, 22); invBtn:SetText("Inventory")
+  invBtn:SetPoint("TOPLEFT", sf, "TOPLEFT", PAD, -y)
+  local bankBtn = CreateFrame("Button", nil, sf, "UIPanelButtonTemplate")
+  bankBtn:SetSize(110, 22); bankBtn:SetText("Bank")
+  bankBtn:SetPoint("LEFT", invBtn, "RIGHT", 8, 0)
+  y = y + 30
+
+  -- Two pre-built panels; the toggle shows one. Bank panel only if the bank cfg exists.
+  local invScroll = MO:GeneralContent(sf, PAD, y, 520, 300, TFuInvFrame)
+  local bankScroll = (TFuBnkFrame and TFuBnkFrame.cfg)
+    and MO:GeneralContent(sf, PAD, y, 520, 300, TFuBnkFrame) or nil
+
+  local function refresh(scrollObj)
+    if (scrollObj and scrollObj.controls) then
+      for _, c in ipairs(scrollObj.controls) do
+        if (c.tfuRefresh) then c.tfuRefresh() end
+      end
+    end
+  end
+  local function showWindow(which)
+    local inv = (which ~= "bank")
+    invBtn:SetEnabled(not inv); bankBtn:SetEnabled(inv and bankScroll ~= nil)
+    if (inv or not bankScroll) then
+      if (bankScroll) then bankScroll:Hide() end
+      invScroll:Show(); refresh(invScroll); sf.tfuCurrent = "inv"
+    else
+      invScroll:Hide(); bankScroll:Show(); refresh(bankScroll); sf.tfuCurrent = "bank"
+    end
+  end
+  invBtn:SetScript("OnClick", function() showWindow("inv") end)
+  bankBtn:SetScript("OnClick", function() showWindow("bank") end)
+  showWindow("inv")
+
+  -- Re-sync the visible panel whenever the section is shown. Honor a requested window
+  -- (set by MO:OpenTo when the bag/bank right-click menu opened Options) so it lands on
+  -- the originating window's tab, then clear the request.
+  sf.controls[#sf.controls + 1] = { tfuRefresh = function()
+    local w = MO.requestedWindow or sf.tfuCurrent or "inv"
+    MO.requestedWindow = nil
+    showWindow(w)
+  end }
 end)
 
 MO:RegisterSection("categories", "Categories", function(sf, MO)
   local function track(c) sf.controls[#sf.controls + 1] = c; return c end
 
-  local _, y = MO:Header(sf, 8, "Categories")
+  local y = 8  -- the content-title (top) already shows "Categories"
   MO:Label(sf, y, "Uncheck to disable a category (its items fall back to type sorting).")
   y = y + 16
   MO:Label(sf, y, "Delete removes it; Add makes a category from text found in the tooltip.")
@@ -423,7 +570,7 @@ MO:RegisterSection("grouping", "Grouping", function(sf, MO)
   end
   targets[#targets + 1] = { text = "Trade Goods", value = L["TRADE_GOODS"] }
 
-  local _, y = MO:Header(sf, 8, "Material Grouping")
+  local y = 8  -- the content-title (top) already shows "Grouping"
   MO:Label(sf, y, "Point several materials at the same group to merge them onto one bar.")
   y = y + 22
 
@@ -458,8 +605,66 @@ MO:RegisterSection("grouping", "Grouping", function(sf, MO)
 end)
 
 MO:RegisterSection("filters", "Filters", function(sf, MO)
-  local _, ny = MO:Header(sf, 8, "Filters")
-  MO:Label(sf, ny, "Filter dimensions and saved-filter management land here next.")
+  local function track(c) sf.controls[#sf.controls + 1] = c; return c end
+  local y = 8  -- the content-title (top) already shows "Filters"
+  MO:Label(sf, y, "Apply loads a saved filter into both windows. Live filtering and")
+  y = y + 16
+  MO:Label(sf, y, "'Save current filter as...' live on the funnel button in each window.")
+  y = y + 22
+
+  local listW, listH, rowH = 520, 320, 26
+  local sfl, child = MO:ScrollList(sf, PAD, y, listW, listH)
+  track(sfl)
+
+  local empty = child:CreateFontString(nil, "ARTWORK", "GameFontDisable")
+  empty:SetPoint("TOPLEFT", child, "TOPLEFT", 8, -8)
+  empty:SetText("No saved filters yet \226\128\148 use the funnel button \226\134\146 Save current filter as...")
+
+  local pool = {}
+  local rebuild
+  local function getRow(i)
+    local r = pool[i]
+    if (not r) then
+      r = {}
+      r.fs = child:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
+      r.apply = CreateFrame("Button", nil, child, "UIPanelButtonTemplate")
+      r.apply:SetSize(60, 20); r.apply:SetText("Apply")
+      r.del = CreateFrame("Button", nil, child, "UIPanelButtonTemplate")
+      r.del:SetSize(60, 20); r.del:SetText("Delete")
+      pool[i] = r
+    end
+    return r
+  end
+
+  rebuild = function()
+    local list = TFuBag:GetUserFilters()
+    empty:SetShown(#list == 0)
+    for i, e in ipairs(list) do
+      local r = getRow(i)
+      local yoff = -((i - 1) * rowH) - 4
+      r.fs:ClearAllPoints(); r.fs:SetPoint("TOPLEFT", child, "TOPLEFT", 6, yoff - 3)
+      r.fs:SetText(e.name)
+      r.apply:ClearAllPoints(); r.apply:SetPoint("TOPLEFT", child, "TOPLEFT", listW - 200, yoff)
+      r.apply.entry = e
+      r.apply:SetScript("OnClick", function(self)
+        if (TFuInvFrame) then TFuBag:ApplyUserFilter(TFuInvFrame, self.entry) end
+        if (TFuBnkFrame) then TFuBag:ApplyUserFilter(TFuBnkFrame, self.entry) end
+      end)
+      r.del:ClearAllPoints(); r.del:SetPoint("TOPLEFT", child, "TOPLEFT", listW - 130, yoff)
+      r.del.fname = e.name
+      r.del:SetScript("OnClick", function(self)
+        TFuBag:DeleteUserFilter(self.fname); rebuild()
+      end)
+      r.fs:Show(); r.apply:Show(); r.del:Show()
+    end
+    for i = #list + 1, #pool do
+      pool[i].fs:Hide(); pool[i].apply:Hide(); pool[i].del:Hide()
+    end
+    child:SetHeight(math.max(listH, #list * rowH + 12))
+  end
+
+  rebuild()
+  sfl.tfuRefresh = rebuild
 end)
 
 -- Temporary opener for testing the new UI before the swap.

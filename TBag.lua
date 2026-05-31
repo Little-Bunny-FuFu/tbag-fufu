@@ -1989,6 +1989,12 @@ function TFuBag:InitDefVals(cfg, bagarr, row1offset, reset)
   -- per-box titles). Each mode keeps its OWN saved positions (cat_layout vs
   -- cat_layout_free) so toggling between them doesn't clobber either arrangement.
   self:SetDef(cfg, "ml_freeplace", 0, reset, self.NumFunc, 0, 1);
+  -- Window sizing mode. 1 = LEGACY: the Item Columns + Horizontal Bars sliders drive the
+  -- layout, the window grows vertically only and never exceeds the column count. 0 =
+  -- DYNAMIC: the window is resizable (corner grip) and auto-grows, and categories reflow
+  -- to fill the current window width (the column/bar sliders are inert). Default legacy so
+  -- existing layouts are unchanged until the user opts in.
+  self:SetDef(cfg, "legacy_sizing", 1, reset, self.NumFunc, 0, 1);
   -- GRID positions. Keyed by bar index: cat_layout[barnum] = { gx, gy, cols }.
   -- Integer GRID COORDS (cells) so placements scale with button size/window scale.
   -- Per-window (Inv vs Bnk each get their own). Preserved across loads; wiped only
@@ -2386,6 +2392,10 @@ function TFuBag:WireCatTitleClick(frame, bf, baritmbar, show)
   if (not btn) then
     btn = CreateFrame("Button", nil, bf);
     btn:RegisterForClicks("RightButtonUp");
+    -- Pass LEFT clicks through to the Manual-Layout drag handle beneath, so dragging a
+    -- category by its title text still works (the button covers the text and would
+    -- otherwise swallow the drag-start there). Right-clicks are still handled here.
+    if (btn.SetPropagateMouseClicks) then btn:SetPropagateMouseClicks(true); end
     btn:SetScript("OnClick", function(self, mouseButton)
       if (mouseButton ~= "RightButton") then return; end
       local names = self.catNames;
@@ -2976,10 +2986,23 @@ function TFuBag:RecolorWindow(frame)
   if (not frame) then return; end
   local cfg = frame.cfg;
   local framename = frame:GetName();
+  -- Recolor the MAIN window frame (bar 0 / MAIN_BAR) too. The bar loop below starts at 1,
+  -- so without this the main window's background/border color only changed on reopen
+  -- (the picker's live callback never repainted it).
+  if (frame.SetBackdropColor) then
+    self:ColorFrame(cfg, frame, self.MAIN_BAR);
+  end
   for bar = 1, self.BAR_MAX do
     local bf = _G[framename.."_bar_"..bar];
     if (bf and bf.SetBackdropColor) then
       self:ColorFrame(cfg, bf, bar);
+    end
+  end
+  -- Bag selector button colors (the bag_N "Spotlight" color also tints the selector
+  -- button's checked texture / edge, not just the item highlights below).
+  if (frame.bags) then
+    for _, bag in ipairs(frame.bags) do
+      self:UpdateBagColors(bag);
     end
   end
   self:UpdateButtonHighlights();

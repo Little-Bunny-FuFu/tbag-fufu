@@ -992,11 +992,11 @@ function Inv.RightClickMenu_populate(self, level)
     UIDropDownMenu_AddButton(info, level);
 
     info = TFuBag:MakeColorPickerInfo(TFuInvFrame.cfg, "bkgr_", bar,
-        string.format(L["Background Color for Bar %d"],bar), function() TFuInvFrame:UpdateWindow() end);
+        string.format(L["Background Color for Bar %d"],bar), function() TFuBag:RecolorWindow(TFuInvFrame) end);
     UIDropDownMenu_AddButton(info, level);
 
     info = TFuBag:MakeColorPickerInfo(TFuInvFrame.cfg, "brdr_", bar,
-        string.format(L["Border Color for Bar %d"],bar), function() TFuInvFrame:UpdateWindow() end);
+        string.format(L["Border Color for Bar %d"],bar), function() TFuBag:RecolorWindow(TFuInvFrame) end);
     UIDropDownMenu_AddButton(info, level);
 
   -------------------------------------------------------------------------------------------------
@@ -1106,10 +1106,12 @@ function Inv.RightClickMenu_populate(self, level)
       UIDropDownMenu_AddButton(info, level);
 
       info = {
-        ["text"] = L["Advanced Configuration"],
+        ["text"] = L["Options"],
         ["value"] = nil,
         ["func"] = function()
-            TFuInv_OptsFrame:Show();
+            -- Modern options window, opened to General -> Inventory tab. The legacy
+            -- panel (with the rule editor) stays reachable via /tinv config.
+            TFuBag.ModernOpt:OpenTo("general", "inv");
           end
         };
       UIDropDownMenu_AddButton(info, level);
@@ -1185,7 +1187,7 @@ function Inv.RightClickMenu_populate(self, level)
             UIDropDownMenu_AddButton(info, level);
           end
         elseif (UIDROPDOWNMENU_MENU_VALUE["opt"] == "set_colors") then
-          TFuBag:MakeColorMenu(TFuInvFrame.cfg, function () TFuInvFrame:UpdateWindow() end, level, TFuInvFrame.bags);
+          TFuBag:MakeColorMenu(TFuInvFrame.cfg, function () TFuBag:RecolorWindow(TFuInvFrame) end, level, TFuInvFrame.bags);
         elseif (UIDROPDOWNMENU_MENU_VALUE["opt"] == "anchor") then
           info = {
             ["text"] = L["TOPLEFT"];

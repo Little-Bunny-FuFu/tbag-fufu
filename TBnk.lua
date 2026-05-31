@@ -1078,14 +1078,27 @@ end
 
 function Bank.Button_ChangeEditMode_OnClick()
   PlaySound(PlaySoundKitID and "igMainMenuOptioncheckBoxOn" or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
-  if (TFuBnkFrame.edit_mode == 0) then
-    TFuBnkFrame.edit_mode = 1;
+  -- Mirror the inventory gear (Inv.Button_ChangeEditMode_OnClick): with Legacy Edit ON
+  -- the gear toggles classic click editing; with it OFF the gear toggles Manual Layout
+  -- (drag-to-arrange categories). Previously the bank only ever did edit_mode, so it had
+  -- no drag-to-arrange regardless of the setting. The shared LayoutWindow ML path already
+  -- handles any frame (use_ml checks cfg.manual_layout + playerid == PLAYERID).
+  local cfg = TFuBnkFrame.cfg;
+  if (cfg["legacy_edit"] == 1) then
+    TFuBnkFrame.edit_mode = (TFuBnkFrame.edit_mode == 1) and 0 or 1;
   else
-    TFuBnkFrame.edit_mode = 0;
+    TFuBnkFrame.edit_mode = 0;  -- classic edit off when using Manual Layout
+    cfg["manual_layout"] = (cfg["manual_layout"] == 1) and 0 or 1;
+    -- Bank drag-to-arrange uses FREE placement (insert + push neighbours + auto-grow),
+    -- matching the inventory. Grid mode (ml_freeplace=0) blocks any drop that overlaps a
+    -- neighbour, so a box dropped between/next to others just snaps back. The bank had no
+    -- drag mode before, so there is no prior grid layout to preserve.
+    if (cfg["manual_layout"] == 1) then cfg["ml_freeplace"] = 1; end
   end
 
-  -- Relayout (not resort): edit-mode only changes the layout, not categorization.
-  -- Forcing a resort here scanned every item's tooltip -> major lag on a big bank.
+  -- Relayout (not resort): edit-mode/manual-layout only changes the layout, not
+  -- categorization. Forcing a resort here scanned every item's tooltip -> major lag on a
+  -- big bank.
   TFuBnkFrame._last_hilight = nil;  -- force the next edit-highlight refresh
   TFuBnkFrame.force_relayout = true;
   TFuBnkFrame:UpdateWindow(TFuBag.REQ_NONE);
@@ -1916,10 +1929,12 @@ function Bank.RightClickMenu_populate(self, level)
   UIDropDownMenu_AddButton(info, level);
 
     info = {
-  ["text"] = L["Advanced Configuration"],
+  ["text"] = L["Options"],
   ["value"] = nil,
   ["func"] = function()
-    TFuBnk_OptsFrame:Show();
+    -- Modern options window, opened to General -> Bank tab. The legacy panel (with the
+    -- rule editor) stays reachable via /tbnk config.
+    TFuBag.ModernOpt:OpenTo("general", "bank");
   end
   };
     UIDropDownMenu_AddButton(info, level);
@@ -2333,6 +2348,34 @@ function Bank:UpdateWindow(resort_req)
   else
     TFuBnkFrame_ColumnsAdd:Hide();
     TFuBnkFrame_ColumnsDel:Hide();
+  end
+
+  -- Edit/Manual-Layout toggle button: green glow + full alpha when active, faded when off
+  -- (mirrors the inventory gear so the bank shows the same active-state highlight).
+  local mlbtn = TFuBnk_Button_ChangeEditMode;
+  if (mlbtn) then
+    if (not mlbtn.MLGlow) then
+      mlbtn.MLGlow = mlbtn:CreateTexture(nil, "OVERLAY");
+      mlbtn.MLGlow:SetTexture("Interface\\Buttons\\UI-ActionButton-Border");
+      mlbtn.MLGlow:SetBlendMode("ADD");
+      mlbtn.MLGlow:SetVertexColor(0, 1, 0);  -- green
+      mlbtn.MLGlow:SetPoint("CENTER", mlbtn, "CENTER", 0, 0);
+      local w, h = mlbtn:GetSize();
+      mlbtn.MLGlow:SetSize((w or 20) * 1.7, (h or 20) * 1.7);
+    end
+    local edit_active;
+    if (self.cfg["legacy_edit"] == 1) then
+      edit_active = (self.edit_mode == 1);
+    else
+      edit_active = (self.cfg["manual_layout"] == 1);
+    end
+    if (edit_active) then
+      mlbtn.MLGlow:Show();
+      mlbtn:SetAlpha(1.0);
+    else
+      mlbtn.MLGlow:Hide();
+      mlbtn:SetAlpha(0.4);  -- faded when off
+    end
   end
 
   TFuBnkFrame:SetButton_Anchors();
