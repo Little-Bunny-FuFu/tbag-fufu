@@ -44,6 +44,95 @@ function MainFrame:DecreaseColumns()
   end
 end
 
+-- DYNAMIC sizing (Stage 2): bottom-right resize grip. Built on Blizzard's reusable
+-- PanelResizeButtonMixin (StartSizing/StopMovingOrSizing + a min/max OnSizeChanged
+-- clamp it installs on the target). Shown only when legacy_sizing == 0 AND the layout
+-- is auto-flow (Manual Layout sizes the window to its own bounding box). The grip is
+-- created lazily the first time LayoutWindow runs for this frame.
+TFuBag.RESIZE_MIN_W = 220;
+TFuBag.RESIZE_MIN_H = 160;
+
+function MainFrame:EnsureResizeGrip()
+  if (self.ResizeGrip) then return; end
+  self:SetResizable(true);
+  local grip = CreateFrame("Button", self:GetName().."_ResizeGrip", self,
+    "PanelResizeButtonTemplate");
+  grip:ClearAllPoints();
+  grip:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -2, 2);
+  grip:SetFrameLevel(self:GetFrameLevel() + 20);
+  -- Init wires the StartSizing/StopMovingOrSizing scripts and installs the clamp.
+  -- Bounds are (re)applied every layout by UpdateResizeGrip; pass nil maxes here so
+  -- the clamp is inert until dynamic mode turns it on.
+  grip:Init(self, TFuBag.RESIZE_MIN_W, TFuBag.RESIZE_MIN_H, nil, nil);
+  grip:SetOnResizeStoppedCallback(function(target)
+    if (target.OnResizeStopped) then target:OnResizeStopped(); end
+  end);
+  -- The window is normally anchored by a cfg corner (default BOTTOMLEFT) to UIParent,
+  -- which would make StartSizing("BOTTOMRIGHT") grow UP-and-right. Re-anchor to a
+  -- single TOPLEFT point (same offset convention as SetFrameAnchor: offset == the
+  -- frame's own GetLeft()/GetTop()) so sizing keeps the top-left fixed and the grip
+  -- follows the cursor naturally. OnResizeStopped re-saves all four edges afterwards.
+  self.onResizeStartCallback = function()
+    local left, top = self:GetLeft(), self:GetTop();
+    self:ClearAllPoints();
+    self:SetPoint("TOPLEFT", "UIParent", "BOTTOMLEFT", left, top);
+    return true;
+  end
+  self.ResizeGrip = grip;
+end
+
+-- Is this frame currently in DYNAMIC auto-flow mode (resize grip applies)? Manual
+-- Layout (drag-placed boxes, logged-in character only) sizes the window itself.
+function MainFrame:IsDynamicResize()
+  local cfg = self.cfg;
+  if (not cfg or cfg.legacy_sizing ~= 0) then return false; end
+  local in_ml = (cfg.manual_layout == 1 and cfg.legacy_edit ~= 1
+                 and self.playerid == TFuBag.PLAYERID);
+  return not in_ml;
+end
+
+function MainFrame:UpdateResizeGrip()
+  local grip = self.ResizeGrip;
+  if (not grip) then return; end
+  if (self:IsDynamicResize()) then
+    -- Clamp live drags to the screen cap (frame-space) and a sane minimum.
+    local cap_w, cap_h = TFuBag:GetWindowCap(self);
+    grip.minWidth  = TFuBag.RESIZE_MIN_W;
+    grip.minHeight = TFuBag.RESIZE_MIN_H;
+    grip.maxWidth  = cap_w;
+    grip.maxHeight = cap_h;
+    grip:Show();
+    grip:Enable();
+  else
+    -- Legacy / Manual Layout: neutralise the clamp so the content-driven layout
+    -- sizes are never altered by the mixin's OnSizeChanged.
+    grip.minWidth  = 1;
+    grip.minHeight = 1;
+    grip.maxWidth  = nil;
+    grip.maxHeight = nil;
+    grip:Hide();
+  end
+end
+
+function MainFrame:OnResizeStopped()
+  -- The mixin clamped the live drag to [min, cap], so the current size is the final
+  -- dynamic size. Persist it; the relayout below re-runs UpdateScrollViewport which
+  -- reads cfg.win_w/win_h and snaps the viewport + scrollbars to match.
+  self.cfg.win_w = self:GetWidth();
+  self.cfg.win_h = self:GetHeight();
+
+  -- Re-save the window position from the post-resize geometry (mirror DragStop) so
+  -- the saved anchor offsets match the new edges -- otherwise the next SetFrameAnchor
+  -- would snap the window back to its pre-resize footprint.
+  local scale = self:GetScale();
+  self.cfg.frameLEFT   = self:GetLeft()   * scale;
+  self.cfg.frameRIGHT  = self:GetRight()  * scale;
+  self.cfg.frameTOP    = self:GetTop()    * scale;
+  self.cfg.frameBOTTOM = self:GetBottom() * scale;
+
+  TFuBag:LayoutWindow(self);
+end
+
 function MainFrame:DragStart()
   if not self.isMoving and self.cfg.moveLock == 1 then
     -- Raise the window and turn off top level while dragging.

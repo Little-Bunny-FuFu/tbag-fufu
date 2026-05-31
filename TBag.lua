@@ -1995,6 +1995,13 @@ function TFuBag:InitDefVals(cfg, bagarr, row1offset, reset)
   -- to fill the current window width (the column/bar sliders are inert). Default legacy so
   -- existing layouts are unchanged until the user opts in.
   self:SetDef(cfg, "legacy_sizing", 1, reset, self.NumFunc, 0, 1);
+  -- User-chosen DYNAMIC window size (frame coordinate units, not screen px), set by
+  -- dragging the bottom-right resize grip. 0 = unset: the window auto-grows to fit its
+  -- content (capped to the screen). Once dragged, the window is held at win_w x win_h
+  -- (clamped to GetWindowCap) and content scrolls/reflows to fit. Only consulted when
+  -- legacy_sizing == 0; the column/bar sliders are inert in that mode.
+  self:SetDef(cfg, "win_w", 0, reset, self.NumFunc, 0, 8000);
+  self:SetDef(cfg, "win_h", 0, reset, self.NumFunc, 0, 8000);
   -- GRID positions. Keyed by bar index: cat_layout[barnum] = { gx, gy, cols }.
   -- Integer GRID COORDS (cells) so placements scale with button size/window scale.
   -- Per-window (Inv vs Bnk each get their own). Preserved across loads; wiped only
@@ -5261,7 +5268,7 @@ end
 -- like rotated siblings. Used in two places below.
 TFuBag.HSCROLL_H = 21;
 
-function TFuBag:UpdateScrollViewport(frame, PAD_TOP, PAD_BOTTOM, content_w, content_h, cap_enabled)
+function TFuBag:UpdateScrollViewport(frame, PAD_TOP, PAD_BOTTOM, content_w, content_h, cap_enabled, dynamic)
   local sb = frame.Scroll;        -- ScrollBox (WowScrollBox)
   if (not sb) then return; end
   local sc = sb.ScrollChild;
@@ -5350,7 +5357,32 @@ function TFuBag:UpdateScrollViewport(frame, PAD_TOP, PAD_BOTTOM, content_w, cont
   local bottom_pad = PAD_BOTTOM + self.BORDER + frame:PoolY(1);
   local sb_w = content_w + 4;
   local sb_h = content_h + 5;
-  if (cap_enabled) then
+  if (dynamic) then
+    -- DYNAMIC sizing: hold the window at the user-dragged size (cfg.win_w/win_h)
+    -- when set, else auto-grow to fit content. Both axes clamp to the screen cap.
+    -- A target LARGER than the content shows as empty slack on the right/bottom
+    -- (Stage 3 reflows categories to fill it); a target SMALLER than the content
+    -- scrolls via the WowScrollBox (vertical) + HScrollBar (horizontal). The
+    -- min-cell floor keeps a degenerate drag from collapsing the viewport.
+    local cfg = frame.cfg;
+    local cap_w, cap_h = self:GetWindowCap(frame);
+    local vp_cap_w = cap_w - 2 * self.BORDER - self.SB_COL;
+    if (cfg.win_w and cfg.win_w > 0) then
+      sb_w = cfg.win_w - 2 * self.BORDER - self.SB_COL;
+    end
+    if (sb_w > vp_cap_w) then sb_w = vp_cap_w; end
+    if (sb_w < frame.BF_PADWIDTH) then sb_w = frame.BF_PADWIDTH; end
+    -- The HScrollBar appears IFF the viewport is narrower than the content. When
+    -- visible it reserves HSCROLL_H at the bottom so content can't render behind it.
+    local hbar_will_show = (sb_w < content_w + 4);
+    local h_reserve = hbar_will_show and self.HSCROLL_H or 0;
+    if (cfg.win_h and cfg.win_h > 0) then
+      sb_h = cfg.win_h - PAD_TOP - bottom_pad - h_reserve;
+    end
+    local vp_cap_h = cap_h - PAD_TOP - bottom_pad - h_reserve;
+    if (sb_h > vp_cap_h) then sb_h = vp_cap_h; end
+    if (sb_h < frame.BF_PADHEIGHT) then sb_h = frame.BF_PADHEIGHT; end
+  elseif (cap_enabled) then
     local cap_w, cap_h = self:GetWindowCap(frame);
     -- Available horizontal area: chrome eats 2*BORDER plus the reserved
     -- scrollbar column. Capping sb_w creates horizontal overflow which the
@@ -5392,7 +5424,7 @@ function TFuBag:UpdateScrollViewport(frame, PAD_TOP, PAD_BOTTOM, content_w, cont
   -- skip the reservation -- otherwise bars anchored to mainFrame's
   -- BOTTOMRIGHT extend into that empty gap and get clipped at sb's right
   -- edge by the framework's clipChildren cascade.
-  local sb_col_reserve = cap_enabled and self.SB_COL or 0;
+  local sb_col_reserve = (dynamic or cap_enabled) and self.SB_COL or 0;
   frame:SetWidth(sb_w + 2 * self.BORDER + sb_col_reserve);
   frame:SetHeight(PAD_TOP + sb_h + bottom_pad + (hbar_visible and self.HSCROLL_H or 0));
 
@@ -5873,12 +5905,20 @@ end
 
 function TFuBag:LayoutWindow(frame)
   local framename = frame:GetName()
-  -- Cap-to-screen + scroll for the bank: anchor the category bars into the scroll
-  -- Container (content-sized) instead of the main window frame, and cap the window
-  -- height (UpdateScrollViewport cap), so the WowScrollBox scrolls the overflow
-  -- (same machinery Manual Layout uses). Bank-only for now to avoid regressing the
-  -- inventory; extend once verified. scname is the Container's global name.
-  local scroll_cap = (frame == TFuBnkFrame)
+  -- Stage 2 resize grip: ensure it exists and reflect the current sizing mode
+  -- (shown only when dynamic sizing is on). Done first so it is consistent even on
+  -- the Manual Layout early-return paths below.
+  if (frame.EnsureResizeGrip) then
+    frame:EnsureResizeGrip()
+    frame:UpdateResizeGrip()
+  end
+  -- Anchor the category bars into the scroll Container (content-sized) instead of the
+  -- main window frame, so the WowScrollBox can clip + scroll the overflow (same
+  -- machinery Manual Layout uses). Enabled for the bank (always) and for EITHER window
+  -- when DYNAMIC sizing is on: dynamic mode caps the window to the user-dragged size
+  -- (UpdateScrollViewport) and scrolls anything that doesn't fit. scname is the
+  -- Container's global name.
+  local scroll_cap = (frame == TFuBnkFrame) or (frame.cfg.legacy_sizing == 0)
   local scname = framename.."_Scroll_ScrollChild_Container"
   local bar_anchor = scroll_cap and scname or framename
   local cfg = frame.cfg
@@ -6212,7 +6252,10 @@ function TFuBag:LayoutWindow(frame)
   local af_content_h = new_height - PAD_TOP - PAD_BOTTOM - self.BORDER - frame:PoolY(1);
   if (af_content_w < 1) then af_content_w = 1; end
   if (af_content_h < 1) then af_content_h = 1; end
-  self:UpdateScrollViewport(frame, PAD_TOP, PAD_BOTTOM, af_content_w, af_content_h, scroll_cap);
+  -- DYNAMIC sizing (legacy_sizing == 0) only governs the AUTO-FLOW layout -- Manual
+  -- Layout sizes the window to its freely-placed bounding box and is left alone.
+  local dynamic = (cfg.legacy_sizing == 0);
+  self:UpdateScrollViewport(frame, PAD_TOP, PAD_BOTTOM, af_content_w, af_content_h, scroll_cap, dynamic);
 
   -- Manual Layout first enable: the auto-flow above has positioned every box, so
   -- capture those positions and re-lay-out in the chosen Manual Layout mode.
