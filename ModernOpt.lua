@@ -110,6 +110,24 @@ function MO:Button(parent, y, text, width, onClick)
   return b, y + 22 + ROW_GAP
 end
 
+-- Scrollable list region (classic ScrollFrameTemplate: built-in scrollbar + mouse wheel).
+-- Returns (scrollFrame, scrollChild). Callers lay rows out top-down in the child and set
+-- child:SetHeight(totalContentHeight) to enable scrolling. width/height size the viewport.
+function MO:ScrollList(parent, x, y, width, height)
+  local sf = CreateFrame("ScrollFrame", nil, parent, "ScrollFrameTemplate")
+  sf:SetPoint("TOPLEFT", parent, "TOPLEFT", x, -y)
+  sf:SetSize(width, height)
+  -- A faint backdrop so the list region reads as a distinct panel.
+  local bg = sf:CreateTexture(nil, "BACKGROUND")
+  bg:SetAllPoints(sf)
+  bg:SetColorTexture(0, 0, 0, 0.25)
+  local child = CreateFrame("Frame", nil, sf)
+  child:SetSize(width, height)   -- height is reset by the caller to the content height
+  sf:SetScrollChild(child)
+  sf.child = child
+  return sf, child, y + height + ROW_GAP
+end
+
 -----------------------------------------------------------------------
 -- Window shell
 -----------------------------------------------------------------------
@@ -280,6 +298,47 @@ end)
 MO:RegisterSection("categories", "Categories", function(sf, MO)
   local function track(c) sf.controls[#sf.controls + 1] = c; return c end
 
+  local _, y = MO:Header(sf, 8, "Enable / Disable Categories")
+  MO:Label(sf, y, "Uncheck a category to turn off its sorting rules; its items then fall")
+  y = y + 16
+  MO:Label(sf, y, "back to plain item-type sorting. Applies to both bag and bank windows.")
+  y = y + 20
+
+  -- Scrollable checkbox list, one row per distinct category (first-occurrence order).
+  local listW, listH, rowH = 520, 360, 24
+  local sfl, child = MO:ScrollList(sf, PAD, y, listW, listH)
+  track(sfl)
+
+  local cats = TFuBag:GetCategoryList()
+  local rows = {}
+  for i, c in ipairs(cats) do
+    local name = c.name
+    local cb = CreateFrame("CheckButton", nil, child, "UICheckButtonTemplate")
+    cb:SetSize(22, 22)
+    cb:SetPoint("TOPLEFT", child, "TOPLEFT", 4, -((i - 1) * rowH))
+    local fs = cb:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
+    fs:SetPoint("LEFT", cb, "RIGHT", 4, 0)
+    fs:SetText(name)
+    cb:SetChecked(TFuBag:IsCategoryEnabled(name))
+    cb:SetScript("OnClick", function(self)
+      TFuBag:SetCategoryEnabled(name, self:GetChecked() and true or false)
+    end)
+    cb.tfuCat = name
+    rows[#rows + 1] = cb
+  end
+  child:SetHeight(math.max(listH, #cats * rowH + 8))
+
+  -- Re-sync every checkbox when the section is re-shown (e.g. after a /reset).
+  sfl.tfuRefresh = function()
+    for _, cb in ipairs(rows) do
+      cb:SetChecked(TFuBag:IsCategoryEnabled(cb.tfuCat))
+    end
+  end
+end)
+
+MO:RegisterSection("grouping", "Grouping", function(sf, MO)
+  local function track(c) sf.controls[#sf.controls + 1] = c; return c end
+
   -- Build the shared target list once: each material category + Trade Goods.
   local targets = {}
   for _, m in ipairs(TFuBag.MATERIAL_SUBTYPES) do
@@ -293,7 +352,7 @@ MO:RegisterSection("categories", "Categories", function(sf, MO)
 
   -- Presets.
   local b1 = MO:Button(sf, y, "All Separate", 110, function()
-    TFuBag:ApplyGroupPreset("separate"); MO:ShowSection("categories")
+    TFuBag:ApplyGroupPreset("separate"); MO:ShowSection("grouping")
   end)
   track(b1)
   local b2 = CreateFrame("Button", nil, sf, "UIPanelButtonTemplate")
@@ -301,7 +360,7 @@ MO:RegisterSection("categories", "Categories", function(sf, MO)
   b2:SetSize(140, 22)
   b2:SetText("All in One Bar")
   b2:SetScript("OnClick", function()
-    TFuBag:ApplyGroupPreset("onebar"); MO:ShowSection("categories")
+    TFuBag:ApplyGroupPreset("onebar"); MO:ShowSection("grouping")
   end)
   track(b2)
   y = y + 22 + ROW_GAP + 6

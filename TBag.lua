@@ -972,6 +972,68 @@ function TFuBag:ApplyGroupPreset(preset)
   if (TFuBnkFrame) then TFuBnkFrame:UpdateWindow(self.REQ_MUST); end
 end
 
+-- ===== Category enable/disable (Categories options panel) =====
+-- item_search_list is a flat list of MATCH RULES; each row is
+-- {name, keyword, tooltip, type, subtype, [special]} with an optional .off flag.
+-- Many rows share one user-facing category name (rule[1]). PickBar skips rows with
+-- .off set (TBag.lua), so disabling a category = setting .off on all of its rules; its
+-- items then fall through to the normal type/subtype categorization (or UNKNOWN).
+
+-- Distinct category names in first-occurrence order, each with its current enabled
+-- state. enabled = at least one of the category's rules is active (.off unset). Reads
+-- the inventory list (both windows are kept in sync by SetCategoryEnabled); falls back
+-- to the bank list when the inventory window is not initialised yet.
+function TFuBag:GetCategoryList()
+  local cfg = (TFuInvFrame and TFuInvFrame.cfg) or (TFuBnkFrame and TFuBnkFrame.cfg);
+  local list = cfg and cfg["item_search_list"];
+  local out, seen = {}, {};
+  if (not list) then return out; end
+  for _, rule in ipairs(list) do
+    local name = rule[1];
+    if (name and name ~= "") then
+      local e = seen[name];
+      if (not e) then
+        e = { name = name, enabled = false };
+        seen[name] = e;
+        out[#out + 1] = e;
+      end
+      if (not rule.off) then e.enabled = true; end
+    end
+  end
+  return out;
+end
+
+function TFuBag:IsCategoryEnabled(name)
+  local cfg = (TFuInvFrame and TFuInvFrame.cfg) or (TFuBnkFrame and TFuBnkFrame.cfg);
+  local list = cfg and cfg["item_search_list"];
+  if (not list) then return true; end
+  for _, rule in ipairs(list) do
+    if (rule[1] == name and not rule.off) then return true; end
+  end
+  return false;
+end
+
+-- Enable/disable an entire category: set .off (true / nil) on every rule whose name
+-- matches, in BOTH windows' rule lists (kept in sync like mat_group). The .off key
+-- persists in SavedVariables (only /reset's ResetSorts copy drops it). Triggers a
+-- recat + relayout unless deferred.
+function TFuBag:SetCategoryEnabled(name, enabled, defer)
+  local off = (not enabled) or nil;
+  for _, frame in ipairs({ TFuInvFrame, TFuBnkFrame }) do
+    local list = frame and frame.cfg and frame.cfg["item_search_list"];
+    if (list) then
+      for _, rule in ipairs(list) do
+        if (rule[1] == name) then rule.off = off; end
+      end
+    end
+  end
+  if (not defer) then
+    self:BumpCatGen();
+    if (TFuInvFrame) then TFuInvFrame:UpdateWindow(self.REQ_MUST); end
+    if (TFuBnkFrame) then TFuBnkFrame:UpdateWindow(self.REQ_MUST); end
+  end
+end
+
 function TFuBag:GetItemFilter(frame)
   if (not frame.itemFilter) then
     frame.itemFilter = {
