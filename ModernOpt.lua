@@ -378,6 +378,7 @@ function MO:GeneralContent(parent, x, y, w, h, frame)
   chk("Spotlight Mouseover", "spotlight_hover")
   chk("Show Item Rarity Color", "show_rarity_color")
   chk("Show Category Names", "show_cat_names")
+  chk("Show Header/Footer Lines", "show_chrome_lines")
 
   _, ny = self:Header(child, yy, "Behavior"); yy = ny
   chk("Auto Stack", "stack_auto")

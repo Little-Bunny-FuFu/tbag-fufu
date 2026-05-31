@@ -153,7 +153,11 @@ TFuBag.PAD_BOTTOM_NORM = 30;
 TFuBag.PAD_BOTTOM_SEARCH = 30;
 TFuBag.PAD_BOTTOM_SPACER = 5;
 TFuBag.PAD_TOP_GFX = 63;
-TFuBag.PAD_TOP_NORM = 25;
+-- Top chrome band. The close / move-lock buttons are 34px tall and anchored at the
+-- very top, so the band must clear them (was 25, which let the header separator line
+-- and the first content row sit under the buttons). 38 = 34 + a 4px gap that the
+-- header rule sits in.
+TFuBag.PAD_TOP_NORM = 38;
 TFuBag.BORDER = 8;
 -- Reserved column on the right of mainFrame for the scrollbar widget. The
 -- ScrollBox stops short of this column so bars never lay out behind the
@@ -2002,6 +2006,10 @@ function TFuBag:InitDefVals(cfg, bagarr, row1offset, reset)
   -- legacy_sizing == 0; the column/bar sliders are inert in that mode.
   self:SetDef(cfg, "win_w", 0, reset, self.NumFunc, 0, 8000);
   self:SetDef(cfg, "win_h", 0, reset, self.NumFunc, 0, 8000);
+  -- Header / footer separator rules. 1 = draw the thin lines that divide the top
+  -- button strip and the bottom search/money/total chrome from the category space;
+  -- 0 = hide them for the cleaner, legacy-TBag look. Default on.
+  self:SetDef(cfg, "show_chrome_lines", 1, reset, self.NumFunc, 0, 1);
   -- GRID positions. Keyed by bar index: cat_layout[barnum] = { gx, gy, cols }.
   -- Integer GRID COORDS (cells) so placements scale with button size/window scale.
   -- Per-window (Inv vs Bnk each get their own). Preserved across loads; wiped only
@@ -5255,6 +5263,42 @@ function TFuBag:GetWindowCap(frame)
          UIParent:GetHeight() * 0.85 / scale;
 end
 
+-- Bottom-chrome widgets per window. The footer separator anchors just above the
+-- HIGHEST visible one of these (the real top of the search / money / total / bag /
+-- tab-strip block), rather than the PAD_BOTTOM reserve -- which over-reserves in the
+-- Warband bank (bag-slot rows that aren't shown), floating the line far above the
+-- actual controls.
+TFuBag.INV_FOOTER_WIDGETS = {
+  "TFuInvFrame_Total", "TFuInv_SearchBox", "TFuInvFrame_MoneyFrame",
+  "TFuInvFrame_TokenFrame", "TFuInvMenuBarBackpackButton",
+  "TFuInvacterBag1Slot", "TFuInvacterBag2Slot", "TFuInvacterBag3Slot", "TFuInvacterBag4Slot",
+};
+TFuBag.BNK_FOOTER_WIDGETS = {
+  "TFuBnkFrame_Total", "TFuBnk_SearchBox", "TFuBnkFrame_MoneyFrame",
+  "TFuBnkFrame_TokenFrame", "TFuBnkFrame_TabStrip", "TFuBnkFrameBagBank",
+};
+
+-- Highest visible top edge among `names`, expressed in frame-local units measured up
+-- from the frame's bottom. Returns nil if none are positioned yet. Effective-scale
+-- aware so scaled widgets (e.g. the 0.7 bag-slot buttons) are compared correctly.
+function TFuBag:FooterChromeTop(frame, names)
+  local efs = frame:GetEffectiveScale();
+  if (not efs or efs <= 0) then efs = 1; end
+  local fbot = (frame:GetBottom() or 0) * efs;
+  local best;
+  for _, nm in ipairs(names) do
+    local w = _G[nm];
+    if (w and w:IsShown()) then
+      local t = w:GetTop();
+      if (t) then
+        local ty = (t * w:GetEffectiveScale() - fbot) / efs;
+        if (not best or ty > best) then best = ty; end
+      end
+    end
+  end
+  return best;
+end
+
 -- Position + size the WowScrollBox viewport. Pattern follows Baganator's
 -- single-content-frame model: ScrollBox is the viewport (with clipChildren via
 -- ScrollBoxBaseTemplate inheritance), ScrollChild is the one .scrollable=true
@@ -5345,6 +5389,21 @@ function TFuBag:UpdateScrollViewport(frame, PAD_TOP, PAD_BOTTOM, content_w, cont
         origWheel(self, delta);
       end
     end);
+
+    -- Header / footer separator rules. Thin lines that divide the top button strip
+    -- and the bottom search/money/total chrome from the scrollable category space,
+    -- giving the window a clean header/footer. Positioned + shown each layout below
+    -- (only when the corresponding chrome band is present).
+    if (not frame.HeaderLine) then
+      frame.HeaderLine = frame:CreateTexture(nil, "OVERLAY");
+      frame.HeaderLine:SetColorTexture(0.5, 0.5, 0.5, 0.55);
+      frame.HeaderLine:Hide();
+    end
+    if (not frame.FooterLine) then
+      frame.FooterLine = frame:CreateTexture(nil, "OVERLAY");
+      frame.FooterLine:SetColorTexture(0.5, 0.5, 0.5, 0.55);
+      frame.FooterLine:Hide();
+    end
 
     frame.scrollInitDone = true;
   end
@@ -5487,6 +5546,43 @@ function TFuBag:UpdateScrollViewport(frame, PAD_TOP, PAD_BOTTOM, content_w, cont
       -- so it isn't stuck shifted from a previous (capped) layout.
       container:ClearAllPoints();
       container:SetPoint("TOPLEFT", sc, "TOPLEFT", 2, -2);
+    end
+  end
+
+  -- Header / footer separator rules. The header line sits just under the top button
+  -- strip (bottom edge of the PAD_TOP band); the footer line sits at the content
+  -- bottom, just above the search/money/total chrome (and below the HScrollBar, which
+  -- belongs to the category space). Each is shown only when its chrome band exists.
+  local show_lines = (frame.cfg.show_chrome_lines ~= 0);
+  if (frame.HeaderLine) then
+    if (show_lines and PAD_TOP > 0) then
+      frame.HeaderLine:ClearAllPoints();
+      frame.HeaderLine:SetPoint("TOPLEFT",  frame, "TOPLEFT",   self.BORDER, -PAD_TOP + 2);
+      frame.HeaderLine:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -self.BORDER, -PAD_TOP + 2);
+      frame.HeaderLine:SetHeight(1);
+      frame.HeaderLine:Show();
+    else
+      frame.HeaderLine:Hide();
+    end
+  end
+  if (frame.FooterLine) then
+    if (show_lines and PAD_BOTTOM > 0) then
+      -- Sit ~6px above the highest visible bottom control (search/money/total/bag/tab
+      -- strip) so the line hugs the real options instead of the over-reserved band.
+      -- Clamp so it never rises above the content bottom (which would overlap the last
+      -- category row) -- fall back to the content bottom if nothing measured yet.
+      local names = (frame == TFuBnkFrame) and self.BNK_FOOTER_WIDGETS
+                                            or self.INV_FOOTER_WIDGETS;
+      local ctop = self:FooterChromeTop(frame, names);
+      local fy = ctop and (ctop + 6) or bottom_pad;
+      if (fy > bottom_pad) then fy = bottom_pad; end
+      frame.FooterLine:ClearAllPoints();
+      frame.FooterLine:SetPoint("BOTTOMLEFT",  frame, "BOTTOMLEFT",   self.BORDER, fy);
+      frame.FooterLine:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -self.BORDER, fy);
+      frame.FooterLine:SetHeight(1);
+      frame.FooterLine:Show();
+    else
+      frame.FooterLine:Hide();
     end
   end
 
@@ -5998,22 +6094,35 @@ function TFuBag:LayoutWindow(frame)
   local width_in_between;
 
   if (framename == "TFuInvFrame") then
-    if (TFuInv_SearchBox:IsVisible() or TFuInvFrame_Total:IsVisible() or
-        TFuInvacterBag3Slot:IsVisible() or TFuInvFrame_MoneyFrame:IsVisible()) then
-        PAD_BOTTOM = PAD_BOTTOM + self.PAD_BOTTOM_NORM;
-    end
-    if (edit_mode == 1) then
-      PAD_BOTTOM = PAD_BOTTOM + self.PAD_BOTTOM_EDIT;
-    end
-     -- If we need the extra row...  add it in.
-    if ((TFuInv_SearchBox:IsVisible()
-        and (TFuInvFrame_Total:IsVisible() or TFuInvacterBag3Slot:IsVisible())) or
-        TFuInvFrame_MoneyFrame:IsVisible() and TFuInvFrame_TokenFrame:IsVisible()) then
-      PAD_BOTTOM = PAD_BOTTOM + self.PAD_BOTTOM_SEARCH;
-    end
-    if (PAD_BOTTOM > 0) then
-      -- If there's anything at the bottom add the spacer
-      PAD_BOTTOM = PAD_BOTTOM + self.PAD_BOTTOM_SPACER;
+    -- Reserve the bottom band to FIT the actual visible controls (search / total /
+    -- money / token / bag slots), measured up from the frame bottom + a 12px gap (==
+    -- a 6px gap above the footer rule, mirroring the bank). The old per-row heuristic
+    -- sized the band right at the controls, so the footer rule clamped up onto the
+    -- category content (no breathing room). Same measured approach as the bank keeps
+    -- the two windows consistent. Heuristic fallback before controls are positioned.
+    local measured = self:FooterChromeTop(frame, self.INV_FOOTER_WIDGETS);
+    if (measured and measured > 0) then
+      PAD_BOTTOM = math.ceil(measured) + 12 - self.BORDER - frame:PoolY(1);
+      if (PAD_BOTTOM < self.PAD_BOTTOM_NORM) then PAD_BOTTOM = self.PAD_BOTTOM_NORM; end
+      if (edit_mode == 1) then PAD_BOTTOM = PAD_BOTTOM + self.PAD_BOTTOM_EDIT; end
+    else
+      if (TFuInv_SearchBox:IsVisible() or TFuInvFrame_Total:IsVisible() or
+          TFuInvacterBag3Slot:IsVisible() or TFuInvFrame_MoneyFrame:IsVisible()) then
+          PAD_BOTTOM = PAD_BOTTOM + self.PAD_BOTTOM_NORM;
+      end
+      if (edit_mode == 1) then
+        PAD_BOTTOM = PAD_BOTTOM + self.PAD_BOTTOM_EDIT;
+      end
+       -- If we need the extra row...  add it in.
+      if ((TFuInv_SearchBox:IsVisible()
+          and (TFuInvFrame_Total:IsVisible() or TFuInvacterBag3Slot:IsVisible())) or
+          TFuInvFrame_MoneyFrame:IsVisible() and TFuInvFrame_TokenFrame:IsVisible()) then
+        PAD_BOTTOM = PAD_BOTTOM + self.PAD_BOTTOM_SEARCH;
+      end
+      if (PAD_BOTTOM > 0) then
+        -- If there's anything at the bottom add the spacer
+        PAD_BOTTOM = PAD_BOTTOM + self.PAD_BOTTOM_SPACER;
+      end
     end
     if (TFuInv_UserDropdown:IsVisible() or TFuInv_Button_HighlightToggle:IsVisible() or
         TFuInv_Button_ChangeEditMode:IsVisible() or TFuInv_Button_ShowBank:IsVisible() or
@@ -6023,43 +6132,45 @@ function TFuBag:LayoutWindow(frame)
      end
  else
     -- TFuBnkFrame
-    -- Stage 2: the per-tab selector strip shares the bottom Total row (the classic
-    -- bag-slot grid is gone), so reserving the normal bottom row covers it. Trigger
-    -- the reservation on the strip too, so the row is kept even if Total is hidden.
     local strip_shown = TFuBnkFrame.TabStrip and TFuBnkFrame.TabStrip:IsShown();
-    if (TFuBnkFrame_Total:IsVisible() or TFuBnkFrameBagBank:IsVisible() or strip_shown or
-        TFuBnkFrame_MoneyFrame:IsVisible() or TFuBnkFrame_TokenFrame:IsVisible()) then
-      PAD_BOTTOM = PAD_BOTTOM + self.PAD_BOTTOM_NORM;
-    end
-    if (edit_mode == 1) then
-      PAD_BOTTOM = PAD_BOTTOM + self.PAD_BOTTOM_EDIT;
-    end
-
-    -- Search box adds a row below the Total/strip row (same logic as inventory).
-    if (TFuBnk_SearchBox:IsVisible() and
-        (TFuBnkFrame_Total:IsVisible() or strip_shown)) then
-      PAD_BOTTOM = PAD_BOTTOM + self.PAD_BOTTOM_SEARCH;
-    end
-
-    -- Do we need an extra row
-    local bags_row = 0;
-    if (TFuBnkFrameBagBank:IsVisible()) then
-      bags_row = bags_row + 5;
-    end
-    if (TFuBnkFrame_Total:IsVisible()) then
-      bags_row = bags_row + 1;
-    end
-    if TFuBnkFrame_MoneyFrame:IsVisible() or TFuBnkFrame_TokenFrame:IsVisible() then
-      bags_row = bags_row + 4;
-    end
-    if (colmax <= bags_row or
-       (TFuBnkFrame_MoneyFrame:IsVisible() and TFuBnkFrame_TokenFrame:IsVisible())) then
-      PAD_BOTTOM = PAD_BOTTOM + self.PAD_BOTTOM_NORM;
-    end
-
-    if (PAD_BOTTOM > 0) then
-      -- If there's anything at the bottom add the spacer
-      PAD_BOTTOM = PAD_BOTTOM + self.PAD_BOTTOM_SPACER;
+    -- Reserve the bottom band to FIT the actual visible controls (search / total /
+    -- money / token / tab strip), measured up from the frame bottom + a 12px gap (which
+    -- leaves a 6px gap above the footer rule, mirroring the rule's 6px gap above the
+    -- controls). The old per-row heuristic over-reserved -- the 12.0 Warband bank
+    -- dropped the classic bag-slot grid, so the +5 bag row and the doubled NORM row
+    -- pushed the categories ~65px above the controls, floating them far from the footer
+    -- rule and leaving dead space. Fall back to the heuristic only before the controls
+    -- are first positioned (measurement returns nil).
+    local measured = self:FooterChromeTop(frame, self.BNK_FOOTER_WIDGETS);
+    if (measured and measured > 0) then
+      PAD_BOTTOM = math.ceil(measured) + 12 - self.BORDER - frame:PoolY(1);
+      if (PAD_BOTTOM < self.PAD_BOTTOM_NORM) then PAD_BOTTOM = self.PAD_BOTTOM_NORM; end
+      if (edit_mode == 1) then PAD_BOTTOM = PAD_BOTTOM + self.PAD_BOTTOM_EDIT; end
+    else
+      if (TFuBnkFrame_Total:IsVisible() or TFuBnkFrameBagBank:IsVisible() or strip_shown or
+          TFuBnkFrame_MoneyFrame:IsVisible() or TFuBnkFrame_TokenFrame:IsVisible()) then
+        PAD_BOTTOM = PAD_BOTTOM + self.PAD_BOTTOM_NORM;
+      end
+      if (edit_mode == 1) then
+        PAD_BOTTOM = PAD_BOTTOM + self.PAD_BOTTOM_EDIT;
+      end
+      if (TFuBnk_SearchBox:IsVisible() and
+          (TFuBnkFrame_Total:IsVisible() or strip_shown)) then
+        PAD_BOTTOM = PAD_BOTTOM + self.PAD_BOTTOM_SEARCH;
+      end
+      local bags_row = 0;
+      if (TFuBnkFrameBagBank:IsVisible()) then bags_row = bags_row + 5; end
+      if (TFuBnkFrame_Total:IsVisible()) then bags_row = bags_row + 1; end
+      if TFuBnkFrame_MoneyFrame:IsVisible() or TFuBnkFrame_TokenFrame:IsVisible() then
+        bags_row = bags_row + 4;
+      end
+      if (colmax <= bags_row or
+         (TFuBnkFrame_MoneyFrame:IsVisible() and TFuBnkFrame_TokenFrame:IsVisible())) then
+        PAD_BOTTOM = PAD_BOTTOM + self.PAD_BOTTOM_NORM;
+      end
+      if (PAD_BOTTOM > 0) then
+        PAD_BOTTOM = PAD_BOTTOM + self.PAD_BOTTOM_SPACER;
+      end
     end
 
     if (TFuBnk_UserDropdown:IsVisible() or TFuBnk_Button_HighlightToggle:IsVisible() or
