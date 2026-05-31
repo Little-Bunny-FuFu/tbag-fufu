@@ -290,13 +290,36 @@ end
 -- views. Rendering one type keeps the slot count (and per-open scan/layout cost) and
 -- window height roughly halved. Tab ids ARE Enum.BagIndex container ids, read with
 -- the same C_Container calls as bags. All C_Bank reads are AllowedWhenUntainted; no
+-- Authoritative "a live bank session exists right now" signal for 12.0. Blizzard's
+-- BankFrame opens on BANKFRAME_OPENED and its OnHide calls C_Bank.CloseBankFrame(), so
+-- the panel being shown == an open server-side bank session. We read it (never write) so
+-- there is no taint. This is more reliable than our own physAtBank latch, which OnHide
+-- clears even though our no-op CloseBankFrame() stub leaves the session (and Blizzard's
+-- bank) alive -- the desync that made the Show Bank toggle reopen the CACHED bank instead
+-- of the live one while still standing at the banker.
+function Bank:IsBankSessionLive()
+  return (BankFrame and BankFrame:IsShown()) and true or false
+end
+
 -- BankFrame hijack -> no taint. Run on BANKFRAME_OPENED + BANK_TABS_CHANGED + switch.
--- Live = physically standing at our OWN bank, viewing our own character. Only then do
--- the C_Bank reads return real data and the live controls (deposit / money transfer /
--- buy tab / tab settings) apply. Viewing another character, or our own bank away from a
+-- Live = a bank session is open AND we are viewing our OWN character. Only then do the
+-- C_Bank reads return real data and the live controls (deposit / money transfer / buy
+-- tab / tab settings) apply. Viewing another character, or our own bank away from a
 -- banker, is a cache-only (read-only) view. Recomputed whenever the player selection or
 -- physical bank state changes (RebuildTabList, dropdown switch).
+--   physAtBank is our BANKFRAME_OPENED/CLOSED latch; BankFrame:IsShown() is the live
+-- session itself. We OR them: closing the tbag window clears physAtBank but leaves the
+-- session alive, so consulting the panel lets the Show Bank toggle re-open the LIVE bank
+-- (as if you had clicked the banker) rather than the stale cached snapshot.
 function Bank:RefreshLiveFlag()
+  -- Heal the physAtBank latch from the authoritative session signal: if Blizzard's bank
+  -- is open we ARE physically at a banker, even if OnHide cleared the latch. This keeps
+  -- the physAtBank==1 gates in Events.lua (live tab/slot refreshes) working after the
+  -- tbag window is closed and re-opened against a still-live session. BANKFRAME_CLOSED
+  -- clears it again when the session actually ends.
+  if (self:IsBankSessionLive()) then
+    self.physAtBank = 1
+  end
   if (self.physAtBank == 1 and self.playerid == TFuBag.PLAYERID) then
     self.atbank = 1
   else

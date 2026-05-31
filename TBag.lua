@@ -2233,6 +2233,56 @@ function TFuBag:GetBarCategoryName(baritmbar)
   return table.concat(names, " / ");
 end
 
+-- Right-click a category title label to dump that category's contents to chat (same as
+-- /printcat <name>). The titles are FontStrings (non-interactive), so we overlay a
+-- transparent button sized to JUST the title text. It registers only for right-click, so
+-- it ignores (does not error on) left-clicks; because it covers only the text and not the
+-- full-width Manual-Layout drag handle beneath, the handle stays grabbable on either side
+-- of the text. One button per bar frame, created once and reused; call with show=false to
+-- hide it when titles are off.
+function TFuBag:WireCatTitleClick(frame, bf, baritmbar, show)
+  if (not bf) then return; end
+  local label = bf.CatName;
+  if (not label) then return; end
+  local btn = bf.CatTitleBtn;
+  if (not show) then
+    if (btn) then btn:Hide(); end
+    return;
+  end
+  if (not btn) then
+    btn = CreateFrame("Button", nil, bf);
+    btn:RegisterForClicks("RightButtonUp");
+    btn:SetScript("OnClick", function(self, mouseButton)
+      if (mouseButton ~= "RightButton") then return; end
+      local names = self.catNames;
+      if (not names) then return; end
+      for _, nm in ipairs(names) do
+        TFuBag:PrintCategoryContents(self.which, nm);
+      end
+    end);
+    btn:SetScript("OnEnter", function(self)
+      GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+      GameTooltip:SetText("Right-click: print this category to chat", 1, 1, 1, 1, true);
+      GameTooltip:Show();
+    end);
+    btn:SetScript("OnLeave", function() GameTooltip:Hide(); end);
+    bf.CatTitleBtn = btn;
+  end
+  -- Re-cover the title text every layout (the label re-anchors center/left/right).
+  btn:ClearAllPoints();
+  btn:SetAllPoints(label);
+  btn:SetFrameLevel(bf:GetFrameLevel() + 12);
+  btn.which = (frame == TFuBnkFrame) and "bank" or "inv";
+  -- Split a merged-bar title ("A / B") so each category is dumped separately.
+  local names = {};
+  for piece in string.gmatch(self:GetBarCategoryName(baritmbar), "[^/]+") do
+    local t = strtrim(piece);
+    if (t ~= "") then names[#names + 1] = t; end
+  end
+  btn.catNames = names;
+  btn:Show();
+end
+
 -- Used for options strings
 function TFuBag:GetBagDispName(bag)
   if ( bag < self.BAGMIN ) or ( bag > self.BAGMAX ) then return ""; end
@@ -5344,8 +5394,10 @@ function TFuBag:LayoutWindowFree(frame, PAD_TOP, PAD_BOTTOM, show_cat_names, CAT
             end
           end
           label:Show();
+          self:WireCatTitleClick(frame, bf, baritm[barnum], true);
         else
           label:Hide();
+          self:WireCatTitleClick(frame, bf, nil, false);
         end
       end
 
@@ -5356,6 +5408,7 @@ function TFuBag:LayoutWindowFree(frame, PAD_TOP, PAD_BOTTOM, show_cat_names, CAT
       self:SetBarDraggable(frame, barnum, bf, false);
       local label = bf.CatName;
       if (label) then label:Hide(); end
+      self:WireCatTitleClick(frame, bf, nil, false);
     end
   end
 
@@ -5558,8 +5611,10 @@ function TFuBag:LayoutWindowFreePlace(frame, PAD_TOP, PAD_BOTTOM, show_cat_names
             end
           end
           label:Show();
+          self:WireCatTitleClick(frame, bf, baritm[barnum], true);
         else
           label:Hide();
+          self:WireCatTitleClick(frame, bf, nil, false);
         end
       end
 
@@ -5572,6 +5627,7 @@ function TFuBag:LayoutWindowFreePlace(frame, PAD_TOP, PAD_BOTTOM, show_cat_names
       self:SetBarDraggable(frame, barnum, bf, false);
       local label = bf.CatName;
       if (label) then label:Hide(); end
+      self:WireCatTitleClick(frame, bf, nil, false);
     end
   end
 
@@ -5874,12 +5930,15 @@ function TFuBag:LayoutWindow(frame)
                 end
               end
               label:Show();
+              self:WireCatTitleClick(frame, barframe[iBar], baritm[barnum+iBar], true);
             else
               label:Hide();
+              self:WireCatTitleClick(frame, barframe[iBar], nil, false);
             end
           end
         else
           barframe[iBar]:Hide();
+          self:WireCatTitleClick(frame, barframe[iBar], nil, false);
         end
       end
 
