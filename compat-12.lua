@@ -22,6 +22,10 @@ if C then
   SplitContainerItem       = C.SplitContainerItem
   UseContainerItem         = C.UseContainerItem
   ContainerIDToInventoryID = C.ContainerIDToInventoryID
+  -- Vendor sell-cursor (coin shown when hovering a sellable item at a merchant). The bare
+  -- global was moved into C_Container in 10.0; without this alias ItemButton.OnEnter calls
+  -- a nil value at a vendor ("attempt to call a nil value", spammed during Sell All Junk).
+  ShowContainerSellCursor  = C.ShowContainerSellCursor
 
   -- 8.0+: GetContainerItemInfo returns a ContainerItemInfo struct instead of
   -- positional values. Re-expose the Legion positional order TBag reads.
@@ -44,6 +48,11 @@ end
 -- bag-size cap in GetBagMaxItems / CreateDummyBag; restore it generously
 -- (50 matches the working TBag-Inventory-Only reference port's hardcoded cap).
 MAX_CONTAINER_ITEMS = MAX_CONTAINER_ITEMS or 50
+
+-- LE_ITEM_QUALITY_* enum globals were removed in retail (replaced by Enum.ItemQuality.*).
+-- TBag's merchant junk-coin overlay compares item rarity against LE_ITEM_QUALITY_POOR; with
+-- the global nil that test was always false, so the coin never appeared on grey items.
+LE_ITEM_QUALITY_POOR = LE_ITEM_QUALITY_POOR or (Enum and Enum.ItemQuality and Enum.ItemQuality.Poor)
 
 -- ---------------------------------------------------------------------------
 -- AddOn API -> C_AddOns (11.0).
