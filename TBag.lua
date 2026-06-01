@@ -682,18 +682,19 @@ function TFuBag:CleanConfig()
     TFuBagInfo[player]["pvp"] = nil;
   end
 
-  -- One-time: the "Bags" category used to share default bar 29 with "Junk" (rendering a
-  -- combined "Junk/Bags" box). It now defaults to its own bar (10). Relocate existing
-  -- configs that are still on the old shared default only -- a user who deliberately moved
-  -- Bags elsewhere is left untouched. Guarded so it runs exactly once.
-  if (not TFuBagCfg["bag_bar_split_done"]) then
+  -- One-time: "Bags" and "Junk" used to share default bar 29 (with each other + the Act-on
+  -- categories), rendering a mixed box. They now default to their own bars (Bags=10,
+  -- Junk=9). Relocate existing configs that are still on the old shared bar 29 only -- a
+  -- category a user deliberately moved elsewhere is left untouched. Guarded to run once.
+  if (not TFuBagCfg["catbar_split_v2"]) then
     for _, wkey in ipairs({ "Inv", "Bnk" }) do
       local cb = TFuBagCfg[wkey] and TFuBagCfg[wkey][self.CAT_BAR];
-      if (cb and cb[L["BAG"]] == 29) then
-        cb[L["BAG"]] = 10;
+      if (cb) then
+        if (cb[L["BAG"]] == 29) then cb[L["BAG"]] = 10; end
+        if (cb[L["GRAY_ITEMS"]] == 29) then cb[L["GRAY_ITEMS"]] = 9; end
       end
     end
-    TFuBagCfg["bag_bar_split_done"] = true;
+    TFuBagCfg["catbar_split_v2"] = true;
   end
 end
 
@@ -2478,8 +2479,8 @@ function TFuBag:SetDefLayout(cfg, bagarr, row1offset, reset)
   self:SetCatBar(cfg, L["ACT_ON"], 29, reset);
   self:SetCatBar(cfg, L["ACT_OPEN"], 29, reset);
   self:SetCatBar(cfg, L["ACT_SELL"], 29, reset);
-  self:SetCatBar(cfg, L["BAG"], 10, reset);  -- own bar (was 29, shared with Junk -> a "Junk/Bags" box)
-  self:SetCatBar(cfg, L["GRAY_ITEMS"], 29, reset);
+  self:SetCatBar(cfg, L["BAG"], 10, reset);        -- own bar (was 29, shared with Junk)
+  self:SetCatBar(cfg, L["GRAY_ITEMS"], 9, reset);  -- own bar (was 29, shared with Bags + Act-ons)
 
   local bag;
   for _, bag in ipairs(bagarr) do
