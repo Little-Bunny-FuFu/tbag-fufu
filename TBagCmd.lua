@@ -51,8 +51,15 @@ local TFuBALL_HELP = {
 
 
 function TFuBag:ShowHelp(arr)
-  for _, line in ipairs(arr) do
-    self:Print(line);
+  -- Brand the header line with the addon prefix (same scheme as the EmptyBag /
+  -- search / printchars reports); keep the indented command lines plain so the
+  -- block isn't a wall of repeated prefixes.
+  for i, line in ipairs(arr) do
+    if (i == 1) then
+      self:Print(self.SCP..line);
+    else
+      self:Print(line);
+    end
   end
 end
 
@@ -70,10 +77,10 @@ function TFuBnk_cmd(msg)
   elseif (cmd == L["debug"]) then
     if (TFuBag.DEBUGMESSAGES == 0) then
       TFuBag.DEBUGMESSAGES = 1;
-      TFuBag:Print("TFuBnk: Debugging messages on.");
+      TFuBag:Print(TFuBag.SCP.."Debugging messages on.");
     else
       TFuBag.DEBUGMESSAGES = 0;
-      TFuBag:Print("TFuBnk: Debugging messages off.");
+      TFuBag:Print(TFuBag.SCP.."Debugging messages off.");
     end
   elseif (cmd == L["reset"]) then
     TFuBagCfg["Bnk"] = {};
@@ -85,7 +92,7 @@ function TFuBnk_cmd(msg)
     TFuBag:AssignCats(TFuBnkFrame.cfg, 0);
     TFuBag:BuildBarClassList(TFuBnkFrame.BC_LIST, TFuBnkFrame.cfg);
     TFuBag:BumpCatGen();  -- rules changed: force a recat (and a re-sort on next open if hidden)
-    TFuBag:Print("TFuBnk: Sort rules reset to defaults.");
+    TFuBag:Print(TFuBag.SCP.."Bank sort rules reset to defaults.");
     TFuBnkFrame:UpdateWindow(TFuBag.REQ_MUST);
   elseif (cmd == L["resetpos"]) then
     TFuBnkFrame:SetDefPos(TFuBnkFrame.cfg,1);
@@ -105,7 +112,7 @@ function TFuBnk_cmd(msg)
     TFuBnkFrame.cfg.cat_layout = {};
     TFuBnkFrame.cfg.cat_layout_free = {};
     TFuBnkFrame.cfg.ml_auto = true;
-    TFuBag:Print("TFuBnk: Manual Layout reset; will re-snapshot from the default layout.");
+    TFuBag:Print(TFuBag.SCP.."Bank Manual Layout reset; will re-snapshot from the default layout.");
     TFuBnkFrame:UpdateWindow(TFuBag.REQ_MUST);
   elseif (cmd == "bank") then
     -- Interim: switch between Character and Warband bank views (clickable per-type
@@ -144,10 +151,10 @@ function TFuInv_cmd(msg)
   elseif (cmd == L["debug"]) then
     if (TFuBag.DEBUGMESSAGES == 0) then
       TFuBag.DEBUGMESSAGES = 1;
-      TFuBag:Print("TFuInv: Debugging messages on.");
+      TFuBag:Print(TFuBag.SCP.."Debugging messages on.");
     else
       TFuBag.DEBUGMESSAGES = 0;
-      TFuBag:Print("TFuInv: Debugging messages off.");
+      TFuBag:Print(TFuBag.SCP.."Debugging messages off.");
     end
   elseif (cmd == L["reset"]) then
     TFuBagCfg["Inv"] = {};
@@ -159,7 +166,7 @@ function TFuInv_cmd(msg)
     TFuBag:AssignCats(TFuInvFrame.cfg, 0);
     TFuBag:BuildBarClassList(TFuInvFrame.BC_LIST, TFuInvFrame.cfg);
     TFuBag:BumpCatGen();  -- rules changed: force a recat (and a re-sort on next open if hidden)
-    TFuBag:Print("TFuInv: Sort rules reset to defaults.");
+    TFuBag:Print(TFuBag.SCP.."Inventory sort rules reset to defaults.");
     TFuInvFrame:UpdateWindow(TFuBag.REQ_MUST);
   elseif (cmd == L["resetpos"]) then
     TFuInvFrame:SetDefPos(TFuInvFrame.cfg,1);
@@ -177,7 +184,7 @@ function TFuInv_cmd(msg)
     TFuInvFrame.cfg.cat_layout = {};
     TFuInvFrame.cfg.cat_layout_free = {};
     TFuInvFrame.cfg.ml_auto = true;
-    TFuBag:Print("TFuInv: Manual Layout reset; will re-snapshot from the default layout.");
+    TFuBag:Print(TFuBag.SCP.."Inventory Manual Layout reset; will re-snapshot from the default layout.");
     TFuInvFrame:UpdateWindow(TFuBag.REQ_MUST);
   elseif (cmd == "printtypes") then
     -- TEMP diagnostic: dump distinct item class/subclass buckets in the bags.
