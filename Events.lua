@@ -180,7 +180,22 @@ function TFuBag:BANKFRAME_OPENED()
   -- re-categorizes (PickBar + per-item tooltip scan) all ~1000 bank tab slots on
   -- every open even when nothing changed -> the per-open lag. First open still
   -- populates because an empty/stale cache reads as "changed".
+  -- BUT Show() only fires OnShow on a hidden->shown transition. If the tbag bank window
+  -- was ALREADY open (the user had the cached bank up and then clicked the banker), Show()
+  -- is a no-op, so OnShow never runs and the item buttons that RebuildTabList's
+  -- HideAllTabButtons just cleared are never re-shown -> every icon vanishes (only the
+  -- stale header spacing remains) until a manual resort. Drive the update ourselves when
+  -- already shown. REQ_PART keeps it cheap: the always-run per-button pass re-shows the
+  -- buttons at their (unchanged) layout positions with no forced recat -- and RebuildTabList
+  -- already flags CACHE_REQ=REQ_MUST if the tab set actually changed, which REQ_PART folds in.
+  local wasShown = TFuBnkFrame:IsShown()
   TFuBnkFrame:Show()
+  if (wasShown) then
+    -- Synchronous (not RequestUpdate): RebuildTabList already hid the buttons this frame,
+    -- so a deferred/debounced update would let the hidden state render first -> a visible
+    -- flash. A direct UpdateWindow re-shows them in the same frame, matching OnShow's path.
+    TFuBnkFrame:UpdateWindow(TFuBag.REQ_PART)
+  end
   -- Repaint the inventory window so its bag items pick up the bank-deposit eligibility
   -- greying (bag contents didn't change -> a light REQ_NONE repaint, no re-sort).
   TFuBag:RequestUpdate(TFuInvFrame)
