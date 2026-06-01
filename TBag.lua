@@ -3977,20 +3977,50 @@ function TFuBag:DepositToFreeSlot(frame)
   if (not CursorHasItem()) then return; end
   if (not (frame and frame.cfg)) then return; end
   if (not self:IsLive(frame)) then ClearCursor(); return; end
-  if (frame.dropBag and frame.dropSlot) then
-    PickupContainerItem(frame.dropBag, frame.dropSlot);
+
+  local dbag, dslot = frame.dropBag, frame.dropSlot;
+  -- An equipped bag dragged out of its slot (TFuBag.cursorBagId) frees all of its OWN
+  -- slots, so the auto-target (SortItmCache's first free slot) can land inside that very
+  -- bag -> Blizzard rejects "a bag can't be placed in itself". Retarget to a free slot in a
+  -- DIFFERENT bag so removing a bag whose freed slots are the only free space still works.
+  local cb = self.cursorBagId;
+  self.cursorBagId = nil;
+  if (cb and dbag == cb) then
+    dbag, dslot = self:FindFreeSlotExcept(frame, cb);
+  end
+
+  if (dbag and dslot) then
+    PickupContainerItem(dbag, dslot);
     -- A stack split sets STACKSPLIT, so the PickupContainerItem hook (which just ran,
     -- synchronously) blacklisted this destination slot from auto-stacking -- that skip
     -- otherwise persists until a reload, leaving a deposited split portion un-merged.
     -- Clear it here so the BAG_UPDATE that follows this deposit can auto-stack the slot
     -- with a matching partial stack. (The split SOURCE keeps its skip, so a split kept
     -- in the same bag still won't immediately re-merge.)
-    self:SetStackSkip(frame.dropBag, frame.dropSlot, nil);
-    self:SetCompSkip(frame.dropBag, frame.dropSlot, nil);
+    self:SetStackSkip(dbag, dslot, nil);
+    self:SetCompSkip(dbag, dslot, nil);
   else
     ClearCursor();
     UIErrorsFrame:AddMessage(ERR_BAG_FULL, 1.0, 0.1, 0.1, 1.0);
   end
+end
+
+-- First free slot in any inventory bag OTHER than exceptBag (used when stowing an equipped
+-- bag dragged out of its slot, so it can't be dropped back into itself).
+function TFuBag:FindFreeSlotExcept(frame, exceptBag)
+  local pcache = frame and frame.playerid and TFuInvItm[frame.playerid];
+  if (not pcache) then return nil, nil; end
+  for _, b in ipairs(frame.bags) do
+    if (b ~= exceptBag and pcache[b]) then
+      for s = 1, self:GetBagMaxItems(b) do
+        local itm = pcache[b][s];
+        if (itm and (not itm[self.I_ITEMLINK] or itm[self.I_ITEMLINK] == "")) then
+          return b, s;
+        end
+      end
+    end
+  end
+  return nil, nil;
 end
 
 -- Hidden drop-target holder: wires the WHOLE window (main frame + scroll content) as a

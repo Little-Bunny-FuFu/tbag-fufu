@@ -708,6 +708,9 @@ function BagButton:OnDrag()
 
   if not isLive then return end
   PickupBagFromSlot(ContainerIDToInventoryID(bag))
+  -- Remember which equipped bag is now on the cursor so a window-body drop doesn't try to
+  -- stow it into one of its OWN (now-free) slots -> Blizzard "a bag can't go in itself".
+  TFuBag.cursorBagId = bag
 end
 
 -- Used for the ItemAnim subframe to trigger the animation

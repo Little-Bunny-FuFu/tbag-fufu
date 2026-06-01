@@ -276,7 +276,12 @@ function Inv:UpdateBagGfx()
     totalfree = totalfree + free;
     totalsize = totalsize + size;
 
-    -- Update the textures as well
+    -- Refresh the live bag-level info (the equipped bag item's link) before drawing the
+    -- selector icon. A bag that was just emptied/unequipped has no items, so PickBar -- which
+    -- normally refreshes this via GetBagType -- never runs for it, leaving the OLD bag icon on
+    -- a now-empty slot. GetBagType re-reads GetInventoryItemLink (nil once unequipped), so the
+    -- icon falls back to the empty bag-slot texture.
+    TFuBag:GetBagType(self.playerid, bag);
     TFuBag:GetBagFrameTexture(bag):SetTexture(
         TFuBag:GetBagTexture(self.playerid, bag));
 
