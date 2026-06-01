@@ -1,0 +1,32 @@
+name: Package and release
+
+# Build a packaged addon zip and publish a GitHub Release whenever a version tag is
+# pushed (e.g. `git tag -a v12.0.0.02 -m ...; git push origin v12.0.0.02`). Uses the
+# BigWigs/CurseForge packager, which reads .pkgmeta (package-as: tbag-fufu, the ignore
+# list, manual-changelog) and substitutes @project-version@ in the .toc from the tag.
+#
+# GitHub-only: no CF_API_KEY / WOWI_API_TOKEN / WAGO_API_TOKEN secrets are set, so the
+# packager publishes the zip to a GitHub Release and skips all external sites (matches
+# the private GitHub + guild distribution model).
+
+on:
+  push:
+    tags:
+      - '**'
+
+permissions:
+  contents: write   # let the packager create the GitHub Release with GITHUB_TOKEN
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone project
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # full history so the packager can build the changelog
+
+      - name: Package and create release
+        uses: BigWigsMods/packager@v2
+        env:
+          GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
