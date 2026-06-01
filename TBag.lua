@@ -1200,30 +1200,62 @@ function TFuBag:BarHasSubgroups(items)
   return false;
 end
 
--- Effective box dimensions (cols, rows, isSub) for a Manual Layout bar: a flat
--- cols x rows grid from the saved layout. `colmax` is the column budget.
--- NOTE: equipment SUB-GROUP shelves are intentionally NOT rendered in Manual Layout.
--- The sub-headered shelf is designed full-width (one bar per row, EquipSubPlan at
--- colmax); forcing that onto freely/grid-placed boxes made every equipment bar
--- colmax-wide and broke the layout (overlapping boxes; /reseed didn't help because the
--- breakage is in the size/position math, not the saved coords). So ML draws equipment
--- bars flat like any other category; the shelf view is the auto-flow (ML off) layout.
--- Used by both ML layout paths so the size passes and the draw pass agree.
+-- Sort-key fragment for an item's equipment SUB-GROUP, honoring a user drag-reorder
+-- (cfg.subgroup_order[catKey][subLabel] = rank, 1 = first). SortItmCache compares the
+-- whole concatenated key with `>` (descending), so a ranked sub-group must produce a
+-- LARGER fragment to sort EARLIER: ranked fragments lead with "1" and encode
+-- (9999 - rank) so rank 1 is the largest; unranked fragments lead with "0" and fall
+-- back to the raw label, preserving the original alphabetical order for any category
+-- the user has never reordered. Same-label items share a fragment, so a sub-group
+-- stays contiguous (EquipSubPlan relies on that).
+function TFuBag:SubSortKey(cfg, itm)
+  local sl = itm[self.I_SUBGROUP] or "";
+  local m = cfg and cfg.subgroup_order and cfg.subgroup_order[itm[self.I_CAT]];
+  local r = m and m[sl];
+  if (r) then
+    return "1"..string.format("%04d", 9999 - r);
+  end
+  return "0"..sl;
+end
+
+-- Effective box dimensions (cols, rows, isSub) for a Manual Layout bar. This is the
+-- SINGLE SOURCE OF TRUTH for a bar's grid footprint -- the draw passes AND every
+-- collision/snap/seed footprint route through it, so what is drawn always equals what
+-- is reserved (a footprint that recomputed rows independently as ceil(n/cols) while the
+-- box drew at a different height was the overlap bug).
+--
+-- Normal categories: a flat cols x rows grid from the saved layout (`rec.cols`),
+-- clamped to the column budget `colmax`.
+--
+-- Equipment (sub-grouped) categories: drawn as a FULL-WIDTH shelf block, exactly like
+-- the auto-flow (ML-off) view -- one box per category, EquipSubPlan packs the armor/
+-- weapon sub-groups across `colmax` with per-sub-group headers. Width is colmax (not
+-- rec.cols, which is ignored for these); height is the shelf plan's height CEIL'd to
+-- whole cells so the band math + footprints stay integer (fractional shelf heights are
+-- what confused the grid bands before). isSub=true drives AssignButtonsToFrame's shelf
+-- draw. Gated on edit_mode ~= 1 to match AssignButtonsToFrame's own sub-render guard,
+-- so legacy-edit mode (bar buttons shown) still draws equipment flat.
 function TFuBag:MLBarDims(frame, items, rec, colmax)
   if (not colmax or colmax < 1) then colmax = 1; end
   local n = (items and table.getn(items)) or 0;
+  if (self:BarHasSubgroups(items) and (not frame or frame.edit_mode ~= 1)) then
+    -- Full-width shelf block. The column budget is the box's CAPTURED width (rec.cols ==
+    -- the content width measured from the auto-flow render), so equipment reflows with
+    -- the window exactly like a normal category does; fall back to colmax only when
+    -- seeding a brand-new equipment box that has no record yet. NOT clamped to colmax:
+    -- a window dragged wider than the static budget renders equipment at the larger
+    -- dynamic width, and clamping here would freeze it at the static width (the reflow
+    -- bug). EquipSubPlan re-packs the sub-groups across whatever budget it is given.
+    local cols = (rec and rec.cols) or colmax;
+    if (cols < 1) then cols = 1; end
+    local H = (self:EquipSubPlan(items, cols));
+    local rows = math.ceil(H);
+    if (rows < 1) then rows = 1; end
+    return cols, rows, true;
+  end
   local cols = (rec and rec.cols) or 1;
   if (cols < 1) then cols = 1; end
   if (cols > colmax) then cols = colmax; end
-  -- Equipment (sub-grouped) bars are drawn FULL-WIDTH in auto-flow, so the snapshot
-  -- stored colmax for them. In ML draw them as a normal FLAT grid sized to their item
-  -- count instead: a stale colmax-wide box overlaps its neighbours, and a bank-type
-  -- switch (or any catGen re-pick -> REQ_MUST repaint) re-applies that bad width. Other
-  -- bars keep their saved width.
-  if (self:BarHasSubgroups(items)) then
-    cols = math.min(n, colmax);
-    if (cols < 1) then cols = 1; end
-  end
   local rows = math.ceil(n / cols);
   if (rows < 1) then rows = 1; end
   return cols, rows, false;
@@ -1285,7 +1317,7 @@ function TFuBag:EquipSubPlan(items, colmax)
     local startCell = cx + pre;
     local itemsTopY = shelfTopY + hb;
     if (c.label and c.label ~= "") then
-      headers[#headers + 1] = { label = c.label, w = w, firstItm = c.items[1] };
+      headers[#headers + 1] = { label = c.label, w = w, rows = rows, firstItm = c.items[1] };
     end
     for idx, itm in ipairs(c.items) do
       placements[#placements + 1] = {
@@ -1299,6 +1331,92 @@ function TFuBag:EquipSubPlan(items, colmax)
   end
   local height = shelfTopY + hb + shelfItemRows;
   return height, headers, placements;
+end
+
+-- ===== Equipment sub-group drag-reorder =====================================
+-- The shelf headers can be dragged (only while Manual Layout is unlocked) to set a
+-- custom sub-group order WITHIN a category. The order is stored as a per-category
+-- rank map (cfg.subgroup_order) consumed by SubSortKey, so it persists and applies in
+-- both ML on and ML off (it changes the sort, not the layout).
+
+-- Distinct equipment sub-group labels for a bar, in their CURRENT display order (the
+-- post-sort baritm order). This is the basis a drag-reorder edits.
+function TFuBag:SubGroupOrderedLabels(baritmbar)
+  local out, seen = {}, {};
+  for _, itm in ipairs(baritmbar) do
+    local sl = itm[self.I_SUBGROUP];
+    if (sl and sl ~= "" and not seen[sl]) then
+      seen[sl] = true; out[#out + 1] = sl;
+    end
+  end
+  return out;
+end
+
+-- Persist a sub-group order (list of labels; list index = desired position, 1 first)
+-- for a category, then resort + relayout so it takes effect. No catGen bump: this only
+-- changes the within-bar SORT (SortItmCache re-sorts every REQ_MUST), not categorization.
+function TFuBag:ApplySubGroupOrder(frame, catKey, ordered)
+  local cfg = frame.cfg;
+  if (not cfg or not catKey) then return; end
+  cfg.subgroup_order = cfg.subgroup_order or {};
+  local m = {};
+  for i, label in ipairs(ordered) do m[label] = i; end
+  cfg.subgroup_order[catKey] = m;
+  frame:UpdateWindow(self.REQ_MUST);
+end
+
+-- Drop handler for a dragged sub-group header: find the header the cursor is nearest
+-- (same category), move the dragged label to that slot (after the target when moving
+-- forward, before it when moving back), and persist. Cursor-nearest works for the 2D
+-- wrapped shelf flow where headers are not in a single row.
+function TFuBag:SubHeaderDrop(frame, barnum, draggedLabel)
+  local baritmbar = frame.BARITM[barnum];
+  if (not baritmbar or table.getn(baritmbar) == 0) then return; end
+  local catKey = baritmbar[1][self.I_CAT];
+  local ordered = self:SubGroupOrderedLabels(baritmbar);
+
+  local from;
+  for i, l in ipairs(ordered) do if (l == draggedLabel) then from = i; break; end end
+  if (not from) then return; end
+
+  local boxFrame = _G[frame:GetName().."_bar_"..barnum];
+  local headers = boxFrame and boxFrame.SubHeaders;
+  local labels = boxFrame and boxFrame.SubHeaderLabels;
+  if (not headers or not labels) then return; end
+
+  -- GetCursorPosition is in raw screen pixels; GetCenter is in the region's scaled
+  -- units. Convert each header center to screen pixels (center * effective scale) so
+  -- the nearest-header test is correct regardless of the bag frame's scale.
+  local mx, my = GetCursorPosition();
+
+  local targetLabel, bestD;
+  for i, fs in ipairs(headers) do
+    if (fs:IsShown() and labels[i] and labels[i] ~= draggedLabel) then
+      local cx, cy = fs:GetCenter();
+      local es = fs:GetEffectiveScale();
+      if (cx and cy and es) then
+        cx, cy = cx * es, cy * es;
+        local d = (cx - mx) * (cx - mx) + (cy - my) * (cy - my);
+        if (not bestD or d < bestD) then bestD = d; targetLabel = labels[i]; end
+      end
+    end
+  end
+  if (not targetLabel) then return; end
+
+  local to;
+  for i, l in ipairs(ordered) do if (l == targetLabel) then to = i; break; end end
+  if (not to or to == from) then return; end
+
+  table.remove(ordered, from);
+  local ti;
+  for i, l in ipairs(ordered) do if (l == targetLabel) then ti = i; break; end end
+  if (not ti) then return; end
+  if (from < to) then
+    table.insert(ordered, ti + 1, draggedLabel);  -- moved forward: drop after target
+  else
+    table.insert(ordered, ti, draggedLabel);        -- moved back: drop before target
+  end
+  self:ApplySubGroupOrder(frame, catKey, ordered);
 end
 
 -- Read an armor slot's group target from the targeted window (default = identity).
@@ -4534,13 +4652,13 @@ function TFuBag:SortItmCache(cfg, playerid, itmcache, baritm, bagarr)
       table.sort(baritm[barnum],
         function(a,b) return
           a[TFuBag.I_CAT]..
-          (a[TFuBag.I_SUBGROUP] or "")..
+          TFuBag:SubSortKey(cfg, a)..
           TFuBag:ReverseString(a[TFuBag.I_NAME],toggle)..
           string.format("%04s",a[TFuBag.I_COUNT])..string.format("%02s",a[TFuBag.I_SLOT])
 
           >
           b[TFuBag.I_CAT]..
-          (b[TFuBag.I_SUBGROUP] or "")..
+          TFuBag:SubSortKey(cfg, b)..
           TFuBag:ReverseString(b[TFuBag.I_NAME],toggle)..
           string.format("%04s",b[TFuBag.I_COUNT])..string.format("%02s",b[TFuBag.I_SLOT])
         end
@@ -5212,6 +5330,55 @@ function TFuBag:PlaceItemButtonAtCell(mainFrame, frame, itm, xcell, cur_y)
   self.BUTTONS[buttonname] = itm
 end
 
+-- Transparent drag handle over a sub-group header (FontStrings can't take mouse).
+-- Created once per (boxFrame, header index) and reused; mainFrame/barnum are stable
+-- for a given box frame so the closures capture them. Grabbable only while ML is
+-- unlocked (re-checked in the scripts). On drop it hands the header's CURRENT label
+-- (set per layout in s.subLabel) to SubHeaderDrop. Sits above the box so the drag
+-- reorders the sub-group instead of moving the category box beneath it.
+function TFuBag:MakeSubHeaderHandle(boxFrame, mainFrame, barnum)
+  local hd = CreateFrame("Button", nil, boxFrame)
+  hd:SetFrameLevel(boxFrame:GetFrameLevel() + 5)
+  hd:RegisterForDrag("LeftButton")
+  local hl = hd:CreateTexture(nil, "HIGHLIGHT")
+  hl:SetAllPoints(hd)
+  hl:SetColorTexture(1, 1, 1, 0.25)
+  hd:SetScript("OnDragStart", function(s)
+    if (mainFrame.ml_edit ~= 1) then return end
+    -- Lift the SAME translucent ghost the category-box drag uses, sized to this
+    -- sub-group's cluster and lifted off its first item button, so reordering a
+    -- sub-category gives the same visual cue as dragging a whole category.
+    local g = TFuBag:MLGetGhost(mainFrame)
+    local cw = s.cw or 1; if (cw < 1) then cw = 1 end
+    local rows = s.crows or 1; if (rows < 1) then rows = 1 end
+    g:ClearAllPoints()
+    g:SetWidth(mainFrame:FrameX(cw))
+    g:SetHeight(mainFrame:FrameY(rows))
+    g:SetPoint("TOPLEFT", s.anchorBtn or s, "TOPLEFT", 0, 0)
+    g:Show()
+    g:StartMoving()
+    TFuBag:MLSetItemMouse(mainFrame, false)  -- items inert until the drag ends
+    s.dragging = true
+  end)
+  hd:SetScript("OnDragStop", function(s)
+    local g = mainFrame.MLGhost
+    if (g) then g:StopMovingOrSizing(); g:Hide() end
+    TFuBag:MLSetItemMouse(mainFrame, true)   -- restore item mouse (any drag path)
+    if (s.dragging and s.subLabel) then
+      TFuBag:SubHeaderDrop(mainFrame, barnum, s.subLabel)
+    end
+    s.dragging = false
+  end)
+  hd:SetScript("OnEnter", function(s)
+    if (mainFrame.ml_edit ~= 1) then return end
+    GameTooltip:SetOwner(s, "ANCHOR_TOP")
+    GameTooltip:SetText(L["Drag to reorder"] or "Drag to reorder", 1, 1, 1)
+    GameTooltip:Show()
+  end)
+  hd:SetScript("OnLeave", function() GameTooltip:Hide() end)
+  return hd
+end
+
 -- mainFrame = The parent frame of everything
 -- barnum == current bar
 -- frame == name of background frame to be relative to
@@ -5221,10 +5388,14 @@ function TFuBag:AssignButtonsToFrame(mainFrame, barnum, frame, width, height, us
   local items = mainFrame.BARITM[barnum]
   local boxFrame = _G[frame]
 
-  -- Hide any sub-headers from a previous layout; the sub-headered path re-shows
-  -- the ones it needs. Keeps flat boxes (feature off / non-equipment) clean.
+  -- Hide any sub-headers (and their drag handles) from a previous layout; the
+  -- sub-headered path re-shows the ones it needs. Keeps flat boxes (feature off /
+  -- non-equipment) clean and the handles inert when not in the shelf view.
   if (boxFrame and boxFrame.SubHeaders) then
     for _, fs in ipairs(boxFrame.SubHeaders) do fs:Hide() end
+  end
+  if (boxFrame and boxFrame.SubHeaderHandles) then
+    for _, hd in ipairs(boxFrame.SubHeaderHandles) do hd:EnableMouse(false); hd:Hide() end
   end
 
   local sub = useSub and mainFrame.edit_mode ~= 1 and self:BarHasSubgroups(items)
@@ -5242,15 +5413,20 @@ function TFuBag:AssignButtonsToFrame(mainFrame, barnum, frame, width, height, us
     -- (left-aligned over the cluster), truncated to the cluster width.
     if (boxFrame) then
       boxFrame.SubHeaders = boxFrame.SubHeaders or {}
+      boxFrame.SubHeaderLabels = boxFrame.SubHeaderLabels or {}
+      boxFrame.SubHeaderHandles = boxFrame.SubHeaderHandles or {}
+      local mlEdit = (mainFrame.ml_edit == 1)
       for i, h in ipairs(headers) do
         local fs = boxFrame.SubHeaders[i]
         if (not fs) then
           fs = boxFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
           boxFrame.SubHeaders[i] = fs
         end
+        boxFrame.SubHeaderLabels[i] = h.label
         fs:ClearAllPoints()
         local btn = h.firstItm
           and _G[TFuBag:GetBagItemButtonName(h.firstItm[TFuBag.I_BAG], h.firstItm[TFuBag.I_SLOT])]
+        local shown = false
         -- Sub-group headers honor the "Show Category Names" toggle, like the main
         -- category titles -- previously they always showed regardless of the setting.
         if (btn and mainFrame.cfg and mainFrame.cfg.show_cat_names == 1) then
@@ -5268,9 +5444,36 @@ function TFuBag:AssignButtonsToFrame(mainFrame, barnum, frame, width, height, us
           fs:SetWordWrap(false)
           fs:SetText(h.label)
           fs:Show()
+          shown = true
         else
           fs:Hide()
         end
+        -- Drag-to-reorder handle: grabbable only while ML is UNLOCKED and the header
+        -- is shown. Covers the header text; above the box so the drag reorders the
+        -- sub-group rather than moving the category box. Inert (hidden) otherwise.
+        local hd = boxFrame.SubHeaderHandles[i]
+        if (shown and mlEdit) then
+          if (not hd) then
+            hd = self:MakeSubHeaderHandle(boxFrame, mainFrame, barnum)
+            boxFrame.SubHeaderHandles[i] = hd
+          end
+          hd.subLabel = h.label
+          hd.cw = h.w           -- cluster width in cells (for the drag ghost)
+          hd.crows = h.rows      -- cluster height in rows (for the drag ghost)
+          hd.anchorBtn = btn     -- the cluster's first item button (ghost lift-off)
+          hd:ClearAllPoints()
+          hd:SetAllPoints(fs)
+          hd:EnableMouse(true)
+          hd:Show()
+        elseif (hd) then
+          hd:EnableMouse(false)
+          hd:Hide()
+        end
+      end
+      -- Hide handles left over from a previous layout with more sub-groups.
+      for i = table.getn(headers) + 1, table.getn(boxFrame.SubHeaderHandles) do
+        local hd = boxFrame.SubHeaderHandles[i]
+        if (hd) then hd:EnableMouse(false); hd:Hide() end
       end
     end
     return
@@ -5343,9 +5546,7 @@ function TFuBag:SeedCatLayout(frame, calc_dat)
     local rec = cat_layout[bn];
     if (rec) then
       any_placed = true;
-      local n = table.getn(baritm[bn]);
-      local cols = rec.cols or 1; if (cols < 1) then cols = 1; end
-      local rows = math.ceil((n > 0 and n or 1) / cols);
+      local _, rows = self:MLBarDims(frame, baritm[bn], rec, colmax);
       if ((rec.gy or 0) + rows > max_row) then max_row = (rec.gy or 0) + rows; end
     end
   end
@@ -5361,9 +5562,16 @@ function TFuBag:SeedCatLayout(frame, calc_dat)
         local bn = barnum + iBar;
         local n = table.getn(baritm[bn]);
         if (n > 0 and not cat_layout[bn]) then
-          local cols = calc_dat[iBar.."_width"];
-          if (not cols or cols < 1) then cols = 1; end
-          local rows = math.ceil(n / cols);
+          -- Equipment seeds full-width (shelf block); others take the auto-flow
+          -- optimizer width. MLBarDims gives the matching footprint either way.
+          local cols, rows;
+          if (self:BarHasSubgroups(baritm[bn]) and frame.edit_mode ~= 1) then
+            cols, rows = self:MLBarDims(frame, baritm[bn], nil, colmax);
+          else
+            cols = calc_dat[iBar.."_width"];
+            if (not cols or cols < 1) then cols = 1; end
+            rows = math.ceil(n / cols);
+          end
           if (gx + cols > colmax) then gx = 0; gy = gy + row_h; row_h = 0; end
           cat_layout[bn] = { gx = gx, gy = gy, cols = cols };
           gx = gx + cols;
@@ -5421,6 +5629,14 @@ function TFuBag:SnapshotCatLayout(frame)
         if (cols < 1) then cols = 1; end
         local rows = math.floor((h - cfg.frameYSpace) / pitchY + 0.5);
         if (rows < 1) then rows = 1; end
+        -- Equipment carries in as a full-width shelf block. KEEP the measured cols (the
+        -- rendered content width, so equipment reflows with the window like normal
+        -- categories) and take only the row count from the shelf plan at THAT width, so
+        -- the band accumulation below matches how the box later draws (no cell drift).
+        if (self:BarHasSubgroups(baritm[bn]) and frame.edit_mode ~= 1) then
+          rows = math.ceil((self:EquipSubPlan(baritm[bn], cols)));
+          if (rows < 1) then rows = 1; end
+        end
         table.insert(boxes, { bn = bn, l = l, b = b, cols = cols, rows = rows });
         if (not minLeft or l < minLeft) then minLeft = l; end
       end
@@ -5487,13 +5703,9 @@ TFuBag.MLDrag = TFuBag.MLDrag or { active = false };
 function TFuBag:MLCatFootprint(frame, barnum, gx, gy)
   local cfg = frame.cfg;
   local rec = cfg.cat_layout[barnum];
-  local n = table.getn(frame.BARITM[barnum]);
-  local colmax = cfg.maxColumns;
-  local cols = (rec and rec.cols) or 1;
-  if (cols < 1) then cols = 1; end
-  if (cols > colmax) then cols = colmax; end
-  local rows = math.ceil((n > 0 and n or 1) / cols);
-  if (rows < 1) then rows = 1; end
+  -- Footprint == drawn size: route through MLBarDims (full-width shelf height for
+  -- equipment, flat cols x rows otherwise) so collision matches what is rendered.
+  local cols, rows = self:MLBarDims(frame, frame.BARITM[barnum], rec, cfg.maxColumns);
   return gx, gy, gx + cols, gy + rows;
 end
 
@@ -5611,9 +5823,8 @@ function TFuBag:MLSnapFree(frame, barnum, afx, afy, dcols, drows)
   for bn = 1, self.BAR_MAX do
     if (bn ~= barnum and store[bn] and table.getn(frame.BARITM[bn]) > 0) then
       local r = store[bn];
-      local bc = r.cols or 1; if (bc < 1) then bc = 1; end
-      local m = table.getn(frame.BARITM[bn]);
-      local br = math.ceil(m / bc); if (br < 1) then br = 1; end
+      -- footprint via MLBarDims so equipment's full-width shelf snaps correctly.
+      local bc, br = self:MLBarDims(frame, frame.BARITM[bn], r, cfg.maxColumns);
       local bfx, bfy = r.fx or 0, r.fy or 0;
       local cx = { bfx, bfx + bc + gapXc, bfx - dcols - gapXc };
       for _, v in ipairs(cx) do
@@ -5648,10 +5859,8 @@ function TFuBag:MLPushNeighbors(frame, anchorbar, acols, arows)
   local function rect(bn)
     local r = store[bn];
     if (not r) then return nil; end
-    local m = table.getn(frame.BARITM[bn]);
-    if (m <= 0) then return nil; end
-    local c = r.cols or 1; if (c < 1) then c = 1; end
-    local rr = math.ceil(m / c); if (rr < 1) then rr = 1; end
+    if (table.getn(frame.BARITM[bn]) <= 0) then return nil; end
+    local c, rr = self:MLBarDims(frame, frame.BARITM[bn], r, frame.cfg.maxColumns);
     local x1, y1 = r.fx or 0, r.fy or 0;
     return x1, y1 - titlec, x1 + c, y1 + rr, c, rr;
   end
@@ -5713,10 +5922,8 @@ function TFuBag:MLResolveFree(frame, barnum, acols, arows)
   local function rect(bn)
     local r = store[bn];
     if (not r) then return nil; end
-    local m = table.getn(frame.BARITM[bn]);
-    if (m <= 0) then return nil; end
-    local c = r.cols or 1; if (c < 1) then c = 1; end
-    local rr = math.ceil(m / c); if (rr < 1) then rr = 1; end
+    if (table.getn(frame.BARITM[bn]) <= 0) then return nil; end
+    local c, rr = self:MLBarDims(frame, frame.BARITM[bn], r, frame.cfg.maxColumns);
     local x1, y1 = r.fx or 0, r.fy or 0;
     return x1, y1 - titlec, x1 + c, y1 + rr;
   end
@@ -5797,9 +6004,8 @@ function TFuBag:MLDragStop(frame, barnum, bf)
     if (rec and g) then
       local cellX = frame.BF_PADWIDTH + cfg.frameXSpace;
       local cellY = frame.BF_PADHEIGHT + cfg.frameYSpace;
-      local n = table.getn(frame.BARITM[barnum]);
-      local dcols = rec.cols or 1; if (dcols < 1) then dcols = 1; end
-      local drows = math.ceil((n > 0 and n or 1) / dcols); if (drows < 1) then drows = 1; end
+      -- Dragged box footprint via MLBarDims (full-width shelf for equipment).
+      local dcols, drows = self:MLBarDims(frame, frame.BARITM[barnum], rec, cfg.maxColumns);
       local gl, gt = g:GetLeft(), g:GetTop();
       if (gl and gt and self.MLDrag.left0 and self.MLDrag.top0 and cellX > 0 and cellY > 0) then
         local afx = (self.MLDrag.gx0 or 0) + (gl - self.MLDrag.left0) / cellX;
@@ -6585,6 +6791,8 @@ function TFuBag:SnapshotCatLayoutFree(frame)
       if (l and tp and w) then
         local cols = math.floor((w - cfg.frameXSpace) / cellX + 0.5);
         if (cols < 1) then cols = 1; end
+        -- Equipment keeps its measured (full content) width so it reflows with the
+        -- window like normal categories; MLBarDims uses rec.cols as the shelf budget.
         table.insert(boxes, { bn = bn, l = l, tp = tp, cols = cols });
         if (not minLeft or l < minLeft) then minLeft = l; end
         if (not maxTop or tp > maxTop) then maxTop = tp; end
@@ -6614,8 +6822,7 @@ function TFuBag:SeedCatLayoutFree(frame)
     local rec = store[bn];
     if (rec and table.getn(baritm[bn]) > 0) then
       any = true;
-      local cols = rec.cols or 1; if (cols < 1) then cols = 1; end
-      local rows = math.ceil(table.getn(baritm[bn]) / cols); if (rows < 1) then rows = 1; end
+      local _, rows = self:MLBarDims(frame, baritm[bn], rec, colmax);
       local b = (rec.fy or 0) + rows;
       if (b > maxBottom) then maxBottom = b; end
     end
@@ -6625,10 +6832,17 @@ function TFuBag:SeedCatLayoutFree(frame)
   for bn = 1, self.BAR_MAX do
     local n = table.getn(baritm[bn]);
     if (n > 0 and not store[bn]) then
-      local cols = math.min(n, colmax); if (cols < 1) then cols = 1; end
+      -- Equipment seeds full-width (shelf block); others to a flat n-wide box.
+      local cols, rows;
+      if (self:BarHasSubgroups(baritm[bn]) and frame.edit_mode ~= 1) then
+        cols, rows = self:MLBarDims(frame, baritm[bn], nil, colmax);
+      else
+        cols = math.min(n, colmax); if (cols < 1) then cols = 1; end
+        rows = math.ceil(n / cols);
+      end
       store[bn] = { fx = fx, fy = fy, cols = cols };
       fx = fx + cols;
-      if (fx >= colmax) then fx = 0; fy = fy + math.ceil(n / cols); end
+      if (fx >= colmax) then fx = 0; fy = fy + rows; end
     end
   end
 end
@@ -6842,8 +7056,12 @@ function TFuBag:LayoutWindow(frame)
   -- on top of the existing Space/Pool budgets. Default 0 leaves layout unchanged.
   local cat_spacing = cfg.cat_spacing or 0
   -- Manual Layout state (computed up front so the seed pass below can match ML-off).
-  -- use_ml: arranged layout is active. ml_seeded: a saved layout exists. will_seed:
-  -- first enable (no saved layout) -> the auto-flow runs once and is snapshotted.
+  -- use_ml: arranged layout is active. ml_seeded: a saved layout exists. ml_auto: that
+  -- saved layout is auto-generated (mirrors ML-off), NOT hand-dragged. will_seed: the
+  -- auto-flow runs and is (re)snapshotted this pass -- on first enable, AND on every
+  -- pass while ml_auto, so an AUTO layout always tracks the current ML-off auto-flow
+  -- (same display + stacking) and stale saved coords never survive a category/size
+  -- change. A hand-placed layout (ml_auto false, set on the first drag) is left alone.
   local use_ml = (cfg.manual_layout == 1 and cfg.legacy_edit ~= 1 and frame.playerid == TFuBag.PLAYERID)
   local ml_free = (cfg.ml_freeplace == 1)
   local ml_seeded = false
@@ -6851,7 +7069,7 @@ function TFuBag:LayoutWindow(frame)
     local store = ml_free and cfg.cat_layout_free or cfg.cat_layout
     for bn = 1, self.BAR_MAX do if (store[bn]) then ml_seeded = true; break end end
   end
-  local will_seed = use_ml and not ml_seeded
+  local will_seed = use_ml and (not ml_seeded or cfg.ml_auto == true)
   -- DYNAMIC sizing (Stage 3): when the user has dragged a window size, derive the
   -- effective column budget + bars-per-row from that width so the auto-flow fills it.
   -- Density (columns per category bar) is taken from the user's legacy slider ratio so
@@ -6986,9 +7204,12 @@ function TFuBag:LayoutWindow(frame)
   -- Legacy Edit forces the original auto-flow + classic edit path (no drag/placement).
   -- use_ml / ml_free / ml_seeded were computed above (before the column budget) so the
   -- seed pass could borrow the dynamic budget; reuse them here.
+  -- Draw at the SAVED coords only for a hand-placed layout (seeded AND not ml_auto).
+  -- An auto layout (ml_auto, or never seeded) falls through to the auto-flow body +
+  -- snapshot tail so ML-on keeps mirroring ML-off until the user drags a box.
   local ml_seed = false;
   if (use_ml) then
-    if (ml_seeded) then
+    if (ml_seeded and cfg.ml_auto ~= true) then
       if (ml_free) then
         return self:LayoutWindowFreePlace(frame, PAD_TOP, PAD_BOTTOM, show_cat_names, CATNAME_H);
       end
@@ -7239,16 +7460,21 @@ function TFuBag:LayoutWindow(frame)
   local dynamic = (cfg.legacy_sizing == 0);
   self:UpdateScrollViewport(frame, PAD_TOP, PAD_BOTTOM, af_content_w, af_content_h, scroll_cap, dynamic);
 
-  -- Manual Layout first enable: the auto-flow above has positioned every box, so
-  -- capture those positions and re-lay-out in the chosen Manual Layout mode.
+  -- Manual Layout (re)seed: the auto-flow above has positioned every box, so capture
+  -- those positions and re-lay-out in the chosen Manual Layout mode. Runs on first
+  -- enable AND on every pass while ml_auto, so the arranged layout keeps mirroring
+  -- ML-off. WIPE the store first so the fresh snapshot is the sole source of truth
+  -- (a category removed/resized since the last snapshot leaves no stale coords behind).
   if (ml_seed) then
     -- This layout was auto-generated from the auto-flow (not hand-placed), so it may be
     -- re-seeded to follow the window width on resize until the user drags a box.
     cfg.ml_auto = true;
     if (ml_free) then
+      wipe(cfg.cat_layout_free);
       self:SnapshotCatLayoutFree(frame);
       return self:LayoutWindowFreePlace(frame, PAD_TOP, PAD_BOTTOM, show_cat_names, CATNAME_H);
     end
+    wipe(cfg.cat_layout);
     self:SnapshotCatLayout(frame);
     return self:LayoutWindowFree(frame, PAD_TOP, PAD_BOTTOM, show_cat_names, CATNAME_H);
   end
