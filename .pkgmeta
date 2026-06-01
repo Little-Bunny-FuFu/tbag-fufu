@@ -4,3 +4,4 @@ manual-changelog: Changelog.txt
 ignore:
   - dist.sh
   - scrape-wowhead.perl
+  - docs
