@@ -320,13 +320,14 @@ function Bank:RefreshLiveFlag()
   -- clears it again when the session actually ends.
   if (self:IsBankSessionLive()) then
     self.physAtBank = 1
-  else
-    -- Authoritative in BOTH directions: if Blizzard's bank panel is not shown the
-    -- session is over, so clear the latch even if a BANKFRAME_CLOSED was somehow
-    -- missed. Prevents a stale physAtBank == 1 from forcing live controls / per-tab
-    -- rescans onto a cache-only view.
-    self.physAtBank = 0
   end
+  -- ONE-WAY heal only (set, never clear). physAtBank is an event-driven latch:
+  -- BANKFRAME_OPENED sets it, BANKFRAME_CLOSED / OnHide clears it. Do NOT also clear it
+  -- from BankFrame:IsShown() here -- at BANKFRAME_OPENED time Blizzard has not shown its
+  -- BankFrame yet (the open is a handshake; our handler runs first), so a two-way heal
+  -- wrongly clears the just-set latch -> atbank = 0 -> RebuildTabList takes the cached
+  -- (non-live) branch and the Warband view never appears on first open (it only shows
+  -- after a dropdown round-trip re-runs this once the frame is finally shown).
   if (self.physAtBank == 1 and self.playerid == TFuBag.PLAYERID) then
     self.atbank = 1
   else
