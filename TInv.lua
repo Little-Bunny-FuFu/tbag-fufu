@@ -282,10 +282,14 @@ function Inv:UpdateBagGfx()
     TFuBag:GetBagType(self.playerid, bag);
     local frametex = TFuBag:GetBagFrameTexture(bag);
     local baglink = TFuBag:GetPlayerBagCfg(self.playerid, bag, TFuBag.I_ITEMLINK);
+    frametex:SetBlendMode("BLEND");  -- atlas/icon default (undo any prior state)
     if (bag > BACKPACK_CONTAINER and (not baglink or baglink == "")) then
-      -- Empty equippable bag slot -> Blizzard's empty bag-slot atlas. (The old
-      -- "UI-PaperDoll-Slot-Bag" texture was removed in 12.0, leaving a blank icon.)
-      frametex:SetAtlas("bag-border-empty");
+      -- Empty equippable bag slot. Match the empty item slots in the window: they
+      -- inherit ContainerFrameItemButtonTemplate, whose emptyBackgroundAtlas is
+      -- "bags-item-slot64" (the dark square slot art). Blizzard's "bag-border-empty"
+      -- is that SAME art cropped inside a circle, which clashes with tbag's square
+      -- slots -- so use the uncropped square atlas directly.
+      frametex:SetAtlas("bags-item-slot64");
     else
       frametex:SetTexture(TFuBag:GetBagTexture(self.playerid, bag));
     end
