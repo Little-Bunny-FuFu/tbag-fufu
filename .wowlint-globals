@@ -40,7 +40,6 @@ ExpandCurrencyList
 GetNumBankSlots
 GetBankSlotCost
 DepositReagentBank
-CloseBankFrame
 
 # --- intentional existence-checked / optional globals (guarded with `if X then`) ---
 PlaySoundKitID

@@ -229,7 +229,15 @@ function MainFrame:OnHide()
 
   if self.physAtBank and self.physAtBank == 1 then
     self.physAtBank = 0
-    CloseBankFrame()
+    -- End the live server bank session when the user closes the bank window at a
+    -- banker, matching the default UI. The bare CloseBankFrame global was removed in
+    -- 12.0; the real call is C_Bank.CloseBankFrame (unrestricted, AllowedWhenUntainted
+    -- -- a function call, not a secure-table write, so no taint). Reopening the tbag
+    -- bank window without re-clicking the banker then shows the cached (read-only)
+    -- view, exactly as the default UI requires a re-open after the session ends.
+    if C_Bank and C_Bank.CloseBankFrame then
+      C_Bank.CloseBankFrame()
+    end
   end
   -- atbank is a BANK-session flag; only the bank window owns it. This OnHide is
   -- shared (TFuBag_MainTemplate), so an unconditional reset also wrote atbank=0

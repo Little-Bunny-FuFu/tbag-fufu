@@ -95,12 +95,13 @@ if C_CurrencyInfo then
 end
 
 -- ---------------------------------------------------------------------------
--- Bank: the classic-bank API is GONE in 12.0 (account-bank/warband replaced
--- it). The bank module (TFuBnk) is gated OFF in the .toc pending a ground-up
--- rewrite. These historical constants + safe no-op stubs keep the bag/inventory
--- side from nil-crashing on bank code paths that still live in the core files.
--- TODO(bank rewrite): replace with real C_Bank-backed implementations and
--- re-enable TBnk.xml / TBnkOpts.xml in the .toc. See tbag-fufu-12.0-api-audit.md.
+-- Bank: the classic-bank API is GONE in 12.0 (account-bank/warband replaced it).
+-- The bank module (TFuBnk) HAS since been rewritten against C_Bank and is loaded
+-- in the .toc (TBnk.xml / TBnkTabSettings.lua). These historical constants + safe
+-- no-op stubs only neutralize the few LEGACY classic-bank call sites still present
+-- in the core files (GetNumBankSlots / IsReagentBankUnlocked / DepositReagentBank /
+-- Bank*ButtonIDToInvSlotID); the C_Bank rewrite does not rely on them -- they just
+-- keep those legacy paths from nil-crashing. See tbag-fufu-12.0-api-audit.md.
 -- ---------------------------------------------------------------------------
 BANK_CONTAINER        = BANK_CONTAINER        or -1
 REAGENTBANK_CONTAINER = REAGENTBANK_CONTAINER or -3
@@ -112,8 +113,10 @@ if not BankButtonIDToInvSlotID       then function BankButtonIDToInvSlotID() ret
 if not ReagentBankButtonIDToInvSlotID then function ReagentBankButtonIDToInvSlotID() return 0 end end
 
 -- Bag-slot count globals the bank/inventory loops iterate (changed/removed in
--- 12.0). Fallbacks keep `for i=1,NUM_*` loops from erroring on nil. CloseBankFrame
--- (called from MainFrame.lua) is stubbed only if Blizzard removed the global.
+-- 12.0). Fallbacks keep `for i=1,NUM_*` loops from erroring on nil.
 NUM_BAG_SLOTS    = NUM_BAG_SLOTS    or NUM_TOTAL_EQUIPPED_BAG_SLOTS or 4
 NUM_BANKBAGSLOTS = NUM_BANKBAGSLOTS or 0
-if not CloseBankFrame then function CloseBankFrame() end end
+-- (No CloseBankFrame stub: the bare global was removed in 12.0 and tbag no longer
+-- calls it -- MainFrame:OnHide now calls C_Bank.CloseBankFrame() directly to end the
+-- live session when the bank window closes at a banker. "Session live" is read off
+-- BankFrame:IsShown() (Bank:IsBankSessionLive).)
