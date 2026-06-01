@@ -1478,7 +1478,8 @@ function Inv:UpdateWindowBody(resort_req)
   for _, bag in ipairs(self.bags) do
     local size = TFuBag:GetPlayerBagCfg(self.playerid, bag, TFuBag.I_BAGSIZE);
     if (not size) then size = 0; end
-    if (self.cfg["show_Bag"..bag] ~= 1 and not TFuBag:GetBagFrame(bag):GetChecked()) then
+    local bagframe = TFuBag:GetBagFrame(bag);
+    if (self.cfg["show_Bag"..bag] ~= 1 and not (bagframe and bagframe:GetChecked())) then
       size = 0;
     end
     for slot = 1, size do

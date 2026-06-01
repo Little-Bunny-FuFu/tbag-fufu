@@ -320,6 +320,12 @@ function Bank:RefreshLiveFlag()
   -- clears it again when the session actually ends.
   if (self:IsBankSessionLive()) then
     self.physAtBank = 1
+  else
+    -- Authoritative in BOTH directions: if Blizzard's bank panel is not shown the
+    -- session is over, so clear the latch even if a BANKFRAME_CLOSED was somehow
+    -- missed. Prevents a stale physAtBank == 1 from forcing live controls / per-tab
+    -- rescans onto a cache-only view.
+    self.physAtBank = 0
   end
   if (self.physAtBank == 1 and self.playerid == TFuBag.PLAYERID) then
     self.atbank = 1

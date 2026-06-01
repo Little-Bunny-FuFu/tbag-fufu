@@ -206,7 +206,7 @@ function Hooks.ToggleAllBags()
   for _,bag in ipairs(TFuInvFrame.bags) do
     if TFuInvFrame.cfg["show_Bag"..bag] ~= 1 then
       local bagframe = TFuBag:GetBagFrame(bag)
-      if not bagframe:GetChecked() then
+      if bagframe and not bagframe:GetChecked() then
         bagframe:SetChecked(true)
         TFuInvFrame.CACHE_REQ = TFuBag.REQ_MUST
         inv_bag_toggled = true

@@ -16,8 +16,12 @@ TFuBag.S_VERSION = "version"
 TFuBag.Professions = {}
 local Professions = TFuBag.Professions
 
--- Current DB Version
-Professions.DB_VERSION = 2
+-- Current DB Version. MUST match TBagItemInfo.lua's S_VERSION (currently 3): the
+-- installer (RefreshCreations/RefreshReagents) overwrites the whole DB when the stored
+-- [S_VERSION] ~= 3, and GetTradeCreated/GetReagents stamp this constant when they create
+-- the table. A lower value here meant an accessor that created the table first stamped a
+-- version the installer then clobbered -- wiping live recipe-scan additions.
+Professions.DB_VERSION = 3
 
 -- 12.0: recipe/reagent keyword scan rewritten against C_TradeSkillUI (the old
 -- GetTradeSkill*/SetTradeSkill* frame API it used was removed). Set false to
