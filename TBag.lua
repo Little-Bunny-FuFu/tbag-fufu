@@ -810,6 +810,26 @@ function TFuBag:EmptyBag(bag)
     end
   end
 
+  if (moved > 0) then
+    -- Keep the auto-compress from immediately refilling this bag (see
+    -- TFuBag:IsBagEmptyGuarded). Only meaningful once we've actually queued moves.
+    self:MarkBagEmptied(bag);
+    -- The guard is passive -- the compress only runs on a bag event (BAG_UPDATE
+    -- sets stack_once), so once the grace lapses an idle window would stay
+    -- un-refilled until the next event or a manual re-sort. Nudge one compress
+    -- pass just after expiry, mirroring the BAG_UPDATE path (gated on stack_auto /
+    -- live), so normal specialty-bag grouping resumes on its own. RequestUpdate
+    -- no-ops on a hidden window, matching normal play (tbag only compresses while
+    -- the window is open).
+    C_Timer.After(self.EMPTY_GUARD_SECS + 0.5, function()
+      local f = TFuInvFrame;
+      if (f and f.cfg and f.cfg.stack_auto == 1 and TFuBag:IsLive(f)) then
+        f.cfg.stack_once = 1;
+      end
+      TFuBag:RequestUpdate(f);
+    end);
+  end
+
   if (moved == 0 and failed == 0) then
     self:Print(self.SCP.."That bag is already empty.");
   elseif (failed > 0) then
@@ -7679,8 +7699,8 @@ function TFuBag:Stack(where, itmcache, sa, ca)
         local emptyitm = epts[empty]
         local emptybag = emptyitm[self.I_BAG];
         local emptyslot = emptyitm[self.I_SLOT]
-        -- Is it really empty.
-        if (emptyitm[self.I_ITEMLINK] == nil) then
+        -- Is it really empty, and not a bag the user just asked to empty?
+        if (emptyitm[self.I_ITEMLINK] == nil and not self:IsBagEmptyGuarded(emptybag)) then
           for item = 1, items_size do
             if (itms[item]) then
               local itemitm = itms[item];
@@ -7769,6 +7789,29 @@ function self:SetCompSkip(bag, slot, val)
     self.COMPSKIP[bag] = {};
   end
   self.COMPSKIP[bag][slot] = val;
+end
+
+-- Bags just emptied via TFuBag:EmptyBag are guarded against the auto-compress
+-- (the second half of TFuBag:Stack) re-filling them for EMPTY_GUARD_SECS. Without
+-- this, clearing a specialty bag (herb, enchanting, ...) is instantly undone: the
+-- items moved out land in general bags, and the next compress pass sees the
+-- now-empty family-matching slots and pulls them straight back. The grace period
+-- gives the user time to unequip/swap the emptied bag.
+TFuBag.EMPTIED_BAGS = {};
+TFuBag.EMPTY_GUARD_SECS = 30;
+
+function TFuBag:MarkBagEmptied(bag)
+  self.EMPTIED_BAGS[bag] = GetTime();
+end
+
+function TFuBag:IsBagEmptyGuarded(bag)
+  local t = self.EMPTIED_BAGS[bag];
+  if (not t) then return false; end
+  if (GetTime() - t < self.EMPTY_GUARD_SECS) then
+    return true;
+  end
+  self.EMPTIED_BAGS[bag] = nil;  -- expired -- clear so the table doesn't grow
+  return false;
 end
 
 function TFuBag.SplitContainerItem(bag, slot, split)
