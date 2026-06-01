@@ -81,6 +81,16 @@ function TFuBnk_cmd(msg)
     TFuBag:DeleteCachedCharacter(char,realm);
   elseif (cmd == L["config"]) then
     TFuBnk_OptsFrame:Show();
+  elseif (cmd == "reseed") then
+    -- Clear BOTH saved Manual Layouts (grid + free) so the active mode re-snapshots
+    -- from the current auto-flow on the next layout (mirror of /tinv reseed). The fresh
+    -- seed sets cfg.ml_auto, so the bank's Manual Layout then reflows on window resize
+    -- like the inventory.
+    TFuBnkFrame.cfg.cat_layout = {};
+    TFuBnkFrame.cfg.cat_layout_free = {};
+    TFuBnkFrame.cfg.ml_auto = true;
+    TFuBag:Print("TFuBnk: Manual Layout reset; will re-snapshot from the default layout.");
+    TFuBnkFrame:UpdateWindow(TFuBag.REQ_MUST);
   elseif (cmd == "bank") then
     -- Interim: switch between Character and Warband bank views (clickable per-type
     -- tab buttons are the next stage).
@@ -149,6 +159,7 @@ function TFuInv_cmd(msg)
     -- re-snapshots from the current auto-flow on the next enable.
     TFuInvFrame.cfg.cat_layout = {};
     TFuInvFrame.cfg.cat_layout_free = {};
+    TFuInvFrame.cfg.ml_auto = true;
     TFuBag:Print("TFuInv: Manual Layout reset; will re-snapshot from the default layout.");
     TFuInvFrame:UpdateWindow(TFuBag.REQ_MUST);
   elseif (cmd == "printtypes") then

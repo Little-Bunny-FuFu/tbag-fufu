@@ -119,6 +119,7 @@ function Inv:init(reset)
   self.BARITM = {};
   self.hilight_new = 0;
   self.edit_mode = 0;
+  self.ml_edit = 0;         -- Manual Layout edit/unlock: 1 = boxes draggable; manual_layout stays active when this is 0 (layout shown, locked)
   self.edit_hilight = "";   -- when editmode is 1, which items do you want to hilight
   self.edit_selected = "";  -- when editmode is 1, this is the class of item you clicked on
   self.RightClickMenu_mode = "";
@@ -323,8 +324,13 @@ function Inv.Button_ChangeEditMode_OnClick()
   if (cfg["legacy_edit"] == 1) then
     TFuInvFrame.edit_mode = (TFuInvFrame.edit_mode == 1) and 0 or 1;
   else
+    -- Drag-to-arrange: the gear is a pure lock/UNLOCK for editing the manual layout.
+    -- Unlocking also ACTIVATES manual layout; LOCKING keeps the arranged layout shown
+    -- (use_ml only checks manual_layout, so placements persist) -- it is not turned off
+    -- here. To return to auto-flow, uncheck "Use Manual Layout" in Options.
     TFuInvFrame.edit_mode = 0;  -- classic edit off when using Manual Layout
-    cfg["manual_layout"] = (cfg["manual_layout"] == 1) and 0 or 1;
+    TFuInvFrame.ml_edit = (TFuInvFrame.ml_edit == 1) and 0 or 1;
+    if (TFuInvFrame.ml_edit == 1) then cfg["manual_layout"] = 1; end
   end
   TFuInvFrame._last_hilight = nil;  -- force the next edit-highlight refresh
   -- resort will force a window redraw
@@ -1021,10 +1027,17 @@ function Inv.RightClickMenu_populate(self, level)
       info = { ["disabled"] = 1 };
       UIDropDownMenu_AddButton(info, level);
 
+      -- "Manual Layout" here toggles the MODE on/off (mirrors the Options checkbox);
+      -- the gear button enters/exits edit. Turning the mode off also locks (ml_edit=0).
       info = {
         ["text"] = L["Manual Layout"],
         ["value"] = nil,
-        ["func"] = TFuInvFrame.Button_ChangeEditMode_OnClick
+        ["func"] = function()
+          local c = TFuInvFrame.cfg;
+          c["manual_layout"] = (c["manual_layout"] == 1) and 0 or 1;
+          if (c["manual_layout"] ~= 1) then TFuInvFrame.ml_edit = 0; end
+          TFuInvFrame:UpdateWindow(TFuBag.REQ_MUST);
+        end
         };
       if (TFuInvFrame.cfg["manual_layout"] == 1) then
         info["checked"] = 1;
@@ -1512,13 +1525,14 @@ function Inv:UpdateWindow(resort_req)
       local w, h = mlbtn:GetSize();
       mlbtn.MLGlow:SetSize((w or 20) * 1.7, (h or 20) * 1.7);
     end
-    -- Glow reflects whichever mode the button drives: classic edit_mode under
-    -- Legacy Edit, else Manual Layout.
+    -- Glow reflects whether the gear is in its ACTIVE/editing state: classic edit_mode
+    -- under Legacy Edit, else the Manual Layout edit/unlock (ml_edit). Manual layout
+    -- being active is persistent and shown via the menu/options checkbox, not the glow.
     local edit_active;
     if (self.cfg["legacy_edit"] == 1) then
       edit_active = (self.edit_mode == 1);
     else
-      edit_active = (self.cfg["manual_layout"] == 1);
+      edit_active = (self.ml_edit == 1);
     end
     if (edit_active) then
       mlbtn.MLGlow:Show();

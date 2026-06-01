@@ -83,6 +83,9 @@ end
 
 -- Is this frame currently in DYNAMIC auto-flow mode (resize grip applies)? Manual
 -- Layout (drag-placed boxes, logged-in character only) sizes the window itself.
+-- AUTO-FLOW dynamic reflow: true only when the auto-flow layout should reflow its
+-- columns to the dragged window width. Manual Layout uses stored box coords, so it is
+-- NOT auto-flow-dynamic (the seed pass is handled separately in LayoutWindow).
 function MainFrame:IsDynamicResize()
   local cfg = self.cfg;
   if (not cfg or cfg.legacy_sizing ~= 0) then return false; end
@@ -91,11 +94,20 @@ function MainFrame:IsDynamicResize()
   return not in_ml;
 end
 
+-- Should the resize GRIP be shown? Dynamic sizing (legacy_sizing == 0) makes the window
+-- resizable in EVERY mode: auto-flow (incl. alt views) reflows to the size; Manual Layout
+-- (both Free and Grid) treats the window as a canvas the boxes are placed/scrolled within.
+function MainFrame:IsResizable()
+  local cfg = self.cfg;
+  return (cfg ~= nil and cfg.legacy_sizing == 0);
+end
+
 function MainFrame:UpdateResizeGrip()
   local grip = self.ResizeGrip;
   if (not grip) then return; end
-  if (self:IsDynamicResize()) then
-    -- Clamp live drags to the screen cap (frame-space) and a sane minimum.
+  if (self:IsResizable()) then
+    -- Clamp live drags to the screen cap (frame-space) and a sane minimum. Applies to
+    -- auto-flow AND Manual Layout (both treat the dragged size as the window/canvas).
     local cap_w, cap_h = TFuBag:GetWindowCap(self);
     grip.minWidth  = TFuBag.RESIZE_MIN_W;
     grip.minHeight = TFuBag.RESIZE_MIN_H;
@@ -104,8 +116,8 @@ function MainFrame:UpdateResizeGrip()
     grip:Show();
     grip:Enable();
   else
-    -- Legacy / Manual Layout: neutralise the clamp so the content-driven layout
-    -- sizes are never altered by the mixin's OnSizeChanged.
+    -- Legacy sizing: neutralise the clamp so the content-driven layout sizes are
+    -- never altered by the mixin's OnSizeChanged.
     grip.minWidth  = 1;
     grip.minHeight = 1;
     grip.maxWidth  = nil;
@@ -129,6 +141,17 @@ function MainFrame:OnResizeStopped()
   self.cfg.frameRIGHT  = self:GetRight()  * scale;
   self.cfg.frameTOP    = self:GetTop()    * scale;
   self.cfg.frameBOTTOM = self:GetBottom() * scale;
+
+  -- Manual Layout that is still the AUTO-seeded arrangement (user hasn't dragged a box)
+  -- reflows to the new window width: wipe the active store so LayoutWindow re-seeds at
+  -- the dragged size. A hand-customized layout (cfg.ml_auto false) is left untouched --
+  -- the resize only changes its canvas. (Auto-flow reflows on its own via ComputeDynColumns.)
+  local cfg = self.cfg;
+  local in_ml = (cfg.manual_layout == 1 and cfg.legacy_edit ~= 1 and self.playerid == TFuBag.PLAYERID);
+  if (in_ml and cfg.ml_auto) then
+    local store = (cfg.ml_freeplace == 1) and cfg.cat_layout_free or cfg.cat_layout;
+    if (store) then for k in pairs(store) do store[k] = nil; end end
+  end
 
   TFuBag:LayoutWindow(self);
 end
@@ -230,6 +253,7 @@ function MainFrame:OnShow()
   -- Always default to the current player
   self:SetPlayer(TFuBag.PLAYERID)
   self.edit_mode = 0
+  self.ml_edit = 0   -- reopen LOCKED: show the arranged layout, not in drag-edit
 
   if self == TFuBnkFrame then
     TFuInvFrame:Show()

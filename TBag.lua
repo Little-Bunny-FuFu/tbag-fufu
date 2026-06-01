@@ -5502,7 +5502,7 @@ end
 
 function TFuBag:MLDragStart(frame, barnum, bf)
   local cfg = frame.cfg;
-  if (cfg.manual_layout ~= 1 or cfg.legacy_edit == 1) then return; end
+  if (cfg.manual_layout ~= 1 or cfg.legacy_edit == 1 or frame.ml_edit ~= 1) then return; end
   local free = (cfg.ml_freeplace == 1);
   local rec = (free and cfg.cat_layout_free or cfg.cat_layout)[barnum];
   if (not rec) then return; end
@@ -5733,6 +5733,9 @@ function TFuBag:MLDragStop(frame, barnum, bf)
   self.MLDrag.active = false;
 
   local cfg = frame.cfg;
+  -- The user has hand-placed a box: the layout is no longer the auto-seeded one, so
+  -- stop reflowing it to the window width on resize (it is now a fixed manual layout).
+  cfg.ml_auto = false;
 
   -- FREE PLACEMENT (Stage 2): drop the box where it was released, magnet-snap its
   -- edges to nearby bars for clean alignment, then push only the bars it actually
@@ -6450,7 +6453,8 @@ function TFuBag:LayoutWindowFree(frame, PAD_TOP, PAD_BOTTOM, show_cat_names, CAT
 
       TFuBag:AssignButtonsToFrame(frame, barnum, barname, cols, rows);
       bf:Show();
-      self:SetBarDraggable(frame, barnum, bf, true, show_cat_names, label_gap);
+      -- Draggable only while UNLOCKED (gear/edit on); locked = layout shown but inert.
+      self:SetBarDraggable(frame, barnum, bf, frame.ml_edit == 1, show_cat_names, label_gap);
 
       -- Name label: center over the box when it fits the box columns; when it is
       -- wider, justify toward the ScrollChild interior at an edge (so it never runs
@@ -6503,9 +6507,14 @@ function TFuBag:LayoutWindowFree(frame, PAD_TOP, PAD_BOTTOM, show_cat_names, CAT
 
   if (max_bottom < 1) then max_bottom = top_reserve + frame:FrameY(1); end
 
-  frame:SetWidth(window_width);
-  frame:SetHeight(PAD_TOP + max_bottom + PAD_BOTTOM + self.BORDER + frame:PoolY(1));
-  self:UpdateScrollViewport(frame, PAD_TOP, PAD_BOTTOM, max_right_sc, max_bottom, true);
+  -- Canvas sizing: honor the user-dragged win_w/win_h (resize grip) when set, so grid
+  -- Manual Layout is resizable too -- content larger than the canvas scrolls (dynamic
+  -- viewport path). First use (never dragged) falls back to the content bounding box.
+  local content_fh = PAD_TOP + max_bottom + PAD_BOTTOM + self.BORDER + frame:PoolY(1);
+  local canvas = (cfg.win_w and cfg.win_w > 0 and cfg.win_h and cfg.win_h > 0);
+  frame:SetWidth(canvas and cfg.win_w or window_width);
+  frame:SetHeight(canvas and cfg.win_h or content_fh);
+  self:UpdateScrollViewport(frame, PAD_TOP, PAD_BOTTOM, max_right_sc, max_bottom, true, canvas);
   return frame:GetHeight();
 end
 
@@ -6668,7 +6677,8 @@ function TFuBag:LayoutWindowFreePlace(frame, PAD_TOP, PAD_BOTTOM, show_cat_names
       self:ColorFrame(cfg, bf, barnum);
       TFuBag:AssignButtonsToFrame(frame, barnum, barname, cols, rows);
       bf:Show();
-      self:SetBarDraggable(frame, barnum, bf, true, show_cat_names, label_gap);
+      -- Draggable only while UNLOCKED (gear/edit on); locked = layout shown but inert.
+      self:SetBarDraggable(frame, barnum, bf, frame.ml_edit == 1, show_cat_names, label_gap);
 
       local label = bf.CatName;
       if (label) then
@@ -6723,9 +6733,16 @@ function TFuBag:LayoutWindowFreePlace(frame, PAD_TOP, PAD_BOTTOM, show_cat_names
   if (max_right < 1) then max_right = frame:FrameX(1); end
   if (max_bottom < 1) then max_bottom = top_reserve + frame:FrameY(1); end
 
-  frame:SetWidth(max_right + 2 * self.BORDER + self.SB_COL);
-  frame:SetHeight(PAD_TOP + max_bottom + PAD_BOTTOM + self.BORDER + frame:PoolY(1));
-  self:UpdateScrollViewport(frame, PAD_TOP, PAD_BOTTOM, max_right, max_bottom, true);
+  -- Canvas sizing: in free placement the window is a fixed canvas the boxes float
+  -- within, so honor the user-dragged win_w/win_h (resize grip) when set -- content
+  -- larger than the canvas scrolls via UpdateScrollViewport's dynamic path. First use
+  -- (never dragged) falls back to the content bounding box, like before.
+  local content_fw = max_right + 2 * self.BORDER + self.SB_COL;
+  local content_fh = PAD_TOP + max_bottom + PAD_BOTTOM + self.BORDER + frame:PoolY(1);
+  local canvas = (cfg.win_w and cfg.win_w > 0 and cfg.win_h and cfg.win_h > 0);
+  frame:SetWidth(canvas and cfg.win_w or content_fw);
+  frame:SetHeight(canvas and cfg.win_h or content_fh);
+  self:UpdateScrollViewport(frame, PAD_TOP, PAD_BOTTOM, max_right, max_bottom, true, canvas);
   return frame:GetHeight();
 end
 
@@ -6791,14 +6808,29 @@ function TFuBag:LayoutWindow(frame)
   -- Category Spacing: extra hard gap between adjacent category bars (both axes),
   -- on top of the existing Space/Pool budgets. Default 0 leaves layout unchanged.
   local cat_spacing = cfg.cat_spacing or 0
+  -- Manual Layout state (computed up front so the seed pass below can match ML-off).
+  -- use_ml: arranged layout is active. ml_seeded: a saved layout exists. will_seed:
+  -- first enable (no saved layout) -> the auto-flow runs once and is snapshotted.
+  local use_ml = (cfg.manual_layout == 1 and cfg.legacy_edit ~= 1 and frame.playerid == TFuBag.PLAYERID)
+  local ml_free = (cfg.ml_freeplace == 1)
+  local ml_seeded = false
+  if (use_ml) then
+    local store = ml_free and cfg.cat_layout_free or cfg.cat_layout
+    for bn = 1, self.BAR_MAX do if (store[bn]) then ml_seeded = true; break end end
+  end
+  local will_seed = use_ml and not ml_seeded
   -- DYNAMIC sizing (Stage 3): when the user has dragged a window size, derive the
   -- effective column budget + bars-per-row from that width so the auto-flow fills it.
   -- Density (columns per category bar) is taken from the user's legacy slider ratio so
-  -- the look stays familiar. Only the AUTO-FLOW path reflows -- Manual Layout (where
-  -- IsDynamicResize is false) keeps its freely-placed boxes. When win_w is unset (never
-  -- dragged) we fall through to the legacy maxColumns so the window auto-grows to a
-  -- sensible default width.
-  if (frame.IsDynamicResize and frame:IsDynamicResize() and cfg.win_w and cfg.win_w > 0) then
+  -- the look stays familiar. Only the AUTO-FLOW path reflows -- a SEEDED Manual Layout
+  -- (where IsDynamicResize is false) keeps its freely-placed boxes. We ALSO use the
+  -- dynamic budget for the first-enable SEED pass (will_seed): the snapshot must
+  -- reproduce the ML-off auto-flow, but manual_layout being on makes IsDynamicResize
+  -- false, so without this the seed laid out with the cramped legacy budget and the
+  -- snapshotted boxes overlapped. When win_w is unset we fall through to legacy.
+  local want_dynamic = (frame.IsDynamicResize and frame:IsDynamicResize())
+                       or (will_seed and cfg.legacy_sizing == 0)
+  if (want_dynamic and cfg.win_w and cfg.win_w > 0) then
     local density = colmax / bar_x
     if (density < 1) then density = 1 end
     colmax, bar_x = self:ComputeDynColumns(frame, cfg.win_w, density)
@@ -6919,16 +6951,11 @@ function TFuBag:LayoutWindow(frame)
   -- enable (no saved layout) run the auto-flow once below, then the tail snapshots
   -- it and re-lays-out freeform so enabling looks identical to ML-off.
   -- Legacy Edit forces the original auto-flow + classic edit path (no drag/placement).
-  local use_ml = (cfg.manual_layout == 1 and cfg.legacy_edit ~= 1 and frame.playerid == TFuBag.PLAYERID);
-  local ml_free = (cfg.ml_freeplace == 1);
+  -- use_ml / ml_free / ml_seeded were computed above (before the column budget) so the
+  -- seed pass could borrow the dynamic budget; reuse them here.
   local ml_seed = false;
   if (use_ml) then
-    local store = ml_free and cfg.cat_layout_free or cfg.cat_layout;
-    local seeded = false;
-    for bn = 1, self.BAR_MAX do
-      if (store[bn]) then seeded = true; break; end
-    end
-    if (seeded) then
+    if (ml_seeded) then
       if (ml_free) then
         return self:LayoutWindowFreePlace(frame, PAD_TOP, PAD_BOTTOM, show_cat_names, CATNAME_H);
       end
@@ -7182,6 +7209,9 @@ function TFuBag:LayoutWindow(frame)
   -- Manual Layout first enable: the auto-flow above has positioned every box, so
   -- capture those positions and re-lay-out in the chosen Manual Layout mode.
   if (ml_seed) then
+    -- This layout was auto-generated from the auto-flow (not hand-placed), so it may be
+    -- re-seeded to follow the window width on resize until the user drags a box.
+    cfg.ml_auto = true;
     if (ml_free) then
       self:SnapshotCatLayoutFree(frame);
       return self:LayoutWindowFreePlace(frame, PAD_TOP, PAD_BOTTOM, show_cat_names, CATNAME_H);

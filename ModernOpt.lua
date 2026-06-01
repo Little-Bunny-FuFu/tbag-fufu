@@ -125,6 +125,28 @@ function MO:Button(parent, y, text, width, onClick)
   return b, y + 22 + ROW_GAP
 end
 
+-- Single-line text field with a left label. get() -> string, set(string) on commit
+-- (Enter or focus loss); Escape reverts to the stored value. maxLetters caps input.
+function MO:EditBox(parent, y, label, maxLetters, width, get, set)
+  local fs = parent:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
+  fs:SetPoint("TOPLEFT", parent, "TOPLEFT", PAD, -(y + 4))
+  fs:SetText(label)
+
+  local eb = CreateFrame("EditBox", nil, parent, "InputBoxTemplate")
+  eb:SetAutoFocus(false)
+  eb:SetSize(width or 90, 20)
+  eb:SetPoint("TOPLEFT", parent, "TOPLEFT", PAD + 220, -y)
+  if (maxLetters and maxLetters > 0) then eb:SetMaxLetters(maxLetters) end
+  eb:SetText(get() or "")
+  eb:SetCursorPosition(0)
+  local function commit() set(eb:GetText() or "") end
+  eb:SetScript("OnEnterPressed", function(self) commit(); self:ClearFocus() end)
+  eb:SetScript("OnEscapePressed", function(self) self:SetText(get() or ""); self:ClearFocus() end)
+  eb:SetScript("OnEditFocusLost", function() commit() end)
+  eb.tfuRefresh = function() eb:SetText(get() or ""); eb:SetCursorPosition(0) end
+  return eb, y + 24 + ROW_GAP
+end
+
 -- Inventory | Bank target toggle for the Categories / Grouping / Armor panels.
 -- Reflects the shared TFuBag.optTarget; the selected window's button is disabled.
 -- onSwitch() runs after the target changes (rebuild/refresh the section). Returns
@@ -347,6 +369,13 @@ function MO:GeneralContent(parent, x, y, w, h, frame)
     track(c); yy = ny
     return c
   end
+  local function edit(label, key, maxlen, apply)
+    local c, ny = self:EditBox(child, yy, label, maxlen, 90,
+      function() return cfg[key] end,
+      function(v) cfg[key] = v; (apply or force)() end)
+    track(c); yy = ny
+    return c
+  end
 
   local _, ny = self:Header(child, yy, "Sizing"); yy = ny
 
@@ -412,16 +441,52 @@ function MO:GeneralContent(parent, x, y, w, h, frame)
   chk("Auto Stack", "stack_auto")
   chk("Stack on Re-sort", "stack_resort")
   -- One toggle for the arrange mode. ON = drag-to-arrange (manual layout via the gear);
-  -- OFF = legacy click editing. This is the legacy_edit flag inverted -- exposing it and
-  -- ml_freeplace as two peer boxes let an inconsistent combo (legacy_edit=1) silently
-  -- break drag, which is what "drag to arrange doesn't work" was. (Free-vs-grid placement,
-  -- ml_freeplace, stays on the legacy /config panel.)
+  -- OFF = legacy click editing. This is the legacy_edit flag inverted. The companion
+  -- "Free Placement" box below (ml_freeplace) only makes sense while drag is on, so it
+  -- is greyed when drag is off -- which is what prevents the old broken combo (a stale
+  -- legacy_edit=1 silently breaking drag) rather than parking it on a separate panel.
+  -- Manual-layout option chain: "Drag to arrange" (legacy_edit) is the top switch;
+  -- "Use Manual Layout" (manual_layout) is meaningful only in drag mode; "Free
+  -- Placement" (ml_freeplace) only when manual layout is active. Greying enforces this.
+  local manualChk, freeplaceChk
+  local function gateManual()
+    local dragMode = (cfg.legacy_edit ~= 1)
+    if (manualChk) then
+      if (manualChk.SetEnabled) then manualChk:SetEnabled(dragMode) end
+      manualChk:SetAlpha(dragMode and 1 or 0.4)
+    end
+    if (freeplaceChk) then
+      local on = dragMode and (cfg.manual_layout == 1)
+      if (freeplaceChk.SetEnabled) then freeplaceChk:SetEnabled(on) end
+      freeplaceChk:SetAlpha(on and 1 or 0.4)
+    end
+  end
   do
     local c, ny = self:Checkbox(child, yy, "Drag to arrange categories (off = legacy click editing)",
       function() return cfg.legacy_edit ~= 1 end,
-      function(v) cfg.legacy_edit = v and 0 or 1; force() end)
+      function(v) cfg.legacy_edit = v and 0 or 1; gateManual(); force() end)
     track(c); yy = ny
   end
+  do
+    -- The gear toggles edit/unlock; this is the persistent on/off for whether the
+    -- arranged layout is used at all. Turning it off returns to auto-flow and locks.
+    local c, ny = self:Checkbox(child, yy, "Use Manual Layout (off = auto-arrange categories)",
+      function() return cfg.manual_layout == 1 end,
+      function(v)
+        cfg.manual_layout = v and 1 or 0
+        if (not v) then frame.ml_edit = 0 end  -- leaving manual layout: lock
+        gateManual(); force()
+      end)
+    manualChk = c; track(c); yy = ny
+  end
+  do
+    local c, ny = self:Checkbox(child, yy, "Free Placement within Manual Layout (off = snap to grid)",
+      function() return cfg.ml_freeplace == 1 end,
+      function(v) cfg.ml_freeplace = v and 1 or 0; force() end)
+    freeplaceChk = c; track(c); yy = ny
+  end
+  gateManual()
+  track({ tfuRefresh = gateManual })  -- re-grey whenever the panel is shown
   chk("Profession Bags precede Sorting", "special_bag_sort")
   chk("Split Reagents by Profession (original TBag style)", "reagent_split")
   chk("Trade Creation precedes Sorting (reopen window)", "trade_created_sort")
@@ -430,6 +495,15 @@ function MO:GeneralContent(parent, x, y, w, h, frame)
     chk("Alt Key Auto-Pickup", "alt_pickup")
     chk("Alt Key Auto-Panel", "alt_panel")
   end
+
+  -- New-item tag text + timeouts (the tag shown on items picked up since last view).
+  -- TAG_MAX (legacy) was 10 chars; inlined here so this does not depend on TBagOpt.lua.
+  _, ny = self:Header(child, yy, "New Item Tags"); yy = ny
+  edit("New Tag Text", TFuBag.V_NEWON, 10)
+  edit("Increased Tag Text", TFuBag.V_NEWPLUS, 10)
+  edit("Decreased Tag Text", TFuBag.V_NEWMINUS, 10)
+  sld("New Tag Timeout (minutes)", "newItemTimeout", 0, 24 * 60, 15)
+  sld("Recent Tag Timeout (minutes)", "recentTimeout", 0, 60, 5)
 
   child:SetHeight(math.max(h, yy + 8))
   return sfl

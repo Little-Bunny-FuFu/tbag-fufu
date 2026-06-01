@@ -120,6 +120,7 @@ function Bank:init(reset)
   self.BARITM = {};
   self.hilight_new = 0;
   self.edit_mode = 0;
+  self.ml_edit = 0;               -- Manual Layout edit/unlock: 1 = boxes draggable; manual_layout stays active when this is 0
   self.edit_hilight = "";         -- when editmode is 1, which items do you want to hilight
   self.edit_selected = "";        -- when editmode is 1, this is the class of item you clicked on
   self.RightClickMenu_mode = "";
@@ -1103,13 +1104,14 @@ function Bank.Button_ChangeEditMode_OnClick()
   if (cfg["legacy_edit"] == 1) then
     TFuBnkFrame.edit_mode = (TFuBnkFrame.edit_mode == 1) and 0 or 1;
   else
+    -- Gear = lock/UNLOCK the manual layout (mirror of Inv). Unlocking activates manual
+    -- layout; locking keeps it shown. Disable via "Use Manual Layout" in Options.
     TFuBnkFrame.edit_mode = 0;  -- classic edit off when using Manual Layout
-    cfg["manual_layout"] = (cfg["manual_layout"] == 1) and 0 or 1;
-    -- Bank drag-to-arrange uses FREE placement (insert + push neighbours + auto-grow),
-    -- matching the inventory. Grid mode (ml_freeplace=0) blocks any drop that overlaps a
-    -- neighbour, so a box dropped between/next to others just snaps back. The bank had no
-    -- drag mode before, so there is no prior grid layout to preserve.
-    if (cfg["manual_layout"] == 1) then cfg["ml_freeplace"] = 1; end
+    TFuBnkFrame.ml_edit = (TFuBnkFrame.ml_edit == 1) and 0 or 1;
+    -- Activate manual layout on unlock; respect the user's Free Placement choice
+    -- (do NOT force ml_freeplace -- both grid and free are fully supported now, and
+    -- forcing it re-enabled Free Placement every time the gear was pressed).
+    if (TFuBnkFrame.ml_edit == 1) then cfg["manual_layout"] = 1; end
   end
 
   -- Relayout (not resort): edit-mode/manual-layout only changes the layout, not
@@ -1869,12 +1871,25 @@ function Bank.RightClickMenu_populate(self, level)
     info = { ["disabled"] = 1 };
     UIDropDownMenu_AddButton(info, level);
 
+    -- Under Legacy Edit this is the classic edit_mode toggle; otherwise it toggles the
+    -- Manual Layout MODE on/off (the gear button handles enter/exit edit). Mirrors Inv.
     info = {
   ["text"] = L["Edit Mode"],
   ["value"] = nil,
-  ["func"] = TFuBnkFrame.Button_ChangeEditMode_OnClick
+  ["func"] = function()
+    local c = TFuBnkFrame.cfg;
+    if (c["legacy_edit"] == 1) then
+      TFuBnkFrame.Button_ChangeEditMode_OnClick();
+    else
+      c["manual_layout"] = (c["manual_layout"] == 1) and 0 or 1;
+      if (c["manual_layout"] ~= 1) then TFuBnkFrame.ml_edit = 0; end  -- leaving: lock (respect Free Placement choice)
+      TFuBnkFrame.force_relayout = true;
+      TFuBnkFrame:UpdateWindow(TFuBag.REQ_NONE);
+    end
+  end
   };
-    if (TFuBnkFrame.edit_mode == 1) then
+    if ((TFuBnkFrame.cfg["legacy_edit"] == 1 and TFuBnkFrame.edit_mode == 1)
+        or (TFuBnkFrame.cfg["legacy_edit"] ~= 1 and TFuBnkFrame.cfg["manual_layout"] == 1)) then
       info["checked"] = 1;
     end
     UIDropDownMenu_AddButton(info, level);
@@ -2379,11 +2394,14 @@ function Bank:UpdateWindow(resort_req)
       local w, h = mlbtn:GetSize();
       mlbtn.MLGlow:SetSize((w or 20) * 1.7, (h or 20) * 1.7);
     end
+    -- Glow = gear in its ACTIVE/editing state (mirror of Inv): classic edit_mode under
+    -- Legacy Edit, else the Manual Layout edit/unlock (ml_edit). Manual layout being
+    -- active is persistent (menu/options checkbox), not shown by the glow.
     local edit_active;
     if (self.cfg["legacy_edit"] == 1) then
       edit_active = (self.edit_mode == 1);
     else
-      edit_active = (self.cfg["manual_layout"] == 1);
+      edit_active = (self.ml_edit == 1);
     end
     if (edit_active) then
       mlbtn.MLGlow:Show();
