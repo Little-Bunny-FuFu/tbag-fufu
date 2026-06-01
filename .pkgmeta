@@ -1,4 +1,4 @@
-package-as: TBag
+package-as: tbag-fufu
 manual-changelog: Changelog.txt
 
 ignore:
@@ -7,3 +7,6 @@ ignore:
   - docs
   - .wowlint-globals
   - TBagTest.lua
+  - .claude
+  - bug-reports
+  - ToDo.txt
