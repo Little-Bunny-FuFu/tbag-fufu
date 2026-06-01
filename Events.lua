@@ -54,6 +54,15 @@ end
 function TFuBag:VARIABLES_LOADED()
   self.Inv:init(0)
   self.Bank:init(0)
+  -- Hide Blizzard's own bank window by default (tbag replaces it). Account-wide flag,
+  -- nil on a fresh install -> hidden. Toggle with /tbnk blizzbank. Install the OnShow
+  -- suppression hook now so it is in place before the first bank open regardless of
+  -- addon handler order (idempotent; also re-tried on BANKFRAME_OPENED in case the
+  -- Blizzard bank UI is load-on-demand and BankFrame did not exist yet at load).
+  if (TFuBagCfg["hide_blizzard_bank"] == nil) then
+    TFuBagCfg["hide_blizzard_bank"] = 1
+  end
+  TFuBnkFrame:ApplyBlizzardBankSuppression()
   self:RegisterEvent("BAG_UPDATE")
   self:RegisterEvent("BAG_UPDATE_COOLDOWN")
   self:RegisterEvent("ITEM_LOCK_CHANGED")
@@ -165,6 +174,7 @@ end
 
 function TFuBag:BANKFRAME_OPENED()
   if not TFuBag.BANK_ENABLED then return end  -- bank gated off; let Blizzard's bank show
+  TFuBnkFrame:ApplyBlizzardBankSuppression()  -- idempotent; covers LoD BankFrame / a combat-deferred apply
   TFuBnkFrame.physAtBank = 1
   -- 12.0: rebuild the dynamic tab list (char + warband) before showing/scanning.
   -- Called on the frame so self == TFuBnkFrame (Bank methods bind via metatable).
@@ -190,6 +200,13 @@ function TFuBag:BANKFRAME_OPENED()
     -- flash. A direct UpdateWindow re-shows them in the same frame, matching OnShow's path.
     TFuBnkFrame:UpdateWindow(TFuBag.REQ_PART)
   end
+  -- Open the inventory window alongside the bank, matching the default UI (a banker --
+  -- or the Warband distance inhibitor -- opens BOTH bank + bags). The bank's OnShow does
+  -- call TFuInvFrame:Show(), but only on a hidden->shown transition; when the tbag bank
+  -- window was already open (cached path) OnShow doesn't fire, and hiding Blizzard's bank
+  -- also suppresses its own open-the-bags behavior -- so show it explicitly here. No-op if
+  -- already shown.
+  TFuInvFrame:Show()
   -- Repaint the inventory window so its bag items pick up the bank-deposit eligibility
   -- greying (bag contents didn't change -> a light REQ_NONE repaint, no re-sort).
   TFuBag:RequestUpdate(TFuInvFrame)
@@ -199,8 +216,12 @@ function TFuBag:BANKFRAME_CLOSED()
   TFuBnkFrame.physAtBank = 0
   TFuBnkFrame.atbank = 0
   TFuBnkFrame:Hide()
-  -- Clear the deposit-eligibility greying now that no bank is open.
-  TFuBag:RequestUpdate(TFuInvFrame)
+  -- Match the default UI: closing the bank window (or walking away from the banker) also
+  -- closes the bags. tbag opens the inventory window alongside the bank on
+  -- BANKFRAME_OPENED, so close it here too. This only fires for a live session (a cached
+  -- bank-window close never reaches BANKFRAME_CLOSED), so remote/cached browsing of the
+  -- inventory is unaffected.
+  TFuInvFrame:Hide()
 end
 
 -- 12.0 bank tab set changed (purchase / settings) -- rebuild and refresh if open.

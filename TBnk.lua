@@ -302,6 +302,61 @@ function Bank:IsBankSessionLive()
   return (BankFrame and BankFrame:IsShown()) and true or false
 end
 
+-- Suppress / restore Blizzard's own bank window for the /tbnk blizzbank toggle.
+--
+-- We MUST NOT simply Hide() BankFrame: BankFrameMixin:OnHide calls C_Bank.CloseBankFrame()
+-- (+ CloseAllBags), so hiding it during a live session closes the bank we just opened --
+-- the contents go cached/blank and become un-clickable (and BANKFRAME_CLOSED tears down
+-- tbag's windows). BankFrameMixin:OnShow likewise calls OpenAllBags.
+--
+-- Instead, mirror Baganator: NEUTRALIZE BankFrame's OnShow/OnHide/OnEvent and reparent it
+-- under a permanently-hidden holder. Then it never renders AND hiding it never ends the
+-- session. tbag drives everything itself: it opens its own inv window on BANKFRAME_OPENED
+-- and ends the session via C_Bank.CloseBankFrame() from MainFrame:OnHide, so none of
+-- Blizzard's BankFrame logic is needed. Fully reversible (restore the saved scripts +
+-- reparent to UIParent) so the toggle can switch the default UI back on.
+--
+-- Order matters: neutralize OnHide BEFORE the reparent/Hide so neither can fire
+-- CloseBankFrame. Money transfer (Blizzard BANK_MONEY_* popups) and item ops (untainted
+-- C_* APIs) never route through BankFrame, so this touches no protected/secure path.
+local blizzBankHolder   -- permanently-hidden reparent target (lazy)
+local blizzBankSaved    -- captured Blizzard originals (once, before we neutralize)
+
+function Bank:ApplyBlizzardBankSuppression()
+  if (not BankFrame) then return end
+  if (InCombatLockdown()) then return end  -- SetParent may be combat-protected; re-applied on next open
+  if (not blizzBankSaved) then
+    blizzBankSaved = {
+      OnShow  = BankFrame:GetScript("OnShow"),
+      OnHide  = BankFrame:GetScript("OnHide"),
+      OnEvent = BankFrame:GetScript("OnEvent"),
+      parent  = BankFrame:GetParent() or UIParent,
+    }
+  end
+
+  local hide = (TFuBag.BANK_ENABLED and TFuBagCfg and TFuBagCfg["hide_blizzard_bank"] == 1)
+  if (hide) then
+    if (not blizzBankHolder) then
+      blizzBankHolder = CreateFrame("Frame")
+      blizzBankHolder:Hide()
+    end
+    BankFrame:SetScript("OnHide", nil)   -- FIRST: stop hide/reparent from closing the session
+    BankFrame:SetScript("OnShow", nil)   -- stop OpenAllBags / tab setup on (re)show
+    BankFrame:SetScript("OnEvent", nil)
+    if (BankFrame:GetParent() ~= blizzBankHolder) then
+      BankFrame:SetParent(blizzBankHolder)
+    end
+    if (BankFrame:IsShown()) then BankFrame:Hide() end  -- safe now (OnHide neutralized)
+  elseif (blizzBankSaved) then
+    BankFrame:SetScript("OnShow", blizzBankSaved.OnShow)
+    BankFrame:SetScript("OnHide", blizzBankSaved.OnHide)
+    BankFrame:SetScript("OnEvent", blizzBankSaved.OnEvent)
+    if (BankFrame:GetParent() ~= blizzBankSaved.parent) then
+      BankFrame:SetParent(blizzBankSaved.parent)
+    end
+  end
+end
+
 -- BankFrame hijack -> no taint. Run on BANKFRAME_OPENED + BANK_TABS_CHANGED + switch.
 -- Live = a bank session is open AND we are viewing our OWN character. Only then do the
 -- C_Bank reads return real data and the live controls (deposit / money transfer / buy

@@ -12,6 +12,7 @@ local TFuBNK_HELP = {
     L[" /tbnk hide  -- hide window"],
     L[" /tbnk update  -- refresh the window"],
     L[" /tbnk config  -- configuration options"],
+    " /tbnk blizzbank  -- toggle hiding Blizzard's default bank UI",
     L[" /tbnk debug  -- turn debug info on/off"],
     L[" /tbnk reset  -- sets everything back to default values"],
     L[" /tbnk resetpos -- put the bank back to its default position"],
@@ -118,6 +119,17 @@ function TFuBnk_cmd(msg)
     -- Interim: switch between Character and Warband bank views (clickable per-type
     -- tab buttons are the next stage).
     TFuBnkFrame:ToggleBankType();
+  elseif (cmd == "blizzbank") then
+    -- Toggle hiding Blizzard's own bank window (tbag replaces it). Account-wide flag;
+    -- Bank:ApplyBlizzardBankSuppression neutralizes/reparents (or restores) BankFrame.
+    if (TFuBagCfg["hide_blizzard_bank"] == 1) then
+      TFuBagCfg["hide_blizzard_bank"] = 0
+      TFuBag:Print(TFuBag.SCP.."Blizzard's default bank UI will now SHOW (fully applies on the next bank open).");
+    else
+      TFuBagCfg["hide_blizzard_bank"] = 1
+      TFuBag:Print(TFuBag.SCP.."Blizzard's default bank UI is now HIDDEN.");
+    end
+    TFuBnkFrame:ApplyBlizzardBankSuppression();
   elseif (cmd == "printtypes") then
     -- TEMP diagnostic: dump distinct item class/subclass buckets in the bags.
     TFuBag:PrintItemTypes();
