@@ -54,7 +54,7 @@ function ItemButton:OnEnter()
 
   if isLive then
     if InRepairMode() and (repairCost and repairCost > 0) then
-      GameTooltip:AddLine(TEXT(REPAIR_COST), 1, 1, 1)
+      GameTooltip:AddLine(REPAIR_COST, 1, 1, 1)
       SetTooltipMoney(GameTooltip, repairCost)
       GameTooltip:Show()
     elseif MerchantFrame:IsVisible() then
