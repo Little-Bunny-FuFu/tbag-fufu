@@ -1200,6 +1200,27 @@ function TFuBag:BarHasSubgroups(items)
   return false;
 end
 
+-- Effective box dimensions (cols, rows, isSub) for a Manual Layout bar. A sub-grouped
+-- equipment bar (and NOT classic edit mode) keeps its full-width shelf layout so the
+-- per-slot sub-headers survive in Manual Layout, exactly like auto-flow -- otherwise it
+-- is a flat cols x rows grid from the saved layout. `colmax` is the column budget.
+-- Used by both ML layout paths so the size passes and the draw pass agree.
+function TFuBag:MLBarDims(frame, items, rec, colmax)
+  if (not colmax or colmax < 1) then colmax = 1; end
+  local cols = (rec and rec.cols) or 1;
+  if (cols < 1) then cols = 1; end
+  if (cols > colmax) then cols = colmax; end
+  if (frame.edit_mode ~= 1 and self:BarHasSubgroups(items)) then
+    local h = self:EquipSubPlan(items, colmax);
+    if (not h or h < 1) then h = 1; end
+    return colmax, h, true;   -- full width + shelf height; rows may be fractional
+  end
+  local n = (items and table.getn(items)) or 0;
+  local rows = math.ceil(n / cols);
+  if (rows < 1) then rows = 1; end
+  return cols, rows, false;
+end
+
 -- Plan a sub-headered box across the FULL content width `colmax` (Baganator-style
 -- shelf flow). Each sub-group is an inline cluster (header on top, its items in a
 -- block beneath); clusters pack left-to-right and wrap to a new shelf when the
@@ -5131,12 +5152,13 @@ end
 function TFuBag:PlaceItemButton(mainFrame, frame, itm, cur_x, cur_y)
   local buttonname = TFuBag:GetBagItemButtonName(itm[TFuBag.I_BAG], itm[TFuBag.I_SLOT])
 
-  -- -BF_X_PAD (instead of +) centers the button cluster in the box: the frame
-  -- is 2*BF_X_PAD wider than the buttons need, so this splits that slack evenly
-  -- left/right (a slight edge on both sides) rather than leaving the rightmost
-  -- button flush against the box edge.
-  self:PositionFrame(buttonname, "BOTTOMRIGHT", frame, "BOTTOMRIGHT",
-    0-mainFrame:FrameX(cur_x)-mainFrame.BF_X_PAD,
+  -- LEFT-anchored (matches PlaceItemButtonAtCell): items fill left-to-right starting
+  -- at the box's left edge, so an under-filled box (e.g. a wide equipment / bind-split
+  -- bar that renders flat in Manual Layout) is LEFT-justified like every other category,
+  -- not clustered on the right. +BF_X_PAD keeps the same edge inset the right-anchored
+  -- version used, so a FULL box stays centered exactly as before.
+  self:PositionFrame(buttonname, "BOTTOMLEFT", frame, "BOTTOMLEFT",
+    mainFrame:FrameX(cur_x)+mainFrame.BF_X_PAD,
     mainFrame:FrameY(cur_y)+mainFrame.BF_Y_PAD,
     mainFrame.BF_WIDTH, mainFrame.BF_HEIGHT)
 
@@ -6248,10 +6270,13 @@ function TFuBag:UpdateScrollViewport(frame, PAD_TOP, PAD_BOTTOM, content_w, cont
   -- shortens by HSCROLL_H so the two don't overlap in the corner.
   if (bar) then
     local col_inset = self.BORDER + (self.SB_COL - 8) / 2;
+    -- Inset the bar below the header chrome and above the footer (12px margins) so it
+    -- sits centered in the content region instead of butting the header line.
+    local v_margin = 12;
     bar:ClearAllPoints();
-    bar:SetPoint("TOPRIGHT",    frame, "TOPRIGHT",    -col_inset, -36);
+    bar:SetPoint("TOPRIGHT",    frame, "TOPRIGHT",    -col_inset, -(PAD_TOP + v_margin));
     bar:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -col_inset,
-      bottom_pad + (hbar_visible and self.HSCROLL_H or 0));
+      bottom_pad + (hbar_visible and self.HSCROLL_H or 0) + v_margin);
   end
 
   -- Horizontal scrollbar: anchor to sb's BOTTOMLEFT/BOTTOMRIGHT so it spans
@@ -6267,7 +6292,12 @@ function TFuBag:UpdateScrollViewport(frame, PAD_TOP, PAD_BOTTOM, content_w, cont
     -- with a little breathing room before the chrome.
     hbar:ClearAllPoints();
     hbar:SetPoint("TOPLEFT",  sb, "BOTTOMLEFT",  0, -8);
-    hbar:SetPoint("TOPRIGHT", sb, "BOTTOMRIGHT", 0, -8);
+    -- Extend the right end so it lands at the vertical scrollbar's RIGHT edge (so the
+    -- end-cap arrows line up), not the window border. The vertical bar's right edge is
+    -- at frame.right - col_inset (col_inset = BORDER + (SB_COL-8)/2); the offset from
+    -- sb's right (frame.right - BORDER - SB_COL) to there is (SB_COL + 8)/2. The vertical
+    -- bar stops above the hbar (its bottom reserves HSCROLL_H), so there is no overlap.
+    hbar:SetPoint("TOPRIGHT", sb, "BOTTOMRIGHT", (self.SB_COL + 8) / 2, -8);
     if (hbar_visible) then
       -- Show BEFORE SetVisibleExtentPercentage so the track has a measured
       -- width when ScrollBarMixin:Update computes the proportional thumb
@@ -6398,11 +6428,7 @@ function TFuBag:LayoutWindowFree(frame, PAD_TOP, PAD_BOTTOM, show_cat_names, CAT
       local rec = cat_layout[barnum];
       local n = table.getn(baritm[barnum]);
       if (rec and n > 0) then
-        local cols = rec.cols or 1;
-        if (cols < 1) then cols = 1; end
-        if (cols > colmax) then cols = colmax; end
-        local rows = math.ceil(n / cols);
-        if (rows < 1) then rows = 1; end
+        local cols, rows = self:MLBarDims(frame, baritm[barnum], rec, colmax);
         local bottom = (rec.gy or 0) + rows;
         if (not seen[bottom]) then seen[bottom] = true; table.insert(bottoms, bottom); end
       end
@@ -6421,9 +6447,7 @@ function TFuBag:LayoutWindowFree(frame, PAD_TOP, PAD_BOTTOM, show_cat_names, CAT
   for barnum = 1, self.BAR_MAX do
     local rec = cat_layout[barnum];
     if (rec and table.getn(baritm[barnum]) > 0) then
-      local cols = rec.cols or 1;
-      if (cols < 1) then cols = 1; end
-      if (cols > colmax) then cols = colmax; end
+      local cols = self:MLBarDims(frame, baritm[barnum], rec, colmax);
       local gx = rec.gx or 0; if (gx < 0) then gx = 0; end
       local right = gx * pitchX + frame:FrameX(cols);
       if (right > max_right_sc) then max_right_sc = right; end
@@ -6447,11 +6471,7 @@ function TFuBag:LayoutWindowFree(frame, PAD_TOP, PAD_BOTTOM, show_cat_names, CAT
     local n = table.getn(baritm[barnum]);
     local rec = cat_layout[barnum];
     if (bf and n > 0 and rec) then
-      local cols = rec.cols or 1;
-      if (cols < 1) then cols = 1; end
-      if (cols > colmax) then cols = colmax; end
-      local rows = math.ceil(n / cols);
-      if (rows < 1) then rows = 1; end
+      local cols, rows, isSub = self:MLBarDims(frame, baritm[barnum], rec, colmax);
       local gx = rec.gx or 0; if (gx < 0) then gx = 0; end
       local gy = rec.gy or 0; if (gy < 0) then gy = 0; end
 
@@ -6466,7 +6486,7 @@ function TFuBag:LayoutWindowFree(frame, PAD_TOP, PAD_BOTTOM, show_cat_names, CAT
 
       self:ColorFrame(cfg, bf, barnum);
 
-      TFuBag:AssignButtonsToFrame(frame, barnum, barname, cols, rows);
+      TFuBag:AssignButtonsToFrame(frame, barnum, barname, cols, rows, isSub);
       bf:Show();
       -- Draggable only while UNLOCKED (gear/edit on); locked = layout shown but inert.
       self:SetBarDraggable(frame, barnum, bf, frame.ml_edit == 1, show_cat_names, label_gap);
@@ -6657,9 +6677,7 @@ function TFuBag:LayoutWindowFreePlace(frame, PAD_TOP, PAD_BOTTOM, show_cat_names
   for barnum = 1, self.BAR_MAX do
     local rec = store[barnum];
     if (rec and table.getn(baritm[barnum]) > 0) then
-      local cols = rec.cols or 1;
-      if (cols < 1) then cols = 1; end
-      if (cols > colmax) then cols = colmax; end
+      local cols = self:MLBarDims(frame, baritm[barnum], rec, colmax);
       local fx = rec.fx or 0; if (fx < 0) then fx = 0; end
       local right = fx * cellX + frame:FrameX(cols);
       if (right > content_w) then content_w = right; end
@@ -6676,11 +6694,7 @@ function TFuBag:LayoutWindowFreePlace(frame, PAD_TOP, PAD_BOTTOM, show_cat_names
     local n = table.getn(baritm[barnum]);
     local rec = store[barnum];
     if (bf and n > 0 and rec) then
-      local cols = rec.cols or 1;
-      if (cols < 1) then cols = 1; end
-      if (cols > colmax) then cols = colmax; end
-      local rows = math.ceil(n / cols);
-      if (rows < 1) then rows = 1; end
+      local cols, rows, isSub = self:MLBarDims(frame, baritm[barnum], rec, colmax);
       local fx = rec.fx or 0; if (fx < 0) then fx = 0; end
       local fy = rec.fy or 0; if (fy < 0) then fy = 0; end
 
@@ -6690,7 +6704,7 @@ function TFuBag:LayoutWindowFreePlace(frame, PAD_TOP, PAD_BOTTOM, show_cat_names
         px, 0 - py, frame:FrameX(cols), frame:FrameY(rows));
 
       self:ColorFrame(cfg, bf, barnum);
-      TFuBag:AssignButtonsToFrame(frame, barnum, barname, cols, rows);
+      TFuBag:AssignButtonsToFrame(frame, barnum, barname, cols, rows, isSub);
       bf:Show();
       -- Draggable only while UNLOCKED (gear/edit on); locked = layout shown but inert.
       self:SetBarDraggable(frame, barnum, bf, frame.ml_edit == 1, show_cat_names, label_gap);

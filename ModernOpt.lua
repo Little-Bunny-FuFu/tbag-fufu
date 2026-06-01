@@ -81,14 +81,50 @@ function MO:Slider(parent, y, label, minV, maxV, step, get, set)
   sl:SetPoint("TOPLEFT", parent, "TOPLEFT", PAD, -(y + 18))
   sl:SetWidth(280)
   local steps = math.floor((maxV - minV) / step + 0.5)
-  local fmt = {
-    [MinimalSliderWithSteppersMixin.Label.Right] = function(v) return tostring(v) end,
-  }
+  -- No template value label -- an editable box (below) shows AND sets the value.
+  local fmt = {}
+
+  -- Editable value field to the right of the track: type a number + Enter to set the
+  -- value directly (clamped to range, snapped to step). Reflects drags live.
+  local eb = CreateFrame("EditBox", nil, parent, "InputBoxTemplate")
+  eb:SetAutoFocus(false)
+  eb:SetNumeric(true)
+  eb:SetMaxLetters(5)
+  eb:SetJustifyH("CENTER")
+  eb:SetSize(46, 18)
+  eb:SetPoint("LEFT", sl, "RIGHT", 14, 0)
+
+  local applying = false
+  local function snap(v)
+    if (not v) then return nil end
+    if (v < minV) then v = minV elseif (v > maxV) then v = maxV end
+    return minV + math.floor((v - minV) / step + 0.5) * step
+  end
+  local function showBox(v) eb:SetText(tostring(v)); eb:SetCursorPosition(0) end
+
   sl:Init(get(), minV, maxV, steps, fmt)
+  showBox(get())
   sl:RegisterCallback(MinimalSliderWithSteppersMixin.Event.OnValueChanged, function(_, value)
+    if (applying) then return end
     set(value)
+    showBox(value)
   end, parent)
-  sl.tfuRefresh = function() sl:Init(get(), minV, maxV, steps, fmt) end
+  eb:SetScript("OnEnterPressed", function(self)
+    local v = snap(tonumber(self:GetText()))
+    if (v) then
+      applying = true
+      set(v)
+      sl:Init(v, minV, maxV, steps, fmt)  -- move the slider to the typed value
+      applying = false
+      showBox(v)
+    else
+      showBox(get())  -- invalid: revert to current
+    end
+    self:ClearFocus()
+  end)
+  eb:SetScript("OnEscapePressed", function(self) showBox(get()); self:ClearFocus() end)
+
+  sl.tfuRefresh = function() sl:Init(get(), minV, maxV, steps, fmt); showBox(get()) end
   return sl, y + 18 + 30 + ROW_GAP
 end
 
@@ -183,14 +219,40 @@ function MO:ScrollList(parent, x, y, width, height)
   -- measured yet -- the explicit width then stands).
   local pw = parent:GetWidth()
   if (pw and pw > 0) then
-    local maxW = pw - x - 24
+    local maxW = pw - x - 26
     if (maxW > 0 and width > maxW) then width = maxW end
   end
+  -- Clamp the height so the list never butts against the panel bottom: leave a slight
+  -- gap below it (matches the other sections). Skipped if the parent isn't measured yet.
+  local ph = parent:GetHeight()
+  if (ph and ph > 0) then
+    local maxH = ph - y - 12
+    if (maxH > 0 and height > maxH) then height = maxH end
+  end
   sf:SetSize(width, height)
-  -- A faint backdrop so the list region reads as a distinct panel.
-  local bg = sf:CreateTexture(nil, "BACKGROUND")
-  bg:SetAllPoints(sf)
-  bg:SetColorTexture(0, 0, 0, 0.25)
+  -- Rounded backdrop so the list region reads as a distinct panel with soft corners.
+  -- A BackdropTemplate frame BEHIND the scroll frame (extended right to cover the
+  -- scrollbar column), one level below sf so the list content + bar render on top.
+  local bg = CreateFrame("Frame", nil, parent, "BackdropTemplate")
+  bg:SetFrameLevel(parent:GetFrameLevel())
+  bg:SetPoint("TOPLEFT", sf, "TOPLEFT", -4, 4)
+  bg:SetPoint("BOTTOMRIGHT", sf, "BOTTOMRIGHT", 22, -4)
+  bg:SetBackdrop({
+    bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+    edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+    tile = true, tileSize = 16, edgeSize = 14,
+    insets = { left = 3, right = 3, top = 3, bottom = 3 },
+  })
+  bg:SetBackdropColor(0, 0, 0, 0.30)
+  bg:SetBackdropBorderColor(0.5, 0.5, 0.5, 0.7)
+  -- Center the scrollbar in the right gutter with top/bottom margins, so it does not
+  -- butt the rounded top/bottom corners (the template anchors it flush to the top).
+  local sbar = sf.ScrollBar
+  if (sbar) then
+    sbar:ClearAllPoints()
+    sbar:SetPoint("TOP", sf, "TOPRIGHT", 11, -18)
+    sbar:SetPoint("BOTTOM", sf, "BOTTOMRIGHT", 11, 18)
+  end
   local child = CreateFrame("Frame", nil, sf)
   child:SetSize(width, height)   -- height is reset by the caller to the content height
   sf:SetScrollChild(child)
@@ -298,6 +360,20 @@ function MO:CreateWindow()
 
   self.contentTitle = content:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
   self.contentTitle:SetPoint("TOPLEFT", content, "TOPLEFT", PAD, -4)
+
+  -- Vertical divider between the nav column and the content panel (two-pane look).
+  local vdiv = f:CreateTexture(nil, "ARTWORK")
+  vdiv:SetColorTexture(0.5, 0.5, 0.5, 0.35)
+  vdiv:SetWidth(1)
+  vdiv:SetPoint("TOPLEFT", f, "TOPLEFT", NAV_WIDTH + 11, -32)
+  vdiv:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT", NAV_WIDTH + 11, 14)
+
+  -- Thin rule under the section title, separating it from the controls below.
+  local trule = content:CreateTexture(nil, "ARTWORK")
+  trule:SetColorTexture(0.5, 0.5, 0.5, 0.35)
+  trule:SetHeight(1)
+  trule:SetPoint("TOPLEFT", content, "TOPLEFT", PAD, -24)
+  trule:SetPoint("TOPRIGHT", content, "TOPRIGHT", -4, -24)
 
   -- Nav buttons, one per section.
   self.navButtons = {}
