@@ -1008,6 +1008,19 @@ function Inv.RightClickMenu_populate(self, level)
   -------------------------------------------------------------------------------------------------
   ------------------------ MAIN WINDOW CONTEXT MENU -----------------------------------------------
   -------------------------------------------------------------------------------------------------
+  elseif (TFuInvFrame.RightClickMenu_mode == "bagslot") then
+    local eb_bag = TFuInvFrame.RightClickMenu_opts[TFuBag.I_BAG];
+    if (level == 1) then
+      info = { ["text"] = "Bag", ["isTitle"] = 1, ["notCheckable"] = 1 };
+      UIDropDownMenu_AddButton(info, level);
+      info = {
+        ["text"] = "Empty bag (move items out so it can be removed)",
+        ["notCheckable"] = 1,
+        ["func"] = function() CloseDropDownMenus(); TFuBag:EmptyBag(eb_bag); end,
+        };
+      UIDropDownMenu_AddButton(info, level);
+    end
+
   elseif (TFuInvFrame.RightClickMenu_mode == "mainwindow") then
     if (level == 1) then
 

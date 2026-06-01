@@ -34,6 +34,21 @@ local TFuINV_HELP = {
     L[" /tinv deletechar CHAR SERVER -- clears all cached info for character "]
 };
 
+-- /tball (both windows) help. Plain strings (these combined-command lines have no
+-- localization entries). Without this, a bare /tball delegated to both sub-commands and
+-- each printed ITS OWN help -- so only the /tbnk help ended up visible.
+local TFuBALL_HELP = {
+    "TFuBall (both windows) Commands:",
+    " /tball <cmd>  -- run <cmd> on BOTH the inventory and bank windows",
+    " /tball show  -- open both windows",
+    " /tball hide  -- hide both windows",
+    " /tball update  -- refresh both windows",
+    " /tball reset  -- reset both windows to default values",
+    " /tball resetsorts  -- clear both windows' item search lists",
+    " /tball resetpos  -- reset both window positions",
+    " (any /tinv or /tbnk subcommand also works here, applied to both)",
+};
+
 
 function TFuBag:ShowHelp(arr)
   for _, line in ipairs(arr) do
@@ -186,6 +201,13 @@ end
 -- at once (e.g. /tball resetsorts, /tball show, /tball printcat herb). The separate
 -- /tinv and /tbnk commands remain available.
 function TFuBag_cmd_both(msg)
+  -- No-arg / "help": show the combined helpfile. Otherwise both sub-commands would each
+  -- fall through to their own ShowHelp and only the /tbnk help would remain visible.
+  local cmd = string.lower((TFuBag:SplitStr(msg, " ")));
+  if (cmd == "" or cmd == "help") then
+    TFuBag:ShowHelp(TFuBALL_HELP);
+    return;
+  end
   TFuInv_cmd(msg);
   TFuBnk_cmd(msg);
 end

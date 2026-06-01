@@ -681,6 +681,20 @@ function TFuBag:CleanConfig()
     TFuBagInfo[player]["stat"] = nil;
     TFuBagInfo[player]["pvp"] = nil;
   end
+
+  -- One-time: the "Bags" category used to share default bar 29 with "Junk" (rendering a
+  -- combined "Junk/Bags" box). It now defaults to its own bar (10). Relocate existing
+  -- configs that are still on the old shared default only -- a user who deliberately moved
+  -- Bags elsewhere is left untouched. Guarded so it runs exactly once.
+  if (not TFuBagCfg["bag_bar_split_done"]) then
+    for _, wkey in ipairs({ "Inv", "Bnk" }) do
+      local cb = TFuBagCfg[wkey] and TFuBagCfg[wkey][self.CAT_BAR];
+      if (cb and cb[L["BAG"]] == 29) then
+        cb[L["BAG"]] = 10;
+      end
+    end
+    TFuBagCfg["bag_bar_split_done"] = true;
+  end
 end
 
 function TFuBag:BagSlotToString(bag,slot)
@@ -732,6 +746,75 @@ function TFuBag:PutItemInBag(bag)
     return PutItemInBank(true)
   else
     return PutItemInBag(ContainerIDToInventoryID(bag))
+  end
+end
+
+-- Move every item out of an equipped inventory bag into free slots in OTHER bags, so the
+-- now-empty bag can be unequipped/swapped (Blizzard refuses to move a non-empty bag, and
+-- tbag's category view otherwise gives no way to target one physical bag's contents).
+-- Compatible-slot rules mirror the stack/comp logic: a general bag (family 0) takes
+-- anything, a family bag only its family, the reagent bag (2048) crafting reagents. Moves
+-- run through the ItemMover coroutine across BAG_UPDATEs; reports a remainder if space runs out.
+function TFuBag:EmptyBag(bag)
+  if (not bag or bag <= 0) then return; end
+  if (not self:IsLive(TFuInvFrame)) then
+    self:Print(self.SCP.."Can only empty your own live bags.");
+    return;
+  end
+  local pcache = TFuInvItm[self.PLAYERID];
+  local src = pcache and pcache[bag];
+  if (not src) then return; end
+
+  -- Free slots in every OTHER inventory bag, tagged with that bag's item family.
+  local freeslots = {};
+  for _, b in ipairs(TFuInvFrame.bags) do
+    if (b ~= bag and pcache[b]) then
+      local fam = self:GetBagType(self.PLAYERID, b) or 0;
+      for s = 1, self:GetBagMaxItems(b) do
+        local fitm = pcache[b][s];
+        if (fitm and (not fitm[self.I_ITEMLINK] or fitm[self.I_ITEMLINK] == "")) then
+          freeslots[#freeslots + 1] = { bag = b, slot = s, fam = fam };
+        end
+      end
+    end
+  end
+
+  local moved, failed = 0, 0;
+  for s = 1, self:GetBagMaxItems(bag) do
+    local itm = src[s];
+    if (itm and itm[self.I_ITEMLINK] and itm[self.I_ITEMLINK] ~= "") then
+      -- A bag/container ITEM has no holdable family of its own -> general bags only.
+      local itmfam = 0;
+      if (itm[self.I_TYPE] ~= L["Container"]) then
+        itmfam = GetItemFamily(itm[self.I_ITEMLINK]) or 0;
+      end
+      local reagent = itm[self.I_CRAFTINGREAGENT];
+      local chosen;
+      for i = 1, #freeslots do
+        local fs = freeslots[i];
+        if (not fs.taken) and ((fs.fam == 0)
+            or (fs.fam == 2048 and reagent)
+            or (itmfam ~= 0 and bit.band(fs.fam, itmfam) ~= 0)) then
+          chosen = i;
+          break;
+        end
+      end
+      if (chosen) then
+        freeslots[chosen].taken = true;
+        self:ItemMover(bag, s, freeslots[chosen].bag, freeslots[chosen].slot);
+        moved = moved + 1;
+      else
+        failed = failed + 1;
+      end
+    end
+  end
+
+  if (moved == 0 and failed == 0) then
+    self:Print(self.SCP.."That bag is already empty.");
+  elseif (failed > 0) then
+    self:Print(self.SCP..string.format("Moving %d item(s) out; %d had no compatible free slot -- free up space and try again.", moved, failed));
+  else
+    self:Print(self.SCP..string.format("Moving %d item(s) out; the bag will be empty (removable) once the moves finish.", moved));
   end
 end
 
@@ -2395,7 +2478,7 @@ function TFuBag:SetDefLayout(cfg, bagarr, row1offset, reset)
   self:SetCatBar(cfg, L["ACT_ON"], 29, reset);
   self:SetCatBar(cfg, L["ACT_OPEN"], 29, reset);
   self:SetCatBar(cfg, L["ACT_SELL"], 29, reset);
-  self:SetCatBar(cfg, L["BAG"], 29, reset);
+  self:SetCatBar(cfg, L["BAG"], 10, reset);  -- own bar (was 29, shared with Junk -> a "Junk/Bags" box)
   self:SetCatBar(cfg, L["GRAY_ITEMS"], 29, reset);
 
   local bag;
@@ -3138,8 +3221,13 @@ end
 -- Returns the displayed name for a bar: the distinct condensed labels of the
 -- items actually present in it. Items are already sorted by their (per-slot)
 -- category, so the collapsed labels appear grouped. Used by "Show Category Names".
-function TFuBag:GetBarCategoryName(baritmbar)
+function TFuBag:GetBarCategoryName(baritmbar, cfg)
   local labels = self:BuildCatLabels();
+  -- "Separate by bind" OFF collapses all gear into one box; its condensed header would
+  -- otherwise read "BoE" (from BuildCatLabels), which only makes sense when split is ON
+  -- (distinguishing the unbound box from the Soulbound / Account-Bound boxes). With split
+  -- off the box holds ALL gear, so show a generic "Equipment" header instead.
+  local bindSplitOff = (cfg ~= nil and cfg.armor_bind_split ~= 1);
   local seen = {};
   local names = {};
   for _, itm in ipairs(baritmbar) do
@@ -3151,6 +3239,7 @@ function TFuBag:GetBarCategoryName(baritmbar)
     else
       cat = itm[self.I_CAT];
       cat = labels[cat] or cat;
+      if (bindSplitOff and cat == "BoE") then cat = "Equipment"; end
     end
     if (cat and cat ~= "" and not seen[cat]) then
       seen[cat] = true;
@@ -6666,7 +6755,7 @@ function TFuBag:LayoutWindowFree(frame, PAD_TOP, PAD_BOTTOM, show_cat_names, CAT
       if (label) then
         if (show_cat_names) then
           label:SetWordWrap(false);
-          label:SetText(self:GetBarCategoryName(baritm[barnum]));
+          label:SetText(self:GetBarCategoryName(baritm[barnum], frame.cfg));
           label:ClearAllPoints();
           -- Clamp the title to its box width and center it: a name wider than the box
           -- TRUNCATES with an ellipsis instead of drawing over the adjacent category
@@ -6877,7 +6966,7 @@ function TFuBag:LayoutWindowFreePlace(frame, PAD_TOP, PAD_BOTTOM, show_cat_names
         if (show_cat_names) then
           label:SetWordWrap(false);
           label:SetWidth(0);
-          label:SetText(self:GetBarCategoryName(baritm[barnum]));
+          label:SetText(self:GetBarCategoryName(baritm[barnum], frame.cfg));
           label:ClearAllPoints();
           -- Same center / edge-justify rule as the grid and auto-flow: center over
           -- the box when the title fits; otherwise justify toward the interior at
@@ -7307,7 +7396,7 @@ function TFuBag:LayoutWindow(frame)
             if (show_cat_names) then
               label:SetWordWrap(false);
               label:SetWidth(0);   -- auto-size to full text (no truncation)
-              label:SetText(self:GetBarCategoryName(baritm[barnum+iBar]));
+              label:SetText(self:GetBarCategoryName(baritm[barnum+iBar], frame.cfg));
               label:ClearAllPoints();
               local box_w = frame:FrameX(calc_dat[iBar.."_width"]);
               local title_w = label:GetStringWidth();

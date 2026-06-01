@@ -648,6 +648,17 @@ function BagButton:OnClick(button,down,drag)
   local isBagShown = mainFrame.cfg["show_Bag"..bag] == 1
   local itm = TFuBag:GetPlayerBag(mainFrame.playerid,bag)
 
+  -- Right-click an equippable bag slot (not the backpack) with an empty cursor: open a
+  -- context menu (currently just "Empty bag"). Left-click keeps the show/highlight toggle.
+  if (button == "RightButton" and bag > 0 and not CursorHasItem()
+      and isLive and mainFrame.RightClickMenu) then
+    HideDropDownMenu(1)
+    mainFrame.RightClickMenu_mode = "bagslot"
+    mainFrame.RightClickMenu_opts = { [TFuBag.I_BAG] = bag }
+    ToggleDropDownMenu(1, nil, mainFrame.RightClickMenu, self:GetName(), -50, 0)
+    return
+  end
+
   -- (Classic-bank "buy reagent bank" / "buy bank bag slot" click paths removed for
   -- 12.0: the static classic bag-slot buttons are permanently hidden by Bank:init and
   -- the tab-as-container model has no purchasable bag slots. The removed block also held
