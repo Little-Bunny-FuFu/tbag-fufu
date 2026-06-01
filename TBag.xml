@@ -6,7 +6,12 @@
   <Script file="Professions.lua"/>
   <Script file="TBagItemInfo.lua"/>
   <Script file="Events.lua"/>
+  <!-- TBagTest.lua is a dev-only self-test (/tinv tests). The @debug@ block keeps it
+       loaded in a source checkout but the BigWigs packager strips it from the packaged
+       release; .pkgmeta also drops the file from the zip. -->
+  <!--@debug@-->
   <Script file="TBagTest.lua"/>
+  <!--@end-debug@-->
 
   <Texture name="TFuBag_ButtonBkgrTemplate" alphaMode="ADD" file="Interface\AddOns\tbag-fufu\images\ButtonBkgr" setAllPoints="true" virtual="true">
     <Size>

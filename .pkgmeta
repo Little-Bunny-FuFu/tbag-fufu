@@ -6,3 +6,4 @@ ignore:
   - scrape-wowhead.perl
   - docs
   - .wowlint-globals
+  - TBagTest.lua

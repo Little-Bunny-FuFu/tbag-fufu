@@ -4,12 +4,6 @@ local _G = getfenv(0)
 
 -- Coalesce high-frequency, event-driven window updates. A single user action
 -- (Deposit All, a bag<->bank move) makes the server emit a *burst* of BAG_UPDATE
--- / bank-slot-changed events; running a full UpdateWindow (slot rescan + a
--- categorizing sort over up to ~1000 bank slots) per event is what caused the
--- heavy lag. Record the highest resort level requested in the burst and run ONE
--- real update a short moment later, collapsing the flood into a single rebuild.
--- Coalesce high-frequency, event-driven window updates. A single user action
--- (Deposit All, a bag<->bank move) makes the server emit a *burst* of BAG_UPDATE
 -- / bank-slot-changed events, and a fast stream of right-click moves emits one
 -- such burst per item; running a full UpdateWindow (slot rescan + categorizing
 -- sort + relayout over up to ~1000 bank slots) for each is what caused the lag.

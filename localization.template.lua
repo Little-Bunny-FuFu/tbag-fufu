@@ -1,5 +1,10 @@
 -- $Id$
 
+-- NOTE: this file is intentionally NOT listed in tbag-fufu.toc -- it is a
+-- translator starting-point only and must never be loaded (its strings are all
+-- `false`/placeholders). Do not "fix" a missing-locale issue by adding it to the
+-- load list; copy it to localization.<locale>.lua and add THAT instead.
+--
 -- This file serves as the template for starting a new
 -- translation.  Just change the locale value below and
 -- then edit the strings on the right hand side of the
