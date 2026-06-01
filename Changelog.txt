@@ -1,3 +1,24 @@
+* 12.0.0.01-fufu (2026-06-01)
+  First release of the tbag-fufu revival fork: the abandoned CurseForge tbag-shefki
+  (Legion 7.3) brought forward to retail 12.0 and rebranded -fufu. Personal/guild use.
+- Ported the Legion API to retail 12.0: Container / Item / Currency / AddOn APIs remapped
+  to their C_* namespaces (compat-12.lua shim), ItemButton intrinsic templates, and
+  removed-global fixes (TEXT, ShowContainerSellCursor, LE_ITEM_QUALITY_POOR).
+- Bank rewritten for the 12.0 account-bank / Warband tab model (C_Bank): dynamic per-tab
+  views, Character/Warband switch, money + item deposit/withdraw, tab settings, buy-tab,
+  and cached/remote read-only views per character.
+- Replace Blizzard's bank UI: /tbnk blizzbank (hidden by default). The banker and the
+  Warband distance inhibitor open both the bank and inventory windows, and closing the
+  bank closes the inventory -- matching the default UI.
+- Empty-bag tool (right-click a bag selector -> Empty bag) relocates a bag's contents so
+  it can be unequipped, with a 30s grace so the auto-sort does not immediately refill it.
+- Categorization: Bags and Junk split into their own boxes; the unbound-gear box reads
+  "Equipment" vs "BoE" per the bind-split setting; specialty-bag grouping fix.
+- Correctness fixes: bag swap no longer closes the window; a cached->live bank populates
+  without a manual resort; empty bag-slot art; merchant junk-coin; vendor/repair tooltip
+  crashes; an OnLeave nil-bag crash; assorted nil-guards.
+- /tball runs a command on both windows; branded chat output.
+
 * 20150103-r504-Shefki
   Note: This version contains a number of sorting changes the following
   commands are advised after backing up any modified sorting rules you have.
