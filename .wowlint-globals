@@ -3,10 +3,15 @@
 # if-blocks / functions, or are intentional existence-checks), so list them here to keep a
 # luacheck run showing ONLY real removed/moved-API candidates.
 #
-# Run: addon-tools/wow-lint/luac5.1-wow.ps1 <gameplay .lua files> -ShowAll
-# Deliberately NOT listed (keep them visible): genuine removed APIs, and the
-# undeclared-local leaks (button idx playerid s1 s2 tmpcalc instruction_count) which are
-# real "missing local" candidates to fix, not legitimate globals.
+# Run over the FULL gameplay .lua set (cross-file globals like TFuInv_cmd /
+# TFuBnkTabSettings_Open are only resolved when their defining file is included):
+#   addon-tools/wow-lint/luac5.1-wow.ps1 <all gameplay .lua files> -ShowAll
+# Deliberately NOT listed (keep them visible): genuine removed/absent APIs.
+# The former undeclared-local leaks (button idx playerid s1 s2 tmpcalc
+# instruction_count) were FIXED 2026-06-01, so a clean full-set sweep now shows
+# W113 = 0. One expected W143 remains by design: C_TradeSkillUI.GetAllRecipeIDs
+# (absent on retail 12.0) is existence-checked in Professions.lua with a
+# GetFilteredRecipeIDs() fallback -- guarded, not a bug.
 
 # --- compat-12.lua runtime shims (re-expose Legion globals from C_* namespaces) ---
 GetContainerNumSlots

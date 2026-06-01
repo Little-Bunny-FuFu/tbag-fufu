@@ -428,7 +428,7 @@ function TFuBag:Print(msg,r,g,b,frame,id,unknown4th)
 end
 
 function TFuBag:ReverseString(strtorev,toggle)
-  local out = "", s1, s2;
+  local out, s1, s2 = "";
 
   s2 = strtorev;
 
@@ -5276,7 +5276,7 @@ function TFuBag:ScanEquipped()
       dbag[self.I_NAME],_,dbag[self.I_RARITY] = GetItemInfo(dbag[self.I_ITEMLINK]);
       dbag[self.I_COUNT] = 1;
 
-      local tooltip = self:MakeToolTipStr(playerid, dbag[self.I_ITEMLINK], nil, nil, idx, slot);
+      local tooltip = self:MakeToolTipStr(self.PLAYERID, dbag[self.I_ITEMLINK], nil, nil, nil, slot);
       dbag[self.I_CHARGES] = self:GetItmCharges(tooltip);
     end
   end
@@ -5320,7 +5320,7 @@ function TFuBag:ScanMail()
         itm[self.I_COUNT] = count;
         itm[self.I_ITEMLINK] = itemlink;
         itm[self.I_RARITY] = quality;
-        local tooltip = self:MakeToolTipStr(playerid, itm[self.I_ITEMLINK], nil, nil,
+        local tooltip = self:MakeToolTipStr(self.PLAYERID, itm[self.I_ITEMLINK], nil, nil,
                                             idx, slot);
         itm[self.I_CHARGES] = self:GetItmCharges(tooltip);
       end
@@ -5360,6 +5360,7 @@ function TFuBag:CalcBarLayout(calc_dat, baritm, barnum, numbars, colmax, edit_mo
   end
 
   calc_dat["height"] = 0;
+  local tmpcalc = 0;
   repeat
     calc_dat["height"] = calc_dat["height"] + 1;
     tmpcalc = 0;
@@ -7814,7 +7815,7 @@ end
 local function ItemMover__main(instructions)
   local instructions = instructions;
   while true do
-    instruction_count = table.getn(instructions);
+    local instruction_count = table.getn(instructions);
     if (instruction_count > 0) then
       for index = instruction_count, 1, -1 do
         local inst = instructions[index];

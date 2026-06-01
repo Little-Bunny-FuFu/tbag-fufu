@@ -446,7 +446,7 @@ function Inv:SetTopLeftButton_Anchors()
   end
 
   for _,button_name in ipairs(buttons) do
-    button = _G[button_name];
+    local button = _G[button_name];
     if (button) then
       TFuBag:TrimButtonIcon(button);
       button:ClearAllPoints();
@@ -511,7 +511,7 @@ function Inv:SetBottomLeftButton_Anchors()
   end
 
   for _,button_name in ipairs(buttons) do
-    button = _G[button_name];
+    local button = _G[button_name];
     if (button) then
       button:ClearAllPoints();
       if (button_left) then
@@ -548,7 +548,7 @@ function Inv:SetBottomRightButton_Anchors()
   local button_right = nil
 
   for _, button_name in ipairs(buttons) do
-    button = _G[button_name]
+    local button = _G[button_name]
     if button then
       button:ClearAllPoints()
       if button_right then
