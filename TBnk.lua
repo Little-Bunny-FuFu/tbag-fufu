@@ -2300,20 +2300,26 @@ end
 
 Bank.WindowIsUpdating = 0;
 
+-- Exception-safe reentrancy guard -- see Inv:UpdateWindow. A Lua error in the body
+-- (e.g. a transient nil during a tab-set / bank-type transition) must not skip the
+-- `WindowIsUpdating = 0` reset and wedge the bank window until /reload.
 function Bank:UpdateWindow(resort_req)
-  local frame = TFuBnkFrame;
-  local barnum;
-  local cur_y;
-
   TFuBag:PrintDEBUG("Bank:UpdateWindow(): WindowIsUpdating="..Bank.WindowIsUpdating);
-
   if (Bank.WindowIsUpdating == 1) then
     return;
   end
   Bank.WindowIsUpdating = 1;
+  local ok, err = pcall(Bank.UpdateWindowBody, self, resort_req);
+  Bank.WindowIsUpdating = 0;
+  if (not ok) then geterrorhandler()(err); end
+end
+
+function Bank:UpdateWindowBody(resort_req)
+  local frame = TFuBnkFrame;
+  local barnum;
+  local cur_y;
 
   if ( not frame:IsVisible() ) then
-    Bank.WindowIsUpdating = 0;
     return;
   end
 
@@ -2509,8 +2515,6 @@ function Bank:UpdateWindow(resort_req)
   -- recomputed it. UpdateButtonHighlights is light (show/hide/tint only, no rescan).
   TFuBag:UpdateButtonHighlights();
   TFuBag:UpdateFreeSlotsCell(TFuBnkFrame);
-
-  Bank.WindowIsUpdating = 0;
 end
 
 

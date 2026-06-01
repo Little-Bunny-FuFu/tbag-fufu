@@ -231,7 +231,16 @@ function MainFrame:OnHide()
     self.physAtBank = 0
     CloseBankFrame()
   end
-  self.atbank = 0
+  -- atbank is a BANK-session flag; only the bank window owns it. This OnHide is
+  -- shared (TFuBag_MainTemplate), so an unconditional reset also wrote atbank=0
+  -- onto the INVENTORY frame -- which never sets it back. IsLive() treats 0 as
+  -- "not live" (0 is truthy and 0 ~= 1), so once the inventory had been hidden
+  -- once, IsLive(TFuInvFrame) stayed false and UpdateLock bailed before applying
+  -- the deposit-eligibility shading (and cooldowns) until /reload. Scope it to the
+  -- bank so the inventory frame keeps atbank == nil (= always live for own char).
+  if self == TFuBnkFrame then
+    self.atbank = 0
+  end
 
   -- Hide the bank's Character/Warband view-tab buttons (UIParent-parented, so they
   -- don't auto-hide with the bank window).

@@ -1373,19 +1373,28 @@ end
 
 Inv.WindowIsUpdating = 0;
 
+-- Exception-safe reentrancy guard. The body runs under pcall so a Lua error
+-- (e.g. a transient nil during a bank<->warband transition) can no longer skip
+-- the `WindowIsUpdating = 0` reset and wedge the window -- the old failure where
+-- the inventory froze on a stale render (deposit dim / greyscale stuck as a
+-- "cached" view) and every later UpdateWindow no-oped until /reload. The error is
+-- still surfaced via the standard handler so the underlying cause stays diagnosable.
 function Inv:UpdateWindow(resort_req)
-  local frame = TFuInvFrame;
-  local barnum;
-
   TFuBag:PrintDEBUG("TFuInv_UpdateWindow:  WindowIsUpdating="..Inv.WindowIsUpdating );
-
   if (Inv.WindowIsUpdating == 1) then
     return;
   end
   Inv.WindowIsUpdating = 1;
+  local ok, err = pcall(Inv.UpdateWindowBody, self, resort_req);
+  Inv.WindowIsUpdating = 0;
+  if (not ok) then geterrorhandler()(err); end
+end
+
+function Inv:UpdateWindowBody(resort_req)
+  local frame = TFuInvFrame;
+  local barnum;
 
   if ( not frame:IsVisible() ) then
-    Inv.WindowIsUpdating = 0;
     return;
   end
 
@@ -1546,10 +1555,8 @@ function Inv:UpdateWindow(resort_req)
 
   TFuBag:UpdateFreeSlotsCell(TFuInvFrame);
 
-  Inv.WindowIsUpdating = 0;
 --  UpdateAddOnMemoryUsage();
 --  TFuBag:PrintDEBUG('TFuInv_UpdateWindow End Memory = '..tostring(GetAddOnMemoryUsage("TFuBag")));
-
 end
 
 function Inv.UserDropdown_OnLoad(self)
