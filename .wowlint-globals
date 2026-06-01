@@ -1,0 +1,81 @@
+# tbag-fufu -- known-legitimate globals for the wow-lint W113 (undefined-global) sweep.
+# These are NOT auto-detected by addon-tools/wow-lint (they are assigned indented inside
+# if-blocks / functions, or are intentional existence-checks), so list them here to keep a
+# luacheck run showing ONLY real removed/moved-API candidates.
+#
+# Run: addon-tools/wow-lint/luac5.1-wow.ps1 <gameplay .lua files> -ShowAll
+# Deliberately NOT listed (keep them visible): genuine removed APIs, and the
+# undeclared-local leaks (button idx playerid s1 s2 tmpcalc instruction_count) which are
+# real "missing local" candidates to fix, not legitimate globals.
+
+# --- compat-12.lua runtime shims (re-expose Legion globals from C_* namespaces) ---
+GetContainerNumSlots
+GetContainerNumFreeSlots
+GetContainerItemLink
+GetContainerItemCooldown
+GetContainerItemInfo
+GetContainerItemQuestInfo
+PickupContainerItem
+SplitContainerItem
+UseContainerItem
+ContainerIDToInventoryID
+ShowContainerSellCursor
+MAX_CONTAINER_ITEMS
+LE_ITEM_QUALITY_POOR
+LoadAddOn
+IsAddOnLoaded
+GetItemInfo
+GetItemInfoInstant
+GetItemQualityColor
+GetItemFamily
+GetItemIcon
+GetCurrencyListInfo
+GetCurrencyListSize
+ExpandCurrencyList
+GetNumBankSlots
+GetBankSlotCost
+DepositReagentBank
+CloseBankFrame
+
+# --- intentional existence-checked / optional globals (guarded with `if X then`) ---
+PlaySoundKitID
+Print
+BackpackTokenFrame_Update
+TokenFramePopupBackpackCheckBoxText
+
+# --- classic Auction House globals: REMOVED in retail (AuctionFrame is nil); the
+# --- Hooks.lua alt-click-post block is guarded behind `AuctionFrame and ...` so it is
+# --- dead-but-safe. Listed to keep the sweep clean; revisit if adding retail-AH support.
+AuctionFrame
+AuctionFramePost
+AuctionFrameTab3
+AuctionFrameTab_OnClick
+ClickAuctionSellItemButton
+
+# --- SavedVariables (assigned indented inside Init, so not column-0 auto-detected) ---
+TFuBagCfg
+TFuBagInfo
+TFuBnkItm
+TFuInvItm
+TFuContItm
+TFuBodyItm
+TFuMailItm
+TFuTknItm
+
+# --- XML-defined frames/widgets referenced from Lua (auto-detected only when the .xml
+# --- files are also passed to the linter; listed so a .lua-only run is clean too) ---
+TFuBag_tt
+TFuInvFrame_ColumnsAdd
+TFuInvFrame_ColumnsDel
+TFuInvFrame_MoneyFrame
+TFuInvFrame_RightClickMenu
+TFuInvFrame_TokenFrame
+TFuInvFrame_Total
+TFuInvFrame_TotalText
+TFuBnkFrame_ColumnsAdd
+TFuBnkFrame_ColumnsDel
+TFuBnkFrame_MoneyFrame
+TFuBnkFrame_RightClickMenu
+TFuBnkFrame_TokenFrame
+TFuBnkFrame_Total
+TFuBnkFrame_TotalText

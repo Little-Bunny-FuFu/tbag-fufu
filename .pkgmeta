@@ -5,3 +5,4 @@ ignore:
   - dist.sh
   - scrape-wowhead.perl
   - docs
+  - .wowlint-globals
