@@ -177,6 +177,15 @@ end
 function MO:ScrollList(parent, x, y, width, height)
   local sf = CreateFrame("ScrollFrame", nil, parent, "ScrollFrameTemplate")
   sf:SetPoint("TOPLEFT", parent, "TOPLEFT", x, -y)
+  -- ScrollFrameTemplate anchors its scrollbar ~22px to the RIGHT of the frame, so a
+  -- list sized to the full panel width pushes the bar outside the window. Clamp the
+  -- width to leave room for the bar inside the parent (skipped if the parent isn't
+  -- measured yet -- the explicit width then stands).
+  local pw = parent:GetWidth()
+  if (pw and pw > 0) then
+    local maxW = pw - x - 24
+    if (maxW > 0 and width > maxW) then width = maxW end
+  end
   sf:SetSize(width, height)
   -- A faint backdrop so the list region reads as a distinct panel.
   local bg = sf:CreateTexture(nil, "BACKGROUND")

@@ -24,8 +24,6 @@ TBag.xml
 Buttons.xml
 MainFrame.xml
 TInv.xml
-TInvOpts.xml
 TBnk.xml
-TBnkOpts.xml
 TBnkTabSettings.xml
 ModernOpt.lua

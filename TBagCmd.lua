@@ -63,7 +63,8 @@ function TFuBnk_cmd(msg)
   elseif (cmd == L["reset"]) then
     TFuBagCfg["Bnk"] = {};
     TFuBnkFrame:init(1);
-    TFuBnkOpt_ResizeUpdate();
+    TFuBnkFrame:CalcButtonSize(TFuBnkFrame.cfg["frameButtonSize"], TFuBnkFrame.cfg["framePad"]);
+    TFuBnkFrame:UpdateWindow(TFuBag.REQ_MUST);
   elseif (cmd == L["resetsorts"]) then
     TFuBag:ResetSorts(TFuBnkFrame.cfg);
     TFuBag:AssignCats(TFuBnkFrame.cfg, 0);
@@ -80,7 +81,7 @@ function TFuBnk_cmd(msg)
     local char, realm = TFuBag:SplitStr(params," ");
     TFuBag:DeleteCachedCharacter(char,realm);
   elseif (cmd == L["config"]) then
-    TFuBnk_OptsFrame:Show();
+    TFuBag.ModernOpt:OpenTo("general", "bank");
   elseif (cmd == "reseed") then
     -- Clear BOTH saved Manual Layouts (grid + free) so the active mode re-snapshots
     -- from the current auto-flow on the next layout (mirror of /tinv reseed). The fresh
@@ -136,7 +137,8 @@ function TFuInv_cmd(msg)
   elseif (cmd == L["reset"]) then
     TFuBagCfg["Inv"] = {};
     TFuInvFrame:init(1);
-    TFuInvOpt_ResizeUpdate();
+    TFuInvFrame:CalcButtonSize(TFuInvFrame.cfg["frameButtonSize"], TFuInvFrame.cfg["framePad"]);
+    TFuInvFrame:UpdateWindow(TFuBag.REQ_MUST);
   elseif (cmd == L["resetsorts"]) then
     TFuBag:ResetSorts(TFuInvFrame.cfg);
     TFuBag:AssignCats(TFuInvFrame.cfg, 0);
@@ -153,7 +155,7 @@ function TFuInv_cmd(msg)
     local char, realm = TFuBag:SplitStr(params," ");
     TFuBag:DeleteCachedCharacter(char,realm);
   elseif (cmd == L["config"]) then
-    TFuInv_OptsFrame:Show();
+    TFuBag.ModernOpt:OpenTo("general", "inv");
   elseif (cmd == "reseed") then
     -- TEMP: clear BOTH saved Manual Layouts (grid + free) so the active mode
     -- re-snapshots from the current auto-flow on the next enable.

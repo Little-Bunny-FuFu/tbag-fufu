@@ -170,6 +170,21 @@ TFuBag.BORDER = 8;
 -- the visible widget room with a couple px breathing space on each side.
 TFuBag.SB_COL = 20;
 
+-- Option/layout bounds (relocated from the retired TBagOpt.lua; still used by ModernOpt
+-- sliders and the layout/button-size code).
+TFuBag.NUMCOL_MIN = 8;
+TFuBag.NUMCOL_MAX = 20;
+TFuBag.N_BUTTON_MIN = 26;
+TFuBag.N_BUTTON_MAX = 50;
+TFuBag.A_BUTTONSIZE = { 26, 30, 34, 38, 42, 46, 50 };
+TFuBag.N_FONT_MIN = 8;
+TFuBag.N_FONT_MAX = 20;
+TFuBag.TAG_MAX = 10;
+TFuBag.N_SPACE_MAX = 5;
+-- Category Spacing has its own, larger range: it is the gap BETWEEN category frames
+-- (not item buttons), so it needs more travel than the per-button spaces.
+TFuBag.N_CATSPACE_MAX = 30;
+
 TFuBag.COOLDOWN_SCALE = 0.8;
 
 TFuBag.DBC = {  -- Default Bag Colors

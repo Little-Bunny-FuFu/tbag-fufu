@@ -3,7 +3,6 @@
   <Script file="TBag.lua"/>
   <Script file="TBagCmd.lua"/>
   <Script file="Hooks.lua"/>
-  <Script file="TBagOpt.lua"/>
   <Script file="Professions.lua"/>
   <Script file="TBagItemInfo.lua"/>
   <Script file="Events.lua"/>
