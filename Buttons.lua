@@ -141,9 +141,10 @@ function ItemButton:OnLeave()
     ResetCursor()
   end
 
-  if itm then
-    local bag = itm[TFuBag.I_BAG]
-    local spotlight = TFuBag:GetBagFrameSpotlight(bag)
+  -- itm[I_BAG] is nil for an empty-slot placeholder (the bank maps empties to {}, which
+  -- is truthy but has no I_BAG); guard so GetBagFrameSpotlight isn't called with nil.
+  if itm and itm[TFuBag.I_BAG] then
+    local spotlight = TFuBag:GetBagFrameSpotlight(itm[TFuBag.I_BAG])
     if spotlight then spotlight:Hide() end
   end
 

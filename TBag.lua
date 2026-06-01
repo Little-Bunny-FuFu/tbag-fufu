@@ -3531,7 +3531,7 @@ function TFuBag:GetBagNumName(bag)
 end
 
 function TFuBag:GetBagFrameTexture(bag)
-  if (bag >= self.BAGMIN) and (bag <= self.BAGMAX) then
+  if (bag and bag >= self.BAGMIN and bag <= self.BAGMAX) then
     return _G[self:GetBagFrameName(bag).."IconTexture"];
   else
     return nil;
@@ -3539,7 +3539,7 @@ function TFuBag:GetBagFrameTexture(bag)
 end
 
 function TFuBag:GetBagFrameSpotlight(bag)
-  if (bag >= self.BAGMIN) and (bag <= self.BAGMAX) then
+  if (bag and bag >= self.BAGMIN and bag <= self.BAGMAX) then
     return _G[self:GetBagFrameName(bag).."SpotlightTexture"];
   else
     return nil;
