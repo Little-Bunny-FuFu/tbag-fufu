@@ -93,16 +93,6 @@ function Professions:GetTwoProfessions(playerid)
   return TRADE1, TRADE2
 end
 
-function Professions:GetTradeType(trade)
-  if TFuBag:Member(self.trades, trade) then
-    return TFuBag.S_SECOND
-  elseif TFuBag:Member(self.seconds, trade) then
-    return TFuBag.S_TRADES
-  else
-    return TFuBag.S_SKILLS
-  end
-end
-
 function Professions:GetTradeCreated(trade)
   if not TFuBagCfg[TFuBag.S_CREATED] then
     TFuBagCfg[TFuBag.S_CREATED] = {}
@@ -118,38 +108,6 @@ function Professions:GetReagents()
     TFuBagCfg[TFuBag.S_REAGENT][TFuBag.S_VERSION] = self.DB_VERSION
   end
   return TFuBagCfg[TFuBag.S_REAGENT]
-end
-
-local scanningTrades = false
-function Professions:GetSkillRank(trade)
-  if scanningTrades then return end
-  scanningTrades = true
-  local skillRankReturn
-  -- Localize the trade name to search for since we use English names
-  -- for the rest of the trade skill code.
-  trade = L[trade]
-  for idx = 1, GetNumSkillLines() do
-    local skillName, isHeader, isExpanded, skillRank = GetSkillLineInfo(idx)
-    if isHeader == 1 and not isExpanded then
-      local size = GetNumSkillLines()
-      ExpandSkillHeader(idx)
-      size = GetNumSkillLines() - size
-      for j = idx+1, idx+size do
-        skillName, isHeader, isExpanded, skillRank = GetSkillLineInfo(j)
-        if not isHeader and trade == skillName then
-          CollapseSkillHeader(idx)
-          skillRankReturn = skillRank
-        end
-      end
-      CollapseSkillHeader(idx)
-    else
-      if not isHeader and trade == skillName then
-        skillRankReturn = skillRank
-      end
-    end
-  end
-  scanningTrades = false
-  return skillRankReturn
 end
 
 function Professions:ScanAllTradeRanks()

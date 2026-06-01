@@ -648,33 +648,10 @@ function BagButton:OnClick(button,down,drag)
   local isBagShown = mainFrame.cfg["show_Bag"..bag] == 1
   local itm = TFuBag:GetPlayerBag(mainFrame.playerid,bag)
 
-  -- Unpurchased Reagent Bank
-  if (bag == REAGENTBANK_CONTAINER and not TFuBag:IsReagentBankUnlocked(mainFrame.playerid)) then
-    self:SetChecked(not self:GetChecked())
-    if mainFrame.atbank == 1 then
-      PlaySound(PlaySoundKitID and "igMainMenuOption" or SOUNDKIT.IG_MAINMENU_OPTION)
-      StaticPopup_Show("CONFIRM_BUY_REAGENTBANK_TAB")
-      mainFrame:UpdateBagGfx()
-    end
-    return
-  end
-
-  -- Unpurchased bank bag slot (bank window only). Without the frame guard the
-  -- inventory reagent bag (bag 5) satisfies `bag > numSlots + 4` (GetNumBankSlots
-  -- returns 0 here) and is misread as an unpurchased bank slot, so the click
-  -- returns early and never reaches UpdateButtonHighlights -> no highlight.
-  local numSlots = TFuBag:GetNumBankSlots(mainFrame.playerid)
-  if mainFrame == TFuBnkFrame and bag > numSlots + 4 then
-    self:SetChecked(not self:GetChecked())
-    -- Needed to make the CONFIRM_BUY_BANK_SLOT popup work right
-    BankFrame.nextSlotCost = GetBankSlotCost(numSlots)
-    if mainFrame.atbank == 1 then
-      PlaySound(PlaySoundKitID and "igMainMenuOption" or SOUNDKIT.IG_MAINMENU_OPTION)
-      StaticPopup_Show("CONFIRM_BUY_BANK_SLOT")
-      mainFrame:UpdateBagGfx()
-    end
-    return
-  end
+  -- (Classic-bank "buy reagent bank" / "buy bank bag slot" click paths removed for
+  -- 12.0: the static classic bag-slot buttons are permanently hidden by Bank:init and
+  -- the tab-as-container model has no purchasable bag slots. The removed block also held
+  -- an insecure write to Blizzard's secure BankFrame.nextSlotCost -- a latent taint vector.)
 
   -- Handle putting items in the bag
   if isLive and CursorHasItem() then

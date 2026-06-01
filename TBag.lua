@@ -4256,8 +4256,6 @@ function TFuBag:UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, compar
   local bag, slot;  -- used as "for loop" counters
   local itm;    -- entry that will be written to the cache
   local id;
-  local update_suggested = 0;
-  local resort_suggested = 0;
   local resort_mandatory = 0;
 
   -- variables used in outer loop, bag:
@@ -4427,7 +4425,6 @@ function TFuBag:UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, compar
           else
             -- item has not changed, maybe the count did?
             if ( (itm[self.I_COUNT] ~= itmcache[bag][slot][self.I_COUNT]) and (itmcache[bag][slot][self.I_COUNT] ~= nil) ) then
-              update_suggested = 1;
               if (itm[self.I_COUNT] < itmcache[bag][slot][self.I_COUNT]) then
                 itm[self.I_NEWSTR] = self.V_NEWMINUS;
               else
@@ -4478,8 +4475,6 @@ function TFuBag:UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, compar
 --  self:PrintDEBUG('UpdateItmCache End Memory = '..tostring(GetAddOnMemoryUsage("TFuBag")));
   if (resort_mandatory == 1) then
     return self.REQ_MUST;
-  elseif (resort_suggested == 1) then
-    return self.REQ_PART;
   else
     return self.REQ_NONE;
   end
@@ -5524,10 +5519,6 @@ function TFuBag:AssignButtonsToFrame(mainFrame, barnum, frame, width, height, us
   end
 end
 
-function TFuBag:GetBarY(bar_x)
-  return math.floor(self.BAR_MAX / bar_x);
-end
-
 -- fx = Tqqq_FrameX
 -- sx = Tqqq_SpaceX
 
@@ -6191,61 +6182,10 @@ end
 -- Manual Layout placement: draw each category box at its saved grid coords and
 -- auto-grow the window to fit. Boxes are drag-repositionable (Stage 2); cols come
 -- from the seed/snapshot width (per-category options are a later stage).
--- Hide bars whose visual rectangle is ENTIRELY outside the ScrollBox bounds
--- (any overlap keeps the bar shown). WoW's frame-level clipping doesn't
--- deep-clip the framework's child frames, so bars near the viewport edges
--- would render past the bag window -- but full-fit hide was too aggressive
--- (hid bars the user was actively dragging to an edge). This overlap-based
--- check keeps grabbable, partially-visible bars on screen at the cost of a
--- few pixels of overhang past the ScrollBox edges.
-function TFuBag:UpdateBarVisibilityForScroll(frame)
-  local sb = frame.Scroll;
-  if (not sb) then return; end
-  local sb_top, sb_bot = sb:GetTop(), sb:GetBottom();
-  local sb_left, sb_right = sb:GetLeft(), sb:GetRight();
-  if (not (sb_top and sb_bot and sb_left and sb_right)) then return; end
-  for barnum = 1, self.BAR_MAX do
-    local bf = _G[frame:GetName().."_bar_"..barnum];
-    if (bf) then
-      local bt, bb = bf:GetTop(), bf:GetBottom();
-      local bl, br = bf:GetLeft(), bf:GetRight();
-      if (bt and bb and bl and br) then
-        -- Standard 2D AABB overlap (WoW Y axis is inverted: GetTop > GetBottom).
-        local overlaps = (bt > sb_bot and bb < sb_top
-                          and br > sb_left and bl < sb_right);
-        if (overlaps) then bf:Show(); else bf:Hide(); end
-      end
-    end
-  end
-end
-
--- Cheap item-visibility refresh used by the scroll callback. Mirrors the
--- (bar_visible AND not bar_hide_cfg) logic from ItemButton.Update without the
--- per-item tooltip / cooldown / rarity work.
-function TFuBag:RefreshItemVisibility(frame)
-  local cfg = frame.cfg;
-  if (not cfg) then return; end
-  for barnum = 1, self.BAR_MAX do
-    local bf = _G[frame:GetName().."_bar_"..barnum];
-    local bar_visible = bf and bf:IsShown();
-    local bar_hide = self:GetGrp(cfg, self.G_BAR_HIDE, barnum) == 1;
-    local items = frame.BARITM and frame.BARITM[barnum];
-    if (items) then
-      for _, itm in pairs(items) do
-        local bag, slot = itm[self.I_BAG], itm[self.I_SLOT];
-        local btn = _G[self:GetBagItemButtonName(bag, slot)];
-        if (btn) then
-          local forced = self.FORCED_SHOW[self:BagSlotToString(bag, slot)];
-          if ((bar_hide and not forced) or not bar_visible) then
-            btn:Hide();
-          else
-            btn:Show();
-          end
-        end
-      end
-    end
-  end
-end
+-- (UpdateBarVisibilityForScroll / RefreshItemVisibility removed: they were the
+-- manual bar/item clip+show pass for the pre-WowScrollBox custom scroll handler,
+-- which no longer exists -- the framework clips and scrolls natively now. Both had
+-- zero callers.)
 
 -- (Custom wheel handler removed: WowScrollBox handles wheel + scrollbar drag
 -- natively via the LinearView + MinimalScrollBar wiring in UpdateScrollViewport.)
