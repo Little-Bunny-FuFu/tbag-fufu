@@ -4336,7 +4336,11 @@ function TFuBag:UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, compar
 
             local stacksize;
             _, itm[self.I_TYPE], itm[self.I_SUBTYPE], _, _, stacksize, itm[self.I_BINDTYPE], itm[self.I_EXPANSION] = self:GetItemInfo(itm[self.I_ITEMLINK]);
-            _, itm[self.I_COUNT], _, itm[self.I_RARITY], itm[self.I_READABLE], _, _, itm[self.I_NOVALUE] = GetContainerItemInfo(bag, slot);
+            -- hasNoValue is the 9th positional return of the compat-12 shim
+            -- (iconFileID, stackCount, isLocked, quality, isReadable, hasLoot,
+            -- hyperlink, isFiltered, hasNoValue, ...). Reading position 8 here bound
+            -- isFiltered instead, so the merchant junk-coin showed on the wrong items.
+            _, itm[self.I_COUNT], _, itm[self.I_RARITY], itm[self.I_READABLE], _, _, _, itm[self.I_NOVALUE] = GetContainerItemInfo(bag, slot);
             if (stacksize) then
               itm[self.I_NEED] = stacksize - itm[self.I_COUNT];
             else
@@ -4671,11 +4675,22 @@ function TFuBag:SortItmCache(cfg, playerid, itmcache, baritm, bagarr)
 end
 
 
-function TFuBag:SetBarFromClass(cfg, itm)
-  itm[self.I_BAR] = self:GetCat(cfg, itm[self.I_CAT]);
-  while ((itm[self.I_BAR] ~= nil) and type(itm[self.I_BAR]) ~= "number") do
-    itm[self.I_BAR] = self:GetCat(cfg, itm[self.I_BAR]);
+-- Resolve a category-alias chain to a numeric bar id. cfg.catbar can map a category
+-- to a parent category (the "collapse into" feature), so follow the chain until it
+-- reaches a number (or nil). Bounded: a circular or self-referential mapping from a
+-- corrupt/imported SavedVariable would otherwise spin forever and hang the client.
+function TFuBag:ResolveBarAlias(cfg, bar)
+  local guard = 0;
+  while ((bar ~= nil) and (type(bar) ~= "number")) do
+    bar = self:GetCat(cfg, bar);
+    guard = guard + 1;
+    if (guard > 64) then break; end
   end
+  return bar;
+end
+
+function TFuBag:SetBarFromClass(cfg, itm)
+  itm[self.I_BAR] = self:ResolveBarAlias(cfg, self:GetCat(cfg, itm[self.I_CAT]));
   return itm[self.I_BAR];
 end
 
@@ -4707,7 +4722,7 @@ function TFuBag:PickBar(cfg, playerid, itm, trade1, trade2)
   local itemid = self:GetItemID(itm[self.I_ITEMLINK]);
 
   -- reset item keywords
-  if (bagtype and ((type(bagtype) == number and bagtype > 0) or
+  if (bagtype and ((type(bagtype) == "number" and bagtype > 0) or
       (type(bagtype) == "string" and bagtype ~= ""))) then
     if (cfg["special_bag_sort"] == 1) then
       if (type(bagtype) == "number") then
@@ -4779,9 +4794,7 @@ function TFuBag:PickBar(cfg, playerid, itm, trade1, trade2)
   itm[self.I_CAT] = cfg["item_overrides"][itemid];
   if (itm[self.I_CAT] ~= nil) then
     itm[self.I_BAR] = self:GetCat(cfg, itm[self.I_CAT]);
-    while ( (itm[self.I_BAR] ~= nil) and (type(itm[self.I_BAR]) ~= "number") ) do
-    itm[self.I_BAR] = self:GetCat(cfg, itm[self.I_BAR]);
-    end
+    itm[self.I_BAR] = self:ResolveBarAlias(cfg, itm[self.I_BAR]);
     if (type(itm[self.I_BAR]) ~= "number") then
     itm[self.I_CAT] = nil;
     end
@@ -4798,9 +4811,7 @@ function TFuBag:PickBar(cfg, playerid, itm, trade1, trade2)
     if (grp and grp ~= "") then
       itm[self.I_CAT] = grp;
       itm[self.I_BAR] = self:GetCat(cfg, grp);
-      while ((itm[self.I_BAR] ~= nil) and (type(itm[self.I_BAR]) ~= "number")) do
-        itm[self.I_BAR] = self:GetCat(cfg, itm[self.I_BAR]);
-      end
+      itm[self.I_BAR] = self:ResolveBarAlias(cfg, itm[self.I_BAR]);
       if (type(itm[self.I_BAR]) ~= "number") then itm[self.I_CAT] = nil; end
     end
   end
@@ -4817,9 +4828,7 @@ function TFuBag:PickBar(cfg, playerid, itm, trade1, trade2)
     if (eqCat) then
       itm[self.I_CAT] = eqCat;
       itm[self.I_BAR] = self:GetCat(cfg, eqCat);
-      while ((itm[self.I_BAR] ~= nil) and (type(itm[self.I_BAR]) ~= "number")) do
-        itm[self.I_BAR] = self:GetCat(cfg, itm[self.I_BAR]);
-      end
+      itm[self.I_BAR] = self:ResolveBarAlias(cfg, itm[self.I_BAR]);
       if (type(itm[self.I_BAR]) ~= "number") then
         itm[self.I_CAT] = nil;
       else
@@ -4872,9 +4881,7 @@ function TFuBag:PickBar(cfg, playerid, itm, trade1, trade2)
         if (found) then
           itm[self.I_CAT] = value[1];
           itm[self.I_BAR] = self:GetCat(cfg, itm[self.I_CAT]);
-          while ( (itm[self.I_BAR] ~= nil) and (type(itm[self.I_BAR]) ~= "number") ) do
-            itm[self.I_BAR] = self:GetCat(cfg, itm[self.I_BAR]);
-          end
+          itm[self.I_BAR] = self:ResolveBarAlias(cfg, itm[self.I_BAR]);
           if (type(itm[self.I_BAR]) == "number") then
             break;
           else
@@ -4889,9 +4896,7 @@ function TFuBag:PickBar(cfg, playerid, itm, trade1, trade2)
     itm[self.I_CAT] = L["UNKNOWN"];
 
     itm[self.I_BAR] = self:GetCat(cfg, itm[self.I_CAT]);
-    while ( (itm[self.I_BAR] ~= nil) and (type(itm[self.I_BAR]) ~= "number") ) do
-    itm[self.I_BAR] = self:GetCat(cfg, itm[self.I_BAR]);
-    end
+    itm[self.I_BAR] = self:ResolveBarAlias(cfg, itm[self.I_BAR]);
     if (type(itm[self.I_BAR]) ~= "number") then
     itm[self.I_CAT] = L["UNKNOWN"];
     itm[self.I_BAR] = 1;

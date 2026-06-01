@@ -2031,9 +2031,13 @@ function Bank.RightClickMenu_populate(self, level)
 
     for index, bag in ipairs(TFuBnkFrame.bags) do
       if (TFuBnkFrame.cfg["show_Bag"..bag] == 1) then
-        if (table.getn(TFuBnkItm[TFuBnkFrame.playerid][bag]) > 0) then
-          for slot = 1, table.getn(TFuBnkItm[TFuBnkFrame.playerid][bag]) do
-            TFuBag:ResetNew(TFuBnkItm[TFuBnkFrame.playerid][bag][slot]);
+        -- A cached/remote tab id in self.bags may have no item-cache entry yet
+        -- (snapshot tab never populated, freshly-purchased tab); guard the per-bag
+        -- table so table.getn(nil) can't error here. Mirrors UpdateWindowBody's guard.
+        local pbag = TFuBnkItm[TFuBnkFrame.playerid] and TFuBnkItm[TFuBnkFrame.playerid][bag];
+        if (pbag and table.getn(pbag) > 0) then
+          for slot = 1, table.getn(pbag) do
+            TFuBag:ResetNew(pbag[slot]);
           end
         end
       end

@@ -240,8 +240,13 @@ function ItemButton.UpdateLock(self, itm, mainFrame)
   if not itm or not next(itm) then return end
   if not mainFrame then mainFrame = TFuBag:GetButtonMainFrame(self) end
 
-  -- Another player's view never appears locked or deposit-dimmed.
+  -- Another player's view never appears locked or deposit-dimmed. Clear BOTH the
+  -- desaturation and the dim: SetItemButtonTexture (run in ItemButton.Update before
+  -- this) does NOT reset SetDesaturated, so a button greyscaled while live would keep
+  -- stale greyscale when re-rendered for a cached alt (dropdown switch) without this.
+  -- Mirrors the bank-tab branch below.
   if not TFuBag:IsLive(mainFrame) then
+    SetItemButtonDesaturated(self, false);
     TFuBag.ItemButton.SetDepositDim(self, false);
     return;
   end
