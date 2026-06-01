@@ -277,13 +277,18 @@ function Inv:UpdateBagGfx()
     totalsize = totalsize + size;
 
     -- Refresh the live bag-level info (the equipped bag item's link) before drawing the
-    -- selector icon. A bag that was just emptied/unequipped has no items, so PickBar -- which
-    -- normally refreshes this via GetBagType -- never runs for it, leaving the OLD bag icon on
-    -- a now-empty slot. GetBagType re-reads GetInventoryItemLink (nil once unequipped), so the
-    -- icon falls back to the empty bag-slot texture.
+    -- selector icon: an emptied/unequipped bag has no items, so PickBar (which refreshes this
+    -- via GetBagType) never runs for it, leaving a stale icon.
     TFuBag:GetBagType(self.playerid, bag);
-    TFuBag:GetBagFrameTexture(bag):SetTexture(
-        TFuBag:GetBagTexture(self.playerid, bag));
+    local frametex = TFuBag:GetBagFrameTexture(bag);
+    local baglink = TFuBag:GetPlayerBagCfg(self.playerid, bag, TFuBag.I_ITEMLINK);
+    if (bag > BACKPACK_CONTAINER and (not baglink or baglink == "")) then
+      -- Empty equippable bag slot -> Blizzard's empty bag-slot atlas. (The old
+      -- "UI-PaperDoll-Slot-Bag" texture was removed in 12.0, leaving a blank icon.)
+      frametex:SetAtlas("bag-border-empty");
+    else
+      frametex:SetTexture(TFuBag:GetBagTexture(self.playerid, bag));
+    end
 
     TFuBag:UpdateBagColors(bag);
   end
