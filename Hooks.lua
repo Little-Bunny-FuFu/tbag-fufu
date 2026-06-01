@@ -136,11 +136,18 @@ end
 
 function Hooks.CloseBag(bag)
   TFuBag:PrintDEBUG("event: CloseBag("..bag..")")
-  if TFuBag:Member(TFuInvFrame.bags,bag) then
-    TFuInvFrame:Hide()
-  else
-    TFuBnkFrame:Hide()
-  end
+  -- Do NOT hide the combined window on a single-bag close. In the 12.0 UI the
+  -- only path that reaches CloseBag(<oneBag>) for our addon is Blizzard's
+  -- BAG_CLOSED -> ContainerFrameSettingsManager:OnBagClosed swap-transient
+  -- (ContainerFrame.lua): when a bag is swapped/removed the engine fires
+  -- BAG_CLOSED, Blizzard closes that bag's frame and only re-opens it if
+  -- IsBagOpen() is true -- which is always false once we suppress Blizzard's
+  -- container frames, so our window would stay hidden after every bag swap.
+  -- Genuine close-all routes through CloseBackpack/CloseAllWindows (hooked
+  -- separately); their per-bag CloseBag(i) loops are themselves gated behind
+  -- IsBagOpen(i) and so never reach here. The combined window has no notion of
+  -- closing one bag's section, so there is nothing to hide -- BAG_UPDATE drives
+  -- the contents refresh for the swapped bag.
 end
 
 function Hooks.ToggleBag(bag)
