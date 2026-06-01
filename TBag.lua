@@ -1200,22 +1200,30 @@ function TFuBag:BarHasSubgroups(items)
   return false;
 end
 
--- Effective box dimensions (cols, rows, isSub) for a Manual Layout bar. A sub-grouped
--- equipment bar (and NOT classic edit mode) keeps its full-width shelf layout so the
--- per-slot sub-headers survive in Manual Layout, exactly like auto-flow -- otherwise it
--- is a flat cols x rows grid from the saved layout. `colmax` is the column budget.
+-- Effective box dimensions (cols, rows, isSub) for a Manual Layout bar: a flat
+-- cols x rows grid from the saved layout. `colmax` is the column budget.
+-- NOTE: equipment SUB-GROUP shelves are intentionally NOT rendered in Manual Layout.
+-- The sub-headered shelf is designed full-width (one bar per row, EquipSubPlan at
+-- colmax); forcing that onto freely/grid-placed boxes made every equipment bar
+-- colmax-wide and broke the layout (overlapping boxes; /reseed didn't help because the
+-- breakage is in the size/position math, not the saved coords). So ML draws equipment
+-- bars flat like any other category; the shelf view is the auto-flow (ML off) layout.
 -- Used by both ML layout paths so the size passes and the draw pass agree.
 function TFuBag:MLBarDims(frame, items, rec, colmax)
   if (not colmax or colmax < 1) then colmax = 1; end
+  local n = (items and table.getn(items)) or 0;
   local cols = (rec and rec.cols) or 1;
   if (cols < 1) then cols = 1; end
   if (cols > colmax) then cols = colmax; end
-  if (frame.edit_mode ~= 1 and self:BarHasSubgroups(items)) then
-    local h = self:EquipSubPlan(items, colmax);
-    if (not h or h < 1) then h = 1; end
-    return colmax, h, true;   -- full width + shelf height; rows may be fractional
+  -- Equipment (sub-grouped) bars are drawn FULL-WIDTH in auto-flow, so the snapshot
+  -- stored colmax for them. In ML draw them as a normal FLAT grid sized to their item
+  -- count instead: a stale colmax-wide box overlaps its neighbours, and a bank-type
+  -- switch (or any catGen re-pick -> REQ_MUST repaint) re-applies that bad width. Other
+  -- bars keep their saved width.
+  if (self:BarHasSubgroups(items)) then
+    cols = math.min(n, colmax);
+    if (cols < 1) then cols = 1; end
   end
-  local n = (items and table.getn(items)) or 0;
   local rows = math.ceil(n / cols);
   if (rows < 1) then rows = 1; end
   return cols, rows, false;
@@ -5243,7 +5251,9 @@ function TFuBag:AssignButtonsToFrame(mainFrame, barnum, frame, width, height, us
         fs:ClearAllPoints()
         local btn = h.firstItm
           and _G[TFuBag:GetBagItemButtonName(h.firstItm[TFuBag.I_BAG], h.firstItm[TFuBag.I_SLOT])]
-        if (btn) then
+        -- Sub-group headers honor the "Show Category Names" toggle, like the main
+        -- category titles -- previously they always showed regardless of the setting.
+        if (btn and mainFrame.cfg and mainFrame.cfg.show_cat_names == 1) then
           -- Sit in the short header band, CENTERED over the cluster's items (like
           -- the main category title bars). Width is clamped to the cluster so a
           -- long title truncates (ellipsis) instead of overlapping its neighbours.
@@ -5438,7 +5448,11 @@ function TFuBag:SnapshotCatLayout(frame)
   local gy = 0;
   for _, r in ipairs(rows_list) do
     for _, bx in ipairs(r.items) do
-      local gx = math.floor((bx.l - minLeft) / pitchX + 0.5);
+      -- FRACTIONAL grid x: keep the exact auto-flow position so the inter-category
+      -- spacing (PoolX + the box's trailing pad) is preserved. Rounding to whole cells
+      -- dropped any gap smaller than half a cell, which made categories abut/overlap.
+      -- (A drag still snaps gx to a whole cell on drop -- MLDragStop.)
+      local gx = (bx.l - minLeft) / pitchX;
       if (gx < 0) then gx = 0; end
       -- Bottom-align within the row (like the auto-flow): a box shorter than the
       -- row's tallest sits at the row's bottom, so its title drops below the
@@ -5954,10 +5968,12 @@ function TFuBag:SetBarDraggable(frame, barnum, bf, enabled, show_title_handle, l
       end
     end
   else
-    if (bf.mlDragInit) then
-      bf:EnableMouse(false);
-      if (bf.MLTitleHandle) then bf.MLTitleHandle:Hide(); end
-    end
+    -- ALWAYS make a non-draggable box mouse-inert (not just one that was dragged
+    -- before). Otherwise a category box that has never been unlocked keeps its default
+    -- mouse-enabled state and sits over the item buttons, eating their drag-to-pickup --
+    -- which is why bank items couldn't be dragged out in locked Manual Layout.
+    bf:EnableMouse(false);
+    if (bf.MLTitleHandle) then bf.MLTitleHandle:Hide(); end
   end
 end
 
@@ -6499,28 +6515,16 @@ function TFuBag:LayoutWindowFree(frame, PAD_TOP, PAD_BOTTOM, show_cat_names, CAT
       if (label) then
         if (show_cat_names) then
           label:SetWordWrap(false);
-          label:SetWidth(0);
           label:SetText(self:GetBarCategoryName(baritm[barnum]));
           label:ClearAllPoints();
-          local box_w = frame:FrameX(cols);
-          local title_w = label:GetStringWidth();
-          local edge_margin = frame:FrameX(0) + frame.BF_X_PAD;
-          if (title_w <= box_w) then
-            label:SetJustifyH("CENTER");
-            label:SetPoint("BOTTOM", bf, "TOP", 0, 1);
-          else
-            local box_center = px + box_w / 2;
-            if (box_center - title_w / 2 < 0) then
-              label:SetJustifyH("LEFT");
-              label:SetPoint("BOTTOMLEFT", bf, "TOPLEFT", edge_margin, 1);
-            elseif (box_center + title_w / 2 > max_right_sc) then
-              label:SetJustifyH("RIGHT");
-              label:SetPoint("BOTTOMRIGHT", bf, "TOPRIGHT", -edge_margin, 1);
-            else
-              label:SetJustifyH("CENTER");
-              label:SetPoint("BOTTOM", bf, "TOP", 0, 1);
-            end
-          end
+          -- Clamp the title to its box width and center it: a name wider than the box
+          -- TRUNCATES with an ellipsis instead of drawing over the adjacent category
+          -- (manual-layout boxes are packed side by side, so an unclamped title bled
+          -- into its neighbour). The box stays within the content, so this can't run
+          -- off-viewport either.
+          label:SetWidth(frame:FrameX(cols));
+          label:SetJustifyH("CENTER");
+          label:SetPoint("BOTTOM", bf, "TOP", 0, 1);
           label:Show();
           self:WireCatTitleClick(frame, bf, baritm[barnum], true);
         else

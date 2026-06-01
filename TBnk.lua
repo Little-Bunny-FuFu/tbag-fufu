@@ -623,7 +623,7 @@ end
 -- GetChecked()/GetCheckedTexture() drive the existing spotlight + color machinery.
 local TABBTN_SIZE = 26
 local TABBTN_GAP = 4
-local TYPEBTN_W = 74
+local TYPEBTN_SIZE = 34   -- Character/Warband view-switch icons: larger than the tab icons
 -- Tintable selection/hover ring (glowing square border, takes a vertex color).
 local TAB_SEL_TEX = "Interface\\Buttons\\UI-ActionButton-Border"
 local TAB_FALLBACK_ICON = 134400  -- INV_Misc_QuestionMark
@@ -648,20 +648,49 @@ function Bank:BuildTabStrip()
   strip:SetPoint("BOTTOMLEFT", TFuBnkFrame_Total, "BOTTOMRIGHT", 4, 0)
   TFuBnkFrame.TabStrip = strip
 
-  -- Character / Warband view switch. Keep the CharTabButton/WarbandTabButton field
-  -- names (MainFrame:OnHide and /tbnk reference them); just reparent + re-anchor.
-  local cb = CreateFrame("Button", "TFuBnkFrame_CharTabButton", strip, "UIPanelButtonTemplate")
-  cb:SetSize(TYPEBTN_W, TABBTN_SIZE)
-  cb:SetText(L["Character"])
+  -- Character / Warband view switch -- icon buttons matching the per-tab selector style
+  -- (icon + a 2px accent selection border on the ACTIVE view), replacing the old text
+  -- buttons so they match the rest of tbag's icon chrome. Field names kept (MainFrame:
+  -- OnHide and /tbnk reference them). TYPE_SEL = the active-view border colour (gold).
+  local TYPE_SEL = { 1, 0.82, 0, 1 }
+  local function mkTypeButton(name, applyIcon, tipTitle, tipBody, onClick)
+    local b = CreateFrame("Button", name, strip)
+    b:SetSize(TYPEBTN_SIZE, TYPEBTN_SIZE)
+    local icon = b:CreateTexture(nil, "BACKGROUND")
+    icon:SetPoint("TOPLEFT", 1, -1); icon:SetPoint("BOTTOMRIGHT", -1, 1)
+    applyIcon(icon)
+    b.tfuIcon = icon
+    -- 2px solid selection border (mirror GetTabButton), painted on the active view.
+    local function mkEdge() local e = b:CreateTexture(nil, "OVERLAY"); e:SetColorTexture(0, 0, 0, 0); return e end
+    local eT, eB, eL, eR = mkEdge(), mkEdge(), mkEdge(), mkEdge()
+    eT:SetPoint("TOPLEFT"); eT:SetPoint("TOPRIGHT"); eT:SetHeight(2)
+    eB:SetPoint("BOTTOMLEFT"); eB:SetPoint("BOTTOMRIGHT"); eB:SetHeight(2)
+    eL:SetPoint("TOPLEFT"); eL:SetPoint("BOTTOMLEFT"); eL:SetWidth(2)
+    eR:SetPoint("TOPRIGHT"); eR:SetPoint("BOTTOMRIGHT"); eR:SetWidth(2)
+    b.tfuEdges = { eT, eB, eL, eR }
+    b.SetSelectedBorder = function(_, on)
+      local a = on and 1 or 0
+      for _, e in ipairs(b.tfuEdges) do e:SetColorTexture(TYPE_SEL[1], TYPE_SEL[2], TYPE_SEL[3], a) end
+    end
+    local hl = b:CreateTexture(nil, "HIGHLIGHT"); hl:SetAllPoints(); hl:SetColorTexture(1, 1, 1, 0.15)
+    b:SetScript("OnClick", onClick)
+    b:SetScript("OnEnter", function(self) TFuBag.NewbieTip(self, tipTitle, 1.0, 1.0, 1.0, tipBody) end)
+    b:SetScript("OnLeave", function() GameTooltip:Hide(); ResetCursor() end)
+    return b
+  end
+
+  local cb = mkTypeButton("TFuBnkFrame_CharTabButton",
+    function(icon) icon:SetTexture("Interface\\Icons\\INV_Misc_Bag_08") end,
+    L["Character"], "Show your character's personal bank.",
+    function() TFuBnkFrame:SetBankType(Enum.BankType.Character); end)
   cb:SetPoint("LEFT", strip, "LEFT", 0, 0)
-  cb:SetScript("OnClick", function() TFuBnkFrame:SetBankType(Enum.BankType.Character); end)
   TFuBnkFrame.CharTabButton = cb
 
-  local wb = CreateFrame("Button", "TFuBnkFrame_WarbandTabButton", strip, "UIPanelButtonTemplate")
-  wb:SetSize(TYPEBTN_W, TABBTN_SIZE)
-  wb:SetText(L["Warband"])
+  local wb = mkTypeButton("TFuBnkFrame_WarbandTabButton",
+    function(icon) icon:SetAtlas("warbands-icon") end,
+    L["Warband"], "Show the account-wide Warband bank.",
+    function() TFuBnkFrame:SetBankType(Enum.BankType.Account); end)
   wb:SetPoint("LEFT", cb, "RIGHT", TABBTN_GAP, 0)
-  wb:SetScript("OnClick", function() TFuBnkFrame:SetBankType(Enum.BankType.Account); end)
   TFuBnkFrame.WarbandTabButton = wb
 
   -- Buy-tab affordance: shown only when C_Bank.CanPurchaseBankTab is true.
@@ -695,32 +724,77 @@ function Bank:BuildTabStrip()
   -- never invoked from tainted addon code. We only pass the bankType in the dialog
   -- data table -- no secure frame is touched. Parented to the strip (a plain frame
   -- we own), anchored next to the MoneyFrame in UpdateMoneyControls.
-  local dep = CreateFrame("Button", "TFuBnkFrame_MoneyDepositButton", strip, "UIPanelButtonTemplate")
-  dep:SetSize(TYPEBTN_W, TABBTN_SIZE)
-  dep:SetText(BANK_DEPOSIT_MONEY_BUTTON_LABEL or L["Deposit"])
-  dep:SetScript("OnClick", function()
-    StaticPopup_Hide("BANK_MONEY_WITHDRAW")
-    if (StaticPopup_Visible("BANK_MONEY_DEPOSIT")) then
-      StaticPopup_Hide("BANK_MONEY_DEPOSIT")
-      return
+  -- Warband-money deposit / withdraw -- icon action buttons (top-bar style: icon + ADD
+  -- highlight + tooltip), to match tbag's other icon buttons. Greyed via desaturation
+  -- when the action isn't allowed (UpdateMoneyControls). Click logic unchanged (it
+  -- drives Blizzard's BANK_MONEY_* popups, which run the protected transfer untainted).
+  -- Both share the gold-coin icon; a colored badge (+ green deposit / - red withdraw)
+  -- overlays it so the direction reads at a glance.
+  local COIN_ICON = "Interface\\Icons\\INV_Misc_Coin_01"
+  local function mkMoneyButton(name, badge, badgeColor, tipTitle, tipBody, onClick)
+    local b = CreateFrame("Button", name, strip)
+    b:SetSize(TABBTN_SIZE, TABBTN_SIZE)
+    b:SetNormalTexture(COIN_ICON)
+    b:SetPushedTexture(COIN_ICON)
+    b:SetHighlightTexture(COIN_ICON)
+    local h = b:GetHighlightTexture(); if (h) then h:SetBlendMode("ADD") end
+    -- Direction badge drawn as crossing BARS, each anchored CENTER -- so the cross is
+    -- exactly centered on the coin. (The minimap zoom atlas draws its glyph off-center
+    -- within the texture, so anchoring it does NOT center the symbol; bars give the same
+    -- bold +/- look, centered.) Each axis = a black outline bar + the colored bar. "+"
+    -- gets both axes; "-" only the horizontal.
+    local isPlus = (badge == "+")
+    local inner = TABBTN_SIZE * 0.62
+    local thick = math.max(3, math.floor(inner * 0.30))
+    local parts = {}
+    local function bar(w, hgt, sublevel, r, g, bl, a)
+      a = a or 1
+      local t = b:CreateTexture(nil, "OVERLAY")
+      t:SetColorTexture(r, g, bl, a)
+      t:SetDrawLayer("OVERLAY", sublevel)
+      t:SetSize(w, hgt)
+      t:SetPoint("CENTER", b, "CENTER", 0, 0)
+      t.tfuBase = a
+      parts[#parts + 1] = t
     end
-    StaticPopup_Show("BANK_MONEY_DEPOSIT", nil, nil, { bankType = Enum.BankType.Account })
-  end)
-  dep:Hide()
+    bar(inner + 2, thick + 2, 1, 0, 0, 0, 1)                                          -- h outline
+    bar(inner,     thick,     2, badgeColor[1], badgeColor[2], badgeColor[3], 1)      -- h colour
+    if (isPlus) then
+      bar(thick + 2, inner + 2, 1, 0, 0, 0, 1)                                        -- v outline
+      bar(thick,     inner,     2, badgeColor[1], badgeColor[2], badgeColor[3], 1)    -- v colour
+    end
+    b.SetBadgeDim = function(_, dim)
+      for _, p in ipairs(parts) do p:SetAlpha(p.tfuBase * (dim and 0.35 or 1)) end
+    end
+    b:SetScript("OnClick", onClick)
+    b:SetScript("OnEnter", function(self) TFuBag.NewbieTip(self, tipTitle, 1.0, 1.0, 1.0, tipBody) end)
+    b:SetScript("OnLeave", function() GameTooltip:Hide(); ResetCursor() end)
+    b:Hide()
+    return b
+  end
+
+  local dep = mkMoneyButton("TFuBnkFrame_MoneyDepositButton", "+", { 0.1, 1.0, 0.1 },
+    BANK_DEPOSIT_MONEY_BUTTON_LABEL or L["Deposit"], "Deposit money into the Warband bank.",
+    function()
+      StaticPopup_Hide("BANK_MONEY_WITHDRAW")
+      if (StaticPopup_Visible("BANK_MONEY_DEPOSIT")) then
+        StaticPopup_Hide("BANK_MONEY_DEPOSIT")
+        return
+      end
+      StaticPopup_Show("BANK_MONEY_DEPOSIT", nil, nil, { bankType = Enum.BankType.Account })
+    end)
   TFuBnkFrame.MoneyDepositButton = dep
 
-  local wdr = CreateFrame("Button", "TFuBnkFrame_MoneyWithdrawButton", strip, "UIPanelButtonTemplate")
-  wdr:SetSize(TYPEBTN_W, TABBTN_SIZE)
-  wdr:SetText(BANK_WITHDRAW_MONEY_BUTTON_LABEL or L["Withdraw"])
-  wdr:SetScript("OnClick", function()
-    StaticPopup_Hide("BANK_MONEY_DEPOSIT")
-    if (StaticPopup_Visible("BANK_MONEY_WITHDRAW")) then
-      StaticPopup_Hide("BANK_MONEY_WITHDRAW")
-      return
-    end
-    StaticPopup_Show("BANK_MONEY_WITHDRAW", nil, nil, { bankType = Enum.BankType.Account })
-  end)
-  wdr:Hide()
+  local wdr = mkMoneyButton("TFuBnkFrame_MoneyWithdrawButton", "-", { 1.0, 0.2, 0.2 },
+    BANK_WITHDRAW_MONEY_BUTTON_LABEL or L["Withdraw"], "Withdraw money from the Warband bank.",
+    function()
+      StaticPopup_Hide("BANK_MONEY_DEPOSIT")
+      if (StaticPopup_Visible("BANK_MONEY_WITHDRAW")) then
+        StaticPopup_Hide("BANK_MONEY_WITHDRAW")
+        return
+      end
+      StaticPopup_Show("BANK_MONEY_WITHDRAW", nil, nil, { bankType = Enum.BankType.Account })
+    end)
   TFuBnkFrame.MoneyWithdrawButton = wdr
 
   TFuBnkFrame.tabButtons = TFuBnkFrame.tabButtons or {}
@@ -764,6 +838,11 @@ function Bank:UpdateMoneyControls()
   end
   dep:SetEnabled(canDep and true or false)
   wdr:SetEnabled(canWdr and true or false)
+  -- Icon buttons don't grey on disable, so desaturate the icon + dim the badge bars.
+  local dn = dep:GetNormalTexture(); if (dn) then dn:SetDesaturated(not canDep) end
+  local wn = wdr:GetNormalTexture(); if (wn) then wn:SetDesaturated(not canWdr) end
+  if (dep.SetBadgeDim) then dep:SetBadgeDim(not canDep) end
+  if (wdr.SetBadgeDim) then wdr:SetBadgeDim(not canWdr) end
 
   -- Bottom-align the transfer buttons to the money frame's bottom edge so they share
   -- the gold display's spacing from the window bottom. Center-anchoring to the (shorter)
@@ -904,12 +983,12 @@ function Bank:RefreshTabStrip()
   local cb = TFuBnkFrame.CharTabButton
   if (cb) then
     if (hasChar) then cb:Show() else cb:Hide() end
-    if (hasChar and self.bankType ~= CHAR) then cb:Enable() else cb:Disable() end
+    if (cb.SetSelectedBorder) then cb:SetSelectedBorder(self.bankType == CHAR) end
   end
   local wb = TFuBnkFrame.WarbandTabButton
   if (wb) then
     if (hasWar and TFuBag.BANK_INCLUDE_WARBAND) then wb:Show() else wb:Hide() end
-    if (hasWar and self.bankType ~= ACCT) then wb:Enable() else wb:Disable() end
+    if (wb.SetSelectedBorder) then wb:SetSelectedBorder(self.bankType == ACCT) end
   end
 
   -- Hide every known per-tab button, then lay out the active view's tabs after the
@@ -961,6 +1040,15 @@ function Bank:SetBankType(bankType)
   self:HideAllTabButtons()
   self.bankType = bankType
   self:RebuildTabList()
+  -- Character vs Warband are different category sets, so a Manual Layout snapshotted for
+  -- one overlaps the other's content. While the layout is still auto (ml_auto), wipe it
+  -- so UpdateWindow re-seeds cleanly for the new bank type. A hand-arranged layout
+  -- (ml_auto false) is left alone -- the user owns its placement.
+  local cfg = self.cfg
+  if (cfg and cfg.manual_layout == 1 and cfg.legacy_edit ~= 1 and cfg.ml_auto) then
+    local store = (cfg.ml_freeplace == 1) and cfg.cat_layout_free or cfg.cat_layout
+    if (store) then for k in pairs(store) do store[k] = nil end end
+  end
   self:UpdateWindow(TFuBag.REQ_MUST)
   -- Character vs Warband changes which bag items are deposit-eligible: repaint the
   -- inventory window so its greying tracks the active bank type.
