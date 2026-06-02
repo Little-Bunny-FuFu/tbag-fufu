@@ -7558,20 +7558,50 @@ function TFuBag:LayoutWindow(frame)
               -- A button's edge sits this far in from the box edge (buttons are
               -- centered in the box); justify titles to the items, not the box.
               local edge_margin = frame:FrameX(0) + frame.BF_X_PAD;
+              -- Room a wider-than-box title may use on each side before it must
+              -- truncate. Toward a NEIGHBOUR box: half the gap between them, so two
+              -- adjacent titles meet at the gap midpoint and never overlap (the
+              -- "Trade Good" + "Miscellaneous" collision). Toward a WINDOW BORDER
+              -- (the outer side of the row's end boxes, no neighbour there): the
+              -- distance to that border, so it extends over the empty margin and
+              -- stays on-window -- the old behaviour. The cur_width stagger spreads
+              -- width_in_between evenly across the bar_x-1 slots, so consecutive
+              -- boxes sit cat_spacing + width_in_between/(bar_x-1) apart; a sparse
+              -- row gives a big gap (titles overhang freely), a packed row ~none
+              -- (titles clamp). iBar counts from the RIGHT (0 = rightmost box).
+              local gap = cat_spacing;
+              if (bar_x > 1) then gap = gap + width_in_between / (bar_x - 1); end
+              local right_room = (iBar > 0) and (gap / 2)
+                or (bar_right_inset - self.BORDER);
+              local left_room = (iBar < nbars - 1) and (gap / 2)
+                or ((available_width - self.BORDER) - (bar_right_inset + box_w));
+              if (right_room < 0) then right_room = 0; end
+              if (left_room < 0) then left_room = 0; end
               if (title_w <= box_w) then
                 label:SetJustifyH("CENTER");
                 label:SetPoint("BOTTOM", barframe[iBar], "TOP", 0, 1);
               else
                 local box_center = bar_right_inset + box_w/2;
                 if (box_center - title_w/2 < self.BORDER) then
+                  -- near the RIGHT window border: right-justify over the items, text
+                  -- extends left; clamp the leftward run to the room on that side.
+                  local cap = box_w + left_room;
+                  if (title_w > cap) then label:SetWidth(cap); end
                   label:SetJustifyH("RIGHT");
                   label:SetPoint("BOTTOMRIGHT", barframe[iBar], "TOPRIGHT",
                     -edge_margin, 1);
                 elseif (box_center + title_w/2 > available_width - self.BORDER) then
+                  -- near the LEFT window border: left-justify, text extends right.
+                  local cap = box_w + right_room;
+                  if (title_w > cap) then label:SetWidth(cap); end
                   label:SetJustifyH("LEFT");
                   label:SetPoint("BOTTOMLEFT", barframe[iBar], "TOPLEFT",
                     edge_margin, 1);
                 else
+                  -- interior: centre with symmetric overhang, clamped to the nearer
+                  -- neighbour's half-gap so it cannot bleed into either side.
+                  local cap = box_w + 2 * math.min(left_room, right_room);
+                  if (title_w > cap) then label:SetWidth(cap); end
                   label:SetJustifyH("CENTER");
                   label:SetPoint("BOTTOM", barframe[iBar], "TOP", 0, 1);
                 end
