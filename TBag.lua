@@ -3042,6 +3042,7 @@ function TFuBag:InitDefVals(cfg, bagarr, row1offset, reset)
   self:SetDef(cfg, "show_bagbuttons", 1, reset, self.NumFunc, 0, 1);
   self:SetDef(cfg, "show_money", 1, reset, self.NumFunc, 0, 1);
   self:SetDef(cfg, "show_tokens", 1, reset, self.NumFunc, 0, 1);
+  self:SetDef(cfg, "show_filterbutton", 1, reset, self.NumFunc, 0, 1);
 
   -- Category-uplift bar migration: an earlier build placed these categories on
   -- shared bars (so they merged into one box). Clear their saved slots so the

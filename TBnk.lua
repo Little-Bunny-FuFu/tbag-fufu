@@ -241,6 +241,9 @@ function Bank:init(reset)
   if (cfg["show_tokens"] == 0) then
     TFuBnkFrame_TokenFrame:Hide();
   end
+  if (cfg["show_filterbutton"] == 0) then
+    TFuBnk_Button_Filter:Hide();
+  end
 
   TFuBag:BuildBarClassList(self.BC_LIST, cfg);
 
@@ -1745,6 +1748,18 @@ function Bank.Toggle_Total()
   end
 end
 
+function Bank.Toggle_Filter()
+  if (TFuBnkFrame.cfg["show_filterbutton"] == 1) then
+    TFuBnkFrame.cfg["show_filterbutton"] = 0;
+    TFuBnk_Button_Filter:Hide();
+    TFuBnkFrame:SetButton_Anchors();
+  else
+    TFuBnkFrame.cfg["show_filterbutton"] = 1;
+    TFuBnk_Button_Filter:Show();
+    TFuBnkFrame:SetButton_Anchors();
+  end
+end
+
 function Bank.Toggle_SearchBox()
   if (TFuBnkFrame.cfg["show_searchbox"] == 1) then
     TFuBnkFrame.cfg["show_searchbox"] = 0;
@@ -2282,6 +2297,15 @@ function Bank.RightClickMenu_populate(self, level)
             ["keepShownOnClick"] = 1;
             };
           if (TFuBnkFrame.cfg["show_reloadbutton"] == 0) then
+            info["checked"] = 1;
+          end
+          UIDropDownMenu_AddButton(info, level);
+          info = {
+            ["text"] = L["Hide Filter Button"];
+            ["func"] = TFuBnkFrame.Toggle_Filter;
+            ["keepShownOnClick"] = 1;
+            };
+          if (TFuBnkFrame.cfg["show_filterbutton"] == 0) then
             info["checked"] = 1;
           end
           UIDropDownMenu_AddButton(info, level);

@@ -572,6 +572,7 @@ L["Hide"] = true
 L["Hide Player Dropdown"] = true
 L["Hide Search Box"] = true
 L["Hide Re-sort Button"] = true
+L["Hide Filter Button"] = true
 L["Hide Reagent Deposit Button"] = true
 L["Hide Bank Button"] = true
 L["Hide Edit Button"] = true

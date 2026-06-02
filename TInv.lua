@@ -254,6 +254,9 @@ function Inv:init(reset)
   if (cfg["show_tokens"] == 0) then
     TFuInvFrame_TokenFrame:Hide();
   end
+  if (cfg["show_filterbutton"] == 0) then
+    TFuInv_Button_Filter:Hide();
+  end
 
   TFuBag:BuildBarClassList(self.BC_LIST, cfg);
 
@@ -734,6 +737,18 @@ function Inv.Toggle_Total()
   else
     TFuInvFrame.cfg["show_total"] = 1;
     TFuInvFrame_Total:Show();
+    TFuInvFrame:SetButton_Anchors();
+  end
+end
+
+function Inv.Toggle_Filter()
+  if (TFuInvFrame.cfg["show_filterbutton"] == 1) then
+    TFuInvFrame.cfg["show_filterbutton"] = 0;
+    TFuInv_Button_Filter:Hide();
+    TFuInvFrame:SetButton_Anchors();
+  else
+    TFuInvFrame.cfg["show_filterbutton"] = 1;
+    TFuInv_Button_Filter:Show();
     TFuInvFrame:SetButton_Anchors();
   end
 end
@@ -1325,6 +1340,15 @@ function Inv.RightClickMenu_populate(self, level)
             ["keepShownOnClick"] = 1;
             };
           if (TFuInvFrame.cfg["show_reloadbutton"] == 0) then
+            info["checked"] = 1;
+          end
+          UIDropDownMenu_AddButton(info, level);
+          info = {
+            ["text"] = L["Hide Filter Button"];
+            ["func"] = TFuInvFrame.Toggle_Filter;
+            ["keepShownOnClick"] = 1;
+            };
+          if (TFuInvFrame.cfg["show_filterbutton"] == 0) then
             info["checked"] = 1;
           end
           UIDropDownMenu_AddButton(info, level);
