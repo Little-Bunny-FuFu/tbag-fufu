@@ -2464,6 +2464,108 @@ function TFuBag.StrFunc(value, choices_array)
   end
 end
 
+-- Right-click menu toggle indicator (flush-left layout).
+-- Every menu row is drawn notCheckable so the text aligns flush-left and no left-side
+-- check box appears. A genuine on/off toggle instead gets a RADIAL (radio) button drawn on
+-- the RIGHT of its row -- the same column the submenu ">" arrows occupy -- filled when the
+-- toggle is enabled and an empty bordered circle when disabled. An enabled row also gets a
+-- locked highlight so the active state reads at a glance. The radio is a custom child
+-- texture of the shared DropDownList button; both it and the locked highlight are cleared
+-- whenever the list hides, so they can never linger into another addon's reuse of the same
+-- button. UIDropDownMenu is not a protected/secure frame, so a child texture is taint-safe.
+function TFuBag:EnsureMenuCheckHook()
+  if (TFuBag._menuCheckHook) then return; end
+  local lf = _G["DropDownList1"];
+  if (not lf) then return; end       -- created lazily by UIDropDownMenu; retry next open
+  lf:HookScript("OnHide", function(self)
+    for i = 1, (self.numButtons or 0) do
+      local b = _G["DropDownList1Button"..i];
+      if (b) then
+        if (b.tbagRadioRing) then b.tbagRadioRing:Hide(); end
+        if (b.tbagRadioDot) then b.tbagRadioDot:Hide(); end
+        if (b.tbagRowHL) then b.tbagRowHL:Hide(); end
+      end
+    end
+  end);
+  TFuBag._menuCheckHook = true;
+end
+
+-- A radial (radio) on/off button on the RIGHT of a toggle row. UI-RadioButton frame 1 is
+-- the empty bordered ring, frame 2 the filled centre. A real radio shows the ring at ALL
+-- times and overlays the filled centre when selected, so the OUTER size never changes
+-- between states (showing frame 1 OR frame 2 alone made the empty look larger than the
+-- filled). An enabled row also gets a subtle gold row tint -- our own texture, because the
+-- dropdown button's built-in highlight is too faint to read. Reserve room via info.padding
+-- (see AddToggleMenuButton) so text never runs under the radio.
+function TFuBag:SetMenuRadio(button, enabled)
+  if (not button) then return; end
+  local ring = button.tbagRadioRing;
+  if (not ring) then
+    ring = button:CreateTexture(nil, "OVERLAY");
+    ring:SetTexture("Interface\\Buttons\\UI-RadioButton");
+    ring:SetTexCoord(0.0, 0.25, 0.0, 1.0);   -- empty ring (always shown)
+    ring:SetSize(16, 16);
+    ring:SetPoint("RIGHT", button, "RIGHT", -6, 0);
+    button.tbagRadioRing = ring;
+
+    local dot = button:CreateTexture(nil, "OVERLAY", nil, 1);  -- sublevel above the ring
+    dot:SetTexture("Interface\\Buttons\\UI-RadioButton");
+    dot:SetTexCoord(0.25, 0.5, 0.0, 1.0);    -- filled centre overlay
+    dot:SetSize(16, 16);
+    dot:SetPoint("CENTER", ring, "CENTER", 0, 0);
+    button.tbagRadioDot = dot;
+
+    local hl = button:CreateTexture(nil, "BACKGROUND");
+    hl:SetColorTexture(1.0, 0.82, 0.0, 0.12); -- subtle gold "enabled" row tint
+    hl:SetPoint("TOPLEFT", button, "TOPLEFT", 0, 0);
+    hl:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", 0, 0);
+    button.tbagRowHL = hl;
+  end
+  ring:Show();
+  if (enabled) then
+    button.tbagRadioDot:Show();
+    button.tbagRowHL:Show();
+  else
+    button.tbagRadioDot:Hide();
+    button.tbagRowHL:Hide();
+  end
+end
+
+-- Add a notCheckable menu row that is a genuine on/off toggle: flush-left text plus a
+-- right-column radial button (filled when enabled). `stateFn` returns the current on/off
+-- state and is re-evaluated after a click so the radio + row tint update in place. The row
+-- keeps the menu open on click (keepShownOnClick) -- a toggle shouldn't dismiss the menu.
+-- Mirrors a UIDropDownMenu_AddButton call so the inventory and bank menus share one path.
+function TFuBag:AddToggleMenuButton(info, level, stateFn)
+  level = level or 1;
+  info["notCheckable"] = 1;
+  info["keepShownOnClick"] = 1;                    -- toggling shouldn't close the menu
+  info["padding"] = (info["padding"] or 0) + 24;   -- reserve width for the right-side radio
+  TFuBag:EnsureMenuCheckHook();
+  -- Wrap the click so the radio + tint refresh on the clicked button after the toggle runs.
+  local origFunc = info["func"];
+  info["func"] = function(self, a1, a2, checked, mouseButton)
+    if (origFunc) then origFunc(self, a1, a2, checked, mouseButton); end
+    TFuBag:SetMenuRadio(self, stateFn and stateFn());
+  end
+  UIDropDownMenu_AddButton(info, level);
+  local lf = _G["DropDownList"..level];
+  if (lf) then
+    TFuBag:SetMenuRadio(_G["DropDownList"..level.."Button"..lf.numButtons], stateFn and stateFn());
+  end
+end
+
+-- Hide a UIDropDownMenu frame WITHOUT firing its template OnHide, which calls
+-- CloseDropDownMenus() and would also close an open right-click menu (e.g. toggling "Hide
+-- Player Dropdown" from that very menu closed the whole menu). Restores OnHide afterward.
+function TFuBag:HideDropDownSilently(frame)
+  if (not frame) then return; end
+  local onHide = frame:GetScript("OnHide");
+  frame:SetScript("OnHide", nil);
+  frame:Hide();
+  frame:SetScript("OnHide", onHide);
+end
+
 function TFuBag:NicePlacement(buttonsize)
   if (buttonsize > 46) then
     return 50, 16, 4, 3, 1.0;

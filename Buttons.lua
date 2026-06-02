@@ -574,6 +574,14 @@ function BagButton:OnLoad()
     stock:SetAllPoints()
     stock:Show()
   end
+
+  -- Neutralize the placeholder ItemAnim Model. ItemAnimTemplate is gone in 12.0 and nothing
+  -- RegisterEvents ITEM_PUSH, so this Model never animates -- but as a child of the bag
+  -- button it renders an empty 3D viewport whenever the button is shown, and re-showing it
+  -- (toggling Hide Bag Buttons off->on) forces WoW's model render path, which can evict
+  -- world/terrain textures until the window closes. Hiding it leaves nothing to render.
+  local anim = _G[self:GetName().."ItemAnim"]
+  if anim then anim:Hide() end
 end
 
 function BagButton:OnEnter()

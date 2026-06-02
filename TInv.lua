@@ -666,7 +666,7 @@ end
 function Inv.Toggle_UserDropdown()
   if (TFuInvFrame.cfg["show_userdropdown"] == 1) then
     TFuInvFrame.cfg["show_userdropdown"] = 0;
-    TFuInv_UserDropdown:Hide();
+    TFuBag:HideDropDownSilently(TFuInv_UserDropdown);
     TFuInvFrame:SetButton_Anchors();
   else
     TFuInvFrame.cfg["show_userdropdown"] = 1;
@@ -718,7 +718,10 @@ function Inv.Toggle_BagSlotButtons()
     TFuInvacterBag3Slot:Show();
     TFuInvacterBag4Slot:Show();
     TFuInvMenuBarBackpackButton:Show();
-    TFuInvingButton:Show();
+    -- TFuInvingButton is the vestigial keyring button (no bag id); never show it -- the
+    -- 6 real bag slots are backpack(id0) + bags(id1-4) + reagent(id5). Showing it left an
+    -- empty box on the bag bar after a hide/show cycle.
+    TFuInvingButton:Hide();
     TFuInvFrame:SetButton_Anchors();
    end
 end
@@ -797,16 +800,16 @@ function Inv.RightClickMenu_populate(self, level)
     if (level == 1) then
       -- top level of menu
 
-      info = { ["text"] = itm[TFuBag.I_NAME], ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
+      info = { ["text"] = itm[TFuBag.I_NAME], ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = 1 };
       UIDropDownMenu_AddButton(info, level);
 
-      info = { ["disabled"] = 1 };
+      info = { ["disabled"] = 1, ["notCheckable"] = 1 };
       UIDropDownMenu_AddButton(info, level);
 
-      info = { ["text"] = string.format(L["Current Category: %s"],itm[TFuBag.I_CAT]), ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
+      info = { ["text"] = string.format(L["Current Category: %s"],itm[TFuBag.I_CAT]), ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = 1 };
       UIDropDownMenu_AddButton(info, level);
 
-      info = { ["disabled"] = 1 };
+      info = { ["disabled"] = 1, ["notCheckable"] = 1 };
       UIDropDownMenu_AddButton(info, level);
 
       info = { ["text"] = L["Assign item to category:"], ["hasArrow"] = 1, ["value"] = "override_placement" };
@@ -826,7 +829,7 @@ function Inv.RightClickMenu_populate(self, level)
       UIDropDownMenu_AddButton(info, level);
 
       if (TFuINV_SHOWITEMDEBUGINFO==1) then
-        info = { ["disabled"] = 1 };
+        info = { ["disabled"] = 1, ["notCheckable"] = 1 };
         UIDropDownMenu_AddButton(info, level);
 
         info = { ["text"] = L["Debug Info: "], ["hasArrow"] = 1, ["value"] = "show_debug" };
@@ -893,10 +896,10 @@ function Inv.RightClickMenu_populate(self, level)
     bar = TFuInvFrame.RightClickMenu_opts[TFuBag.I_BAR];
 
     info = { ["text"] = string.format(L["|c%sBar |r|c%s%s|r"],TFuBag.C_INST, TFuBag.C_BAR, bar),
-      ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
+      ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = 1 };
     UIDropDownMenu_AddButton(info, level);
 
-    info = { ["disabled"] = 1 };
+    info = { ["disabled"] = 1, ["notCheckable"] = 1 };
     UIDropDownMenu_AddButton(info, level);
 
     for key, value in pairs(TFuInvFrame.BC_LIST[bar]) do
@@ -913,10 +916,10 @@ function Inv.RightClickMenu_populate(self, level)
       UIDropDownMenu_AddButton(info, level);
     end
 
-    info = { ["disabled"] = 1 };
+    info = { ["disabled"] = 1, ["notCheckable"] = 1 };
     UIDropDownMenu_AddButton(info, level);
 
-    info = { ["text"] = L["Sort Mode:"], ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
+    info = { ["text"] = L["Sort Mode:"], ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = 1 };
     UIDropDownMenu_AddButton(info, level);
 
     for key, value in pairs({
@@ -944,10 +947,10 @@ function Inv.RightClickMenu_populate(self, level)
       UIDropDownMenu_AddButton(info, level);
     end
 
-    info = { ["disabled"] = 1 };
+    info = { ["disabled"] = 1, ["notCheckable"] = 1 };
     UIDropDownMenu_AddButton(info, level);
 
-    info = { ["text"] = L["Hide Bar:"], ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
+    info = { ["text"] = L["Hide Bar:"], ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = 1 };
     UIDropDownMenu_AddButton(info, level);
 
     for key,value in pairs({
@@ -975,10 +978,10 @@ function Inv.RightClickMenu_populate(self, level)
     end
 
 
-    info = { ["disabled"] = 1 };
+    info = { ["disabled"] = 1, ["notCheckable"] = 1 };
     UIDropDownMenu_AddButton(info, level);
 
-    info = { ["text"] = L["Highlight new items:"], ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
+    info = { ["text"] = L["Highlight new items:"], ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = 1 };
     UIDropDownMenu_AddButton(info, level);
 
     for key,value in pairs({
@@ -1005,10 +1008,10 @@ function Inv.RightClickMenu_populate(self, level)
       UIDropDownMenu_AddButton(info, level);
     end
 
-    info = { ["disabled"] = 1 };
+    info = { ["disabled"] = 1, ["notCheckable"] = 1 };
     UIDropDownMenu_AddButton(info, level);
 
-    info = { ["text"] = "Color:", ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
+    info = { ["text"] = "Color:", ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = 1 };
     UIDropDownMenu_AddButton(info, level);
 
     info = TFuBag:MakeColorPickerInfo(TFuInvFrame.cfg, "bkgr_", bar,
@@ -1038,21 +1041,38 @@ function Inv.RightClickMenu_populate(self, level)
   elseif (TFuInvFrame.RightClickMenu_mode == "mainwindow") then
     if (level == 1) then
 
-      info = { ["text"] = string.format(L["TBag v%s"],TFuBag.VERSION), ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = nil };
+      info = { ["text"] = string.format(L["TBag v%s"],TFuBag.VERSION), ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = 1 };
       UIDropDownMenu_AddButton(info, level);
 
-      info = { ["disabled"] = 1 };
+      info = { ["disabled"] = 1, ["notCheckable"] = 1 };
       UIDropDownMenu_AddButton(info, level);
 
       info = {
         ["text"] = L["Select Character"];
         ["value"] = { ["opt"]="select_character" },
-        ["hasArrow"] = 1
+        ["hasArrow"] = 1,
+        ["notCheckable"] = 1
         };
       UIDropDownMenu_AddButton(info, level);
 
-      info = { ["disabled"] = 1 };
+      info = { ["disabled"] = 1, ["notCheckable"] = 1 };
       UIDropDownMenu_AddButton(info, level);
+
+      -- Toggle stack: flush-left text, an enabled toggle gets a right-column check.
+      -- Highlight New Items sits at the top of the stack, above Manual Layout.
+      info = {
+        ["value"] = nil,
+        ["func"] = TFuInvFrame.Button_HighlightToggle_OnClick
+        };
+      if (TFuBag.SrchText) then
+        -- With a search active this row becomes a plain "Clear Search" action.
+        info["text"] = L["Clear Search"];
+        info["notCheckable"] = 1;
+        UIDropDownMenu_AddButton(info, level);
+      else
+        info["text"] = L["Highlight New Items"];
+        TFuBag:AddToggleMenuButton(info, level, function() return TFuInvFrame.hilight_new == 1; end);
+      end
 
       -- "Manual Layout" here toggles the MODE on/off (mirrors the Options checkbox);
       -- the gear button enters/exits edit. Turning the mode off also locks (ml_edit=0).
@@ -1066,24 +1086,23 @@ function Inv.RightClickMenu_populate(self, level)
           TFuInvFrame:UpdateWindow(TFuBag.REQ_MUST);
         end
         };
-      if (TFuInvFrame.cfg["manual_layout"] == 1) then
-        info["checked"] = 1;
-      end
-      UIDropDownMenu_AddButton(info, level);
+      TFuBag:AddToggleMenuButton(info, level, function() return TFuInvFrame.cfg["manual_layout"] == 1; end);
 
       info = {
         ["text"] = L["Lock window"],
         ["value"] = nil,
         ["func"] = TFuInvFrame.Button_MoveLockToggle_OnClick
         };
-      if (TFuInvFrame.cfg["moveLock"] == 0) then
-        info["checked"] = 1;
-      end
+      TFuBag:AddToggleMenuButton(info, level, function() return TFuInvFrame.cfg["moveLock"] == 0; end);
+
+
+      info = { ["disabled"] = 1, ["notCheckable"] = 1 };
       UIDropDownMenu_AddButton(info, level);
 
       info = {
         ["text"] = L["Reload and Sort"],
         ["value"] = nil,
+        ["notCheckable"] = 1,
         ["func"] = TFuInvFrame.Button_Reload_OnClick
         };
       UIDropDownMenu_AddButton(info, level);
@@ -1091,6 +1110,7 @@ function Inv.RightClickMenu_populate(self, level)
       info = {
         ["text"] = L["Toggle Bank"],
         ["value"] = nil,
+        ["notCheckable"] = 1,
         ["func"] = TFuInvFrame.Button_ShowBank_OnClick
         };
       UIDropDownMenu_AddButton(info, level);
@@ -1098,31 +1118,15 @@ function Inv.RightClickMenu_populate(self, level)
       info = {
         ["text"] = L["Close Inventory"],
         ["value"] = nil,
-        ["func"] = Inv.Close
+        ["notCheckable"] = 1,
+        ["func"] = function() TFuInvFrame:Hide(); end
         };
-      UIDropDownMenu_AddButton(info, level);
-
-
-      info = { ["disabled"] = 1 };
-      UIDropDownMenu_AddButton(info, level);
-
-      info = {
-        ["value"] = nil,
-        ["func"] = TFuInvFrame.Button_HighlightToggle_OnClick
-        };
-      if (TFuBag.SrchText) then
-        info["text"] = L["Clear Search"];
-      else
-        info["text"] = L["Highlight New Items"];
-        if (TFuInvFrame.hilight_new == 1) then
-          info["checked"] = 1;
-        end
-      end
       UIDropDownMenu_AddButton(info, level);
 
       info = {
         ["text"] = L["Reset NEW tag"],
         ["value"] = nil,
+        ["notCheckable"] = 1,
         ["func"] = function()
             local bag, slot;
 
@@ -1142,12 +1146,13 @@ function Inv.RightClickMenu_populate(self, level)
       UIDropDownMenu_AddButton(info, level);
 
 
-      info = { ["disabled"] = 1 };
+      info = { ["disabled"] = 1, ["notCheckable"] = 1 };
       UIDropDownMenu_AddButton(info, level);
 
       info = {
         ["text"] = L["Options"],
         ["value"] = nil,
+        ["notCheckable"] = 1,
         ["func"] = function()
             -- Modern options window, opened to General -> Inventory tab. The legacy
             -- panel (with the rule editor) stays reachable via /tinv config.
@@ -1156,49 +1161,53 @@ function Inv.RightClickMenu_populate(self, level)
         };
       UIDropDownMenu_AddButton(info, level);
 
-      info = { ["disabled"] = 1 };
+      info = { ["disabled"] = 1, ["notCheckable"] = 1 };
       UIDropDownMenu_AddButton(info, level);
 
 
       info = {
         ["text"] = L["Set Size"];
         ["value"] = { ["opt"]="set_scale" },
-        ["hasArrow"] = 1
+        ["hasArrow"] = 1,
+        ["notCheckable"] = 1
         };
       UIDropDownMenu_AddButton(info, level);
 
-      info = { ["disabled"] = 1 };
+      info = { ["disabled"] = 1, ["notCheckable"] = 1 };
       UIDropDownMenu_AddButton(info, level);
 
       info = {
         ["text"] = L["Set Colors"];
         ["value"] = { ["opt"]="set_colors" },
-        ["hasArrow"] = 1
+        ["hasArrow"] = 1,
+        ["notCheckable"] = 1
         };
       UIDropDownMenu_AddButton(info, level);
 
-      info = { ["disabled"] = 1 };
+      info = { ["disabled"] = 1, ["notCheckable"] = 1 };
       UIDropDownMenu_AddButton(info, level);
 
       info = {
         ["text"] = L["Anchor"];
         ["value"] = { ["opt"]="anchor" },
-        ["hasArrow"] = 1
+        ["hasArrow"] = 1,
+        ["notCheckable"] = 1
         };
       UIDropDownMenu_AddButton(info, level);
 
 
-      info = { ["disabled"] = 1 };
+      info = { ["disabled"] = 1, ["notCheckable"] = 1 };
       UIDropDownMenu_AddButton(info, level);
 
       info = {
         ["text"] = L["Hide"];
         ["value"] = { ["opt"]="hide_frames" },
-        ["hasArrow"] = 1
+        ["hasArrow"] = 1,
+        ["notCheckable"] = 1
         };
       UIDropDownMenu_AddButton(info, level);
 
-      info = { ["disabled"] = 1 };
+      info = { ["disabled"] = 1, ["notCheckable"] = 1 };
       UIDropDownMenu_AddButton(info, level);
 
     elseif (level == 2) then
@@ -1588,7 +1597,14 @@ function Inv:UpdateWindowBody(resort_req)
 end
 
 function Inv.UserDropdown_OnLoad(self)
-  UIDropDownMenu_Initialize(self, Inv.UserDropdown_Initialize);
+  -- Initialize ONCE. UIDropDownMenu_Initialize hides every DropDownList frame (see
+  -- UIDropDownMenu_InitializeHelper), so re-running it on each OnShow tore down an open
+  -- right-click menu when "Hide Player Dropdown" was toggled back on. SetSelectedValue /
+  -- SetWidth below are safe to repeat and keep the shown dropdown current.
+  if (not self.tbagInitialized) then
+    UIDropDownMenu_Initialize(self, Inv.UserDropdown_Initialize);
+    self.tbagInitialized = true;
+  end
   UIDropDownMenu_SetSelectedValue(self, TFuInvFrame.playerid);
   self.tooltip = L["You are viewing the selected player's inventory."];
   UIDropDownMenu_SetWidth(self,TFuBag.USERDD_WIDTH)
