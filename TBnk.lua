@@ -210,6 +210,10 @@ function Bank:init(reset)
   -- per purchased tab + buy-tab affordance) in the bottom chrome. Created once; the
   -- active view's tab row is (re)populated on bank open by Bank:RefreshTabStrip.
   self:BuildTabStrip();
+  -- Honor a saved "Hide Bag Buttons" choice: in 12.0 that toggles the per-tab strip.
+  if (cfg["show_bagbuttons"] == 0 and TFuBnkFrame.TabStrip) then
+    TFuBnkFrame.TabStrip:Hide();
+  end
 
   if (cfg["show_searchbox"] == 0) then
     TFuBnk_SearchBox:Hide();
@@ -1709,31 +1713,19 @@ function Bank.Toggle_Token()
 end
 
 function Bank.Toggle_BagSlotButtons()
+  -- 12.0: the bank's bag selector is the dynamic per-tab strip (Bank:BuildTabStrip), NOT the
+  -- vestigial static TFuBnkFrameBag* frames -- those are kept hidden since the bank rewrite,
+  -- and showing them left empty boxes on the bottom chrome. Toggle the strip instead;
+  -- hiding the strip parent hides all its tab buttons regardless of RefreshTabStrip.
   if (TFuBnkFrame.cfg["show_bagbuttons"] == 1) then
     TFuBnkFrame.cfg["show_bagbuttons"] = 0;
-    TFuBnkFrameBag1:Hide();
-    TFuBnkFrameBag2:Hide();
-    TFuBnkFrameBag3:Hide();
-    TFuBnkFrameBag4:Hide();
-    TFuBnkFrameBag5:Hide();
-    TFuBnkFrameBag6:Hide();
-    TFuBnkFrameBag7:Hide();
-    TFuBnkFrameBagBank:Hide();
-    TFuBnkFrameBagReagent:Hide();
+    if (TFuBnkFrame.TabStrip) then TFuBnkFrame.TabStrip:Hide(); end
     TFuBnkFrame:SetButton_Anchors();
   else
     TFuBnkFrame.cfg["show_bagbuttons"] = 1;
-    TFuBnkFrameBag1:Show();
-    TFuBnkFrameBag2:Show();
-    TFuBnkFrameBag3:Show();
-    TFuBnkFrameBag4:Show();
-    TFuBnkFrameBag5:Show();
-    TFuBnkFrameBag6:Show();
-    TFuBnkFrameBag7:Show();
-    TFuBnkFrameBagBank:Show();
-    TFuBnkFrameBagReagent:Show();
+    if (TFuBnkFrame.TabStrip) then TFuBnkFrame.TabStrip:Show(); end
     TFuBnkFrame:SetButton_Anchors();
-   end
+  end
 end
 
 function Bank.Toggle_Total()
