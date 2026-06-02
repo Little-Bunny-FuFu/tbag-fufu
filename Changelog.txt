@@ -1,3 +1,12 @@
+* 12.0.0.02-fufu (2026-06-02)
+  Bug-fix release.
+- Fix: using a consumable (or any usable item) from the bags raised ADDON_ACTION_FORBIDDEN
+  and would not work. The item button defined its own OnClick that called Blizzard's
+  container handler from Lua, which tainted the protected C_Container.UseContainerItem
+  inside it. The inherited secure OnClick now handles use/pickup untainted; tbag's only
+  custom behavior (right-click-at-bank deposit routed to the viewed bank) moved to a
+  taint-safe PreClick hook. This also clears the cascading OnLeave / bank-update errors.
+
 * 12.0.0.01-fufu (2026-06-01)
   First release of the tbag-fufu revival fork: the abandoned CurseForge tbag-shefki
   (Legion 7.3) brought forward to retail 12.0 and rebranded -fufu. Personal/guild use.
