@@ -1398,42 +1398,78 @@ function TFuBag:EquipSubPlan(items, colmax)
     clusters[#clusters + 1] = c;
   end
 
-  -- 2) Shelf-pack the clusters within colmax columns. cx (cells) is fractional so
-  -- the inter-cluster gap is a fraction of a button; shelfTopY (cells from top)
-  -- advances by the short header band + the shelf's tallest item block.
-  local headers, placements = {}, {};
-  local shelfTopY, cx, shelfItemRows = 0, 0, 0;
-  -- A cluster spreads up to maxCols wide, then WRAPS into a multi-row block
-  -- (rather than one long row spanning the whole shelf), so big sub-groups stay
-  -- compact and leave room for neighbours. Never wider than the box.
+  -- 2) Shelf-pack the clusters within colmax columns. A cluster spreads up to
+  -- maxCols wide, then WRAPS into a multi-row block (rather than one long row), so
+  -- big sub-groups stay compact and leave room for neighbours; never wider than the
+  -- box. The pack test reserves the base SUBGROUP_GAP between clusters, so the
+  -- edge-to-edge spread in step 3 can only ADD to those gaps (never overlap).
   local maxCols = self.SUBGROUP_MAX_COLS or colmax;
   if (maxCols > colmax) then maxCols = colmax; end
   if (maxCols < 1) then maxCols = 1; end
-  for _, c in ipairs(clusters) do
+
+  local shelves = {};            -- shelves[s] = { ci, ci, ... } cluster indices, left->right
+  local meta = {};               -- meta[ci] = { w =, rows = }
+  local cur, cxUsed = {}, 0;     -- current shelf + its width (cells) incl. base gaps
+  for ci, c in ipairs(clusters) do
     local cnt = #c.items;
     local w = cnt; if (w > maxCols) then w = maxCols; end; if (w < 1) then w = 1; end
-    local rows = math.ceil(cnt / w);
-    local pre = (cx > 0) and gap or 0;
-    if (cx > 0 and cx + pre + w > colmax + 0.001) then
-      shelfTopY = shelfTopY + hb + shelfItemRows;   -- close shelf
-      cx, shelfItemRows, pre = 0, 0, 0;
+    meta[ci] = { w = w, rows = math.ceil(cnt / w) };
+    local pre = (cxUsed > 0) and gap or 0;
+    if (cxUsed > 0 and cxUsed + pre + w > colmax + 0.001) then
+      shelves[#shelves + 1] = cur;   -- close the shelf
+      cur, cxUsed, pre = {}, 0, 0;
     end
-    local startCell = cx + pre;
-    local itemsTopY = shelfTopY + hb;
-    if (c.label and c.label ~= "") then
-      headers[#headers + 1] = { label = c.label, w = w, rows = rows, firstItm = c.items[1] };
-    end
-    for idx, itm in ipairs(c.items) do
-      placements[#placements + 1] = {
-        itm = itm,
-        ytop = itemsTopY + math.floor((idx - 1) / w),
-        xcell = startCell + ((idx - 1) % w),
-      };
-    end
-    if (rows > shelfItemRows) then shelfItemRows = rows; end
-    cx = startCell + w;
+    cur[#cur + 1] = ci;
+    cxUsed = cxUsed + pre + w;
   end
-  local height = shelfTopY + hb + shelfItemRows;
+  if (#cur > 0) then shelves[#shelves + 1] = cur; end
+
+  -- 3) Emit placements/headers, spreading each shelf EDGE-TO-EDGE. The leftover
+  -- width (colmax minus the summed cluster widths) is split evenly across the
+  -- (k-1) gaps between the k clusters, so the first cluster sits flush-left, the
+  -- last flush-right, and a lone cluster stays flush-left. shelfTopY (cells from
+  -- top) advances by the short header band + the shelf's tallest item block.
+  local headers, placements = {}, {};
+  local shelfTopY = 0;
+  for _, sh in ipairs(shelves) do
+    local k = #sh;
+    local wsum, maxRows = 0, 0;
+    for _, ci in ipairs(sh) do
+      wsum = wsum + meta[ci].w;
+      if (meta[ci].rows > maxRows) then maxRows = meta[ci].rows; end
+    end
+    local gapEach = (k > 1) and ((colmax - wsum) / (k - 1)) or 0;
+    if (gapEach < 0) then gapEach = 0; end
+    local itemsTopY = shelfTopY + hb;
+    local startCell = 0;
+    for oi, ci in ipairs(sh) do
+      local c = clusters[ci];
+      local w = meta[ci].w;
+      if (c.label and c.label ~= "") then
+        -- Room a sub-header title may overhang into: half the spread gap toward a
+        -- neighbour on this shelf, or the distance to the shelf edge on the outer
+        -- side of an end cluster. Consumed by AssignButtonsToFrame so multi-word
+        -- weapon titles use the empty space instead of truncating to one button.
+        local lroom = (oi > 1) and (gapEach / 2) or 0;
+        local rroom = (oi < k) and (gapEach / 2) or (colmax - (startCell + w));
+        if (rroom < 0) then rroom = 0; end
+        headers[#headers + 1] = {
+          label = c.label, w = w, rows = meta[ci].rows, firstItm = c.items[1],
+          lroom = lroom, rroom = rroom,
+        };
+      end
+      for idx, itm in ipairs(c.items) do
+        placements[#placements + 1] = {
+          itm = itm,
+          ytop = itemsTopY + math.floor((idx - 1) / w),
+          xcell = startCell + ((idx - 1) % w),
+        };
+      end
+      startCell = startCell + w + gapEach;
+    end
+    shelfTopY = shelfTopY + hb + maxRows;
+  end
+  local height = shelfTopY;
   return height, headers, placements;
 end
 
@@ -2827,63 +2863,72 @@ end
 local BKGR_A = 0.4;
 local BRDR_A = 0.5;
 
+-- Generate the distinct per-category box colours into cfg. force = 1 overwrites every
+-- bar; otherwise only unset bars are filled. The palette is a golden-angle hue spread
+-- (adjacent categories differ strongly), with each colour biased AWAY from the window
+-- background so no box blends into it: read the window bg, and if a colour's luminance
+-- lands within SEP of the window's, push it toward white (dark window) or black (light
+-- window) until it separates. Hue is left alone, so categories still tell apart. Run at
+-- default time (SetDefColors) and live when the window bg changes (SetColorFunc).
+function TFuBag:GenCatColors(cfg, force)
+  local function hsv2rgb(h, s, v)   -- h,s,v in [0,1]; returns r,g,b in [0,1]
+    local i = math.floor(h * 6);
+    local f = h * 6 - i;
+    local p, q, t = v * (1 - s), v * (1 - f * s), v * (1 - (1 - f) * s);
+    i = i % 6;
+    if (i == 0) then return v, t, p; end
+    if (i == 1) then return q, v, p; end
+    if (i == 2) then return p, v, t; end
+    if (i == 3) then return p, q, v; end
+    if (i == 4) then return t, p, v; end
+    return v, p, q;
+  end
+  local function lum(r, g, b) return 0.299 * r + 0.587 * g + 0.114 * b; end
+
+  local wr, wg, wb = self:GetColor(cfg, "bkgr_"..self.MAIN_BAR);
+  local Lw = lum(wr, wg, wb);
+  local SEP = 0.42;
+  for i = 1, self.BAR_MAX do
+    local h = ((i - 1) * 0.381966) % 1;   -- golden-ratio conjugate: 137.5-degree step
+    local r, g, b = hsv2rgb(h, 0.55, 0.78);
+    if (math.abs(lum(r, g, b) - Lw) < SEP) then
+      if (Lw < 0.5) then                       -- dark window: brighten toward white
+        local target = math.min(Lw + SEP, 1);
+        local L = lum(r, g, b);
+        local k = (1 - L > 0.001) and ((target - L) / (1 - L)) or 0;
+        if (k < 0) then k = 0; elseif (k > 1) then k = 1; end
+        r = r + (1 - r) * k; g = g + (1 - g) * k; b = b + (1 - b) * k;
+      else                                     -- light window: darken toward black
+        local target = math.max(Lw - SEP, 0);
+        local L = lum(r, g, b);
+        local k = (L > 0.001) and (1 - target / L) or 0;
+        if (k < 0) then k = 0; elseif (k > 1) then k = 1; end
+        r = r * (1 - k); g = g * (1 - k); b = b * (1 - k);
+      end
+    end
+    -- A bar the user hand-picked a colour for is PINNED: leave it untouched so it
+    -- survives window-colour regeneration. Cleared only by a full /reset.
+    if (not (cfg.cat_color_user and cfg.cat_color_user[i])) then
+      self:SetColor(cfg, "bkgr_"..i, r, g, b, BKGR_A, force);
+      self:SetColor(cfg, "brdr_"..i, r, g, b, BRDR_A, force);
+    end
+  end
+end
+
 function TFuBag:SetDefColors(cfg, reset)
   self:SetColor(cfg, "newitem", 0.9, 0.9, 0.25, 1.0, reset);
   self:SetColor(cfg, "recentitem", 0.0, 1.0, 0.4, 1.0, reset);
 
-  -- Red healing
-  self:SetColor(cfg, "bkgr_4", 0.8, 0.1, 0.1, BKGR_A, reset);
-  self:SetColor(cfg, "brdr_4", 0.8, 0.1, 0.1, BRDR_A, reset);
-
-  self:SetColor(cfg, "bkgr_8", 0.8, 0.1, 0.1, BKGR_A, reset);
-  self:SetColor(cfg, "brdr_8", 0.8, 0.1, 0.1, BRDR_A, reset);
-
-  -- Blue mana
-  self:SetColor(cfg, "bkgr_3", 0.1, 0.1, 1.0, BKGR_A, reset);
-  self:SetColor(cfg, "brdr_3", 0.1, 0.1, 1.0, BRDR_A, reset);
-
-  self:SetColor(cfg, "bkgr_7", 0.1, 0.1, 1.0, BKGR_A, reset);
-  self:SetColor(cfg, "brdr_7", 0.1, 0.1, 1.0, BRDR_A, reset);
-
-  -- Green Buffs
-  self:SetColor(cfg, "bkgr_2", 0.1, 0.8, 0.1, BKGR_A, reset);
-  self:SetColor(cfg, "brdr_2", 0.1, 0.8, 0.1, BRDR_A, reset);
-
-  self:SetColor(cfg, "bkgr_6", 0.1, 0.8, 0.1, BKGR_A, reset);
-  self:SetColor(cfg, "brdr_6", 0.1, 0.8, 0.1, BRDR_A, reset);
-
-  -- Yellow trade
-  self:SetColor(cfg, "bkgr_15", 0.9, 0.9, 0.1, BKGR_A, reset);
-  self:SetColor(cfg, "brdr_15", 0.9, 0.9, 0.1, BRDR_A, reset);
-
-  self:SetColor(cfg, "bkgr_16", 0.9, 0.9, 0.1, BKGR_A, reset);
-  self:SetColor(cfg, "brdr_16", 0.9, 0.9, 0.1, BRDR_A, reset);
-
-  self:SetColor(cfg, "bkgr_19", 0.9, 0.9, 0.1, BKGR_A, reset);
-  self:SetColor(cfg, "brdr_19", 0.9, 0.9, 0.1, BRDR_A, reset);
-
-  self:SetColor(cfg, "bkgr_20", 0.9, 0.9, 0.1, BKGR_A, reset);
-  self:SetColor(cfg, "brdr_20", 0.9, 0.9, 0.1, BRDR_A, reset);
-
-  -- White equipment
-  self:SetColor(cfg, "bkgr_9", 0.65, 0.7, 0.75, BKGR_A, reset);
-  self:SetColor(cfg, "brdr_9", 0.65, 0.7, 0.75, BRDR_A, reset);
-
-  self:SetColor(cfg, "bkgr_10", 0.65, 0.7, 0.75, BKGR_A, reset);
-  self:SetColor(cfg, "brdr_10", 0.65, 0.7, 0.75, BRDR_A, reset);
-
-  self:SetColor(cfg, "bkgr_13", 0.65, 0.7, 0.75, BKGR_A, reset);
-  self:SetColor(cfg, "brdr_13", 0.65, 0.7, 0.75, BRDR_A, reset);
-
-  self:SetColor(cfg, "bkgr_17", 0.65, 0.7, 0.75, BKGR_A, reset);
-  self:SetColor(cfg, "brdr_17", 0.65, 0.7, 0.75, BRDR_A, reset);
-
-  self:SetColor(cfg, "bkgr_18", 0.65, 0.7, 0.75, BKGR_A, reset);
-  self:SetColor(cfg, "brdr_18", 0.65, 0.7, 0.75, BRDR_A, reset);
-
-  -- purple ammo / shards
-  self:SetColor(cfg, "bkgr_28", 0.8, 0.3, 0.9, BKGR_A, reset);
-  self:SetColor(cfg, "brdr_28", 0.8, 0.3, 0.9, BRDR_A, reset);
+  -- Per-category box colours (see GenCatColors). A one-time VERSION bump force-applies
+  -- the current scheme to EVERY bar once -- older profiles stored legacy colours that
+  -- read as "colourless"; afterwards only unset bars are filled so a user-picked colour
+  -- sticks, and an explicit /reset re-applies. The window-aware palette is regenerated
+  -- live when the window background colour changes (SetColorFunc).
+  if (reset == 1) then cfg.cat_color_user = {}; end   -- /reset un-pins all categories
+  local CUR_COLOR_VER = 5;
+  local migrate = (tonumber(cfg.color_ver) or 0) < CUR_COLOR_VER;
+  cfg.color_ver = CUR_COLOR_VER;
+  self:GenCatColors(cfg, (reset == 1 or migrate) and 1 or nil);
 end
 
 function TFuBag:ResetSorts(cfg)
@@ -3398,6 +3443,11 @@ function TFuBag:WireCatTitleClick(frame, bf, baritmbar, show)
     if (btn.SetPropagateMouseClicks) then btn:SetPropagateMouseClicks(true); end
     btn:SetScript("OnClick", function(self, mouseButton)
       if (mouseButton ~= "RightButton") then return; end
+      -- In edit mode the right-click opens the category ("bar") menu via click
+      -- propagation to the bar frame beneath; don't ALSO print. Printing stays the
+      -- view-mode behaviour and is available from the menu's "Print contents" entry.
+      local mf = self.mainFrame;
+      if (mf and (mf.ml_edit == 1 or mf.edit_mode == 1)) then return; end
       local names = self.catNames;
       if (not names) then return; end
       for _, nm in ipairs(names) do
@@ -3417,6 +3467,7 @@ function TFuBag:WireCatTitleClick(frame, bf, baritmbar, show)
   btn:SetAllPoints(label);
   btn:SetFrameLevel(bf:GetFrameLevel() + 12);
   btn.which = (frame == TFuBnkFrame) and "bank" or "inv";
+  btn.mainFrame = frame;   -- so the OnClick can tell edit mode from view mode
   -- Dump by the INTERNAL category token(s) on this bar, not the display label:
   -- PrintCategoryContents matches itm[I_CAT] (e.g. "TRADE_TOOL"), which often differs
   -- from the shown name (e.g. "Profession Tools"). Collect the distinct tokens of the
@@ -3430,6 +3481,23 @@ function TFuBag:WireCatTitleClick(frame, bf, baritmbar, show)
   end
   btn.catNames = names;
   btn:Show();
+end
+
+-- Print every category on a bar to chat. Used by the bar menu's "Print contents"
+-- action (the title's view-mode right-click prints the same set: the distinct
+-- internal I_CAT tokens of the bar's items, since a merged bar holds several).
+function TFuBag:PrintBarContents(frame, bar)
+  local items = frame and frame.BARITM and frame.BARITM[bar];
+  if (not items) then return; end
+  local which = (frame == TFuBnkFrame) and "bank" or "inv";
+  local seen = {};
+  for _, itm in ipairs(items) do
+    local cat = itm[self.I_CAT];
+    if (cat and cat ~= "" and not seen[cat]) then
+      seen[cat] = true;
+      self:PrintCategoryContents(which, cat);
+    end
+  end
 end
 
 -- Used for options strings
@@ -3910,11 +3978,20 @@ function TFuBag:GetColor(cfg, colorname)
 end
 
 
-function TFuBag:ColorFrame(cfg, barframe, bar)
+function TFuBag:ColorFrame(cfg, barframe, bar, frame)
+  -- Category boxes (bar ~= MAIN_BAR) show their per-category colour only while the
+  -- user is actively editing -- classic edit mode or manual-layout edit -- so a box
+  -- is visible to pick its colour or drag it. Outside those modes the boxes BLEND
+  -- into the window (fully transparent background + border) for a clean, uniform
+  -- look, instead of the patchwork of per-category default colours. The MAIN window
+  -- frame always keeps its own colour (it IS the background); a nil frame (callers
+  -- that only paint MAIN_BAR) also paints normally.
+  local editing = frame and (frame.edit_mode == 1 or frame.ml_edit == 1);
+  local blend = frame and bar ~= self.MAIN_BAR and not editing;
   local r, g, b, a = self:GetColor(cfg, "bkgr_"..bar)
-  barframe:SetBackdropColor(r, g, b, a);
+  barframe:SetBackdropColor(r, g, b, blend and 0 or a);
   r, g, b, a = self:GetColor(cfg, "brdr_"..bar)
-  barframe:SetBackdropBorderColor(r, g, b, a);
+  barframe:SetBackdropBorderColor(r, g, b, blend and 0 or a);
 end
 
 function TFuBag:ColorFont(cfg, stock, font, colorname)
@@ -3942,6 +4019,21 @@ function TFuBag.SetColorFunc(prev)
   if value then
     if r and g and b and opacity then
       TFuBag:SetColor(value.cfg, value.colorname, r, g, b, opacity, 1)
+      if (value.colorname == "bkgr_"..TFuBag.MAIN_BAR) then
+        -- Window background changed: regenerate the per-category palette so the boxes
+        -- stay contrasted against it (skips user-pinned categories). Fires on live drag
+        -- and cancel-restore alike, since both route through here.
+        TFuBag:GenCatColors(value.cfg, 1)
+      else
+        -- A manual pick on a category box PINS it, so GenCatColors leaves it alone on
+        -- later window-colour changes. Matches "bkgr_<n>" / "brdr_<n>" for a category
+        -- bar (not the window's bar 0, not bag spotlights).
+        local num = tonumber(string.match(value.colorname or "", "^b[kr][gd]r_(%d+)$"))
+        if (num and num >= 1 and num <= TFuBag.BAR_MAX) then
+          value.cfg.cat_color_user = value.cfg.cat_color_user or {}
+          value.cfg.cat_color_user[num] = true
+        end
+      end
       value.updatefunc()
     end
   end
@@ -3990,12 +4082,12 @@ function TFuBag:RecolorWindow(frame)
   -- so without this the main window's background/border color only changed on reopen
   -- (the picker's live callback never repainted it).
   if (frame.SetBackdropColor) then
-    self:ColorFrame(cfg, frame, self.MAIN_BAR);
+    self:ColorFrame(cfg, frame, self.MAIN_BAR, frame);
   end
   for bar = 1, self.BAR_MAX do
     local bf = _G[framename.."_bar_"..bar];
     if (bf and bf.SetBackdropColor) then
-      self:ColorFrame(cfg, bf, bar);
+      self:ColorFrame(cfg, bf, bar, frame);
     end
   end
   -- Bag selector button colors (the bag_N "Spotlight" color also tints the selector
@@ -5680,10 +5772,23 @@ function TFuBag:AssignButtonsToFrame(mainFrame, barnum, frame, width, height, us
           local bandPx = (mainFrame:FrameY(1) - mainFrame:FrameY(0)) * (self.SUBGROUP_HEADER_H or 1)
           local cellpitch = mainFrame:FrameX(1) - mainFrame:FrameX(0)
           local clusterW = (h.w - 1) * cellpitch + mainFrame.BF_WIDTH
-          fs:SetPoint("BOTTOMLEFT", btn, "TOPLEFT", 0, 1)
-          fs:SetWidth(clusterW)
+          -- Let the title overhang into the empty space the edge-to-edge spread left
+          -- around the cluster (EquipSubPlan's lroom/rroom), so multi-word weapon
+          -- titles show in full instead of truncating to a 1-button cluster. Justify
+          -- toward the room: first cluster on a shelf extends right, last extends
+          -- left, interior centres.
+          local lroomPx = (h.lroom or 0) * cellpitch
+          local rroomPx = (h.rroom or 0) * cellpitch
+          fs:SetPoint("BOTTOMLEFT", btn, "TOPLEFT", -lroomPx, 1)
+          fs:SetWidth(clusterW + lroomPx + rroomPx)
           fs:SetHeight(bandPx)
-          fs:SetJustifyH("CENTER")
+          if (lroomPx <= 0 and rroomPx > 0) then
+            fs:SetJustifyH("LEFT")
+          elseif (rroomPx <= 0 and lroomPx > 0) then
+            fs:SetJustifyH("RIGHT")
+          else
+            fs:SetJustifyH("CENTER")
+          end
           fs:SetJustifyV("BOTTOM")
           fs:SetWordWrap(false)
           fs:SetText(h.label)
@@ -6372,13 +6477,24 @@ end
 -- frame are stable for a given _bar_N frame (it always belongs to one window and
 -- one bar index), so the closures may capture them. A right-click is forwarded to
 -- the main window's menu so enabling box mouse does not swallow it.
+-- Open the per-category ("bar") right-click menu for barnum, anchored at `anchor`.
+-- Lets Manual-Layout drag boxes reach the category options -- colour, sort, hide --
+-- on right-click, instead of only via classic edit mode's numbered bar buttons.
+function TFuBag:OpenBarMenu(frame, barnum, anchor)
+  if (not frame.RightClickMenu) then return; end
+  HideDropDownMenu(1);
+  frame.RightClickMenu_mode = "bar";
+  frame.RightClickMenu_opts = { [self.I_BAR] = barnum };
+  ToggleDropDownMenu(1, nil, frame.RightClickMenu, anchor:GetName(), 0, 0);
+end
+
 function TFuBag:MLInitBarDrag(frame, barnum, bf)
   if (bf.mlDragInit) then return; end
   bf:RegisterForDrag("LeftButton");
   bf:SetScript("OnDragStart", function(s) TFuBag:MLDragStart(frame, barnum, s); end);
   bf:SetScript("OnDragStop",  function(s) TFuBag:MLDragStop(frame, barnum, s); end);
   bf:SetScript("OnMouseUp", function(_, button)
-    if (button == "RightButton") then frame:OnMouseDown("RightButton"); end
+    if (button == "RightButton") then TFuBag:OpenBarMenu(frame, barnum, bf); end
   end);
 
   local h = CreateFrame("Frame", nil, bf);
@@ -6387,7 +6503,7 @@ function TFuBag:MLInitBarDrag(frame, barnum, bf)
   h:SetScript("OnDragStart", function() TFuBag:MLDragStart(frame, barnum, bf); end);
   h:SetScript("OnDragStop",  function() TFuBag:MLDragStop(frame, barnum, bf); end);
   h:SetScript("OnMouseUp", function(_, button)
-    if (button == "RightButton") then frame:OnMouseDown("RightButton"); end
+    if (button == "RightButton") then TFuBag:OpenBarMenu(frame, barnum, bf); end
   end);
   bf.MLTitleHandle = h;
 
@@ -6895,7 +7011,7 @@ function TFuBag:LayoutWindowFree(frame, PAD_TOP, PAD_BOTTOM, show_cat_names, CAT
       self:PositionFrame(barname, "TOPLEFT", scname, "TOPLEFT",
         px, 0 - py, frame:FrameX(cols), frame:FrameY(rows));
 
-      self:ColorFrame(cfg, bf, barnum);
+      self:ColorFrame(cfg, bf, barnum, frame);
 
       TFuBag:AssignButtonsToFrame(frame, barnum, barname, cols, rows, isSub);
       bf:Show();
@@ -7110,7 +7226,7 @@ function TFuBag:LayoutWindowFreePlace(frame, PAD_TOP, PAD_BOTTOM, show_cat_names
       self:PositionFrame(barname, "TOPLEFT", scname, "TOPLEFT",
         px, 0 - py, frame:FrameX(cols), frame:FrameY(rows));
 
-      self:ColorFrame(cfg, bf, barnum);
+      self:ColorFrame(cfg, bf, barnum, frame);
       TFuBag:AssignButtonsToFrame(frame, barnum, barname, cols, rows, isSub);
       bf:Show();
       -- Draggable only while UNLOCKED (gear/edit on); locked = layout shown but inert.
@@ -7528,7 +7644,7 @@ function TFuBag:LayoutWindow(frame)
           cur_x = cur_x + frame:FrameX(calc_dat[iBar.."_width"]) + cat_spacing;
 
           -- Color the frame and assign buttons
-          self:ColorFrame(cfg, barframe[iBar], (barnum+iBar));
+          self:ColorFrame(cfg, barframe[iBar], (barnum+iBar), frame);
 
           TFuBag:AssignButtonsToFrame(frame,(barnum+iBar), framename.."_bar_"..(barnum+iBar),
             calc_dat[iBar.."_width"], calc_dat["height"], true );

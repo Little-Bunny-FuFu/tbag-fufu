@@ -2004,6 +2004,16 @@ function Bank.RightClickMenu_populate(self, level)
     string.format(L["Border Color for Bar %d"],bar), function () TFuBag:RecolorWindow(TFuBnkFrame) end);
   UIDropDownMenu_AddButton(info, level);
 
+  info = { ["disabled"] = 1, ["notCheckable"] = 1 };
+  UIDropDownMenu_AddButton(info, level);
+
+  info = {
+    ["text"] = L["Print contents to chat"],
+    ["notCheckable"] = 1,
+    ["func"] = function() CloseDropDownMenus(); TFuBag:PrintBarContents(TFuBnkFrame, bar); end,
+    };
+  UIDropDownMenu_AddButton(info, level);
+
   -------------------------------------------------------------------------------------------------
   ------------------------ MAIN WINDOW CONTEXT MENU -----------------------------------------------
   -------------------------------------------------------------------------------------------------
