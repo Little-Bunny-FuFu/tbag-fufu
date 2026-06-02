@@ -54,9 +54,15 @@
           battlepay:Hide();
         end
       </OnLoad>
-      <OnClick>
-        TFuBag.ItemButton.NormalClick(self, button);
-      </OnClick>
+      <!-- NO <OnClick> here: defining one would REPLACE the inherited
+           ContainerFrameItemButtonTemplate OnClick with an insecure Lua handler,
+           putting tbag on the call stack and tainting the protected
+           C_Container.UseContainerItem inside it (ADDON_ACTION_FORBIDDEN when
+           using a consumable). Keep Blizzard's inherited secure OnClick for
+           use/pickup; add only our extra behavior via PreClick below. -->
+      <PreClick>
+        TFuBag.ItemButton.PreClick(self, button);
+      </PreClick>
       <OnEnter>
         TFuBag.ItemButton.OnEnter(self, motion);
       </OnEnter>

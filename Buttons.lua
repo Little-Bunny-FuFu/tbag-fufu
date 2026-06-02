@@ -189,15 +189,21 @@ function ItemButton:OnClick(button)
   end
 end
 
--- Normal-mode click handler (the edit-mode overlay handles clicks in edit mode).
--- Default behavior is Blizzard's ContainerFrameItemButtonMixin:OnClick (insecure),
--- EXCEPT: a plain right-click deposit from the bags while our bank window is open at
--- the bank must follow the bank view WE are showing. Blizzard's default deposits to
--- whichever bank its own (replaced) UI thinks is active -- which lands character-bank
--- items in the warband bank, especially with collapse off. We redirect to the
--- currently-viewed bank (Character OR Account/Warband) via the SortItmCache free-slot
--- target, which is computed from that bank type's bags in both collapse modes.
-function ItemButton.NormalClick(self, button)
+-- Pre-click hook. Runs BEFORE the inherited (secure) ContainerFrameItemButtonMixin
+-- OnClick, which we deliberately do NOT replace: replacing it with an insecure Lua
+-- <OnClick> put tbag on the call stack and tainted the protected
+-- C_Container.UseContainerItem inside Blizzard's handler, so using a consumable
+-- raised ADDON_ACTION_FORBIDDEN. The button keeps Blizzard's untainted OnClick for
+-- use/pickup; this hook only adds our one extra behavior.
+--
+-- That behavior: a plain right-click deposit from the bags, while our bank window is
+-- open at the bank, must follow the bank view WE are showing. Blizzard's default
+-- deposits to whichever bank its own (replaced) UI thinks is active -- which lands
+-- character-bank items in the warband bank, especially with collapse off. We redirect
+-- to the currently-viewed bank via the SortItmCache free-slot target. PickupContainerItem
+-- and DepositToFreeSlot are unprotected (taint-safe); the deposit empties the clicked
+-- slot, so the inherited OnClick that fires next is a no-op on that now-empty slot.
+function ItemButton.PreClick(self, button)
   if (button == "RightButton"
       and not (IsShiftKeyDown() or IsControlKeyDown() or IsAltKeyDown())
       and TFuBnkFrame and TFuBnkFrame:IsShown()
@@ -209,12 +215,9 @@ function ItemButton.NormalClick(self, button)
       if (itm and next(itm) and itm[TFuBag.I_ITEMLINK]) then
         PickupContainerItem(itm[TFuBag.I_BAG], itm[TFuBag.I_SLOT])
         TFuBag:DepositToFreeSlot(TFuBnkFrame)   -- routes to the VIEWED bank
-        return
       end
     end
   end
-  -- Everything else: Blizzard's default container-item click behavior.
-  ContainerFrameItemButtonMixin.OnClick(self, button)
 end
 
 -- Handles lock updates.  Takes an itm and mainFrame parameter
