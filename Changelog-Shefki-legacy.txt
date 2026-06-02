@@ -1,0 +1,729 @@
+# tbag-fufu lineage -- the original tbag-shefki (Talos / Shefki) CurseForge changelog.
+# Archived out of the packaged release changelog (Changelog.txt) so the GitHub release
+# notes cover only the -fufu fork. Kept here for provenance; excluded from the package
+# via .pkgmeta.
+
+* 20150103-r504-Shefki
+  Note: This version contains a number of sorting changes the following
+  commands are advised after backing up any modified sorting rules you have.
+  /tinv resetsorts
+  /tbnk resetsorts
+- Fix bag highlights.
+- Fix tracked currencies being show for a character that has no currencies in
+  in some circumstances due to a Blizzard bug.
+- Add Reagent Bank support (resorting the bank will move items into the
+  reagent bank if they can be placed there).
+- Fix quality of items not showing correctly for items that have a chance to
+  roll at a higher quality.
+- Remove class specific REAGENT and TOOLS categories
+- Fix potions, foods and drinks not sorting into the correct categories, due
+  to Blizzard adding commas to the health/mana numbers.
+- Properly categorize channeled mana options as MANA_RESTORE.
+- Fix some old temporary weapon enchants not sorting into BUFF category.
+- Items that when learned go into the toy box are not included in the TOYS
+  category.  This means some items that were in COMBATPETS, COSTUMES and
+  FIREWORKS are in TOYS now.
+- Fix categorization of Crimson Steer Energy drink due to bugged tooltip in
+  game.
+- Fix sorting of engineering portal device and add the WoD one.
+- Add Aviana's Feather to the MOUNT category.
+- Include the fish specific baints for WoD in FISHING.
+- Remove the ARGENT_DAWN category.
+- Remove the CENARION_CIRCLE category.
+- Remove the THORIUM_BROTHER category.
+- Remove the ZUL_GURUB category.
+- Remove the SHA'TAR category.
+- Remove categorization rule for Coilfang Armaments.
+- Remove categorization rule for Salt Shacker.
+- Remove categorization rules for obsolete inks and parchments.
+- Remove RELIC category.
+- Update DARKMOON_CATEGORY for the new faire.
+- Gray items that a vendor will pay for now display a gold icon in the upper
+  left corner when at a vendor.
+- Remove all Soul Shard support.
+- Remove a bunch of compataiblity with old versions of WoW.
+- Remove all ammo, quivers and projectile supports including the various
+  categories.
+- Put the reagents for talent/glyph changes in CLASS_REAGENT category.
+- Add Moroes' Famous Polish to the TOYS category.
+- Add the Day of the Dead costumes to the COSTUMES category.
+- Add CRAFTINGREAGENT keyword which will match all items that have the
+  light blue "Crafting Reagent" text in the tooltip.
+- Remove support for the keyring.
+- Add Spirit of Shinri to the MOUNT category.
+- Add a BLUEPRINTS category for Garrison Blueprints to go in.
+- Add an ARCHAEOLOGY category.
+- Remove the POISONS category.
+- Add salvage bags/crates to the ACT_OPEN category.
+- Add items that create equipmenet (e.g. items from Timeless Isle and
+  Garrison Missions) to the ACT_OPEN category.
+- Add a number of pet items to MINIPET category.
+- Move "Windfeather Plume" from BUFF to MOUNT category.
+- Add a FOLLOWERS category.
+
+* 20141014-r444-Shefki
+- Bump TOC for 6.0
+- Fix the blue  hue over the buttons in 6.0
+
+* 20130910-r439-Shefki
+- Bump TOC for 5.4
+- Fix the blue hue over the buttons in 5.4
+
+* 20130521-r435-Shefki
+- Bump TOC for 5.3
+
+* 20120929-r432-Shefki
+- Resolve problems with caged pets.
+
+* 20120913-r429-Shefki
+ - Fix the problem with the Fishing spell causing errors in 5.0.5 for German
+ and Russian clients.
+
+* 20120902-r426-Shefki
+ - Fix an error for Herbalists using German or Russian clients.
+
+* 20120902-r423-Shefki
+ - Resolves an error when opening the Inscription frame.
+
+* 20120830-r419-Shefki
+ - Resolve errors when opening tradeskill windows.
+
+* 20120828-r416-Shefki
+ - Workaround a bug on Blizzard's side resulting in TBag tainting the GlyphUI in 5.x
+ - Add translation keys for MONK.
+
+* 20120819-r412-Shefki
+ - 5.0 compatability.  Ranged slot was removed from the game.
+   This release is backwards compatible with 4.x as well.
+
+* 20110626-r405-Shefki
+ - 4.2 compatability.  Keyring was removed from the game.
+   This release is backwards compatable with 4.1 as well.
+
+* 20110626-r401-Shefki
+ - Fix the bug with toggling the inventory window with the default game
+   keybinds.
+
+* 20110210-r398-Shefki
+  Note: This version contains a number of sorting changes the following
+  commands are advised after backing up any modified sorting rules you have.
+  /tinv resetsorts
+  /tbnk resetsorts
+ - Fix problem with tackle boxes.
+ - Support for reforged items.  Must log into each character at least
+   once for the items of that character to have reforging info.
+ - Sorting fixes and updated item info for 4.0.6.
+
+* 20101017-r385-Shefki
+ - Update TOC
+ - Fix an error that prevented adjusting order of sorts for Inventory window. 
+
+* 20101006-r381-Shefki
+  Note: This version contains a number of sorting changes the following
+  commands are advised after backing up any modified sorting rules you have.
+  /tinv resetsorts
+  /tbnk resetsorts
+ - More Cataclysm fixes.
+ - Add support for quest overlays added to default UI in 3.3.3.
+ - Remove an unnecessary and extra cooldown frame.
+ - Fix a bug in player level up detection.
+ - Sorting addition for the Gnomeregan Pride costume.
+ - Flag addon as Cataclysm compatabile.
+
+* 20100905-r372-Shefki
+ - Changes to allow TBag to work without errors on Cataclysm beta.
+ - ruRU update.
+
+* 20100304-r366-Shefki
+  Note: This version contains a number of sorting changes the following
+  commands are advised after backing up any modified sorting rules you have.
+  /tinv resetsorts
+  /tbnk resetsorts
+  - Workaround for a Blizzard bug that causes tbag windows to be
+    non-interactive for some people.
+  - Workaround for a Blizzard bug that causes some menu items to be
+    non-interactive for some people.
+  - Some tiny tweaks for 3.3.3 sorting.
+  - ruRU added as a translation (99% complete).
+
+* 20091221-r358-Shefki
+  - deDE update
+
+* 20091220-r355-Shefki
+  Note: This version contains a number of sorting changes the following
+  commands are advised after backing up any modified sorting rules you have.
+  /tinv resetsorts
+  /tbnk resetsorts
+  - Free some unneeded statically used memory, should lower static memory
+    usage of the addon by about 600 KiB.
+  - Item db update for 3.3.0 and a db version update to clear the cache
+    for newly changed recipes.
+  - Fix some minipets that weren't sorting as minipets.
+  - Sorting fixes for a number of card game redemption items.
+  - ToC bump to mark addon as current.
+ 
+* 20090810-r345-Shefki
+  Note: This version contains a number of sorting changes the following
+  commands are advised after backing up any modified sorting rules you have.
+  /tinv resetsorts
+  /tbnk resetsorts
+  - Fix for the reset new dropdown menu.
+  - Fix for the reset command line command.
+  - Fix for the cancel button on the color picker.
+  - Improve support for Heirloom items.
+  - Rework profession scanning code to no longer depend upon the blizzard
+    tradeskill UI.
+  - TRADE1_CREATED and TRADE2_CREATED actually work now.
+  - Improve sorting for Darkmoon cards.
+  - Sorting updates for some items added in 3.1 previously missed.
+  - Sorting updates for items added in 3.2.0
+  - Item db update for 3.2.0
+  - deDE update.
+  - TOC bump to mark addon as current.
+
+* 20090417-r324-Shefki
+  Note: This version contains a number of sorting changes the following
+  commands are advised after backing up any modified sorting rules you have.
+  /tinv resetsorts
+  /tbnk resetsorts
+  - 3.1.0 compatability
+  - Minor sorting changes for 3.1.0
+  - Workaround a bug in the Auctionner-Advanced Appraiser module that caused
+    the alt click support to do weird things.
+  - Item db update for 3.1.0
+  - TOC bump to mark addon as current.
+
+* 20090215-r312-Shefki
+  Note: This version contains a number of sorting changes the following
+  commands are advised after backing up any modified sorting rules you have.
+  /tinv resetsorts
+  /tbnk resetsorts
+ - Fix a infinite loop in the tradeskill handling code.
+ - Update sorting to handle some of the Lunar Festival items.
+ - Pets gained from the Cracked Egg properly sort as MINIPETS now.
+ - Update deDE.
+
+* 20090122-r301-Shefki
+  Note: This version contains a number of sorting changes the following
+  commands are advised after backing up any modified sorting rules you have.
+  /tinv resetsorts
+  /tbnk resetsorts
+ - Properly sort a number of new items added with Wrath and 3.0.8.
+ - Major rework of the tradeskill categorization code, properly
+   supports Enchanting now.
+ - Item DB update for 3.0.8.  Due to the tradeskill rework the itemdb
+   is actually dumped and replaced with a new format as well.
+ - Rogue poisons are now treated like other class reagents.
+ - Show icon on tracked tokens when we have zero of them.
+ - Inventory window will no longer close on Merchant Frames closing.
+ - Don't show the Interface Options Dialog when Escape is pressed and only
+   closes a TBag window.
+ - Properly handle OpenAllBags (including the keybinding).
+ - Fix the Select Character submenu in the context menu.
+ - Fix backgrounds and borders on bars.
+ - deDE update
+
+* 20081112-r276-Shefki
+  - Fixed search splitting items by character level.
+  - Fixed a bug that caused some settings to not immediately take effect
+    for the bank.
+  - Fixed the OpenAllBags hook.
+  - Fix sorting of rogue poisons (/tinv resetsorts /tbnk resetsorts needed)
+  - Fixed cooldown spinners remaining on empty slots.
+  - Fixed bank bags that are hidden not being shown when clicked on.
+  - Fixed items in hidden bags not properly being hidden after the
+    bag was closed.
+  - Workaround a Blizzard bug that causes the game to freeze up when
+    dragging a frame over another frame with a large number of child frames.
+  - Fix a syntax error in the Anchor settings for the bank.
+  - Remove some unnecessary code.
+
+* 20081024-r260-Shefki
+  - Sorting rules updates (/tinv resetsorts and /tbnk resetsorts
+    to replace your config with the default and get the updates)
+  - Handle Inscription Bags properly.
+  - Fix Assign Cats button in Advanced Configuration.
+  - Stop modifying keybindings entirely on first run.  Users existing
+    keybindings can get them started.
+  - Fix button positioning errors when hiding empty keyring slots.
+  - Handle corruption of the cached data more gracefully.
+  - Ensure that bars that do not fit within the number of horizontal
+    bars are correctly hidden.
+  - Correctly hide items on hidden bars.
+  - Possible fix for money type errors.
+  - Minor code cleanups.
+
+* 20081015-r242-Shefki
+  - Fix the MergeReagents error.
+
+* 20081015-r239-Shefki
+  - Fix an issue where the token update events would fire
+    before variables loaded causing an error.
+
+* 20081014-r235-Shefki
+  - General forwards compatability to 3.0 code changes.
+  - Show Blizzard Bag Frames is obsolete and ignored now.
+    Clicking on a bag frame that is hidden in TBag now
+    expands the window and displays those items until
+    the window is closed or the bag is clicked again.
+    Most people will see this mostly with the keychain.
+  - Updates to the sort list to support changes in Wrath:
+    DeathKnights, Minipets, Tokens, Glyphs and Inscription.
+  - Support for Inscription Bags in compressing items to
+    leave the most free slots.
+  - Support for Token tracking for Wrath.
+  - Catch the Spirit of Competition in the default sorts.
+  - Fix a bug that caused BOE items to be treated as if they
+    were Soulbound sometimes.
+  - Catch food that restores health and mana that is marked
+    as a Trade Good (e.g. Raw Greater Sagefish)
+  - Allow dragging items onto the bag icon for the default bank
+    slots just like the other bags in the bank.
+  - Bug fixes to the profession tracking code so that more
+    professions are tracked properly, especially in non-enUS
+    locales.
+  - A large amount of code duplication between the bank and
+    the inventory window has been merged.
+  - Significant effort has been made to decrease the amount
+    of global variables used.
+  - Significantly fewer hooks are used.
+  - Numerous unnecessary frames were removed.
+  - New event handlers which are more efficient.
+  - Stacking should always happen the next time you open the window
+    if needed now.  In the past sometimes it wouldn't happen if you
+    didn't have the window open when you received the item requiring
+    stacking.
+  - More reliable caching of mailbox contents.
+  - Removed the font that shipped with the addon.  Now simply
+    use an included font with the game.  Font usage is now
+    more consistent across the addon.
+  - Packaged by curseforge now. :)
+
+* 20080611-r163-Shefki
+  - Fix an error when opening the Hunter Training window.
+
+* 20080527-r161-Shefki
+  - UI rework.  Text buttons are gone, close and lock buttons
+    back in topright corner.  Search box at the bottom now.
+    All controls are actually inside the window now.
+    Special thanks to Daniel Gilbert for permission to use
+    the lock buttons.
+  - Using the search box will now initiate a new highlight mode.
+    The items that match your search will be highlighted in the
+    window.  This will persist until you clear the text out
+    of the search box, click the highlight button, click the
+    Clear Search menu option in the right click menu or simply
+    close the inventory window.  The mode is shared between
+    the inventory and bank windows.  It overrides the highlight
+    mode for the window and the window will return to its
+    previous highlight mode.  Note: You have to hit enter
+    after typing your search before the highlight mode will
+    be entered, text results are still shown in the first
+    chat frame.
+  - deDE Translation by Dessa.  Thanks to his hard work on
+    making this a reality.  Users switching from English
+    to the translation will likely want to reset their
+    configuration to get the full functionality of the
+    translation.
+  - You can recategorize individual items in edit mode again by
+    right-clicking on them like you could with EngBags.
+  - Empty categories/bars will no longer result in lines through
+    the window.  The lines often looked like a cursor in a text
+    editor and were ugly.
+  - You can set the anchor point of the inventory and bank windows.
+    The window will grow from the selected corner and that
+    corner will never move.  The anchor selection can be
+    found by right clicking on blank space in the window
+    and using the Anchor sub-menu.
+  - When viewing a Hearthstone (or Ruby Slippers) on another
+    character it will show the location that hearthstone
+    will send you to.  You will have to log onto the character
+    after updating before this will fully work.  If the hearth
+    destination is unknown it'll simply show <home location>.
+  - The number of charges on items (e.g. Mana Oil) will be visible
+    on the tooltips when viewing items on other characters
+    or items in your bank while not at the bank.  Requires
+    having seen the item after updating before this will work.
+    The entry on the tooltip may not show exactly where it does
+    on live views simply because other addons add their text first.
+  - Hiding buttons and other controls will shrink the window
+    to remove blank space.
+  - Buttons will no longer end up overlapping when the number
+    of columns is set low.
+  - Fix cooldowns.  The cooldown sweep will show immediately upon
+    using an item.  Previously it would only start showing after
+    the next reload or toggle of the window.
+  - No longer incorrectly show cooldown sweeps when viewing
+    items on other characters.
+  - Stop attempting to put Quivers and Ammo-pouches inside other
+    Quivers and Ammo-pouches.
+  - Improve performance when in edit mode in the bank window.
+  - Fix a variety of sorting issues.  /tinv resetsorts and
+    /tbnk resetsorts will get you a fresh copy of the defaults.
+  - Improvements to the text of the tooltips and menus
+    for buttons.
+  - Change class handling to support other locales.
+  - Remove some more old and unused code.
+
+
+* 20080331-r114-Shefki
+  - Fix an issue where the Blizzard API doesn't tell us the item family
+    which causes a lua error and breaks updating of the bag contents
+    until a reloadui.
+  - Fix a possible taint issue with the FluidFrames workaround.
+  - Sort Nightmare Seed and Giant Sunfish into the proper places
+    with the default config.  Requires /tinv resetsorts and
+    /tbnk resetsorts to get the new default config.
+
+* 20080325-r110-Shefki
+  - Bump interface to 20400, addon requires WoW 2.4.0 or newer now.
+  - Update the Item info database used in categorization to include
+    new 2.4 items.
+  - Use the new Blizzard API to decide what items can go in what bags,
+    this allows the bag compression routines to be 100% accurate now.
+  - Allow all modifier key/click combinations from Auctioneer to work.
+    Note that this means regardless if alt pickup is set you'll now
+    get alt pickup style behavior at the auction house if you have
+    Auctioneer installed.  Also note, alt auto panel is still enabled
+    so if you have this turned on you may see some mod+click doing
+    more than you expect.
+  - Add the statues from Jewelcrafting and Sunmotes to the default sort.
+    /tinv resetsorts and /tbnk resetsorts if you want to get the
+    new default sorts.
+  - Remove a bunch of unused code to make the addon slightly smaller.
+  - Several changes to diminish the amount of memory being used.
+    Users will see the minimal amount of memory the addon uses
+    (i.e. immediately after a garbage collection) drop slightly
+    and in some cases the maximum amount of memory the addon
+    will use (just before a garbage collection) drop significantly.
+    In general the addon will no longer grow in the amount of
+    memory use through general usage.
+  - Fix the quality on items found in a mailbox when searching.  Apparently,
+    Blizzard's API is bugged and doesn't give me the real quality of an item.
+  - Clicking the reload button wouldn't always force a compression on the
+    bank.
+
+* 20080317-r78-Shefki
+  - When running on WoW 2.4.0 or newer, always show icons for items
+    even if they are not in the item cache.  This is thanks to a new
+    functionality of the game.  Will prevent the situation with
+    slots showing no icon after a major update until a few viewings
+    or actually logging into all characters.  Change is backwards
+    compatible, this version will still work with 2.3.x
+  - When shift clicking to insert a link of an item in the built in
+    bank slots don't include the link twice.
+  - Search results will be consolidated again.  Apparently when I fixed
+    a problem with the links on items that had enchants or gems in them
+    I broke the consolidation and didn't notice it.
+  - When in edit mode the column add and delete buttons will now be
+    slightly outside the normal window (like the Search box) so that they
+    will never overlap with the bag icons or money display.
+  - Various small code cleanups to remove unnecessary or duplicate code.
+    Also use Blizzard constants for more things.  E.G.  Rather than
+    hardcoding the max bag size we use MAX_CONTAINER_ITEMS, if Blizzard
+    introduces a larger bag they'll update it and TBag will work without
+    requiring an update.
+  - The TRADE2 keyword was not always being properly set due to a typo.
+  - Stop using message(), some poorly coded addons break this and it will
+    not display if the global Display Lua Errors option is unchecked.
+    Addon feedback will always go to the default chat frame now.
+  - Implement proper support for localization of the addon.  There
+    are still no other translations besides enUS but anyone that's interested
+    can easily do so now.  Anyone who is interested should contact me.
+  - Use in game APIs for getting item quality colors rather than hard coding
+    them.  When Item Rarity Color is turned on Common (White) items will now
+    have White borders.
+  - Implement /tinv resetpos and /tbnk resetpos to allow users to put windows
+    back to their default positions so they don't have to reset all settings
+    to get them back.
+  - Searching should never result in a broken link or an error now.  However,
+    until you log into all characters some search results may be missing due
+    to insufficient data in the cache to produce links for some items.  Simply
+    logging into all characters, looking at their bags, bank and mailbox will
+    remedy this situation.
+  - Fix a small cosmetic issue with Soul Bags.  The game puts the count of
+    Soul Shards on the icon for Soul Bags.  This count didn't show if you
+    were on a non-warlock and looked at a warlocks inventory and would
+    continue to show on a bag slot if logged into a warlock and logged at
+    a non-warlock character.  In both cases the count shows where it should
+    and doesn't where it shouldn't now.
+  - Closing the Item Socketing window will no longer cause an error in TBag.
+
+* 20071128-r45-Shefki
+  - Fix a taint bug that happened when you died.
+  - Fix sort of class reagents and darkmoon faire cards.  Hopefully,
+    this is all correct now for 2.3.0.  Requires another /tinv resetsorts
+    and /tbnk resetsorts
+
+* 20071113-r40-Shefki
+  - Update toc for 2.3.0
+  - Add support for leatherworking bags to the compression algorithm.
+  - Update item info for 2.3.0, there may be some errors in the
+    list of items that can go in what container because of a change in
+    the formatting the game uses for that information.
+  - Update default sorts for the removal of the "Reagent" item type.
+    You'll need to do /tinv resetsorts and /tbnk resetsorts to get
+    the new sorts.
+
+* 20071030-r37-Shefki
+  - Remove extra dev files from zip file included on accident.
+
+* 20071030-r32-Shefki
+  - Fixed: Moving items to and from the bank would cause stacking not to
+    occur on the receiving side.  Both sides will properly stack now.
+    Thanks to Dessa for reporting and helping me debug this problem.
+  - Fixed: TBag was not caching bags that were set not to be shown.  If
+    you later turned that bag on and then viewed another character that
+    you hadn't logged onto with that bag turned on, it would show
+    the items for the last character viewed for those slots and not
+    position them properly.  Item caches can still be missing some
+    data but once all characters have been logged into this issue
+    will no longer occur.  Additionally, this allows all bags to show
+    in search results even if they are hidden.
+  - Fixed: Unhiding the Player dropdown box would cause it to be out of
+    sync with the actual status of the window.
+  - Standardize version numbers and start including svn rev number.
+
+* 2007-10-22-Shefki
+  NOTE: THIS IS A MAJOR UPDATE.  YOU MUST DELETE THE TBag FOLDER IN YOUR
+  ADDONS FOLDER AND REPLACE IT WITH A NEW ONE.  SOME FILES HAVE BEEN
+  DELETED AND NEW ONES ADDED.  YOU MUST ALSO COMPLETELY QUIT WOW.
+  BACKING UP YOUR WTF FOLDER IS RECOMMENDED FOR THIS RELEASE.
+  SOME OF THE ENHANCEMENTS IN THIS UPDATE ONLY APPLY TO THE DEFAULT
+  CONFIGURATION.  YOU CAN KEEP MOST OF YOUR CONFIGURATION AND ONLY
+  RESET THE SEARCH LIST THAT IS NEEDED TO GET THESE ENCHANCEMENTS BY DOING
+  /tinv resetsorts
+  /tbnk resetsorts
+  YOU MAY WISH TO SCREENSHOT YOUR SORT SETTINGS UNDER ADVANCED CONFIGURATION
+  IF YOU HAVE CUSTOMIZED THEM AS THIS WILL WIPE THEM.
+
+  PERFORMANCE & MEMORY USE:
+  - Noticeable optimization has been done to the event handling.  Items
+    when received should display slightly faster than in the past.
+    Users using addons to swap large amounts of gear should notice
+    almost no lag over the default UI when swapping large amounts of gear.
+    The inventory window will also display quicker than before most of the
+    time.  The same optimizations also will lower memory usage some in
+    cases, though not necessarily by a huge amount.
+  - Reviewed all entries output in the config file and removed obsolete
+    entries.  These obsolete entries will be cleaned from every config
+    file when TBag loads which should lower memory use, though probably
+    not to a noticeable degree.
+  - Removed code for portraits and window frames that was no longer
+    functional.  Also removed the graphics that were shipped with the
+    addon for this that were not being used.  Since these won't be loaded
+    should help lower some memory usage.
+
+  UI IMPROVEMENTS:
+  - You can now set a bar to be hidden.  This will allow you to hide any
+    categories assigned to the bar (e.g. empty bag slots).  Go into edit mode
+    right click on a numbered slot and choose the hide option.  Note slots
+    that have had their contents changed will be shown despite the setting
+    until the next full resort occurs.  This means hidden empty slots will
+    show their contents when you put stuff in them and when the resort happens
+    they'll get reassigned to a bar and will be visible based upon that bars
+  - The button to toggle the interface for buying new bag slots in the bank
+    will only appear when at the bank (though the setting is still
+    available from the right click menu away from the bank).  It
+    will also never appear for characters that have already
+    purchased all the bank slots.
+  - All UI elements in the inventory and bank windows can be hidden from
+    the right click menu for the given frame.
+  - You can select the character to display inventory or bank items from
+    the right click menu.
+  - Added option in Advanced Configuration to turn off rarity coloring.
+  - Search box now show Search until you click on it like the search boxes
+    for trade skills to make the UI a little more obvious.
+  - Hidden bags/keychains will show the blizzard frames when the bag icon
+    is clicked on regardless of the show blizzard frames setting.
+  - Allow bags in the bank or inventory to be linked by shift clicking on them
+    while typing in a chat box again, blizzard removed this from their UI
+    which removed it from mine but we like it so implement it ourselves.
+  - Added /tinv printchars and /tinv deletechar to allow users to remove
+    caches for characters they no longer have.  deletechar takes two arguments
+    the character and the realm separated by a space just like printchars
+    outputs them.
+
+  SORTING & STACKING:
+  - Rewrote the stacking algorithm to be more efficient.  The new algorithm
+    should result in fewer moves to complete the stack, will always end
+    in full stack with a single pass and will prefer moving items into larger
+    stacks and profession bags (if they can go into such bags).
+  - Stacking will also now compress your inventory maximizing the number of
+    slots that are empty.  This means items that can go in special bags
+    (e.g. herb bags, mining bags, engineering bags, enchanting bags) will be
+    moved there if there are empty slots.
+  - When moving items while stacking in your inventory is now done in a safe
+    way.  Previously the addon would not check the locked state of items.  While
+    this would never cause the loss of an item it could cause an item to be
+    stuck in locked state until the UI was reloaded.  The problem wasn't very
+    common because it required a lot of small stacks that needed combining to
+    show up but did present itself occasionally when taking AH purchases from
+    the mailbox.
+  - Updated the categorization rules to include a number of new items and
+    added categories for various "collectables" for various factions.
+  - Added new categories for each armor slot to to default categorization
+    list that makes the armor items sort by slot as well as by name now.
+    This should make it easier to find armor items.  As well as giving
+    a much more organized look.
+  - Profession bags now have their own category for each type of Profession
+    bag.  This allows people with multiple profession bags of differing
+    professions to keep them more organized.
+  - Quivers and Ammo pouches are now categorized separately.  Again should
+    allow people with both to have things more organized.
+  - The item information on which items belong to which tradeskills has
+    been updated to be current.  It has been restructured to allow automated
+    updated from a data file included with future releases that will merge
+    with any locally collected data from your own tradeskills.  This should
+    result in categorization for items used in crafting that stays current.
+  - Reagents for crafting no longer receive the keyword for every craft
+    they are used for.  This prevents leather from sorting into tailoring
+    and gems from sorting into say alchemy simply because a few recipes
+    from these crafts happen to use these items and these trades were
+    the last to be categorized.  Keywords are now set by the  craft that
+    uses an item in the most recipes.  If multiple trades use the item
+    the same number of times both keywords will be set.
+  - Added explicit rules for some reagents that are used by many trades
+    (e.g. motes and primals) so that they don't get pushed into a particular
+    trade.
+  - Added two new command line options to drop the sort rules and replace
+    them by the default included one.  /tinv resetsorts and /tbnk resetsorts
+    Highly recommend users backup their configs before doing this in case
+    they missed something they liked.  This will not clear any other
+    configuration.
+
+  MISC:
+  - Updated mail item cache to work with 2.3 mailboxes.  This changes is
+    backwards compatible with older versions of the mailbox API and as
+    a result this will still work with 2.2.  However, the format of the
+    mailbox cache has changed as so you will have to reopen mailboxes on
+    all characters to refresh the data.
+  - Remove some items from the ToDo list and add others.
+
+  BUG FIXES:
+  - Fixed: New categories that are user created will now show on the right
+    click menu for the slot box in edit mode without forcing a reload of the
+    UI.
+  - Fixed: Improper tooltip display while in edit mode on the bank window
+    and mousing over the slot target buttons.  2.2.0 compatibility issue
+    I missed.
+  - Fixed: Properly cache mailbox itemlinks.  TBag was guessing an items link
+    from the name which could cause the game to crash when linking mailbox
+    items shown in the item link or for items in the mailbox to show incorrect
+    info when searched.  Should improve performance when opening the mailbox
+    too because it was brute force searching all items looking for one that
+    had the same name.
+  - Fixed: New tags were at times turning themselves on for no apparent
+    reason.  The wrong function to retrieve the time had been used for
+    setting timestamps which was creating odd behavior at times between
+    sessions.  Some of this may still happen until the bad timestamps
+    are cleared (reset NEW tag from right click menu) or replaced by new
+    timestamps through normal operation.  Could also show up as items that
+    are not new highlighting.
+  - Fixed: The highlight around the backpack button on the main menu bar
+    will now stay in sync properly.  Yay for Blizzard for finally changing
+    their code so I could fix this.
+  - Fixed: An extra header entry in the Bindings.xml that was causing an error
+    output in the Logs/FrameXML.log file.  TBag is now officially free of any
+    FrameXML.log error outputs. Hurray.
+  - Fixed: The sub menus under the right click menu will no longer disappear
+    making them difficult to click on.
+
+* 2007-09-25-Shefki
+  - Bump interface version to match 2.2.0.
+  - Changes required to make tooltips function properly with 2.2.0.
+  - Fixes to the bank due to changes in the Blizzard bank implementation.
+  - Do not open the bank bag frames when not actually at the bank on
+    OpenAllBags().
+  - Try to avoid sound lag issues from multiple blizzard bag frames
+    opening.  Caused by an apparent bug in the 2.2.0 sound system,
+    which I've reported, but at least try to avoid exercising the bug.
+  - Upped max bag size to 40 slots since there are now 36 slot bags
+    on the PTR (at least for premades).
+  - Fixed: When show blizzard bag frames was enabled and you were viewing
+    another characters inventory clicking on a bag button would open the
+    bag even though it was the current characters bag not the character
+    you were viewing.
+  - Rework processing of clicks due to the new modifier key system in
+    2.2.0.
+
+* 2007-06-26-Shefki
+  - Fixed: When the bag or bank is closed in edit mode and then
+    reopened the edit mode button text would be out of sync and
+    say view when it should say edit.
+  - Fixed: When viewing inventory of another character, the bag
+    icons would sometimes revert to the current character's bag
+    icons.
+  - Moved the dropdown, search and various buttons at the
+    top of the inventory and bank windows to the left side and
+    reversed their order.  This avoids the user drop down menu
+    from cutting off the screen when a window is positioned at
+    the far right of the screen.  Really only had to move the
+    user drop down menu but it looked bad if I didn't move the rest.
+  - Fixed: Clicking on bag slots when viewing another character's
+    inventory will no longer pickup items on the current character.
+  - Fixed: Lua error when shift or ctrl clicking an empty slot
+    while viewing another character's bags or bank.
+  - Fixed: TBag would remove character specific keybindings on
+    the first run.
+  - Fixed: Lua errors when mousing over a bag slot that had
+    no bag in it.
+  - Fixed: The FluidFrames addon would prevent the right click
+    menu on the inventory or bank window from coming up and
+    if you moved the inventory or bank window it would not
+    remember it's location.
+
+* 2007-06-19-Shefki
+  - Fixed: Ability to split stacks in bank.
+  - Fixed: Backpack button not opening inventory window.
+  - Fixed: Bag spotlights weren't clearing when closing inventory
+    window in some cases.
+  - Fixed: Other mods using OpenAllBags() were causing the blizzard
+    frames to open.  BulkMail2 was an example of such an addon.
+  - Fixed: When the Keyring is set to show in the inventory window,
+    clicking on the keys allows you to properly interact with them.
+    Previously, you'd pickup inventory items rather than keys or
+    nothing would happen.
+  - Fixed: /tinv show, /tinv hide, /tbnk show, /tbnk hide were not
+    working.  Fixed them.
+  - /tbag is now an alias for /tinv.
+  - Shift clicking on bag/backpack/bankbag buttons now produces a
+    consistent result.  In particular shift clicking on the backpack
+    button will no longer close the inventory window.
+  - Removed the Talos from the header on the keybindings.
+
+* 2007-06-10-Shefki
+  - Right clicking on an item in a built in bank slot wasn't moving
+    the item to the bag.  Somehow the frame wasn't inheriting
+    the proper events, added them back in.
+  - Hopefully fixed the stacking problem where the item would get
+    stuck in the cursor.  Stacking is still somewhat slow but it
+    shouldn't get stuck anymore.  Removed the issue from the
+    Todo/Known issues list.
+
+* 2007-06-09-Shefki
+  - Fix crash from items with cooldowns in some bank slots.
+  - Offline (not at bank) viewing now properly displays items with
+    random enchants.
+  - Search results of items that have random enchants now show the
+    full name and the proper link.
+  - Icon for the built in bank slots is no longer a candy sack but
+    a more appropriate footlocker like icon.
+  - Added an option to disable showing the blizzard bag frames when
+    clicking on bag icons.  (Defaults to not showing them).
+  - Added support for linking items in chat and using the dressing
+    room for offline (not at bank or inventory of other characters).
+    Normal shift click and ctrl click behavior to access this
+    functionality is available.
+  - Added support for Item Comparisons added with WoW 2.1.  Holding
+    down shift while hovering over an item will show you what you
+    have equipped in the same slots as that item.  Works for
+    the bank (offline or online) and bags (current character or not).
+    Note: Some items this will not work with.  This is a Blizzard bug,
+    if it is not properly set to Class: Armor the comparison tooltips
+    will not display.
+  - Removed unused files: TBody.xml, TBody.lua, and Save.txt.
+  - Added Readme.txt and Changelog.txt.
+  - Updated TOC file.  Interface is now set to the current release
+    interface.  Removed the ugly color Talos from the Title.
+    Added my name to the author line.
