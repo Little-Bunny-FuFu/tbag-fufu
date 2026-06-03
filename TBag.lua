@@ -79,6 +79,11 @@ TFuBag.CONTAINERS = "containers";
 TFuBag.G_BAR_SORT = "bar_sort";
 TFuBag.G_USE_NEW  = "use_new";
 TFuBag.G_BAR_HIDE = "bar_hide";
+-- Per-category Layout overrides (Stage 2). Each is cfg[grp][barnum]; nil = auto.
+TFuBag.G_BAR_COLS    = "bar_cols";     -- fixed columns before wrap (overrides auto)
+TFuBag.G_BAR_MINCOLS = "bar_mincols";  -- floor on columns ("never single column" = 2)
+TFuBag.G_BAR_MAXCOLS = "bar_maxcols";  -- ceiling on columns
+TFuBag.G_BAR_SOLO    = "bar_solo";     -- 1 = own full-width row (like equipment shelves)
 
 -- Used for indexing - MUST BE DISTINCT
 TFuBag.I_BAG       = "b";
@@ -2509,21 +2514,45 @@ end
 -- texture of the shared DropDownList button; both it and the locked highlight are cleared
 -- whenever the list hides, so they can never linger into another addon's reuse of the same
 -- button. UIDropDownMenu is not a protected/secure frame, so a child texture is taint-safe.
-function TFuBag:EnsureMenuCheckHook()
-  if (TFuBag._menuCheckHook) then return; end
-  local lf = _G["DropDownList1"];
-  if (not lf) then return; end       -- created lazily by UIDropDownMenu; retry next open
-  lf:HookScript("OnHide", function(self)
-    for i = 1, (self.numButtons or 0) do
-      local b = _G["DropDownList1Button"..i];
-      if (b) then
-        if (b.tbagRadioRing) then b.tbagRadioRing:Hide(); end
-        if (b.tbagRadioDot) then b.tbagRadioDot:Hide(); end
-        if (b.tbagRowHL) then b.tbagRowHL:Hide(); end
-      end
+-- Clear our menu decorations from one DropDownList's buttons and restore the stock check/
+-- uncheck alpha we zeroed, so a button reused by another addon's menu looks normal again.
+function TFuBag:CleanupMenuList(listName)
+  local lf = _G[listName];
+  if (not lf) then return; end
+  for i = 1, (lf.numButtons or 0) do
+    local b = _G[listName.."Button"..i];
+    if (b) then
+      if (b.tbagRadioRing) then b.tbagRadioRing:Hide(); end
+      if (b.tbagRadioDot) then b.tbagRadioDot:Hide(); end
+      if (b.tbagRowHL) then b.tbagRowHL:Hide(); end
+      if (b.tbagRowGlow) then b.tbagRowGlow:Hide(); end
+      if (b.tbagBox) then b.tbagBox:Hide(); end
+      if (b.tbagBoxChk) then b.tbagBoxChk:Hide(); end
+      b.tbagOnFn = nil;
+      local cc = _G[listName.."Button"..i.."Check"];   if (cc) then cc:SetAlpha(1); end
+      local uu = _G[listName.."Button"..i.."UnCheck"]; if (uu) then uu:SetAlpha(1); end
     end
-  end);
-  TFuBag._menuCheckHook = true;
+  end
+end
+
+-- Hook OnHide on the main list (level 1) AND the submenu list (level 2) so decorations are
+-- cleared on both. DropDownList2 is created lazily (only once a submenu first opens), so hook
+-- each independently as it becomes available rather than gating on a single flag.
+function TFuBag:EnsureMenuCheckHook()
+  if (not TFuBag._menuHook1) then
+    local l1 = _G["DropDownList1"];
+    if (l1) then
+      l1:HookScript("OnHide", function() TFuBag:CleanupMenuList("DropDownList1"); end);
+      TFuBag._menuHook1 = true;
+    end
+  end
+  if (not TFuBag._menuHook2) then
+    local l2 = _G["DropDownList2"];
+    if (l2) then
+      l2:HookScript("OnHide", function() TFuBag:CleanupMenuList("DropDownList2"); end);
+      TFuBag._menuHook2 = true;
+    end
+  end
 end
 
 -- A radial (radio) on/off button on the RIGHT of a toggle row. UI-RadioButton frame 1 is
@@ -2589,6 +2618,154 @@ function TFuBag:AddToggleMenuButton(info, level, stateFn)
   if (lf) then
     TFuBag:SetMenuRadio(_G["DropDownList"..level.."Button"..lf.numButtons], stateFn and stateFn());
   end
+end
+
+-- Draw a HIGH-CONTRAST toggle indicator on a menu row: a bright bordered checkbox over the
+-- left check column (so the empty/off state is clearly visible -- the stock legacy check is
+-- nearly invisible on the dark menu background), a check overlay when on, and a gold full-row
+-- wash when on. A dark mask sits under the bright box to hide the faint stock check behind it.
+-- All our own textures, parented to the (shared) dropdown button; EnsureMenuCheckHook clears
+-- them when the list hides so they can't linger into another addon's reuse of the button.
+function TFuBag:SetMenuRow(button, on)
+  if (not button) then return; end
+  local nm = button:GetName();
+  local legacy = nm and _G[nm.."Check"];
+  local legacyUn = nm and _G[nm.."UnCheck"];
+  if (not button.tbagBox) then
+    local box = button:CreateTexture(nil, "ARTWORK", nil, 2);
+    box:SetTexture("Interface\\Buttons\\UI-CheckBox-Up");  -- clearly bevelled empty box
+    box:SetSize(20, 20);
+    button.tbagBox = box;
+    local chk = button:CreateTexture(nil, "ARTWORK", nil, 3);
+    chk:SetTexture("Interface\\Buttons\\UI-CheckBox-Check");
+    chk:SetSize(20, 20);
+    chk:SetPoint("CENTER", box, "CENTER", 0, 0);
+    button.tbagBoxChk = chk;
+    local hl = button:CreateTexture(nil, "BACKGROUND");
+    hl:SetColorTexture(1.0, 0.82, 0.0, 0.18);       -- gold enabled-row wash
+    hl:SetPoint("TOPLEFT", button, "TOPLEFT", 0, 0);
+    hl:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", 0, 0);
+    button.tbagRowGlow = hl;
+  end
+  -- Sit our box EXACTLY over the stock check column so every toggle's indicator lines up with
+  -- the same column the other rows reserve; hide the faint stock check/uncheck so only our
+  -- bright square shows (no stock circle peeking through or sitting beside it).
+  button.tbagBox:ClearAllPoints();
+  if (legacy) then
+    button.tbagBox:SetPoint("CENTER", legacy, "CENTER", 0, 0);
+    legacy:SetAlpha(0);
+  else
+    button.tbagBox:SetPoint("LEFT", button, "LEFT", 2, 0);
+  end
+  if (legacyUn) then legacyUn:SetAlpha(0); end
+  button.tbagBox:Show();
+  button.tbagBoxChk:SetShown(on and true or false);
+  button.tbagRowGlow:SetShown(on and true or false);
+end
+
+-- Hide the faint stock check/uncheck "circle" on every NON-toggle row at `level` (the rows
+-- without our bright box this populate), so the menu shows a single indicator style: our square
+-- box on toggles, nothing on submenu/action rows -- no square-vs-circle clash. The box-shown
+-- test (not just the field) handles a pooled button reused from a toggle row to a plain one.
+function TFuBag:HideMenuChecksExceptToggles(level)
+  level = level or 1;
+  local lf = _G["DropDownList"..level];
+  if (not lf) then return; end
+  for i = 1, (lf.numButtons or 0) do
+    local nm = "DropDownList"..level.."Button"..i;
+    local b = _G[nm];
+    if (b and not (b.tbagBox and b.tbagBox:IsShown())) then
+      local c = _G[nm.."Check"];   if (c) then c:SetAlpha(0); end
+      local u = _G[nm.."UnCheck"]; if (u) then u:SetAlpha(0); end
+    end
+  end
+end
+
+-- Re-apply every glow/checkbox at `level` from each button's stored state function. Called
+-- after a click so a radio group (Sort / Hide / Highlight) shows single-select live and an
+-- independent toggle updates -- the menu stays open (keepShownOnClick) and is NOT repopulated,
+-- so this is what keeps the indicators truthful without a close/reopen.
+function TFuBag:RefreshMenuRows(level)
+  level = level or 1;
+  local lf = _G["DropDownList"..level];
+  if (not lf) then return; end
+  for i = 1, (lf.numButtons or 0) do
+    local b = _G["DropDownList"..level.."Button"..i];
+    if (b and b.tbagOnFn) then
+      self:SetMenuRow(b, b.tbagOnFn());
+    end
+  end
+end
+
+-- Add a keep-open menu toggle / radio-member row with the high-contrast indicator. `isOnFn`
+-- returns whether the row is currently on (re-read from cfg, so a radio group resolves to a
+-- single selection). The row stays CHECKABLE (left column reserved -> names line up) but the
+-- stock check is masked over by our bright box. keepShownOnClick clobbers button.checked with a
+-- static toggle, so the wrapper restores isOnFn and refreshes every row's indicator.
+function TFuBag:AddMenuToggle(info, level, isOnFn)
+  level = level or 1;
+  self:EnsureMenuCheckHook();
+  info["keepShownOnClick"] = 1;
+  info["checked"] = function() return isOnFn(); end;
+  local origFunc = info["func"];
+  info["func"] = function(btn, a1, a2, checked, mb)
+    if (origFunc) then origFunc(btn, a1, a2, checked, mb); end
+    btn.checked = function() return isOnFn(); end;   -- restore live check after the clobber
+    btn.tbagOnFn = isOnFn;
+    TFuBag:RefreshMenuRows(level);
+  end
+  UIDropDownMenu_AddButton(info, level);
+  local lf = _G["DropDownList"..level];
+  if (lf) then
+    local b = _G["DropDownList"..level.."Button"..lf.numButtons];
+    if (b) then
+      b.tbagOnFn = isOnFn;
+      TFuBag:SetMenuRow(b, isOnFn());
+    end
+  end
+end
+
+-- Add a single-select row with the square-box indicator that CLOSES the menu on pick
+-- (combobox behaviour), for selection lists where keeping the menu open is wrong -- e.g. the
+-- character dropdown box. `isOn` is the current state at draw time; the menu rebuilds on
+-- reopen so no live refresh is needed.
+function TFuBag:AddSquareCheckRow(info, level, isOn)
+  level = level or 1;
+  self:EnsureMenuCheckHook();
+  UIDropDownMenu_AddButton(info, level);
+  local lf = _G["DropDownList"..level];
+  if (lf) then
+    local b = _G["DropDownList"..level.."Button"..lf.numButtons];
+    if (b) then
+      b.tbagOnFn = function() return isOn; end;
+      self:SetMenuRow(b, isOn);
+    end
+  end
+end
+
+-- Add a hasArrow submenu-opener row that behaves consistently: clicking it EXPANDS the value
+-- list (its own OnEnter handler) and keeps the menu open, instead of closing the menu or doing
+-- nothing. It can't be made non-clickable -- Blizzard routes disabled rows through an overlay
+-- whose OnEnter closes child menus, so a disabled hasArrow row never expands. The click raises
+-- the parent list back over the submenu, so we re-raise the submenu next frame. The caller's
+-- info should set text/value/hasArrow; we add keepShownOnClick + the expand/raise func.
+function TFuBag:AddSubmenuParent(info, level)
+  level = level or 1;
+  info["hasArrow"] = 1;
+  info["keepShownOnClick"] = 1;
+  local origFunc = info["func"];
+  info["func"] = function(btn, a1, a2, checked, mb)
+    if (origFunc) then origFunc(btn, a1, a2, checked, mb); end
+    local oe = btn and btn:GetScript("OnEnter");
+    if (oe) then oe(btn); end
+    if (C_Timer and C_Timer.After) then
+      C_Timer.After(0, function()
+        local sub = _G["DropDownList"..(level + 1)];
+        if (sub and sub:IsShown()) then sub:Raise(); end
+      end);
+    end
+  end
+  UIDropDownMenu_AddButton(info, level);
 end
 
 -- Hide a UIDropDownMenu frame WITHOUT firing its template OnHide, which calls
@@ -4348,6 +4525,10 @@ function TFuBag:MakeColorMenu(cfg, updatefunc, level, bagarr)
       bag, string.format(L["Spotlight for %s"],self:GetBagDispName(bag)), updatefunc);
     UIDropDownMenu_AddButton(info, level);
   end
+
+  -- These rows show a colour swatch (right) as their indicator; hide the stock check "circle"
+  -- so they match the rest of the menu's single-indicator style.
+  self:HideMenuChecksExceptToggles(level);
 end
 
 -----------------------------------------------------------------------
@@ -5553,14 +5734,51 @@ end
 -- Main Display
 -----------------------------------------------------------------------
 
-function TFuBag:CalcBarLayout(calc_dat, baritm, barnum, numbars, colmax, edit_mode)
-  local iBar;
+-- Per-category column range [min,max] for the auto-flow optimizer, from the user's
+-- per-category Layout options (Stage 2):
+--   bar_cols (fixed)  -> min == max == that value
+--   bar_mincols       -> floor on columns ("never single column" stores 2)
+--   bar_maxcols       -> ceiling on columns
+-- Capped by the column budget and the item count (no point being wider than either).
+-- Unset / nil options yield the natural 1..count range (no constraint), so an
+-- unconstrained call reproduces the legacy packing exactly.
+function TFuBag:BarColConstraint(cfg, bn, count, colmax)
+  local lo, hi = 1, count;
+  if (hi < 1) then hi = 1; end
+  if (cfg) then
+    local fixed = self:GetGrp(cfg, self.G_BAR_COLS, bn);
+    if (type(fixed) == "number" and fixed >= 1) then
+      lo = fixed; hi = fixed;
+    else
+      local mn = self:GetGrp(cfg, self.G_BAR_MINCOLS, bn);
+      local mx = self:GetGrp(cfg, self.G_BAR_MAXCOLS, bn);
+      if (type(mn) == "number" and mn > lo) then lo = mn; end
+      if (type(mx) == "number" and mx >= 1 and mx < hi) then hi = mx; end
+    end
+  end
+  if (hi > colmax) then hi = colmax; end
+  if (count >= 1 and hi > count) then hi = count; end   -- never wider than the items
+  if (hi < 1) then hi = 1; end
+  if (lo > hi) then lo = hi; end
+  if (lo < 1) then lo = 1; end
+  return lo, hi;
+end
 
-  -- First set the total bar sizes
+-- Lay out a row of `numbars` adjacent category bars: pick each bar's column width so the
+-- row is as short as possible while the total width fits `colmax`. cfg (optional) carries
+-- the per-category column constraints; they apply in VIEW mode only -- edit mode keeps the
+-- classic packing so the numbered bar button isn't displaced. Writes calc_dat[iBar],
+-- calc_dat[iBar.."_width"], and calc_dat["height"] (the row's tallest box, in rows).
+function TFuBag:CalcBarLayout(calc_dat, baritm, barnum, numbars, colmax, edit_mode, cfg)
+  local iBar;
+  if (not colmax or colmax < 1) then colmax = 1; end
+
   calc_dat = calc_dat or {};
   for k,_ in pairs(calc_dat) do
     calc_dat[k] = nil;
   end
+
+  -- Item count per bar (edit mode reserves one extra cell for the numbered bar button).
   for iBar = 0, numbars-1 do
     if (edit_mode == 1) then
       calc_dat[iBar] = table.getn(baritm[barnum+iBar]) + 1;
@@ -5569,49 +5787,73 @@ function TFuBag:CalcBarLayout(calc_dat, baritm, barnum, numbars, colmax, edit_mo
     end
   end
 
-  -- Make the rectangles for each possible width
+  -- Allowed column range [lo,hi] per bar.
+  local lo, hi = {}, {};
   for iBar = 0, numbars-1 do
-    calc_dat[iBar.."_heights"] = {};
-    if calc_dat[iBar] > 0 then
-      for tmpcalc = 1, calc_dat[iBar] do
-        calc_dat[iBar.."_heights"][tmpcalc] = math.ceil( calc_dat[iBar] / tmpcalc );
-      end
+    local cnt = calc_dat[iBar];
+    if (cnt <= 0) then
+      lo[iBar], hi[iBar] = 0, 0;
+    elseif (edit_mode ~= 1 and cfg) then
+      lo[iBar], hi[iBar] = self:BarColConstraint(cfg, barnum+iBar, cnt, colmax);
+    else
+      lo[iBar], hi[iBar] = 1, cnt;
     end
   end
 
-  calc_dat["height"] = 0;
-  local tmpcalc = 0;
+  -- Grow the shared trial height H (rows) until the clamped widths fit colmax. Width at H
+  -- rows = ceil(count/H), clamped into [lo,hi]; more rows -> narrower natural width until a
+  -- lo floor stops the shrink.
+  local widths = {};
+  local Hmax = 1;
+  for iBar = 0, numbars-1 do
+    if (calc_dat[iBar] > Hmax) then Hmax = calc_dat[iBar]; end
+  end
+  local H = 0;
+  local total;
   repeat
-    calc_dat["height"] = calc_dat["height"] + 1;
-    tmpcalc = 0;
-
+    H = H + 1;
+    total = 0;
     for iBar = 0, numbars-1 do
-      if (calc_dat[iBar] > 0) then
-        if (calc_dat[iBar.."_heights"][calc_dat["height"]]) then
-          tmpcalc = tmpcalc + calc_dat[iBar.."_heights"][calc_dat["height"]];
-        else
-          tmpcalc = tmpcalc + 1;
-        end
+      local cnt = calc_dat[iBar];
+      local w = 0;
+      if (cnt > 0) then
+        w = math.ceil(cnt / H);
+        if (w < lo[iBar]) then w = lo[iBar]; end
+        if (w > hi[iBar]) then w = hi[iBar]; end
       end
+      widths[iBar] = w;
+      total = total + w;
     end
-  until tmpcalc <= colmax;
+  until (total <= colmax or H >= Hmax);
 
-  if tmpcalc == 0 then
-    calc_dat["height"] = 0;
-  else
-    -- at calc_dat["height"], everything fits
+  -- A high min-column floor across several bars can still overflow the budget; shave the
+  -- widest bars toward 1 until it fits, so boxes never run past the window edge (a softened
+  -- user min beats a horizontal overflow).
+  while (total > colmax) do
+    local widest, wi = 0, nil;
     for iBar = 0, numbars-1 do
-      if calc_dat[iBar] > 0 then
-        if (calc_dat[iBar.."_heights"][calc_dat["height"]]) then
-          calc_dat[iBar.."_width"] = calc_dat[iBar.."_heights"][calc_dat["height"]];
-        else
-          calc_dat[iBar.."_width"] = 1;
-        end
-      else
-       calc_dat[iBar.."_width"] = 0;
-      end
+      if (widths[iBar] > widest) then widest = widths[iBar]; wi = iBar; end
+    end
+    if (not wi or widest <= 1) then break; end
+    widths[wi] = widths[wi] - 1;
+    total = total - 1;
+  end
+
+  -- Final widths + the row's true height (tallest box from the chosen widths).
+  local maxrows = 0;
+  for iBar = 0, numbars-1 do
+    local cnt = calc_dat[iBar];
+    if (cnt > 0) then
+      local w = widths[iBar];
+      if (w < 1) then w = 1; end
+      calc_dat[iBar.."_width"] = w;
+      local rows = math.ceil(cnt / w);
+      if (rows > maxrows) then maxrows = rows; end
+    else
+      calc_dat[iBar.."_width"] = 0;
     end
   end
+  calc_dat["height"] = maxrows;
 end
 
 -- Position one item button at grid cell (cur_x = column from RIGHT, cur_y = row
@@ -5904,7 +6146,7 @@ function TFuBag:SeedCatLayout(frame, calc_dat)
   local gx, gy = 0, (any_placed and max_row or 0);
   for barnum = 1, self.BAR_MAX, bar_x do
     local nbars = math.min(bar_x, self.BAR_MAX - barnum + 1);
-    self:CalcBarLayout(calc_dat, baritm, barnum, nbars, colmax, 0);
+    self:CalcBarLayout(calc_dat, baritm, barnum, nbars, colmax, 0, cfg);
     if (calc_dat["height"] and calc_dat["height"] > 0) then
       local row_h = 0;
       local placed_in_row = false;
@@ -6494,6 +6736,109 @@ function TFuBag:OpenBarMenu(frame, barnum, anchor)
   -- category menu pops where the user clicked, not pinned to the bar frame's corner.
   -- (`anchor` is kept for call-site clarity but no longer used for positioning.)
   ToggleDropDownMenu(1, nil, frame.RightClickMenu, "cursor", 0, 0);
+end
+
+-- Per-category "Layout:" section of the bar menu (Stage 2). Uses the SAME left-check style
+-- as the Sort / Hide rows so the whole menu matches: a left checkbox marks an on toggle, and
+-- every option row reserves that left column (checkable, even the submenu rows that never
+-- show a check) so all option names line up. Solo and never-single are on/off toggles that
+-- keep the menu open; the column submenus open at level 2 (BarLayoutSubmenu) and show their
+-- current value in the row text. Shared by the inventory and bank bar menus.
+function TFuBag:BarLayoutMenu(frame, bar, level)
+  local cfg = frame.cfg;
+  local info;
+
+  info = { ["disabled"] = 1, ["notCheckable"] = 1 };
+  UIDropDownMenu_AddButton(info, level);
+
+  info = { ["text"] = L["Layout:"], ["isTitle"] = 1, ["notClickable"] = 1, ["notCheckable"] = 1 };
+  UIDropDownMenu_AddButton(info, level);
+
+  -- Solo full-width row (own row spanning the whole window; overrides the column options).
+  -- Explicit nil/1 flip -- NOT `on and nil or 1`, whose nil middle term always yields 1 so
+  -- the toggle could never be cleared.
+  info = {
+    ["text"] = L["Solo full-width row"],
+    ["func"] = function()
+      local newv;
+      if (self:GetGrp(cfg, self.G_BAR_SOLO, bar) == 1) then newv = nil; else newv = 1; end
+      self:SetGrpDef(cfg, self.G_BAR_SOLO, bar, newv, 1);
+      frame:UpdateWindow(self.REQ_MUST);
+    end,
+    };
+  self:AddMenuToggle(info, level,
+    function() return self:GetGrp(cfg, self.G_BAR_SOLO, bar) == 1; end);
+
+  -- Never single column (floor the width at 2 == a shortcut for Min columns = 2).
+  info = {
+    ["text"] = L["Never single column"],
+    ["func"] = function()
+      local cur = self:GetGrp(cfg, self.G_BAR_MINCOLS, bar);
+      local newv;
+      if (type(cur) == "number" and cur >= 2) then newv = nil; else newv = 2; end
+      self:SetGrpDef(cfg, self.G_BAR_MINCOLS, bar, newv, 1);
+      frame:UpdateWindow(self.REQ_MUST);
+    end,
+    };
+  self:AddMenuToggle(info, level, function()
+    local m = self:GetGrp(cfg, self.G_BAR_MINCOLS, bar);
+    return (type(m) == "number" and m >= 2);
+  end);
+
+  -- Fixed / min / max column submenus. Checkable so they reserve the same left column as the
+  -- toggles (names line up). The check is a `function` -> shown when a custom (non-Auto)
+  -- value is set and re-evaluated live by UIDropDownMenu_RefreshAll after a pick, so the row
+  -- reflects the choice without closing the menu. The exact value is the checked item INSIDE
+  -- the submenu (which also updates live). Inline value text was dropped: it was static, so
+  -- it went stale ("... : Auto" while the list showed 1) until the menu was reopened.
+  -- A bare hasArrow row with no func closes the whole menu when CLICKED (the list only opened
+  -- on hover). keepShownOnClick stops the close; the submenu still opens on hover. We do NOT
+  -- force the submenu open on click any more: invoking the button's OnEnter raised the level-1
+  -- list back in front of the open submenu (the submenu then sat behind, still clickable). The
+  -- row stays checkable (left column reserved -> names line up) but its stock check is hidden
+  -- by HideMenuChecksExceptToggles so it shows no indicator (no square-vs-circle clash).
+  local function addColParent(text, val)
+    self:AddSubmenuParent({ ["text"] = text, ["value"] = val }, level);
+  end
+  addColParent(L["Columns before wrap"], "bar_cols");
+  addColParent(L["Min columns"], "bar_mincols");
+  addColParent(L["Max columns"], "bar_maxcols");
+end
+
+-- Level-2 column-count list for a BarLayoutMenu submenu (Auto + 1..12). `which` is the
+-- opened entry's value ("bar_cols" / "bar_mincols" / "bar_maxcols"). SINGLE-SELECT: exactly
+-- one of Auto / 1..12 is the value. Each row's `checked` is a function, so a RefreshAll after
+-- a pick re-evaluates them all -- only the chosen one stays checked (no more "1 and 3 both
+-- ticked") -- AND re-evaluates the parent row's check, WITHOUT closing the menu. keepShownOnClick
+-- holds the submenu open so several values can be tried in a row.
+function TFuBag:BarLayoutSubmenu(frame, bar, level, which)
+  local cfg = frame.cfg;
+  local grp;
+  if (which == "bar_cols") then grp = self.G_BAR_COLS;
+  elseif (which == "bar_mincols") then grp = self.G_BAR_MINCOLS;
+  elseif (which == "bar_maxcols") then grp = self.G_BAR_MAXCOLS;
+  else return; end
+
+  local function apply(val)
+    self:SetGrpDef(cfg, grp, bar, val, 1);
+    frame:UpdateWindow(self.REQ_MUST);
+  end
+
+  -- Route the value rows through AddMenuToggle so they get the SAME square-box indicator as the
+  -- top-level toggles (no stock circle). AddMenuToggle keeps the submenu open and, via
+  -- RefreshMenuRows(level), re-evaluates every row after a pick so exactly one stays checked.
+  self:AddMenuToggle({
+    ["text"] = L["Auto"],
+    ["func"] = function() apply(nil); end,
+    }, level, function() return type(self:GetGrp(cfg, grp, bar)) ~= "number"; end);
+
+  for c = 1, 12 do
+    local cc = c;
+    self:AddMenuToggle({
+      ["text"] = tostring(cc),
+      ["func"] = function() apply(cc); end,
+      }, level, function() return self:GetGrp(cfg, grp, bar) == cc; end);
+  end
 end
 
 function TFuBag:MLInitBarDrag(frame, barnum, bf)
@@ -7565,7 +7910,7 @@ function TFuBag:LayoutWindow(frame)
     end
 
     self:CalcBarLayout(calc_dat, baritm, barnum, nbars,
-      colmax, edit_mode);
+      colmax, edit_mode, cfg);
 
     -- Sub-headered (equipment) bars draw SOLO and FULL-WIDTH (Baganator-style
     -- shelf flow): override the flat optimizer so the box spans the whole content
@@ -7575,6 +7920,15 @@ function TFuBag:LayoutWindow(frame)
       calc_dat[0] = table.getn(baritm[barnum]);
       calc_dat["0_width"] = colmax;
       calc_dat["height"] = (self:EquipSubPlan(baritm[barnum], colmax));
+    elseif (nbars == 1 and edit_mode ~= 1
+            and self:GetGrp(cfg, self.G_BAR_SOLO, barnum) == 1
+            and table.getn(baritm[barnum]) > 0) then
+      -- User "solo full-width row": flat flow across the whole content width, like the
+      -- equipment shelf but without sub-headers. Peeled to its own row below.
+      local n = table.getn(baritm[barnum]);
+      calc_dat[0] = n;
+      calc_dat["0_width"] = colmax;
+      calc_dat["height"] = math.ceil(n / colmax);
     end
 
     --- now we know the size and height of all bars for this line
@@ -7756,17 +8110,27 @@ function TFuBag:LayoutWindow(frame)
   -- Normal category rows (excludes EMPTY_BAR = BAR_MAX, which was drawn above).
   -- Sub-headered equipment bars are peeled out and drawn SOLO + full-width
   -- (Baganator-style); runs of ordinary bars between them still pack bar_x-wide.
+  -- A bar draws SOLO on its own row when it is an equipment shelf (sub-headers) OR the
+  -- user pinned it "Solo full-width row". Runs of ordinary bars between them still pack
+  -- bar_x-wide.
   local function isSubBar(bn)
     return edit_mode ~= 1 and table.getn(baritm[bn]) > 0 and self:BarHasSubgroups(baritm[bn]);
   end
+  local function isSoloBar(bn)
+    return edit_mode ~= 1 and table.getn(baritm[bn]) > 0
+           and self:GetGrp(cfg, self.G_BAR_SOLO, bn) == 1;
+  end
+  local function peelSolo(bn)
+    return isSubBar(bn) or isSoloBar(bn);
+  end
   local barnum = 1;
   while (barnum <= self.BAR_MAX - 1) do
-    if (isSubBar(barnum)) then
+    if (peelSolo(barnum)) then
       drawRow(barnum, 1);
       barnum = barnum + 1;
     else
       local n = 0;
-      while (n < bar_x and (barnum + n) <= self.BAR_MAX - 1 and not isSubBar(barnum + n)) do
+      while (n < bar_x and (barnum + n) <= self.BAR_MAX - 1 and not peelSolo(barnum + n)) do
         n = n + 1;
       end
       if (n < 1) then n = 1; end
@@ -8192,10 +8556,7 @@ function TFuBag:UserDropdown_Init(onclickfunc, TItm, curplayer, selRealm,level)
     end
     info.value = key;
     info.func = onclickfunc;
-    if (key == curplayer) then
-      info.checked = 1;
-    end
-    UIDropDownMenu_AddButton(info,level);
+    self:AddSquareCheckRow(info, level, (key == curplayer));
   end
 end
 

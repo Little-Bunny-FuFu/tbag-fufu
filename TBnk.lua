@@ -1880,6 +1880,12 @@ function Bank.RightClickMenu_populate(self, level)
   -- right click on a slot
   bar = TFuBnkFrame.RightClickMenu_opts[TFuBag.I_BAR];
 
+  -- Level 2: the per-category Layout column submenus (the only submenus in this menu).
+  if (level == 2) then
+    TFuBag:BarLayoutSubmenu(TFuBnkFrame, bar, level, UIDROPDOWNMENU_MENU_VALUE);
+    return;
+  end
+
   info = { ["text"] = string.format(L["|c%sBar |r|c%s%s|r"],TFuBag.C_INST,TFuBag.C_BAR,bar), ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = 1 };
   UIDropDownMenu_AddButton(info, level);
 
@@ -1929,9 +1935,8 @@ function Bank.RightClickMenu_populate(self, level)
     TFuBag:SetGrpDef(TFuBnkFrame.cfg, TFuBag.G_BAR_SORT, this.value[TFuBag.I_BAR], this.value["sortby"], 1);
     TFuBnkFrame:UpdateWindow(TFuBag.REQ_MUST);
   end,
-  ["checked"] = checked
   };
-    UIDropDownMenu_AddButton(info, level);
+    TFuBag:AddMenuToggle(info, level, function() return TFuBag:GetGrp(TFuBnkFrame.cfg, TFuBag.G_BAR_SORT, bar) == key; end);
   end
 
   info = { ["disabled"] = 1, ["notCheckable"] = 1 };
@@ -1959,9 +1964,8 @@ function Bank.RightClickMenu_populate(self, level)
         TFuBag:SetGrpDef(TFuBnkFrame.cfg, TFuBag.G_USE_NEW, this.value[TFuBag.I_BAR], this.value["value"], 1);
         TFuBnkFrame:UpdateWindow();
     end,
-  ["checked"] = checked
   };
-    UIDropDownMenu_AddButton(info, level);
+    TFuBag:AddMenuToggle(info, level, function() return TFuBag:GetGrp(TFuBnkFrame.cfg, TFuBag.G_USE_NEW, bar) == key; end);
   end
 
   info = { ["disabled"] = 1, ["notCheckable"] = 1 };
@@ -1989,9 +1993,8 @@ function Bank.RightClickMenu_populate(self, level)
         TFuBag:SetGrpDef(TFuBnkFrame.cfg, TFuBag.G_BAR_HIDE, this.value[TFuBag.I_BAR], this.value["value"], 1);
         TFuBnkFrame:UpdateWindow();
     end,
-  ["checked"] = checked
   };
-    UIDropDownMenu_AddButton(info, level);
+    TFuBag:AddMenuToggle(info, level, function() return TFuBag:GetGrp(TFuBnkFrame.cfg, TFuBag.G_BAR_HIDE, bar) == key; end);
   end
 
   info = { ["disabled"] = 1, ["notCheckable"] = 1 };
@@ -2008,15 +2011,21 @@ function Bank.RightClickMenu_populate(self, level)
     string.format(L["Border Color for Bar %d"],bar), function () TFuBag:RecolorWindow(TFuBnkFrame) end);
   UIDropDownMenu_AddButton(info, level);
 
+  -- Per-category Layout overrides (columns / solo full-width).
+  TFuBag:BarLayoutMenu(TFuBnkFrame, bar, level);
+
   info = { ["disabled"] = 1, ["notCheckable"] = 1 };
   UIDropDownMenu_AddButton(info, level);
 
   info = {
     ["text"] = L["Print contents to chat"],
-    ["notCheckable"] = 1,
     ["func"] = function() CloseDropDownMenus(); TFuBag:PrintBarContents(TFuBnkFrame, bar); end,
     };
   UIDropDownMenu_AddButton(info, level);
+
+  -- Hide the faint stock check "circle" on every non-toggle row so the menu shows one
+  -- indicator style (our square box on toggles, nothing elsewhere).
+  TFuBag:HideMenuChecksExceptToggles(level);
 
   -------------------------------------------------------------------------------------------------
   ------------------------ MAIN WINDOW CONTEXT MENU -----------------------------------------------
@@ -2031,13 +2040,10 @@ function Bank.RightClickMenu_populate(self, level)
       info = { ["disabled"] = 1, ["notCheckable"] = 1 };
       UIDropDownMenu_AddButton(info, level);
 
-      info = {
-        ["text"] = L["Select Character"];
+      TFuBag:AddSubmenuParent({
+        ["text"] = L["Select Character"],
         ["value"] = { ["opt"]="select_character" },
-        ["hasArrow"] = 1,
-        ["notCheckable"] = 1
-        };
-      UIDropDownMenu_AddButton(info, level);
+        }, level);
     end
 
     info = { ["disabled"] = 1, ["notCheckable"] = 1 };
@@ -2056,7 +2062,7 @@ function Bank.RightClickMenu_populate(self, level)
       UIDropDownMenu_AddButton(info, level);
     else
       info["text"] = L["Highlight New Items"];
-      TFuBag:AddToggleMenuButton(info, level, function() return TFuBnkFrame.hilight_new == 1; end);
+      TFuBag:AddMenuToggle(info, level, function() return TFuBnkFrame.hilight_new == 1; end);
     end
 
     -- Under Legacy Edit this is the classic edit_mode toggle; otherwise it toggles the
@@ -2076,7 +2082,7 @@ function Bank.RightClickMenu_populate(self, level)
     end
   end
   };
-    TFuBag:AddToggleMenuButton(info, level, function()
+    TFuBag:AddMenuToggle(info, level, function()
       return ((TFuBnkFrame.cfg["legacy_edit"] == 1 and TFuBnkFrame.edit_mode == 1)
         or (TFuBnkFrame.cfg["legacy_edit"] ~= 1 and TFuBnkFrame.cfg["manual_layout"] == 1));
       end);
@@ -2086,7 +2092,7 @@ function Bank.RightClickMenu_populate(self, level)
   ["value"] = nil,
   ["func"] = TFuBnkFrame.Button_MoveLockToggle_OnClick
   };
-    TFuBag:AddToggleMenuButton(info, level, function() return TFuBnkFrame.cfg["moveLock"] == 0; end);
+    TFuBag:AddMenuToggle(info, level, function() return TFuBnkFrame.cfg["moveLock"] == 0; end);
 
 
     info = { ["disabled"] = 1, ["notCheckable"] = 1 };
@@ -2095,7 +2101,6 @@ function Bank.RightClickMenu_populate(self, level)
   info = {
   ["text"] = L["Reload and Sort"],
   ["value"] = nil,
-  ["notCheckable"] = 1,
   ["func"] = TFuBnkFrame.Button_Reload_OnClick
   };
   UIDropDownMenu_AddButton(info, level);
@@ -2103,7 +2108,6 @@ function Bank.RightClickMenu_populate(self, level)
     info = {
   ["text"] = TFuBnkFrame:GetDepositButtonLabel(),
   ["value"] = nil,
-  ["notCheckable"] = 1,
   ["func"] = TFuBnkFrame.Button_DepositReagent_OnClick
   };
   UIDropDownMenu_AddButton(info, level);
@@ -2111,7 +2115,6 @@ function Bank.RightClickMenu_populate(self, level)
     info = {
   ["text"] = L["Reset NEW tag"],
   ["value"] = nil,
-  ["notCheckable"] = 1,
   ["func"] = function()
     local bag, slot, index;
 
@@ -2140,7 +2143,6 @@ function Bank.RightClickMenu_populate(self, level)
     info = {
   ["text"] = L["Options"],
   ["value"] = nil,
-  ["notCheckable"] = 1,
   ["func"] = function()
     -- Modern options window, opened to General -> Bank tab. The legacy panel (with the
     -- rule editor) stays reachable via /tbnk config.
@@ -2153,55 +2155,46 @@ function Bank.RightClickMenu_populate(self, level)
     UIDropDownMenu_AddButton(info, level);
 
 
-    info = {
-      ["text"] = L["Set Size"];
+    TFuBag:AddSubmenuParent({
+      ["text"] = L["Set Size"],
       ["value"] = { ["opt"]="set_scale" },
-      ["hasArrow"] = 1,
-      ["notCheckable"] = 1
-    };
-    UIDropDownMenu_AddButton(info, level);
+      }, level);
 
       info = { ["disabled"] = 1, ["notCheckable"] = 1 };
       UIDropDownMenu_AddButton(info, level);
 
-      info = {
-        ["text"] = L["Set Colors"];
+      TFuBag:AddSubmenuParent({
+        ["text"] = L["Set Colors"],
         ["value"] = { ["opt"]="set_colors" },
-        ["hasArrow"] = 1,
-        ["notCheckable"] = 1
-        };
-      UIDropDownMenu_AddButton(info, level);
+        }, level);
 
       info = { ["disabled"] = 1, ["notCheckable"] = 1 };
       UIDropDownMenu_AddButton(info, level);
 
-      info = {
-        ["text"] = L["Anchor"];
+      TFuBag:AddSubmenuParent({
+        ["text"] = L["Anchor"],
         ["value"] = { ["opt"]="anchor" },
-        ["hasArrow"] = 1,
-        ["notCheckable"] = 1
-        };
-      UIDropDownMenu_AddButton(info, level);
+        }, level);
 
       info = { ["disabled"] = 1, ["notCheckable"] = 1 };
       UIDropDownMenu_AddButton(info, level);
 
-      info = {
-        ["text"] = L["Hide"];
+      TFuBag:AddSubmenuParent({
+        ["text"] = L["Hide"],
         ["value"] = { ["opt"]="hide_frames" },
-        ["hasArrow"] = 1,
-        ["notCheckable"] = 1
-        };
-      UIDropDownMenu_AddButton(info, level);
+        }, level);
 
       info = { ["disabled"] = 1, ["notCheckable"] = 1 };
       UIDropDownMenu_AddButton(info, level);
 
+      -- Single indicator style: hide the stock check "circle" on every non-toggle row.
+      TFuBag:HideMenuChecksExceptToggles(level);
 
     elseif (level == 2) then
       if (UIDROPDOWNMENU_MENU_VALUE ~= nil) then
         if (UIDROPDOWNMENU_MENU_VALUE["opt"] == "set_scale") then
           for _, value in ipairs(TFuBag.A_BUTTONSIZE) do
+            local sz = value;
             info = {
               ["text"] = value.."x"..value;
               ["value"] = value;
@@ -2216,177 +2209,46 @@ function Bank.RightClickMenu_populate(self, level)
                 end
               end
             };
-            if (tonumber(TFuBnkFrame.cfg["frameButtonSize"]*TFuBnkFrame.cfg["scale"] - value)
-      < 1.0) and (tonumber(TFuBnkFrame.cfg["frameButtonSize"]*TFuBnkFrame.cfg["scale"] - value)
-      > -1.0) then
-              info["checked"] = 1;
-            end
-            UIDropDownMenu_AddButton(info, level);
+            TFuBag:AddMenuToggle(info, level, function()
+              local d = tonumber(TFuBnkFrame.cfg["frameButtonSize"]*TFuBnkFrame.cfg["scale"] - sz);
+              return (d ~= nil and d < 1.0 and d > -1.0);
+            end);
           end
         elseif (UIDROPDOWNMENU_MENU_VALUE["opt"] == "set_colors") then
           TFuBag:MakeColorMenu(TFuBnkFrame.cfg, function () TFuBag:RecolorWindow(TFuBnkFrame) end, level, TFuBnkFrame.bags);
         elseif (UIDROPDOWNMENU_MENU_VALUE["opt"] == "anchor") then
-          info = {
-            ["text"] = L["TOPLEFT"];
-            ["func"] = function ()
-                         TFuBag:SetFrameAnchor (TFuBnkFrame,TFuBnkFrame.cfg,"TOP","LEFT")
-                       end;
-            };
-          if (TFuBnkFrame.cfg["frameXRelativeTo"] == "LEFT" and
-              TFuBnkFrame.cfg["frameYRelativeTo"] == "TOP") then
-            info["checked"] = 1;
+          local function anchorRow(text, vert, horiz)
+            TFuBag:AddMenuToggle({
+              ["text"] = text,
+              ["func"] = function() TFuBag:SetFrameAnchor(TFuBnkFrame, TFuBnkFrame.cfg, vert, horiz) end,
+              }, level, function()
+                return TFuBnkFrame.cfg["frameXRelativeTo"] == horiz
+                   and TFuBnkFrame.cfg["frameYRelativeTo"] == vert;
+              end);
           end
-          UIDropDownMenu_AddButton(info, level);
-          info = {
-            ["text"] = L["TOPRIGHT"];
-            ["func"] = function ()
-                         TFuBag:SetFrameAnchor (TFuBnkFrame,TFuBnkFrame.cfg,"TOP","RIGHT")
-                       end;
-            };
-          if (TFuBnkFrame.cfg["frameXRelativeTo"] == "RIGHT" and
-              TFuBnkFrame.cfg["frameYRelativeTo"] == "TOP") then
-            info["checked"] = 1;
-          end
-          UIDropDownMenu_AddButton(info, level);
-          info = {
-            ["text"] = L["BOTTOMLEFT"];            ["func"] = function ()
-                         TFuBag:SetFrameAnchor (TFuBnkFrame,TFuBnkFrame.cfg,"BOTTOM","LEFT")
-                       end;
-            };
-          if (TFuBnkFrame.cfg["frameXRelativeTo"] == "LEFT" and
-              TFuBnkFrame.cfg["frameYRelativeTo"] == "BOTTOM") then
-            info["checked"] = 1;
-          end
-          UIDropDownMenu_AddButton(info, level);
-          info = {
-            ["text"] = L["BOTTOMRIGHT"];
-            ["func"] = function ()
-                         TFuBag:SetFrameAnchor (TFuBnkFrame,TFuBnkFrame.cfg,"BOTTOM","RIGHT")
-                       end;
-            };
-          if (TFuBnkFrame.cfg["frameXRelativeTo"] == "RIGHT" and
-              TFuBnkFrame.cfg["frameYRelativeTo"] == "BOTTOM") then
-            info["checked"] = 1;
-          end
-          UIDropDownMenu_AddButton(info, level);
+          anchorRow(L["TOPLEFT"],     "TOP",    "LEFT");
+          anchorRow(L["TOPRIGHT"],    "TOP",    "RIGHT");
+          anchorRow(L["BOTTOMLEFT"],  "BOTTOM", "LEFT");
+          anchorRow(L["BOTTOMRIGHT"], "BOTTOM", "RIGHT");
         elseif (UIDROPDOWNMENU_MENU_VALUE["opt"] == "hide_frames") then
-          info = {
-            ["text"] = L["Hide Player Dropdown"];
-            ["func"] = TFuBnkFrame.Toggle_UserDropdown;
-            ["keepShownOnClick"] = 1;
-            };
-          if (TFuBnkFrame.cfg["show_userdropdown"] == 0) then
-            info["checked"] = 1;
+          -- Hide toggles, square-box keep-open style (checked when show_* == 0 == hidden).
+          local function hideToggle(text, toggleFunc, cfgKey)
+            TFuBag:AddMenuToggle({ ["text"] = text, ["func"] = toggleFunc }, level,
+              function() return TFuBnkFrame.cfg[cfgKey] == 0; end);
           end
-          UIDropDownMenu_AddButton(info, level);
-          info = {
-            ["text"] = L["Hide Highlight Button"];
-            ["func"] = TFuBnkFrame.Toggle_HighlightButton;
-            ["keepShownOnClick"] = 1;
-            };
-          if (TFuBnkFrame.cfg["show_hilightbutton"] == 0) then
-            info["checked"] = 1;
-          end
-          UIDropDownMenu_AddButton(info, level);
-          info = {
-            ["text"] = L["Hide Edit Button"];
-            ["func"] = TFuBnkFrame.Toggle_EditButton;
-            ["keepShownOnClick"] = 1;
-           };
-          if (TFuBnkFrame.cfg["show_editbutton"] == 0) then
-            info["checked"] = 1;
-          end
-          UIDropDownMenu_AddButton(info, level);
-          info = {
-            ["text"] = L["Hide Re-sort Button"];
-            ["func"] = TFuBnkFrame.Toggle_ReloadButton;
-            ["keepShownOnClick"] = 1;
-            };
-          if (TFuBnkFrame.cfg["show_reloadbutton"] == 0) then
-            info["checked"] = 1;
-          end
-          UIDropDownMenu_AddButton(info, level);
-          info = {
-            ["text"] = L["Hide Filter Button"];
-            ["func"] = TFuBnkFrame.Toggle_Filter;
-            ["keepShownOnClick"] = 1;
-            };
-          if (TFuBnkFrame.cfg["show_filterbutton"] == 0) then
-            info["checked"] = 1;
-          end
-          UIDropDownMenu_AddButton(info, level);
-          info = {
-            ["text"] = L["Hide Reagent Deposit Button"];
-            ["func"] = TFuBnkFrame.Toggle_DepositReagentButton;
-            ["keepShownOnClick"] = 1;
-            };
-          if (TFuBnkFrame.cfg["show_depositbutton"] == 0) then
-            info["checked"] = 1;
-          end
-          UIDropDownMenu_AddButton(info, level);
-          info = {
-            ["text"] = L["Hide Lock Button"];
-            ["func"] = TFuBnkFrame.Toggle_LockButton;
-            ["keepShownOnClick"] = 1;
-            };
-          if (TFuBnkFrame.cfg["show_lockbutton"] == 0) then
-            info["checked"] = 1;
-          end
-          UIDropDownMenu_AddButton(info, level);
-          info = {
-            ["text"] = L["Hide Close Button"];
-            ["func"] = TFuBnkFrame.Toggle_CloseButton;
-            ["keepShownOnClick"] = 1;
-            };
-          if (TFuBnkFrame.cfg["show_closebutton"] == 0) then
-            info["checked"] = 1;
-          end
-          UIDropDownMenu_AddButton(info, level);
-          info = {
-            ["text"] = L["Hide Search Box"];
-            ["func"] = TFuBnkFrame.Toggle_SearchBox;
-            ["keepShownOnClick"] = 1;
-            };
-          if (TFuBnkFrame.cfg["show_searchbox"] == 0) then
-            info["checked"] = 1;
-          end
-          UIDropDownMenu_AddButton(info, level);
-          info = {
-            ["text"] = L["Hide Total"];
-            ["func"] = TFuBnkFrame.Toggle_Total;
-            ["keepShownOnClick"] = 1;
-            };
-          if (TFuBnkFrame.cfg["show_total"] == 0) then
-            info["checked"] = 1;
-          end
-          UIDropDownMenu_AddButton(info, level);
-          info = {
-            ["text"] = L["Hide Bag Buttons"];
-            ["func"] = TFuBnkFrame.Toggle_BagSlotButtons;
-            ["keepShownOnClick"] = 1;
-            };
-          if (TFuBnkFrame.cfg["show_bagbuttons"] == 0) then
-            info["checked"] = 1;
-          end
-          UIDropDownMenu_AddButton(info, level);
-          info = {
-            ["text"] = L["Hide Tokens"];
-            ["func"] = TFuBnkFrame.Toggle_Token;
-            ["keepShownOnClick"] = 1;
-            };
-          if (TFuBnkFrame.cfg["show_tokens"] == 0) then
-            info["checked"] = 1;
-          end
-          UIDropDownMenu_AddButton(info, level);
-          info = {
-            ["text"] = L["Hide Money"];
-            ["func"] = TFuBnkFrame.Toggle_Money;
-            ["keepShownOnClick"] = 1;
-            };
-          if (TFuBnkFrame.cfg["show_money"] == 0) then
-            info["checked"] = 1;
-          end
-          UIDropDownMenu_AddButton(info, level);
+          hideToggle(L["Hide Player Dropdown"],        TFuBnkFrame.Toggle_UserDropdown,        "show_userdropdown");
+          hideToggle(L["Hide Highlight Button"],       TFuBnkFrame.Toggle_HighlightButton,     "show_hilightbutton");
+          hideToggle(L["Hide Edit Button"],            TFuBnkFrame.Toggle_EditButton,          "show_editbutton");
+          hideToggle(L["Hide Re-sort Button"],         TFuBnkFrame.Toggle_ReloadButton,        "show_reloadbutton");
+          hideToggle(L["Hide Filter Button"],          TFuBnkFrame.Toggle_Filter,              "show_filterbutton");
+          hideToggle(L["Hide Reagent Deposit Button"], TFuBnkFrame.Toggle_DepositReagentButton,"show_depositbutton");
+          hideToggle(L["Hide Lock Button"],            TFuBnkFrame.Toggle_LockButton,          "show_lockbutton");
+          hideToggle(L["Hide Close Button"],           TFuBnkFrame.Toggle_CloseButton,         "show_closebutton");
+          hideToggle(L["Hide Search Box"],             TFuBnkFrame.Toggle_SearchBox,           "show_searchbox");
+          hideToggle(L["Hide Total"],                  TFuBnkFrame.Toggle_Total,               "show_total");
+          hideToggle(L["Hide Bag Buttons"],            TFuBnkFrame.Toggle_BagSlotButtons,      "show_bagbuttons");
+          hideToggle(L["Hide Tokens"],                 TFuBnkFrame.Toggle_Token,               "show_tokens");
+          hideToggle(L["Hide Money"],                  TFuBnkFrame.Toggle_Money,               "show_money");
         elseif (UIDROPDOWNMENU_MENU_VALUE["opt"] == "select_character") then
           Bank.UserDropdown_Initialize(self, level);
         end

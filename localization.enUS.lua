@@ -609,6 +609,15 @@ L["Drag to reorder"] = true
 L["Deposit"] = true
 L["Withdraw"] = true
 
+-- Per-category Layout menu (Stage 2)
+L["Layout:"] = true
+L["Solo full-width row"] = true
+L["Never single column"] = true
+L["Columns before wrap"] = true
+L["Min columns"] = true
+L["Max columns"] = true
+L["Auto"] = true
+
 L["The Bank"] = true
 L["|c%sLeft click to move category |r|c%s%s|r|c%s to bar |r|c%s%s|r"] = true
 L["|c%sBar |r|c%s%s|r"] = true
