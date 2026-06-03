@@ -1886,22 +1886,26 @@ function Bank.RightClickMenu_populate(self, level)
   info = { ["disabled"] = 1, ["notCheckable"] = 1 };
   UIDropDownMenu_AddButton(info, level);
 
-  for key, value in pairs(TFuBnkFrame.BC_LIST[bar]) do
-    info = {
-    ["text"] = string.format(L["Move: |c%s%s|r"],TFuBag.C_CAT,value);
-    ["value"] = value;
-    ["func"] = function(self)
-  local this = self or _G.this
-  TFuBnkFrame.edit_selected = (this.value);
-  TFuBnkFrame.edit_hilight = (this.value);
-  TFuBnkFrame:UpdateWindow();
+  -- "Move" only completes via a left-click on a numbered bar button (classic edit
+  -- mode only); offer it only there, else it is a dead entry in view / Manual Layout.
+  if (TFuBnkFrame.edit_mode == 1) then
+    for key, value in pairs(TFuBnkFrame.BC_LIST[bar]) do
+      info = {
+      ["text"] = string.format(L["Move: |c%s%s|r"],TFuBag.C_CAT,value);
+      ["value"] = value;
+      ["func"] = function(self)
+    local this = self or _G.this
+    TFuBnkFrame.edit_selected = (this.value);
+    TFuBnkFrame.edit_hilight = (this.value);
+    TFuBnkFrame:UpdateWindow();
+      end
+      };
+      UIDropDownMenu_AddButton(info, level);
     end
-    };
+
+    info = { ["disabled"] = 1, ["notCheckable"] = 1 };
     UIDropDownMenu_AddButton(info, level);
   end
-
-  info = { ["disabled"] = 1, ["notCheckable"] = 1 };
-  UIDropDownMenu_AddButton(info, level);
 
   info = { ["text"] = L["Sort Mode:"], ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = 1 };
   UIDropDownMenu_AddButton(info, level);

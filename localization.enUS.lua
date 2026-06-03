@@ -584,6 +584,31 @@ L["Hide Total"] = true
 L["Hide Bag Buttons"] = true
 L["Hide Money"] = true
 L["Hide Tokens"] = true
+
+-- Item filter menu (Filter Button)
+L["Filter Items"] = true
+L["Show only items matching the selected rarity, type, usable, or expansion filters."] = true
+L["Clear All Filters"] = true
+L["Usable Only"] = true
+L["Current Expansion Only"] = true
+L["Rarity"] = true
+L["Item Type"] = true
+L["Item Subtype"] = true
+L["Expansion"] = true
+L["Bound"] = true
+L["Bind on Equip"] = true
+L["User Filters"] = true
+L["(none saved)"] = true
+L["Save current filter as..."] = true
+L["(none)"] = true
+L["Delete saved filter"] = true
+
+-- Misc tooltips / labels
+L["Item has no category"] = true
+L["Drag to reorder"] = true
+L["Deposit"] = true
+L["Withdraw"] = true
+
 L["The Bank"] = true
 L["|c%sLeft click to move category |r|c%s%s|r|c%s to bar |r|c%s%s|r"] = true
 L["|c%sBar |r|c%s%s|r"] = true

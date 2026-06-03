@@ -917,22 +917,29 @@ function Inv.RightClickMenu_populate(self, level)
     info = { ["disabled"] = 1, ["notCheckable"] = 1 };
     UIDropDownMenu_AddButton(info, level);
 
-    for key, value in pairs(TFuInvFrame.BC_LIST[bar]) do
-      info = {
-        ["text"] = string.format(L["Move: |c%s%s|r"],TFuBag.C_CAT,value);
-        ["value"] = value;
-        ["func"] = function(self)
-          local this = self or _G.this
-          TFuInvFrame.edit_selected = (this.value);
-          TFuInvFrame.edit_hilight = (this.value);
-          TFuInvFrame:UpdateWindow();
-        end
-      };
+    -- "Move" arms a select-then-place: it sets edit_selected, and the move only
+    -- COMPLETES when you left-click a numbered bar button (Buttons.lua), which exists
+    -- ONLY in classic edit mode. In view / Manual-Layout mode there is no target
+    -- button, so the entry would just close the menu and do nothing -- so only offer it
+    -- in classic edit mode. (Drag-to-nest will be the move UX for the other modes.)
+    if (TFuInvFrame.edit_mode == 1) then
+      for key, value in pairs(TFuInvFrame.BC_LIST[bar]) do
+        info = {
+          ["text"] = string.format(L["Move: |c%s%s|r"],TFuBag.C_CAT,value);
+          ["value"] = value;
+          ["func"] = function(self)
+            local this = self or _G.this
+            TFuInvFrame.edit_selected = (this.value);
+            TFuInvFrame.edit_hilight = (this.value);
+            TFuInvFrame:UpdateWindow();
+          end
+        };
+        UIDropDownMenu_AddButton(info, level);
+      end
+
+      info = { ["disabled"] = 1, ["notCheckable"] = 1 };
       UIDropDownMenu_AddButton(info, level);
     end
-
-    info = { ["disabled"] = 1, ["notCheckable"] = 1 };
-    UIDropDownMenu_AddButton(info, level);
 
     info = { ["text"] = L["Sort Mode:"], ["notClickable"] = 1, ["isTitle"] = 1, ["notCheckable"] = 1 };
     UIDropDownMenu_AddButton(info, level);

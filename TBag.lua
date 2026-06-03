@@ -3425,7 +3425,7 @@ end
 -- full-width Manual-Layout drag handle beneath, the handle stays grabbable on either side
 -- of the text. One button per bar frame, created once and reused; call with show=false to
 -- hide it when titles are off.
-function TFuBag:WireCatTitleClick(frame, bf, baritmbar, show)
+function TFuBag:WireCatTitleClick(frame, bf, baritmbar, show, barnum)
   if (not bf) then return; end
   local label = bf.CatName;
   if (not label) then return; end
@@ -3437,26 +3437,26 @@ function TFuBag:WireCatTitleClick(frame, bf, baritmbar, show)
   if (not btn) then
     btn = CreateFrame("Button", nil, bf);
     btn:RegisterForClicks("RightButtonUp");
-    -- Pass LEFT clicks through to the Manual-Layout drag handle beneath, so dragging a
-    -- category by its title text still works (the button covers the text and would
-    -- otherwise swallow the drag-start there). Right-clicks are still handled here.
-    if (btn.SetPropagateMouseClicks) then btn:SetPropagateMouseClicks(true); end
+    -- Do NOT propagate clicks. The title sits over the main window frame, whose
+    -- OnMouseDown("RightButton") opens the window ("mainwindow") menu at the cursor.
+    -- If we propagated, the right mouse-DOWN would fall through and flash that menu
+    -- open before our mouse-UP reopened it as the category menu. With propagation off
+    -- the title owns the right-click outright and opens the category menu directly in
+    -- EVERY mode (no fall-through, no double-toggle). Trade-off: the window/box can no
+    -- longer be dragged by grabbing the title text itself -- drag from anywhere else.
+    if (btn.SetPropagateMouseClicks) then btn:SetPropagateMouseClicks(false); end
     btn:SetScript("OnClick", function(self, mouseButton)
       if (mouseButton ~= "RightButton") then return; end
-      -- In edit mode the right-click opens the category ("bar") menu via click
-      -- propagation to the bar frame beneath; don't ALSO print. Printing stays the
-      -- view-mode behaviour and is available from the menu's "Print contents" entry.
+      -- The category ("bar") menu carries the colour / sort / hide / "Print contents
+      -- to chat" actions (the old direct-print on the title is gone -- print is a menu
+      -- entry now). Opens at the cursor in view AND edit modes.
       local mf = self.mainFrame;
-      if (mf and (mf.ml_edit == 1 or mf.edit_mode == 1)) then return; end
-      local names = self.catNames;
-      if (not names) then return; end
-      for _, nm in ipairs(names) do
-        TFuBag:PrintCategoryContents(self.which, nm);
-      end
+      if (not mf or not self.barnum) then return; end
+      TFuBag:OpenBarMenu(mf, self.barnum, self:GetParent());
     end);
     btn:SetScript("OnEnter", function(self)
       GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-      GameTooltip:SetText("Right-click: print this category to chat", 1, 1, 1, 1, true);
+      GameTooltip:SetText("Right-click: category options", 1, 1, 1, 1, true);
       GameTooltip:Show();
     end);
     btn:SetScript("OnLeave", function() GameTooltip:Hide(); end);
@@ -3468,6 +3468,7 @@ function TFuBag:WireCatTitleClick(frame, bf, baritmbar, show)
   btn:SetFrameLevel(bf:GetFrameLevel() + 12);
   btn.which = (frame == TFuBnkFrame) and "bank" or "inv";
   btn.mainFrame = frame;   -- so the OnClick can tell edit mode from view mode
+  btn.barnum = barnum;     -- which category bar this title belongs to (menu target)
   -- Dump by the INTERNAL category token(s) on this bar, not the display label:
   -- PrintCategoryContents matches itm[I_CAT] (e.g. "TRADE_TOOL"), which often differs
   -- from the shown name (e.g. "Profession Tools"). Collect the distinct tokens of the
@@ -5153,7 +5154,11 @@ function TFuBag:PickBar(cfg, playerid, itm, trade1, trade2)
   -- auto-flow layout can break the box into labeled sub-groups. Supersedes the
   -- tooltip-line armor/weapon rules in the search list below; off
   -- (armor_group_enabled ~= 1) falls through to those rules unchanged.
-  if (itm[self.I_CAT] == nil and cfg.armor_group_enabled == 1) then
+  -- Skip grey (Poor, rarity 0) equippables so they fall through to the GRAY_ITEMS
+  -- ("Junk") search rule below instead of being grouped with real armor/weapons by
+  -- slot. Vendor-trash gear belongs in Junk, not on the equipment shelves. (I_RARITY
+  -- nil = unscanned quality: let it through to EquipCat rather than mis-junking it.)
+  if (itm[self.I_CAT] == nil and cfg.armor_group_enabled == 1 and itm[self.I_RARITY] ~= 0) then
     local eqCat, eqSub = self:EquipCat(cfg, itm);
     if (eqCat) then
       itm[self.I_CAT] = eqCat;
@@ -6485,7 +6490,10 @@ function TFuBag:OpenBarMenu(frame, barnum, anchor)
   HideDropDownMenu(1);
   frame.RightClickMenu_mode = "bar";
   frame.RightClickMenu_opts = { [self.I_BAR] = barnum };
-  ToggleDropDownMenu(1, nil, frame.RightClickMenu, anchor:GetName(), 0, 0);
+  -- Anchor at the cursor (matching MainFrame:OnMouseDown's "mainwindow" menu) so the
+  -- category menu pops where the user clicked, not pinned to the bar frame's corner.
+  -- (`anchor` is kept for call-site clarity but no longer used for positioning.)
+  ToggleDropDownMenu(1, nil, frame.RightClickMenu, "cursor", 0, 0);
 end
 
 function TFuBag:MLInitBarDrag(frame, barnum, bf)
@@ -7037,7 +7045,7 @@ function TFuBag:LayoutWindowFree(frame, PAD_TOP, PAD_BOTTOM, show_cat_names, CAT
           label:SetJustifyH("CENTER");
           label:SetPoint("BOTTOM", bf, "TOP", 0, 1);
           label:Show();
-          self:WireCatTitleClick(frame, bf, baritm[barnum], true);
+          self:WireCatTitleClick(frame, bf, baritm[barnum], true, barnum);
         else
           label:Hide();
           self:WireCatTitleClick(frame, bf, nil, false);
@@ -7262,7 +7270,7 @@ function TFuBag:LayoutWindowFreePlace(frame, PAD_TOP, PAD_BOTTOM, show_cat_names
             end
           end
           label:Show();
-          self:WireCatTitleClick(frame, bf, baritm[barnum], true);
+          self:WireCatTitleClick(frame, bf, baritm[barnum], true, barnum);
         else
           label:Hide();
           self:WireCatTitleClick(frame, bf, nil, false);
@@ -7723,7 +7731,7 @@ function TFuBag:LayoutWindow(frame)
                 end
               end
               label:Show();
-              self:WireCatTitleClick(frame, barframe[iBar], baritm[barnum+iBar], true);
+              self:WireCatTitleClick(frame, barframe[iBar], baritm[barnum+iBar], true, barnum+iBar);
             else
               label:Hide();
               self:WireCatTitleClick(frame, barframe[iBar], nil, false);

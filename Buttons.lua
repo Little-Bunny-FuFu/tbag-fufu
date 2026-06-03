@@ -239,6 +239,24 @@ function ItemButton.SetDepositDim(self, on)
   ov:SetShown(on and true or false)
 end
 
+-- Subtle grey wash over poor-quality ("junk" / vendor-trash) items, so their throwaway
+-- status reads at a glance even away from a merchant (the JunkIcon coin only appears at a
+-- vendor). Light alpha on ARTWORK sublayer 6 -- below the deposit dim (sublayer 7) so a
+-- black wash wins when an item is BOTH junk and deposit-ineligible, and below the
+-- OVERLAY-layer count/stock text so the stack count stays readable. A pooled button reused
+-- for a non-junk item clears it (ItemButton.Update calls this every refresh).
+function ItemButton.SetJunkTint(self, on)
+  local ov = self.tfuJunkTint
+  if (not ov) then
+    if (not on) then return end
+    ov = self:CreateTexture(nil, "ARTWORK", nil, 6)
+    ov:SetColorTexture(0.5, 0.5, 0.5, 0.4)
+    ov:SetAllPoints(self)
+    self.tfuJunkTint = ov
+  end
+  ov:SetShown(on and true or false)
+end
+
 function ItemButton.UpdateLock(self, itm, mainFrame)
   if not itm then itm = TFuBag:GetItmFromFrame(TFuBag.BUTTONS, self) end
   if not itm or not next(itm) then return end
@@ -399,6 +417,10 @@ function ItemButton.Update(self)
     self.JunkIcon:Hide()
   end
 
+  -- Grey tint on poor-quality items so junk reads at a glance, vendor or not.
+  TFuBag.ItemButton.SetJunkTint(self,
+    (not isEmptySlot) and itm[TFuBag.I_RARITY] == LE_ITEM_QUALITY_POOR)
+
   SetItemButtonCount(self, itm[TFuBag.I_COUNT])
   -- Collapsed empty representative (the only empty button shown): overlay the free-slot
   -- count so the single bottom box reads as "N free slots".
@@ -501,8 +523,12 @@ end
 
 
 function BarButton:OnEnter()
-  local mainFrame = self:GetParent()
-  if mainFrame.edit_mode ~= 1 then return end
+  -- The bar button is parented to the scroll Container (TInv/TBnk create it under
+  -- invContainer), so self:GetParent() is NOT the main window -- walk up to the frame
+  -- carrying .cfg, same fix ItemButton:OnClick uses. Without this, edit_mode reads nil
+  -- here and the handler bails (no tooltip; clicking a bar location never moves).
+  local mainFrame = TFuBag:GetButtonMainFrame(self)
+  if not mainFrame or mainFrame.edit_mode ~= 1 then return end
   local bar = self:GetID()
 
   GameTooltip:SetOwner(self, "ANCHOR_LEFT")
@@ -530,8 +556,12 @@ function BarButton:OnLeave()
 end
 
 function BarButton:OnClick(button)
-  local mainFrame = self:GetParent()
-  if mainFrame.edit_mode ~= 1 then return end
+  -- Parented to the scroll Container, not the main window -- resolve the real main
+  -- frame (the one with .cfg) so edit_mode/edit_selected read correctly. self:GetParent()
+  -- returned the Container, whose edit_mode is nil, so every click returned early here
+  -- and category moves did nothing.
+  local mainFrame = TFuBag:GetButtonMainFrame(self)
+  if not mainFrame or mainFrame.edit_mode ~= 1 then return end
   local bar = self:GetID()
 
   if button == "LeftButton" then
