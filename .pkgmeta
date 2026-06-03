@@ -2,6 +2,7 @@ package-as: tbag-fufu
 manual-changelog: Changelog.txt
 
 ignore:
+  - branding
   - Changelog-Shefki-legacy.txt
   - dist.sh
   - scrape-wowhead.perl

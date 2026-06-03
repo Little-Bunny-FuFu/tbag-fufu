@@ -16,7 +16,7 @@ and keeps it maintained.
 - **Auto-sorting into categories** by item type and your professions, with
   optional category names and adjustable spacing.
 - **View any character from anywhere** — once a character's data is cached, you
-  can browse its bags, bank, equipped gear, mail, and currency from any other
+  can browse its bags, bank, and currency from any other
   character via the name dropdown.
 - **Item search** across the current window (and your cached data).
 - **Modern 12.0 bank support** built on the new `C_Bank` API:
@@ -28,8 +28,8 @@ and keeps it maintained.
   - **Bank tab settings** dialog (right-click a tab): rename, pick an icon, set
     the auto-deposit assignment flags, and the expansion filter — matching
     Blizzard's own bank tab settings.
-- **Manual layout mode**: free-placement, draggable category bars
-  (Baganator-style), for a hand-arranged layout.
+- **Manual layout mode**: free-placement, draggable category bars for a
+  hand-arranged layout.
 - **Scrollable, resizable windows** with configurable column counts.
 - Drag-and-drop item moves and stack splitting.
 - Extensive in-game options (separate inventory and bank option panels) plus an
@@ -51,9 +51,7 @@ each character once:
 
 1. Open your bags
 2. Visit the bank
-3. Check your mail
-4. Open your character (equipped) pane
-5. Open a merchant / trade window
+3. Open a merchant / trade window
 
 After that you can view that character's contents from any other character.
 
