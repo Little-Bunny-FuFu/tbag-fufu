@@ -618,6 +618,12 @@ L["Min columns"] = true
 L["Max columns"] = true
 L["Auto"] = true
 
+-- Category nesting (Stage 3)
+L["Nesting:"] = true
+L["Nest under"] = true
+L["Un-nest"] = true
+L["Un-nest all"] = true
+
 L["The Bank"] = true
 L["|c%sLeft click to move category |r|c%s%s|r|c%s to bar |r|c%s%s|r"] = true
 L["|c%sBar |r|c%s%s|r"] = true

@@ -1057,6 +1057,9 @@ function Inv.RightClickMenu_populate(self, level)
     -- Per-category Layout overrides (columns / solo full-width).
     TFuBag:BarLayoutMenu(TFuInvFrame, bar, level);
 
+    -- Category nesting (nest under another category / un-nest).
+    TFuBag:BarNestMenu(TFuInvFrame, bar, level);
+
     info = { ["disabled"] = 1, ["notCheckable"] = 1 };
     UIDropDownMenu_AddButton(info, level);
 
@@ -1073,6 +1076,9 @@ function Inv.RightClickMenu_populate(self, level)
   -------------------------------------------------------------------------------------------------
   ------------------------ MAIN WINDOW CONTEXT MENU -----------------------------------------------
   -------------------------------------------------------------------------------------------------
+  elseif (TFuInvFrame.RightClickMenu_mode == "subcat") then
+    TFuBag:PopulateSubCatMenu(TFuInvFrame, level);
+
   elseif (TFuInvFrame.RightClickMenu_mode == "bagslot") then
     local eb_bag = TFuInvFrame.RightClickMenu_opts[TFuBag.I_BAG];
     if (level == 1) then

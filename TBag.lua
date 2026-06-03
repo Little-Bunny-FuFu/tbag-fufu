@@ -3356,6 +3356,80 @@ function TFuBag:GetCat(cfg, bar)
   end
 end
 
+-- ===================================================================================
+-- Category nesting (Stage 3)
+-- cfg.cat_nest[childCategoryToken] = parentCategoryToken. A nested category's items render
+-- as a labelled sub-group inside its ROOT ancestor's box (flattened view) -- reusing the
+-- equipment sub-header machinery -- with depth shown by indentation. Arbitrary depth, but
+-- every walk is bounded by NEST_MAXDEPTH and cycle-guarded so a corrupt map can't hang.
+-- ===================================================================================
+TFuBag.NEST_MAXDEPTH = 16;
+
+function TFuBag:GetNestParent(cfg, cat)
+  if (not cfg or not cat) then return nil; end
+  return cfg.cat_nest and cfg.cat_nest[cat] or nil;
+end
+
+-- The root ancestor: climb parents until one has none. Cycle/over-deep safe.
+function TFuBag:GetNestRoot(cfg, cat)
+  if (not cfg or not cat) then return cat; end
+  local seen, cur = {}, cat;
+  for _ = 1, self.NEST_MAXDEPTH do
+    local p = self:GetNestParent(cfg, cur);
+    if (not p or seen[p]) then break; end
+    seen[cur] = true; cur = p;
+  end
+  return cur;
+end
+
+-- Number of ancestors (0 == top-level / not nested).
+function TFuBag:GetNestDepth(cfg, cat)
+  if (not cfg or not cat) then return 0; end
+  local seen, d, cur = {}, 0, cat;
+  for _ = 1, self.NEST_MAXDEPTH do
+    local p = self:GetNestParent(cfg, cur);
+    if (not p or seen[p]) then break; end
+    seen[cur] = true; cur = p; d = d + 1;
+  end
+  return d;
+end
+
+-- True if making `parent` the parent of `cat` would create a cycle (parent is cat itself
+-- or already a descendant of cat).
+function TFuBag:WouldNestCycle(cfg, cat, parent)
+  if (cat == parent) then return true; end
+  local seen, cur = {}, parent;
+  for _ = 1, self.NEST_MAXDEPTH do
+    if (cur == cat) then return true; end
+    if (not cur or seen[cur]) then break; end
+    seen[cur] = true; cur = self:GetNestParent(cfg, cur);
+  end
+  return false;
+end
+
+-- Nest `cat` under `parent` (parent nil/"" = un-nest). Refuses cycles.
+function TFuBag:SetNestParent(cfg, cat, parent)
+  if (not cfg or not cat) then return; end
+  if (cfg.cat_nest == nil) then cfg.cat_nest = {}; end
+  if (parent == nil or parent == "") then
+    cfg.cat_nest[cat] = nil;
+  elseif (not self:WouldNestCycle(cfg, cat, parent)) then
+    cfg.cat_nest[cat] = parent;
+  end
+end
+
+-- Direct children of `cat` (sorted), i.e. categories nested exactly one level under it.
+function TFuBag:GetNestChildren(cfg, cat)
+  local out = {};
+  if (cfg and cfg.cat_nest) then
+    for child, parent in pairs(cfg.cat_nest) do
+      if (parent == cat) then out[#out + 1] = child; end
+    end
+    table.sort(out);
+  end
+  return out;
+end
+
 -- Walk up the parent chain until we find a frame carrying the addon's `cfg` --
 -- that's the bag window (TFuInvFrame / TFuBnkFrame). Previously item-button code
 -- did `self:GetParent():GetParent()`, baking in the Item->DummyBag->MainFrame
@@ -5351,6 +5425,25 @@ function TFuBag:PickBar(cfg, playerid, itm, trade1, trade2)
     end
   end
 
+  -- Category nesting (Stage 3): redirect a nested category's items into its ROOT ancestor's
+  -- box as a labelled sub-group (flattened view, reusing the sub-header renderer). Items keep
+  -- their own I_CAT, so the within-box sort (which leads with I_CAT) keeps each nested group
+  -- contiguous; I_SUBGROUP becomes the category's display name, indented by nesting depth.
+  -- Skip items that already carry a sub-group (equipment shelves) -- a nested equipment
+  -- category stays flat for now.
+  if (itm[self.I_CAT] and (itm[self.I_SUBGROUP] == nil or itm[self.I_SUBGROUP] == "")) then
+    local parent = self:GetNestParent(cfg, itm[self.I_CAT]);
+    if (parent) then
+      local rootbar = self:ResolveBarAlias(cfg, self:GetCat(cfg, self:GetNestRoot(cfg, itm[self.I_CAT])));
+      if (type(rootbar) == "number") then
+        local labels = self:BuildCatLabels();
+        local label = (labels and labels[itm[self.I_CAT]]) or itm[self.I_CAT];
+        itm[self.I_BAR] = rootbar;
+        itm[self.I_SUBGROUP] = string.rep("   ", self:GetNestDepth(cfg, itm[self.I_CAT]))..label;
+      end
+    end
+  end
+
   end
   return itm;
 end
@@ -5855,6 +5948,16 @@ function TFuBag:MakeSubHeaderHandle(boxFrame, mainFrame, barnum)
   local hd = CreateFrame("Button", nil, boxFrame)
   hd:SetFrameLevel(boxFrame:GetFrameLevel() + 5)
   hd:RegisterForDrag("LeftButton")
+  hd:RegisterForClicks("RightButtonUp")
+  -- Right-click a sub-group header -> that sub-category's menu (un-nest, etc.). The category
+  -- token comes from the cluster's first item button (s.anchorBtn). Works in view mode too --
+  -- a nested category has no box of its own to right-click, so this header is the only handle.
+  hd:SetScript("OnClick", function(s, button)
+    if (button ~= "RightButton") then return end
+    local itm = s.anchorBtn and TFuBag:GetItmFromFrame(TFuBag.BUTTONS, s.anchorBtn)
+    local cat = itm and itm[TFuBag.I_CAT]
+    if (cat) then TFuBag:OpenSubCatMenu(mainFrame, cat, s) end
+  end)
   local hl = hd:CreateTexture(nil, "HIGHLIGHT")
   hl:SetAllPoints(hd)
   hl:SetColorTexture(1, 1, 1, 0.25)
@@ -5979,8 +6082,14 @@ function TFuBag:AssignButtonsToFrame(mainFrame, barnum, frame, width, height, us
         -- Drag-to-reorder handle: grabbable only while ML is UNLOCKED and the header
         -- is shown. Covers the header text; above the box so the drag reorders the
         -- sub-group rather than moving the category box. Inert (hidden) otherwise.
+        -- The handle is grabbable (drag-reorder) only in ML edit, but a NESTED sub-group also
+        -- needs it in VIEW mode so its header can be right-clicked to un-nest (the nested
+        -- category has no box of its own). So show it when editing OR when this sub-group is a
+        -- nested category. Drag stays guarded to ml_edit inside the handle's scripts.
+        local subItm = btn and self:GetItmFromFrame(self.BUTTONS, btn)
+        local subNested = subItm and self:GetNestParent(mainFrame.cfg, subItm[self.I_CAT])
         local hd = boxFrame.SubHeaderHandles[i]
-        if (shown and mlEdit) then
+        if (shown and (mlEdit or subNested)) then
           if (not hd) then
             hd = self:MakeSubHeaderHandle(boxFrame, mainFrame, barnum)
             boxFrame.SubHeaderHandles[i] = hd
@@ -6744,6 +6853,10 @@ end
 -- ticked") -- AND re-evaluates the parent row's check, WITHOUT closing the menu. keepShownOnClick
 -- holds the submenu open so several values can be tried in a row.
 function TFuBag:BarLayoutSubmenu(frame, bar, level, which)
+  -- The bar menu's submenus are the Layout column lists and the nest/un-nest lists; dispatch
+  -- the nest ones here so the level-2 hook in TInv/TBnk stays a single call.
+  if (which == "bar_nest") then return self:BarNestSubmenu(frame, bar, level); end
+  if (which == "bar_unnest") then return self:BarUnnestSubmenu(frame, bar, level); end
   local cfg = frame.cfg;
   local grp;
   if (which == "bar_cols") then grp = self.G_BAR_COLS;
@@ -6771,6 +6884,184 @@ function TFuBag:BarLayoutSubmenu(frame, bar, level, which)
       ["func"] = function() apply(cc); end,
       }, level, function() return self:GetGrp(cfg, grp, bar) == cc; end);
   end
+end
+
+-- Open the sub-category menu for a nested category `cat`, anchored at the cursor. Reuses the
+-- window's RightClickMenu in a dedicated "subcat" mode (populated by PopulateSubCatMenu).
+function TFuBag:OpenSubCatMenu(frame, cat, anchor)
+  if (not frame or not frame.RightClickMenu or not cat) then return; end
+  HideDropDownMenu(1);
+  frame.RightClickMenu_mode = "subcat";
+  frame.RightClickMenu_opts = { ["cat"] = cat };
+  ToggleDropDownMenu(1, nil, frame.RightClickMenu, "cursor", 0, 0);
+end
+
+-- Clear every toggle decoration (square box / check / glow) and restore the stock check alpha
+-- on a whole level's buttons, regardless of the current numButtons. Used before building a
+-- DECORATION-FREE menu (the sub-cat menu), so reused buttons don't carry a leftover check/box/
+-- glow from a previously shown menu on the first open (the OnHide cleanup only runs once the
+-- list actually hides, which is why a second open looked fine).
+function TFuBag:ResetMenuDecor(level)
+  level = level or 1;
+  for i = 1, (UIDROPDOWNMENU_MAXBUTTONS or 32) do
+    local nm = "DropDownList"..level.."Button"..i;
+    local b = _G[nm];
+    if (b) then
+      if (b.tbagBox) then b.tbagBox:Hide(); end
+      if (b.tbagBoxChk) then b.tbagBoxChk:Hide(); end
+      if (b.tbagRowGlow) then b.tbagRowGlow:Hide(); end
+      b.tbagOnFn = nil;
+      local c = _G[nm.."Check"];   if (c) then c:SetAlpha(1); end
+      local u = _G[nm.."UnCheck"]; if (u) then u:SetAlpha(1); end
+    end
+  end
+end
+
+-- Build the sub-category menu (Stage 3): the category name + Un-nest. Shared by the inventory
+-- and bank RightClickMenu_populate "subcat" branch. (Per-subcategory Layout options come later.)
+function TFuBag:PopulateSubCatMenu(frame, level)
+  self:ResetMenuDecor(level);
+  local cfg = frame.cfg;
+  local cat = frame.RightClickMenu_opts and frame.RightClickMenu_opts.cat;
+  if (not cat) then return; end
+  local labels = self:BuildCatLabels();
+  UIDropDownMenu_AddButton({ ["text"] = (labels[cat] or cat),
+    ["isTitle"] = 1, ["notClickable"] = 1, ["notCheckable"] = 1 }, level);
+  UIDropDownMenu_AddButton({ ["disabled"] = 1, ["notCheckable"] = 1 }, level);
+  if (self:GetNestParent(cfg, cat)) then
+    UIDropDownMenu_AddButton({
+      ["text"] = L["Un-nest"],
+      ["func"] = function()
+        self:SetNestParent(cfg, cat, nil);
+        CloseDropDownMenus();
+        frame:UpdateWindow(self.REQ_MUST);
+      end,
+      }, level);
+  end
+  self:HideMenuChecksExceptToggles(level);
+end
+
+-- All categories nested INTO this bar (its categories are their nest root), regardless of
+-- depth. Nesting redirects items at runtime but leaves CAT_BAR (and BC_LIST) alone, so a
+-- nested category's own bar goes empty/undrawn -- the only place to reach it is the parent
+-- (root) box's menu, which is here.
+function TFuBag:NestedIntoBar(frame, bar)
+  local cfg = frame.cfg;
+  local cats = frame.BC_LIST and frame.BC_LIST[bar];
+  local out = {};
+  if (not cats or not cfg.cat_nest) then return out; end
+  local rootset = {};
+  for _, c in ipairs(cats) do rootset[c] = true; end
+  for child in pairs(cfg.cat_nest) do
+    if (rootset[self:GetNestRoot(cfg, child)]) then out[#out + 1] = child; end
+  end
+  return out;
+end
+
+-- "Nesting:" section of the bar menu (Stage 3): nest this bar's categories under another bar,
+-- or un-nest the categories nested into this one. Shared by the inventory and bank bar menus;
+-- call it after BarLayoutMenu.
+function TFuBag:BarNestMenu(frame, bar, level)
+  local cats = frame.BC_LIST and frame.BC_LIST[bar];
+  if (not cats or #cats == 0) then return; end
+
+  local info = { ["disabled"] = 1, ["notCheckable"] = 1 };
+  UIDropDownMenu_AddButton(info, level);
+  info = { ["text"] = L["Nesting:"], ["isTitle"] = 1, ["notClickable"] = 1, ["notCheckable"] = 1 };
+  UIDropDownMenu_AddButton(info, level);
+
+  self:AddSubmenuParent({ ["text"] = L["Nest under"], ["value"] = "bar_nest" }, level);
+
+  -- "Un-nest ->" lists the categories nested into this bar (grouped by their original bar, so
+  -- a multi-token box like "BoE" shows once), each un-nestable on its own; plus "Un-nest all".
+  if (#self:NestedIntoBar(frame, bar) > 0) then
+    self:AddSubmenuParent({ ["text"] = L["Un-nest"], ["value"] = "bar_unnest" }, level);
+  end
+end
+
+-- Level-2 "Nest under" list: one entry per OTHER drawn bar (by its display name -- NOT per
+-- category token, which produced "BoE" many times), skipping any that would cycle. Picking
+-- one nests this bar's categories under that bar's primary category.
+function TFuBag:BarNestSubmenu(frame, bar, level)
+  local cfg = frame.cfg;
+  local cats = frame.BC_LIST and frame.BC_LIST[bar];
+  if (not cats) then return; end
+
+  local cand = {};
+  for bn = 1, self.BAR_MAX do
+    if (bn ~= bar) then
+      local items = frame.BARITM and frame.BARITM[bn];
+      local bl = frame.BC_LIST[bn];
+      if (items and #items > 0 and bl and #bl > 0) then
+        local parent, ok = bl[1], true;
+        for _, mycat in ipairs(cats) do
+          if (self:WouldNestCycle(cfg, mycat, parent)) then ok = false; break; end
+        end
+        if (ok) then
+          cand[#cand + 1] = { name = self:GetBarCategoryName(items, cfg) or ("Bar "..bn), parent = parent };
+        end
+      end
+    end
+  end
+  table.sort(cand, function(a, b) return a.name < b.name; end);
+
+  for _, e in ipairs(cand) do
+    local parent = e.parent;
+    UIDropDownMenu_AddButton({
+      ["text"] = e.name,
+      ["func"] = function()
+        for _, mycat in ipairs(cats) do self:SetNestParent(cfg, mycat, parent); end
+        CloseDropDownMenus();
+        frame:UpdateWindow(self.REQ_MUST);
+      end,
+      }, level);
+  end
+  self:HideMenuChecksExceptToggles(level);
+end
+
+-- Level-2 "Un-nest" list. Categories nested into this bar are GROUPED by the bar they came
+-- from (cfg.catbar) -- so a box made of many slot tokens (BoE) un-nests as ONE entry, while
+-- distinct nested categories (Enchanting, Profession Tools) each get their own. Picking one
+-- un-nests just that group; "Un-nest all" clears everything.
+function TFuBag:BarUnnestSubmenu(frame, bar, level)
+  local cfg = frame.cfg;
+  local labels = self:BuildCatLabels();
+  local kids = self:NestedIntoBar(frame, bar);
+
+  local groups, order = {}, {};
+  for _, child in ipairs(kids) do
+    local ob = (cfg[self.CAT_BAR] and cfg[self.CAT_BAR][child]) or ("?"..child);
+    if (not groups[ob]) then
+      groups[ob] = { display = (labels[child] or child), tokens = {} };
+      order[#order + 1] = ob;
+    end
+    table.insert(groups[ob].tokens, child);
+  end
+  table.sort(order, function(a, b) return groups[a].display < groups[b].display; end);
+
+  if (#order > 1) then
+    UIDropDownMenu_AddButton({
+      ["text"] = L["Un-nest all"],
+      ["func"] = function()
+        for _, c in ipairs(kids) do self:SetNestParent(cfg, c, nil); end
+        CloseDropDownMenus();
+        frame:UpdateWindow(self.REQ_MUST);
+      end,
+      }, level);
+  end
+
+  for _, ob in ipairs(order) do
+    local toks = groups[ob].tokens;
+    UIDropDownMenu_AddButton({
+      ["text"] = groups[ob].display,
+      ["func"] = function()
+        for _, c in ipairs(toks) do self:SetNestParent(cfg, c, nil); end
+        CloseDropDownMenus();
+        frame:UpdateWindow(self.REQ_MUST);
+      end,
+      }, level);
+  end
+  self:HideMenuChecksExceptToggles(level);
 end
 
 function TFuBag:MLInitBarDrag(frame, barnum, bf)

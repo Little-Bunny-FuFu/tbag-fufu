@@ -2019,6 +2019,9 @@ function Bank.RightClickMenu_populate(self, level)
   -- Per-category Layout overrides (columns / solo full-width).
   TFuBag:BarLayoutMenu(TFuBnkFrame, bar, level);
 
+  -- Category nesting (nest under another category / un-nest).
+  TFuBag:BarNestMenu(TFuBnkFrame, bar, level);
+
   info = { ["disabled"] = 1, ["notCheckable"] = 1 };
   UIDropDownMenu_AddButton(info, level);
 
@@ -2035,6 +2038,9 @@ function Bank.RightClickMenu_populate(self, level)
   -------------------------------------------------------------------------------------------------
   ------------------------ MAIN WINDOW CONTEXT MENU -----------------------------------------------
   -------------------------------------------------------------------------------------------------
+  elseif (TFuBnkFrame.RightClickMenu_mode == "subcat") then
+    TFuBag:PopulateSubCatMenu(TFuBnkFrame, level);
+
   elseif (TFuBnkFrame.RightClickMenu_mode == "mainwindow") then
   if (level == 1) then
 
