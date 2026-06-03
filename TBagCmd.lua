@@ -136,6 +136,16 @@ function TFuBnk_cmd(msg)
   elseif (cmd == "printcat") then
     -- TEMP diagnostic: dump each item's resolved category/bar (optional filter).
     TFuBag:PrintCategoryContents("bank", params);
+  elseif (cmd == "printnodes") then
+    -- STAGE 0 diagnostic: rebuild + dump the category node tree from the legacy tables.
+    TFuBag:DumpNodeModel("bank");
+  elseif (cmd == "resetnest") then
+    -- STAGE 0 transition: wipe legacy cat_nest (the node model owns nesting now). Clears the
+    -- corrupt Stage-3 experiment nests so items stop being mis-redirected.
+    TFuBnkFrame.cfg.cat_nest = {};
+    TFuBag:BumpCatGen();
+    TFuBnkFrame:UpdateWindow(TFuBag.REQ_MUST);
+    TFuBag:Print(TFuBag.SCP.."Bank category nesting cleared.");
   elseif (cmd == "catdiag") then
     -- TEMP diagnostic: dump a category's rules + bar + live tooltip matches.
     TFuBag:CatDiag("bank", params);
@@ -204,6 +214,16 @@ function TFuInv_cmd(msg)
   elseif (cmd == "printcat") then
     -- TEMP diagnostic: dump each item's resolved category/bar (optional filter).
     TFuBag:PrintCategoryContents("inv", params);
+  elseif (cmd == "printnodes") then
+    -- STAGE 0 diagnostic: rebuild + dump the category node tree from the legacy tables.
+    TFuBag:DumpNodeModel("inv");
+  elseif (cmd == "resetnest") then
+    -- STAGE 0 transition: wipe legacy cat_nest (the node model owns nesting now). Clears the
+    -- corrupt Stage-3 experiment nests so items stop being mis-redirected.
+    TFuInvFrame.cfg.cat_nest = {};
+    TFuBag:BumpCatGen();
+    TFuInvFrame:UpdateWindow(TFuBag.REQ_MUST);
+    TFuBag:Print(TFuBag.SCP.."Inventory category nesting cleared.");
   elseif (cmd == "catdiag") then
     -- TEMP diagnostic: dump a category's rules + bar + live tooltip matches.
     TFuBag:CatDiag("inv", params);

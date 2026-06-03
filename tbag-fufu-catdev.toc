@@ -1,0 +1,27 @@
+## Interface: 120005,120007
+## Version: @project-version@
+## Title: TBag-fufu |cff66ccff(Cat-dev)|r
+## Notes: Category node-model DEV build (branch category-system). Enable INSTEAD of TBag-fufu -- they share globals/slash commands and SavedVariables and cannot both be enabled at once.
+## Category: Inventory
+## Author: Talos, Modified by Shefki; revived as -fufu fork
+## X-Notes: Dev/test build for the category node-tree rewrite. Not for release; deploy via deploy.ps1 -DeployAs tbag-fufu-catdev.
+## RequiredDeps:
+## OptionalDeps: Auctioneer
+## SavedVariables: TFuBagCfg, TFuBagInfo, TFuBnkItm, TFuInvItm, TFuContItm, TFuBodyItm, TFuMailItm, TFuTknItm
+## X-Localizations: enUS, deDE, ruRU
+## X-CompatibleLocales: enUS, deDE, ruRU
+##
+compat-12.lua
+stub.lua
+localization.enUS.lua
+localization.deDE.lua
+localization.ruRU.lua
+defaults.lua
+Tokens.xml
+TBag.xml
+Buttons.xml
+MainFrame.xml
+TInv.xml
+TBnk.xml
+TBnkTabSettings.xml
+ModernOpt.lua

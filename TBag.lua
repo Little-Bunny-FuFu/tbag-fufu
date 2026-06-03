@@ -3153,6 +3153,17 @@ function TFuBag:InitDefVals(cfg, bagarr, row1offset, reset)
     cfg["cat_layout_free"] = {};
   end
 
+  -- Category node-tree model (flag-gated rewrite; see the design doc
+  -- tbag-fufu-category-node-model-design.md). STAGE 0: schema + lazy seed builder ONLY --
+  -- nothing reads cfg.cat_nodes yet except the /printnodes dump, and use_node_model defaults
+  -- OFF so PickBar / LayoutWindow are byte-for-byte unchanged. cat_nodes is (re)built from the
+  -- legacy tables by BuildNodeModelFromLegacy when cat_nodes_seeded is false or cat_model_v is
+  -- stale (see EnsureNodeModel). Per-window like cat_layout.
+  self:SetDef(cfg, "use_node_model", 0, reset, self.NumFunc, 0, 1);
+  if (cfg.cat_nodes == nil or reset == 1) then cfg.cat_nodes = {}; end
+  if (reset == 1) then cfg.cat_nodes_seeded = false; cfg.cat_model_v = nil; end
+  if (cfg.cat_nodes_seeded == nil) then cfg.cat_nodes_seeded = false; end
+
   self:SetDef(cfg, "stack_auto", 1, reset, self.NumFunc, 0, 1);
   self:SetDef(cfg, "stack_resort", 1, reset, self.NumFunc, 0, 1);
 
@@ -3428,6 +3439,213 @@ function TFuBag:GetNestChildren(cfg, cat)
     table.sort(out);
   end
   return out;
+end
+
+-- ===================================================================================
+-- Category NODE-TREE model (Stage 0 -- schema + seed builder + dump only)
+-- =================================================================================
+-- The node model replaces the seven-mechanism category tangle (item_search_list / CAT_BAR
+-- alias chain / armor_group / mat_group / cat_nest / item_overrides / per-bar G_BAR_*) with
+-- one table of stable-id nodes (cfg.cat_nodes). See tbag-fufu-category-node-model-design.md.
+--
+-- STAGE 0 IS READ-ONLY w.r.t. behavior: BuildNodeModelFromLegacy only READS the legacy tables
+-- and WRITES cfg.cat_nodes; nothing in PickBar / LayoutWindow consults cat_nodes yet, and the
+-- use_node_model flag is OFF by default. The /printnodes command dumps the built tree so the
+-- seed can be eyeballed against the live categories before Stage 1 wires the resolver.
+TFuBag.CAT_MODEL_V = 1;
+
+function TFuBag:GetNode(cfg, id)
+  return cfg and cfg.cat_nodes and cfg.cat_nodes[id] or nil;
+end
+
+-- Child nodes of `parentId` (parentId nil => top-level nodes), sorted by .order then id.
+function TFuBag:GetNodeChildren(cfg, parentId)
+  local out = {};
+  if (cfg and cfg.cat_nodes) then
+    for _, n in pairs(cfg.cat_nodes) do
+      if (n.parent == parentId) then out[#out + 1] = n; end
+    end
+    table.sort(out, function(a, b)
+      local oa, ob = a.order or 1e9, b.order or 1e9;
+      if (oa ~= ob) then return oa < ob; end
+      return (a.id or 0) < (b.id or 0);
+    end);
+  end
+  return out;
+end
+
+-- Top-level nodes (no parent), in render/priority order.
+function TFuBag:GetNodeOrderList(cfg)
+  return self:GetNodeChildren(cfg, nil);
+end
+
+-- Build cfg.cat_nodes from the current legacy tables, reproducing today's category set.
+-- One node per category IDENTITY (the string used as itm[I_CAT] / a CAT_BAR key that
+-- resolves to a numeric bar). Captures: display name, current bar, priority order, origin
+-- (which legacy mechanism owns it), per-bar display/sort/hide/colour, alias target, and the
+-- cat_nest parent. STAGE 0 builds the tree faithfully but does NOT yet collapse alias groups
+-- into containers or split equipment/material sub-groups -- that is Stage 1's parity work.
+function TFuBag:BuildNodeModelFromLegacy(cfg)
+  if (not cfg) then return; end
+  local labels = self:BuildCatLabels();
+  local cb = self:GetCatBar(cfg);  -- CAT_BAR map (category -> bar number OR -> alias category)
+
+  -- Priority order from the search list (position == PickBar priority).
+  local order = {};
+  do
+    local ol = self:GetCategoryOrderList(cfg);
+    for i, name in ipairs(ol) do order[name] = i; end
+  end
+
+  -- Origin-classification sets.
+  local matSet = {};
+  if (cfg.mat_group) then
+    for _, v in pairs(cfg.mat_group) do
+      if (v and v ~= "") then matSet[v] = true; end
+    end
+  end
+  local armorSet = {};
+  do
+    local grps = { WEAPON = true };
+    if (cfg.armor_group) then
+      for _, v in pairs(cfg.armor_group) do
+        if (v and v ~= "") then grps[v] = true; end
+      end
+    end
+    for g in pairs(grps) do
+      local gl = L[g] or g;
+      armorSet[gl] = true;
+      armorSet[string.format(L["SOULBOUND_%s"], gl)] = true;
+      armorSet[string.format(L["ACCOUNTBOUND_%s"], gl)] = true;
+    end
+  end
+  local searchSet = {};
+  if (cfg.item_search_list) then
+    for _, rule in ipairs(cfg.item_search_list) do
+      if (rule[1] and rule[1] ~= "") then searchSet[rule[1]] = true; end
+    end
+  end
+
+  -- Universe of identities: every CAT_BAR key that resolves to a numeric bar.
+  local idents = {};
+  for cat, _ in pairs(cb) do
+    local bar = self:ResolveBarAlias(cfg, cb[cat]);
+    if (type(bar) == "number") then
+      idents[#idents + 1] = cat;
+    end
+  end
+  -- Stable id assignment: priority order first, then name.
+  table.sort(idents, function(a, b)
+    local oa, ob = order[a] or 1e9, order[b] or 1e9;
+    if (oa ~= ob) then return oa < ob; end
+    return tostring(a) < tostring(b);
+  end);
+
+  local nodes = {};
+  local tokenToId = {};
+  for i, cat in ipairs(idents) do
+    tokenToId[cat] = i;
+  end
+  for i, cat in ipairs(idents) do
+    local bar = self:ResolveBarAlias(cfg, cb[cat]);
+    local raw = cb[cat];
+    local origin = matSet[cat] and "mat"
+                or armorSet[cat] and "armor"
+                or searchSet[cat] and "search"
+                or "other";
+    local color;
+    if (cfg.cat_color_user and cfg.cat_color_user[bar]) then
+      local r, g, b = self:GetColor(cfg, "bkgr_"..bar);
+      color = { r, g, b };
+    end
+    local children = self:GetNestChildren(cfg, cat);
+    nodes[i] = {
+      id       = i,
+      token    = cat,                       -- stable classification identity (today's I_CAT)
+      name     = labels[cat] or cat,        -- condensed display label
+      bar      = bar,                        -- current legacy box (Stage 1 maps node->box)
+      order    = order[cat] or (1000 + i),   -- priority; non-search cats sort after search cats
+      origin   = origin,                     -- mat | armor | search | other
+      kind     = (#children > 0) and "both" or "leaf",
+      display  = {
+        cols    = self:GetGrp(cfg, self.G_BAR_COLS, bar),
+        mincols = self:GetGrp(cfg, self.G_BAR_MINCOLS, bar),
+        maxcols = self:GetGrp(cfg, self.G_BAR_MAXCOLS, bar),
+        solo    = self:GetGrp(cfg, self.G_BAR_SOLO, bar),
+      },
+      sort     = self:GetGrp(cfg, self.G_BAR_SORT, bar),
+      hidden   = self:GetGrp(cfg, self.G_BAR_HIDE, bar),
+      color    = color,
+      alias_of = (type(raw) == "string") and raw or nil,  -- this node aliases onto another category's box
+      parent_token = self:GetNestParent(cfg, cat),
+    };
+  end
+  -- Resolve parent tokens to parent ids (nil if the parent has no node -- left top-level).
+  for _, n in pairs(nodes) do
+    if (n.parent_token) then n.parent = tokenToId[n.parent_token]; end
+  end
+
+  cfg.cat_nodes = nodes;
+  cfg.cat_nodes_seeded = true;
+  cfg.cat_model_v = self.CAT_MODEL_V;
+  return nodes;
+end
+
+-- Build the node model on first use (or after a model-version bump). Idempotent; cheap to call.
+function TFuBag:EnsureNodeModel(cfg)
+  if (not cfg) then return nil; end
+  if (not cfg.cat_nodes_seeded or cfg.cat_model_v ~= self.CAT_MODEL_V or cfg.cat_nodes == nil) then
+    self:BuildNodeModelFromLegacy(cfg);
+  end
+  return cfg.cat_nodes;
+end
+
+-- /tinv printnodes | /tbnk printnodes -- dump the built node tree (dev diagnostic). Always
+-- REBUILDS from legacy first so the dump reflects the live categories.
+function TFuBag:DumpNodeModel(which)
+  local frame = (which == "bank") and TFuBnkFrame or TFuInvFrame;
+  local cfg = frame and frame.cfg;
+  if (not cfg) then self:Print("No "..(which or "inventory").." cfg."); return; end
+  local nodes = self:BuildNodeModelFromLegacy(cfg);
+  local count = 0;
+  for _ in pairs(nodes) do count = count + 1; end
+  self:Print(self.SCP.."Category node tree ("..(which or "inv").."): "..count.." nodes, model v"
+    ..tostring(cfg.cat_model_v)..(cfg.use_node_model == 1 and "  [use_node_model ON]" or "  [use_node_model OFF]"));
+
+  local printed = {};
+  local function fmt(n)
+    local f = {};
+    f[#f + 1] = "bar="..tostring(n.bar);
+    f[#f + 1] = "["..tostring(n.origin).."]";
+    if (n.kind ~= "leaf") then f[#f + 1] = n.kind; end
+    if (n.alias_of) then f[#f + 1] = "alias->"..tostring(n.alias_of); end
+    if (n.hidden == 1) then f[#f + 1] = "hidden"; end
+    if (n.display and n.display.solo == 1) then f[#f + 1] = "solo"; end
+    if (n.display and n.display.cols) then f[#f + 1] = "cols="..tostring(n.display.cols); end
+    if (n.display and n.display.mincols) then f[#f + 1] = "min="..tostring(n.display.mincols); end
+    if (n.display and n.display.maxcols) then f[#f + 1] = "max="..tostring(n.display.maxcols); end
+    if (n.sort) then f[#f + 1] = "sort="..tostring(n.sort); end
+    if (n.color) then f[#f + 1] = "colour"; end
+    return table.concat(f, " ");
+  end
+  local function pr(n, depth)
+    if (printed[n.id]) then return; end
+    printed[n.id] = true;
+    self:Print(string.rep("    ", depth)..n.id..". "..tostring(n.name)
+      .."  <"..tostring(n.token)..">  "..fmt(n));
+    for _, c in ipairs(self:GetNodeChildren(cfg, n.id)) do pr(c, depth + 1); end
+  end
+  for _, n in ipairs(self:GetNodeOrderList(cfg)) do pr(n, 0); end
+  -- Any node not reachable from a top-level root (orphaned parent link).
+  local orphans = {};
+  for _, n in pairs(nodes) do
+    if (not printed[n.id]) then orphans[#orphans + 1] = n; end
+  end
+  if (#orphans > 0) then
+    table.sort(orphans, function(a, b) return (a.id or 0) < (b.id or 0); end);
+    self:Print("  (orphans -- parent node missing):");
+    for _, n in ipairs(orphans) do pr(n, 1); end
+  end
 end
 
 -- Walk up the parent chain until we find a frame carrying the addon's `cfg` --
