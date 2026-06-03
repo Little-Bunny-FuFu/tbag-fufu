@@ -1,3 +1,22 @@
+* 12.0.0.05-fufu (2026-06-03)
+  Per-category layout options and a unified right-click menu style.
+- Per-category Layout options: right-click a category and set how it lays out -- a
+  fixed number of columns before wrapping, a min/max column range, "never single
+  column" (always at least a block), or "solo full-width row" (its own row spanning
+  the window, like the equipment shelves). Categories with no override are unchanged.
+- Right-click a category title to open that category's menu in EVERY mode (view and
+  edit), not just edit mode. "Print contents to chat" is now a menu entry.
+- Fix: in classic Edit Mode, clicking a numbered bar button to move a category did
+  nothing -- the buttons were parented to the scroll viewport, so the handler never
+  saw edit mode. Category moves (and the hover tooltips) work again.
+- Grey / poor-quality ("junk") gear now sorts into the Junk box instead of being
+  grouped with your real armor and weapons, and junk items get a subtle grey tint so
+  their throwaway status reads at a glance even away from a merchant.
+- Right-click menus restyled for consistency: a single, high-contrast indicator
+  (a square checkbox with a gold row highlight when on) on every toggle, all option
+  names aligned, and submenu rows matched -- across the category menu, both window
+  menus, and their sub-lists. Submenu value pickers stay open and single-select.
+
 * 12.0.0.04-fufu (2026-06-03)
   Category colours, equipment-shelf layout, and edit-mode menu access.
 - Equipment boxes (Group armor by slot + Separate by bind) now spread their
