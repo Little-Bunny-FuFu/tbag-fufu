@@ -1,3 +1,22 @@
+* 12.0.0.04-fufu (2026-06-03)
+  Category colours, equipment-shelf layout, and edit-mode menu access.
+- Equipment boxes (Group armor by slot + Separate by bind) now spread their
+  armor/weapon sub-groups edge-to-edge across the full shelf instead of packing
+  them to the left; sub-group titles use the freed space, so multi-word weapon
+  names ("One-Handed Swords", "Crossbows") show in full instead of truncating.
+- Fix: adjacent category titles no longer overflow into one another (e.g. "Trade
+  Good" + "Miscellaneous" running together). A title clamps only when a neighbour
+  is actually close, and still overhangs into genuine empty space.
+- Category boxes now BLEND into the window while viewing and show a colour only in
+  edit mode, so the window stays clean. Each category gets a distinct, auto-
+  generated colour biased away from your window background (so none blend in),
+  regenerated if you change the window colour; a colour you pick by hand is pinned.
+- Right-clicking a category in edit mode now opens that category's menu (colour,
+  sort, hide) instead of the main menu, so per-category colour is reachable in the
+  default drag-to-arrange mode. The menu gains "Print contents to chat"; right-
+  clicking a category title while NOT editing still prints directly.
+- First release published on CurseForge.
+
 * 12.0.0.03-fufu (2026-06-02)
   Options-menu polish and fixes.
 - Right-click option menus reworked: only true on/off options show an indicator now -- a
