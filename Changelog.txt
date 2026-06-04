@@ -1,3 +1,21 @@
+* 12.0.0.06-fufu (2026-06-04)
+  Display fixes: category menu toggles, Manual-Layout title drag, and edge columns.
+- Fix: a category's right-click menu toggles (Sort / Hide / Highlight and the per-
+  category Layout options) drew inconsistently on 12.0 -- some on/off boxes were missing
+  and the indicator overlapped the option text. The toggle indicators now render through
+  the game's own menu check, so they show reliably and line up. Inventory and bank both.
+- Fix: in Manual Layout you couldn't drag a category by its title -- the title's right-
+  click hit-area sat on top of the drag handle and swallowed the grab. Titles drag again
+  (right-click still opens the category menu).
+- Fix: a category near the window edge could be stuck in a single column even with "Never
+  single column" / Min columns / a fixed column count set. The auto-flow packer now keeps
+  a constrained category's minimum width, wrapping it to the next row instead of squashing
+  it to one column to fit the row.
+- Fix: per-category column options (Columns-before-wrap / Min / Max) were ignored in Manual
+  Layout once a box had been hand-placed -- the box kept its captured width and switching
+  Manual Layout / Free Placement on and off reverted it. The options are now re-applied on
+  every layout, so they're honored the same in auto-flow, grid, and free placement.
+
 * 12.0.0.05-fufu (2026-06-03)
   Per-category layout options and a unified right-click menu style.
 - Per-category Layout options: right-click a category and set how it lays out -- a

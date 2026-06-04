@@ -1370,6 +1370,33 @@ function TFuBag:MLBarDims(frame, items, rec, colmax)
   return cols, rows, false;
 end
 
+-- Re-clamp every placed box's saved column width to its per-category column options
+-- (Columns-before-wrap / Min / Max), so changing an option takes effect in Manual Layout
+-- WITHOUT re-dragging -- the same BarColConstraint the ML-off auto-flow applies. Without
+-- this a hand-placed layout (ml_auto == false, no re-seed) keeps the frozen snapshot width
+-- and ignored the option (the "doesn't respect the category setting / reverts" bug). Runs
+-- on both the grid (cat_layout) and free (cat_layout_free) stores -- both key width on
+-- rec.cols. Equipment shelves draw full-width (cols ignored by MLBarDims), so skip them.
+-- Auto leaves the width inside [1, budget]; an explicit fixed/min/max wins over the snapshot.
+function TFuBag:MLApplyColConstraints(frame, store, colmax)
+  if (not store or not frame) then return; end
+  local cfg = frame.cfg;
+  local baritm = frame.BARITM;
+  for bn = 1, self.BAR_MAX do
+    local rec = store[bn];
+    if (rec and rec.cols) then
+      local items = baritm[bn];
+      local n = (items and table.getn(items)) or 0;
+      if (n > 0 and not self:BarHasSubgroups(items)) then
+        local lo, hi = self:BarColConstraint(cfg, bn, n, colmax);
+        local c = rec.cols;
+        if (c < lo) then c = lo; elseif (c > hi) then c = hi; end
+        rec.cols = c;
+      end
+    end
+  end
+end
+
 -- Plan a sub-headered box across the FULL content width `colmax` (Baganator-style
 -- shelf flow). Each sub-group is an inline cluster (header on top, its items in a
 -- block beneath); clusters pack left-to-right and wrap to a new shelf when the
@@ -2505,30 +2532,18 @@ function TFuBag.StrFunc(value, choices_array)
   end
 end
 
--- Right-click menu toggle indicator (flush-left layout).
--- Every menu row is drawn notCheckable so the text aligns flush-left and no left-side
--- check box appears. A genuine on/off toggle instead gets a RADIAL (radio) button drawn on
--- the RIGHT of its row -- the same column the submenu ">" arrows occupy -- filled when the
--- toggle is enabled and an empty bordered circle when disabled. An enabled row also gets a
--- locked highlight so the active state reads at a glance. The radio is a custom child
--- texture of the shared DropDownList button; both it and the locked highlight are cleared
--- whenever the list hides, so they can never linger into another addon's reuse of the same
--- button. UIDropDownMenu is not a protected/secure frame, so a child texture is taint-safe.
--- Clear our menu decorations from one DropDownList's buttons and restore the stock check/
--- uncheck alpha we zeroed, so a button reused by another addon's menu looks normal again.
+-- On list hide, undo the per-row state we leave on the POOLED DropDownList buttons so a
+-- button later reused by ANOTHER addon's menu looks normal again: clear our toggle markers
+-- and restore the stock check/uncheck alpha we zeroed on non-toggle rows (see
+-- HideMenuChecksExceptToggles). UIDropDownMenu is not a protected/secure frame, so touching a
+-- shared button's child alpha is taint-safe.
 function TFuBag:CleanupMenuList(listName)
   local lf = _G[listName];
   if (not lf) then return; end
   for i = 1, (lf.numButtons or 0) do
     local b = _G[listName.."Button"..i];
     if (b) then
-      if (b.tbagRadioRing) then b.tbagRadioRing:Hide(); end
-      if (b.tbagRadioDot) then b.tbagRadioDot:Hide(); end
-      if (b.tbagRowHL) then b.tbagRowHL:Hide(); end
-      if (b.tbagRowGlow) then b.tbagRowGlow:Hide(); end
-      if (b.tbagBox) then b.tbagBox:Hide(); end
-      if (b.tbagBoxChk) then b.tbagBoxChk:Hide(); end
-      b.tbagOnFn = nil;
+      b.tbagToggle = nil;
       local cc = _G[listName.."Button"..i.."Check"];   if (cc) then cc:SetAlpha(1); end
       local uu = _G[listName.."Button"..i.."UnCheck"]; if (uu) then uu:SetAlpha(1); end
     end
@@ -2555,118 +2570,15 @@ function TFuBag:EnsureMenuCheckHook()
   end
 end
 
--- A radial (radio) on/off button on the RIGHT of a toggle row. UI-RadioButton frame 1 is
--- the empty bordered ring, frame 2 the filled centre. A real radio shows the ring at ALL
--- times and overlays the filled centre when selected, so the OUTER size never changes
--- between states (showing frame 1 OR frame 2 alone made the empty look larger than the
--- filled). An enabled row also gets a subtle gold row tint -- our own texture, because the
--- dropdown button's built-in highlight is too faint to read. Reserve room via info.padding
--- (see AddToggleMenuButton) so text never runs under the radio.
-function TFuBag:SetMenuRadio(button, enabled)
-  if (not button) then return; end
-  local ring = button.tbagRadioRing;
-  if (not ring) then
-    ring = button:CreateTexture(nil, "OVERLAY");
-    ring:SetTexture("Interface\\Buttons\\UI-RadioButton");
-    ring:SetTexCoord(0.0, 0.25, 0.0, 1.0);   -- empty ring (always shown)
-    ring:SetSize(16, 16);
-    ring:SetPoint("RIGHT", button, "RIGHT", -6, 0);
-    button.tbagRadioRing = ring;
+-- (Retired: SetMenuRadio / AddToggleMenuButton / SetMenuRow -- the hand-placed check/radio
+-- overlay that raced Blizzard's native check management on 12.0 and mis-drew/overlapped the
+-- toggle rows. Toggle indicators now render natively; see AddMenuToggle / AddSquareCheckRow.)
 
-    local dot = button:CreateTexture(nil, "OVERLAY", nil, 1);  -- sublevel above the ring
-    dot:SetTexture("Interface\\Buttons\\UI-RadioButton");
-    dot:SetTexCoord(0.25, 0.5, 0.0, 1.0);    -- filled centre overlay
-    dot:SetSize(16, 16);
-    dot:SetPoint("CENTER", ring, "CENTER", 0, 0);
-    button.tbagRadioDot = dot;
-
-    local hl = button:CreateTexture(nil, "BACKGROUND");
-    hl:SetColorTexture(1.0, 0.82, 0.0, 0.12); -- subtle gold "enabled" row tint
-    hl:SetPoint("TOPLEFT", button, "TOPLEFT", 0, 0);
-    hl:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", 0, 0);
-    button.tbagRowHL = hl;
-  end
-  ring:Show();
-  if (enabled) then
-    button.tbagRadioDot:Show();
-    button.tbagRowHL:Show();
-  else
-    button.tbagRadioDot:Hide();
-    button.tbagRowHL:Hide();
-  end
-end
-
--- Add a notCheckable menu row that is a genuine on/off toggle: flush-left text plus a
--- right-column radial button (filled when enabled). `stateFn` returns the current on/off
--- state and is re-evaluated after a click so the radio + row tint update in place. The row
--- keeps the menu open on click (keepShownOnClick) -- a toggle shouldn't dismiss the menu.
--- Mirrors a UIDropDownMenu_AddButton call so the inventory and bank menus share one path.
-function TFuBag:AddToggleMenuButton(info, level, stateFn)
-  level = level or 1;
-  info["notCheckable"] = 1;
-  info["keepShownOnClick"] = 1;                    -- toggling shouldn't close the menu
-  info["padding"] = (info["padding"] or 0) + 24;   -- reserve width for the right-side radio
-  TFuBag:EnsureMenuCheckHook();
-  -- Wrap the click so the radio + tint refresh on the clicked button after the toggle runs.
-  local origFunc = info["func"];
-  info["func"] = function(self, a1, a2, checked, mouseButton)
-    if (origFunc) then origFunc(self, a1, a2, checked, mouseButton); end
-    TFuBag:SetMenuRadio(self, stateFn and stateFn());
-  end
-  UIDropDownMenu_AddButton(info, level);
-  local lf = _G["DropDownList"..level];
-  if (lf) then
-    TFuBag:SetMenuRadio(_G["DropDownList"..level.."Button"..lf.numButtons], stateFn and stateFn());
-  end
-end
-
--- Draw a HIGH-CONTRAST toggle indicator on a menu row: a bright bordered checkbox over the
--- left check column (so the empty/off state is clearly visible -- the stock legacy check is
--- nearly invisible on the dark menu background), a check overlay when on, and a gold full-row
--- wash when on. A dark mask sits under the bright box to hide the faint stock check behind it.
--- All our own textures, parented to the (shared) dropdown button; EnsureMenuCheckHook clears
--- them when the list hides so they can't linger into another addon's reuse of the button.
-function TFuBag:SetMenuRow(button, on)
-  if (not button) then return; end
-  local nm = button:GetName();
-  local legacy = nm and _G[nm.."Check"];
-  local legacyUn = nm and _G[nm.."UnCheck"];
-  if (not button.tbagBox) then
-    local box = button:CreateTexture(nil, "ARTWORK", nil, 2);
-    box:SetTexture("Interface\\Buttons\\UI-CheckBox-Up");  -- clearly bevelled empty box
-    box:SetSize(20, 20);
-    button.tbagBox = box;
-    local chk = button:CreateTexture(nil, "ARTWORK", nil, 3);
-    chk:SetTexture("Interface\\Buttons\\UI-CheckBox-Check");
-    chk:SetSize(20, 20);
-    chk:SetPoint("CENTER", box, "CENTER", 0, 0);
-    button.tbagBoxChk = chk;
-    local hl = button:CreateTexture(nil, "BACKGROUND");
-    hl:SetColorTexture(1.0, 0.82, 0.0, 0.18);       -- gold enabled-row wash
-    hl:SetPoint("TOPLEFT", button, "TOPLEFT", 0, 0);
-    hl:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", 0, 0);
-    button.tbagRowGlow = hl;
-  end
-  -- Sit our box EXACTLY over the stock check column so every toggle's indicator lines up with
-  -- the same column the other rows reserve; hide the faint stock check/uncheck so only our
-  -- bright square shows (no stock circle peeking through or sitting beside it).
-  button.tbagBox:ClearAllPoints();
-  if (legacy) then
-    button.tbagBox:SetPoint("CENTER", legacy, "CENTER", 0, 0);
-    legacy:SetAlpha(0);
-  else
-    button.tbagBox:SetPoint("LEFT", button, "LEFT", 2, 0);
-  end
-  if (legacyUn) then legacyUn:SetAlpha(0); end
-  button.tbagBox:Show();
-  button.tbagBoxChk:SetShown(on and true or false);
-  button.tbagRowGlow:SetShown(on and true or false);
-end
-
--- Hide the faint stock check/uncheck "circle" on every NON-toggle row at `level` (the rows
--- without our bright box this populate), so the menu shows a single indicator style: our square
--- box on toggles, nothing on submenu/action rows -- no square-vs-circle clash. The box-shown
--- test (not just the field) handles a pooled button reused from a toggle row to a plain one.
+-- Hide the faint stock check/uncheck "circle" on every NON-toggle row at `level` so the menu
+-- shows a single indicator style: a bright check on real toggles (rendered natively, marked
+-- `tbagToggle`), nothing on submenu/action/colour rows -- no check-vs-circle clash. Toggle rows
+-- are skipped so their native check survives. `tbagToggle` is cleared on list hide
+-- (CleanupMenuList), so a pooled button reused from a toggle row to a plain one is handled.
 function TFuBag:HideMenuChecksExceptToggles(level)
   level = level or 1;
   local lf = _G["DropDownList"..level];
@@ -2674,72 +2586,64 @@ function TFuBag:HideMenuChecksExceptToggles(level)
   for i = 1, (lf.numButtons or 0) do
     local nm = "DropDownList"..level.."Button"..i;
     local b = _G[nm];
-    if (b and not (b.tbagBox and b.tbagBox:IsShown())) then
+    if (b and not b.tbagToggle) then
       local c = _G[nm.."Check"];   if (c) then c:SetAlpha(0); end
       local u = _G[nm.."UnCheck"]; if (u) then u:SetAlpha(0); end
     end
   end
 end
 
--- Re-apply every glow/checkbox at `level` from each button's stored state function. Called
--- after a click so a radio group (Sort / Hide / Highlight) shows single-select live and an
--- independent toggle updates -- the menu stays open (keepShownOnClick) and is NOT repopulated,
--- so this is what keeps the indicators truthful without a close/reopen.
-function TFuBag:RefreshMenuRows(level)
-  level = level or 1;
-  local lf = _G["DropDownList"..level];
-  if (not lf) then return; end
-  for i = 1, (lf.numButtons or 0) do
-    local b = _G["DropDownList"..level.."Button"..i];
-    if (b and b.tbagOnFn) then
-      self:SetMenuRow(b, b.tbagOnFn());
-    end
-  end
-end
+-- (Retired: RefreshMenuRows -- the keep-open menu now refreshes live via the native
+-- UIDropDownMenu_RefreshAll call in AddMenuToggle's click wrapper.)
 
--- Add a keep-open menu toggle / radio-member row with the high-contrast indicator. `isOnFn`
--- returns whether the row is currently on (re-read from cfg, so a radio group resolves to a
--- single selection). The row stays CHECKABLE (left column reserved -> names line up) but the
--- stock check is masked over by our bright box. keepShownOnClick clobbers button.checked with a
--- static toggle, so the wrapper restores isOnFn and refreshes every row's indicator.
+-- Add a keep-open toggle / radio-member row whose check is rendered NATIVELY by UIDropDownMenu
+-- (info.checked + a bright custom check/uncheck texture) rather than the old hand-placed
+-- overlay. Blizzard then owns the indicator's position, show/hide and pooled-button reuse --
+-- the overlay raced Blizzard's own check management on 12.0, which mis-drew / overlapped the
+-- toggle rows. The row stays CHECKABLE so its text lines up with the action rows. `isOnFn`
+-- returns the current on/off (re-read from cfg, so a radio group resolves to one selection).
+-- keepShownOnClick keeps the menu open; after the click we RefreshAll so every row's checked()
+-- re-evaluates live (a radio group updates single-select without a close/reopen). `tbagToggle`
+-- marks the row so HideMenuChecksExceptToggles keeps its check while hiding the plain rows'.
 function TFuBag:AddMenuToggle(info, level, isOnFn)
   level = level or 1;
   self:EnsureMenuCheckHook();
   info["keepShownOnClick"] = 1;
+  info["isNotRadio"] = true;            -- checkbox semantics (the custom texture is the visual)
   info["checked"] = function() return isOnFn(); end;
+  info["customCheckIconTexture"]   = "Interface\\Buttons\\UI-CheckBox-Check";  -- ON: bright check
+  info["customUncheckIconTexture"] = "Interface\\Buttons\\UI-CheckBox-Up";     -- OFF: empty box
   local origFunc = info["func"];
   info["func"] = function(btn, a1, a2, checked, mb)
     if (origFunc) then origFunc(btn, a1, a2, checked, mb); end
-    btn.checked = function() return isOnFn(); end;   -- restore live check after the clobber
-    btn.tbagOnFn = isOnFn;
-    TFuBag:RefreshMenuRows(level);
+    btn.checked = function() return isOnFn(); end;   -- keep the live check (defensive)
+    local dd = UIDROPDOWNMENU_OPEN_MENU;
+    if (dd) then UIDropDownMenu_RefreshAll(dd); end   -- re-evaluate every row's checked() live
   end
   UIDropDownMenu_AddButton(info, level);
   local lf = _G["DropDownList"..level];
   if (lf) then
     local b = _G["DropDownList"..level.."Button"..lf.numButtons];
-    if (b) then
-      b.tbagOnFn = isOnFn;
-      TFuBag:SetMenuRow(b, isOnFn());
-    end
+    if (b) then b.tbagToggle = true; end
   end
 end
 
--- Add a single-select row with the square-box indicator that CLOSES the menu on pick
--- (combobox behaviour), for selection lists where keeping the menu open is wrong -- e.g. the
--- character dropdown box. `isOn` is the current state at draw time; the menu rebuilds on
--- reopen so no live refresh is needed.
+-- Add a single-select row that CLOSES the menu on pick (combobox behaviour), e.g. the
+-- character dropdown box. Native bright check, no keepShownOnClick (so the click dismisses the
+-- menu); `isOn` is the state at draw time -- the menu rebuilds on reopen so no live refresh is
+-- needed. `tbagToggle` keeps HideMenuChecksExceptToggles from hiding this row's check.
 function TFuBag:AddSquareCheckRow(info, level, isOn)
   level = level or 1;
   self:EnsureMenuCheckHook();
+  info["isNotRadio"] = true;
+  info["checked"] = isOn and true or false;
+  info["customCheckIconTexture"]   = "Interface\\Buttons\\UI-CheckBox-Check";
+  info["customUncheckIconTexture"] = "Interface\\Buttons\\UI-CheckBox-Up";
   UIDropDownMenu_AddButton(info, level);
   local lf = _G["DropDownList"..level];
   if (lf) then
     local b = _G["DropDownList"..level.."Button"..lf.numButtons];
-    if (b) then
-      b.tbagOnFn = function() return isOn; end;
-      self:SetMenuRow(b, isOn);
-    end
+    if (b) then b.tbagToggle = true; end
   end
 end
 
@@ -6824,9 +6728,9 @@ function TFuBag:BarLayoutSubmenu(frame, bar, level, which)
     frame:UpdateWindow(self.REQ_MUST);
   end
 
-  -- Route the value rows through AddMenuToggle so they get the SAME square-box indicator as the
-  -- top-level toggles (no stock circle). AddMenuToggle keeps the submenu open and, via
-  -- RefreshMenuRows(level), re-evaluates every row after a pick so exactly one stays checked.
+  -- Route the value rows through AddMenuToggle so they get the SAME native check indicator as
+  -- the top-level toggles (no stock circle). AddMenuToggle keeps the submenu open and, via
+  -- UIDropDownMenu_RefreshAll, re-evaluates every row after a pick so exactly one stays checked.
   self:AddMenuToggle({
     ["text"] = L["Auto"],
     ["func"] = function() apply(nil); end,
@@ -6876,7 +6780,14 @@ function TFuBag:SetBarDraggable(frame, barnum, bf, enabled, show_title_handle, l
         h:ClearAllPoints();
         h:SetPoint("BOTTOMLEFT", bf, "TOPLEFT", 0, 0);
         h:SetPoint("TOPRIGHT", bf, "TOPRIGHT", 0, label_gap);
-        h:SetFrameLevel(bf:GetFrameLevel() + 10);
+        -- Sit ABOVE the right-click CatTitleBtn (bf+12, set by WireCatTitleClick).
+        -- In Manual Layout the title label is stretched to the FULL box width
+        -- (LayoutWindowFree*), so CatTitleBtn (SetAllPoints(label)) covers the whole
+        -- title strip; at bf+10 it occluded this handle and swallowed the left-drag,
+        -- so categories couldn't be dragged by their titles. The handle already routes
+        -- right-click to the same OpenBarMenu, so taking the top spot keeps right-click
+        -- working AND restores the drag.
+        h:SetFrameLevel(bf:GetFrameLevel() + 15);
         h:Show();
       else
         h:Hide();
@@ -7257,6 +7168,8 @@ function TFuBag:LayoutWindowFree(frame, PAD_TOP, PAD_BOTTOM, show_cat_names, CAT
   self:SeedCatLayout(frame, calc_dat);
 
   local cat_layout = cfg.cat_layout;
+  -- Per-category column options win over the snapshot width (see MLApplyColConstraints).
+  self:MLApplyColConstraints(frame, cat_layout, colmax);
 
   -- Trim leading empty columns/rows: shift the whole layout so the left-most and
   -- top-most occupied cells sit at the origin. The window already shrinks to the
@@ -7516,6 +7429,8 @@ function TFuBag:LayoutWindowFreePlace(frame, PAD_TOP, PAD_BOTTOM, show_cat_names
   local label_gap = (show_cat_names and CATNAME_H or 0);
 
   self:SeedCatLayoutFree(frame);
+  -- Per-category column options win over the snapshot width (see MLApplyColConstraints).
+  self:MLApplyColConstraints(frame, store, colmax);
 
   -- Re-anchor the origin to the left/top-most occupied box (shift by the minimum,
   -- whatever its sign). A NEGATIVE min means a box was dragged past the left/top
@@ -8130,7 +8045,23 @@ function TFuBag:LayoutWindow(frame)
       barnum = barnum + 1;
     else
       local n = 0;
+      local floorsum = 0;   -- summed min-column floors of the bars already in this row
       while (n < bar_x and (barnum + n) <= self.BAR_MAX - 1 and not peelSolo(barnum + n)) do
+        -- A bar's minimum-column floor (Min columns / "Never single column" / fixed
+        -- Columns-before-wrap), view mode only -- edit mode packs unconstrained as before.
+        local cnt = table.getn(baritm[barnum + n]);
+        local lo = 0;
+        if (cnt > 0) then
+          lo = (edit_mode ~= 1) and (self:BarColConstraint(cfg, barnum + n, cnt, colmax)) or 1;
+        end
+        -- Don't admit a bar whose floor would push the row's combined floors past the
+        -- column budget: CalcBarLayout's shave loop would then have to violate that
+        -- floor and squash a category to a single column (the "stuck single column near
+        -- the edge" bug). Wrapping it to the next row keeps its Min/wrap setting intact
+        -- without overflowing the window. The first bar always goes in (a lone over-wide
+        -- bar is still handled by the shave as a last resort).
+        if (n > 0 and floorsum + lo > colmax) then break; end
+        floorsum = floorsum + lo;
         n = n + 1;
       end
       if (n < 1) then n = 1; end
