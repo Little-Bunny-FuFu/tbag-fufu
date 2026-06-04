@@ -3506,6 +3506,74 @@ function TFuBag:GetNodeByToken(cfg, token)
   return id and nodes[id] or nil;
 end
 
+-- ===================================================================================
+-- Node-tree navigation + edits (Stage 2 -- nesting). The node-model counterpart of the
+-- legacy cat_nest helpers, but keyed on cat_nodes ids (node.parent = parent id | nil,
+-- node.order = rank among siblings). Every walk is bounded by NEST_MAXDEPTH and
+-- cycle-guarded so a corrupt parent link can never hang. A nested node's items render
+-- inside its ROOT ancestor's box as an indented sub-group (flat view, PickBar redirect).
+-- ===================================================================================
+
+-- The root ancestor node (the node itself if top-level). Cycle/over-deep safe.
+function TFuBag:GetNodeRoot(cfg, node)
+  if (not node) then return nil; end
+  local seen, cur = {}, node;
+  for _ = 1, self.NEST_MAXDEPTH do
+    local p = cur.parent and self:GetNode(cfg, cur.parent);
+    if (not p or seen[p.id]) then break; end
+    seen[cur.id] = true; cur = p;
+  end
+  return cur;
+end
+
+-- Number of ancestors (0 == top-level).
+function TFuBag:GetNodeDepth(cfg, node)
+  if (not node) then return 0; end
+  local seen, d, cur = {}, 0, node;
+  for _ = 1, self.NEST_MAXDEPTH do
+    local p = cur.parent and self:GetNode(cfg, cur.parent);
+    if (not p or seen[p.id]) then break; end
+    seen[cur.id] = true; cur = p; d = d + 1;
+  end
+  return d;
+end
+
+-- True if making parentId the parent of childId would create a cycle (parent is the child
+-- itself or already a descendant of it).
+function TFuBag:WouldNodeCycle(cfg, childId, parentId)
+  if (childId == parentId) then return true; end
+  local seen, cur = {}, parentId;
+  for _ = 1, self.NEST_MAXDEPTH do
+    if (cur == childId) then return true; end
+    if (not cur or seen[cur]) then break; end
+    seen[cur] = true;
+    local n = self:GetNode(cfg, cur);
+    cur = n and n.parent or nil;
+  end
+  return false;
+end
+
+-- Nest childId under parentId (parentId nil = un-nest to top level). Refuses cycles and
+-- missing nodes. On nest, appends the child after its new siblings (sparse order). Returns
+-- true on success, false (with no change) on a bad/cyclic request.
+function TFuBag:SetNodeParent(cfg, childId, parentId)
+  local child = self:GetNode(cfg, childId);
+  if (not child) then return false; end
+  if (parentId == nil) then
+    child.parent = nil;
+    return true;
+  end
+  if (not self:GetNode(cfg, parentId)) then return false; end
+  if (self:WouldNodeCycle(cfg, childId, parentId)) then return false; end
+  child.parent = parentId;
+  local maxOrder = 0;
+  for _, n in pairs(cfg.cat_nodes) do
+    if (n.parent == parentId and (n.order or 0) > maxOrder) then maxOrder = n.order or 0; end
+  end
+  child.order = maxOrder + 10;
+  return true;
+end
+
 -- Build cfg.cat_nodes from the current legacy tables, reproducing today's category set.
 -- One node per category IDENTITY (the string used as itm[I_CAT] / a CAT_BAR key that
 -- resolves to a numeric bar). Captures: display name, current bar, priority order, origin
@@ -3644,13 +3712,15 @@ function TFuBag:EnsureNodeModel(cfg)
   return cfg.cat_nodes;
 end
 
--- /tinv printnodes | /tbnk printnodes -- dump the built node tree (dev diagnostic). Always
--- REBUILDS from legacy first so the dump reflects the live categories.
+-- /tinv printnodes | /tbnk printnodes -- dump the CURRENT node tree (dev diagnostic),
+-- including any nesting the user has applied. Uses EnsureNodeModel (seeds once if needed)
+-- rather than force-rebuilding, so running printnodes does NOT wipe nesting -- use
+-- /tinv resetnodes to deliberately rebuild a flat tree from the legacy tables.
 function TFuBag:DumpNodeModel(which)
   local frame = (which == "bank") and TFuBnkFrame or TFuInvFrame;
   local cfg = frame and frame.cfg;
   if (not cfg) then self:Print("No "..(which or "inventory").." cfg."); return; end
-  local nodes = self:BuildNodeModelFromLegacy(cfg);
+  local nodes = self:EnsureNodeModel(cfg);
   local count = 0;
   for _ in pairs(nodes) do count = count + 1; end
   self:Print(self.SCP.."Category node tree ("..(which or "inv").."): "..count.." nodes, model v"
@@ -3839,6 +3909,12 @@ function TFuBag:GetBarCategoryName(baritmbar, cfg)
   -- (distinguishing the unbound box from the Soulbound / Account-Bound boxes). With split
   -- off the box holds ALL gear, so show a generic "Equipment" header instead.
   local bindSplitOff = (cfg ~= nil and cfg.armor_bind_split ~= 1);
+  -- Node model: title a box by the ROOT node's label, not each item's own category. A
+  -- flat-nested box then reads as the parent ("Trade Goods") instead of "Trade Goods /
+  -- Herbs / Leather" (the legacy nesting title bug); aliased top-level nodes still dedupe
+  -- by their shared label. For a NON-nested node root==self, so this is identical to the
+  -- legacy I_CAT path -- parity preserved.
+  local nodeModel = (cfg ~= nil and cfg.use_node_model == 1);
   local seen = {};
   local names = {};
   for _, itm in ipairs(baritmbar) do
@@ -3848,8 +3924,13 @@ function TFuBag:GetBarCategoryName(baritmbar, cfg)
     if (not itm[self.I_ITEMLINK] or itm[self.I_ITEMLINK] == "") then
       cat = L["Empty"];
     else
-      cat = itm[self.I_CAT];
-      cat = labels[cat] or cat;
+      local tok = itm[self.I_CAT];
+      if (nodeModel and itm.node) then
+        local n = self:GetNode(cfg, itm.node);
+        local root = n and self:GetNodeRoot(cfg, n);
+        if (root and root.token) then tok = root.token; end
+      end
+      cat = labels[tok] or tok;
       if (bindSplitOff and cat == "BoE") then cat = "Equipment"; end
     end
     if (cat and cat ~= "" and not seen[cat]) then
@@ -5725,6 +5806,19 @@ function TFuBag:PickBar(cfg, playerid, itm, trade1, trade2)
     if (node and type(node.bar) == "number") then
       itm.node = node.id;
       itm[self.I_BAR] = node.bar;
+      -- Nesting (Stage 2, flat view): a node with a parent renders its items inside the
+      -- ROOT ancestor's box as an indented sub-group, reusing the equipment sub-header
+      -- renderer. Items keep their own I_CAT so each nested group stays contiguous in the
+      -- within-box sort; I_SUBGROUP becomes the node's display name, indented by depth.
+      -- Skip items that already carry a sub-group (equipment shelves stay as-is for now).
+      if (node.parent and (itm[self.I_SUBGROUP] == nil or itm[self.I_SUBGROUP] == "")) then
+        local root = self:GetNodeRoot(cfg, node);
+        if (root and type(root.bar) == "number") then
+          itm[self.I_BAR] = root.bar;
+          itm[self.I_SUBGROUP] = string.rep("   ", self:GetNodeDepth(cfg, node))
+            ..(node.name or node.token);
+        end
+      end
     end
   end
 

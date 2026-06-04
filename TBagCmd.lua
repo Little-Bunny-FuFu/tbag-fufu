@@ -170,6 +170,34 @@ function TFuBnk_cmd(msg)
     TFuBag:BumpCatGen();
     TFuBnkFrame:UpdateWindow(TFuBag.REQ_MUST);
     TFuBag:Print(TFuBag.SCP.."Bank node model rebuilt from legacy ("..n.." nodes).");
+  elseif (cmd == "nest") then
+    -- STAGE 2 dev: nest node <childId> under <parentId> (ids from /tbnk printnodes). The
+    -- child's items fold into the root box as an indented sub-group. Needs the node model ON.
+    local a, b = TFuBag:SplitStr(params, " ");
+    local childId, parentId = tonumber(a), tonumber(b);
+    TFuBag:EnsureNodeModel(TFuBnkFrame.cfg);
+    if (not childId or not parentId) then
+      TFuBag:Print(TFuBag.SCP.."Usage: /tbnk nest <childId> <parentId>  (ids from printnodes)");
+    elseif (TFuBag:SetNodeParent(TFuBnkFrame.cfg, childId, parentId)) then
+      TFuBag:BumpCatGen();
+      TFuBnkFrame:UpdateWindow(TFuBag.REQ_MUST);
+      TFuBag:Print(TFuBag.SCP.."Nested node "..childId.." under "..parentId..".");
+    else
+      TFuBag:Print(TFuBag.SCP.."Nest refused (bad id or would create a cycle).");
+    end
+  elseif (cmd == "unnest") then
+    -- STAGE 2 dev: un-nest node <childId> back to the top level.
+    local childId = tonumber(params);
+    TFuBag:EnsureNodeModel(TFuBnkFrame.cfg);
+    if (not childId) then
+      TFuBag:Print(TFuBag.SCP.."Usage: /tbnk unnest <childId>  (id from printnodes)");
+    elseif (TFuBag:SetNodeParent(TFuBnkFrame.cfg, childId, nil)) then
+      TFuBag:BumpCatGen();
+      TFuBnkFrame:UpdateWindow(TFuBag.REQ_MUST);
+      TFuBag:Print(TFuBag.SCP.."Un-nested node "..childId..".");
+    else
+      TFuBag:Print(TFuBag.SCP.."Un-nest refused (bad id).");
+    end
   elseif (cmd == "catdiag") then
     -- TEMP diagnostic: dump a category's rules + bar + live tooltip matches.
     TFuBag:CatDiag("bank", params);
@@ -272,6 +300,34 @@ function TFuInv_cmd(msg)
     TFuBag:BumpCatGen();
     TFuInvFrame:UpdateWindow(TFuBag.REQ_MUST);
     TFuBag:Print(TFuBag.SCP.."Inventory node model rebuilt from legacy ("..n.." nodes).");
+  elseif (cmd == "nest") then
+    -- STAGE 2 dev: nest node <childId> under <parentId> (ids from /tinv printnodes). The
+    -- child's items fold into the root box as an indented sub-group. Needs the node model ON.
+    local a, b = TFuBag:SplitStr(params, " ");
+    local childId, parentId = tonumber(a), tonumber(b);
+    TFuBag:EnsureNodeModel(TFuInvFrame.cfg);
+    if (not childId or not parentId) then
+      TFuBag:Print(TFuBag.SCP.."Usage: /tinv nest <childId> <parentId>  (ids from printnodes)");
+    elseif (TFuBag:SetNodeParent(TFuInvFrame.cfg, childId, parentId)) then
+      TFuBag:BumpCatGen();
+      TFuInvFrame:UpdateWindow(TFuBag.REQ_MUST);
+      TFuBag:Print(TFuBag.SCP.."Nested node "..childId.." under "..parentId..".");
+    else
+      TFuBag:Print(TFuBag.SCP.."Nest refused (bad id or would create a cycle).");
+    end
+  elseif (cmd == "unnest") then
+    -- STAGE 2 dev: un-nest node <childId> back to the top level.
+    local childId = tonumber(params);
+    TFuBag:EnsureNodeModel(TFuInvFrame.cfg);
+    if (not childId) then
+      TFuBag:Print(TFuBag.SCP.."Usage: /tinv unnest <childId>  (id from printnodes)");
+    elseif (TFuBag:SetNodeParent(TFuInvFrame.cfg, childId, nil)) then
+      TFuBag:BumpCatGen();
+      TFuInvFrame:UpdateWindow(TFuBag.REQ_MUST);
+      TFuBag:Print(TFuBag.SCP.."Un-nested node "..childId..".");
+    else
+      TFuBag:Print(TFuBag.SCP.."Un-nest refused (bad id).");
+    end
   elseif (cmd == "catdiag") then
     -- TEMP diagnostic: dump a category's rules + bar + live tooltip matches.
     TFuBag:CatDiag("inv", params);
