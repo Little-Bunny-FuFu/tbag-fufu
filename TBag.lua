@@ -3452,7 +3452,11 @@ end
 -- and WRITES cfg.cat_nodes; nothing in PickBar / LayoutWindow consults cat_nodes yet, and the
 -- use_node_model flag is OFF by default. The /printnodes command dumps the built tree so the
 -- seed can be eyeballed against the live categories before Stage 1 wires the resolver.
-TFuBag.CAT_MODEL_V = 1;
+-- v1 = Stage 0 faithful seed (every CAT_BAR key, cat_nest parents imported).
+-- v2 = Stage 1 clean + flat seed (item-receiving categories only, no nesting imported).
+-- Bumping this forces EnsureNodeModel to rebuild a node tree persisted by an older build, so
+-- a SavedVariables cat_nodes from the Stage 0 session is replaced by the current builder.
+TFuBag.CAT_MODEL_V = 2;
 
 function TFuBag:GetNode(cfg, id)
   return cfg and cfg.cat_nodes and cfg.cat_nodes[id] or nil;
@@ -3479,12 +3483,41 @@ function TFuBag:GetNodeOrderList(cfg)
   return self:GetNodeChildren(cfg, nil);
 end
 
+-- Resolve a category token (today's itm[I_CAT]) to its node record. This is the Stage 1
+-- bridge PickBar uses to map the legacy classification onto a node. Backed by a lazily
+-- built token->id index cached against the cat_nodes TABLE IDENTITY, with weak keys so the
+-- index is collected when the node table is rebuilt (resetnodes / flag flip / model bump).
+-- Two windows (inv vs bank) have distinct cat_nodes tables, so each gets its own index.
+TFuBag._tokenIdx = TFuBag._tokenIdx or setmetatable({}, { __mode = "k" });
+function TFuBag:GetNodeByToken(cfg, token)
+  local nodes = cfg and cfg.cat_nodes;
+  if (not nodes or token == nil) then return nil; end
+  local idx = self._tokenIdx[nodes];
+  if (not idx) then
+    idx = {};
+    for id, n in pairs(nodes) do
+      -- Tokens are distinct CAT_BAR keys (one node per identity), so there is no real
+      -- collision; the nil-guard is just defensive against a future duplicate.
+      if (n.token ~= nil and idx[n.token] == nil) then idx[n.token] = id; end
+    end
+    self._tokenIdx[nodes] = idx;
+  end
+  local id = idx[token];
+  return id and nodes[id] or nil;
+end
+
 -- Build cfg.cat_nodes from the current legacy tables, reproducing today's category set.
 -- One node per category IDENTITY (the string used as itm[I_CAT] / a CAT_BAR key that
 -- resolves to a numeric bar). Captures: display name, current bar, priority order, origin
--- (which legacy mechanism owns it), per-bar display/sort/hide/colour, alias target, and the
--- cat_nest parent. STAGE 0 builds the tree faithfully but does NOT yet collapse alias groups
--- into containers or split equipment/material sub-groups -- that is Stage 1's parity work.
+-- (which legacy mechanism owns it), per-bar display/sort/hide/colour, and the alias target.
+-- STAGE 1 SEED (user decision 2026-06-03): CLEAN + FLAT.
+--   * CLEAN -- seed only item-RECEIVING categories (search rule / material / armour / override
+--     target / UNKNOWN); drop the ~120 dead CAT_BAR keys that own a bar but no classifier emits.
+--   * FLAT  -- every node starts top-level + leaf; do NOT import the (corrupt) legacy cat_nest.
+--     The node model owns nesting; it is rebuilt via the Stage 2 UI.
+-- The node->box mapping for Stage 1 is still node.bar == the legacy resolved bar, so flipping
+-- use_node_model renders byte-identical (the parity gate); alias collapsing falls out for free
+-- because aliased categories seed to the SAME node.bar and bucket into the same box.
 function TFuBag:BuildNodeModelFromLegacy(cfg)
   if (not cfg) then return; end
   local labels = self:BuildCatLabels();
@@ -3525,12 +3558,30 @@ function TFuBag:BuildNodeModelFromLegacy(cfg)
       if (rule[1] and rule[1] ~= "") then searchSet[rule[1]] = true; end
     end
   end
+  -- Per-item override TARGETS (item_overrides maps itemid -> category name).
+  local overrideSet = {};
+  if (cfg.item_overrides) then
+    for _, v in pairs(cfg.item_overrides) do
+      if (v and v ~= "") then overrideSet[v] = true; end
+    end
+  end
+  -- CLEAN-SEED predicate: a category actually receives items only via an active search rule,
+  -- a material/armour routing target, a per-item override, or the UNKNOWN catch-all. Dead
+  -- CAT_BAR keys (removed EQUIPPED_*/IN_*_BAG families, stale EMPTY_* variants, the **/++/--
+  -- new-item marker strings, user test cats) own a bar but are never emitted as I_CAT, so they
+  -- get no node. Harmless if the filter ever misses a live token: PickBar's node branch falls
+  -- back to the legacy bar for an unmodelled I_CAT.
+  local function receiving(cat)
+    return searchSet[cat] or matSet[cat] or armorSet[cat] or overrideSet[cat]
+        or (cat == L["UNKNOWN"]);
+  end
 
-  -- Universe of identities: every CAT_BAR key that resolves to a numeric bar.
+  -- Universe of identities: every CAT_BAR key that resolves to a numeric bar AND can receive
+  -- an item (clean seed).
   local idents = {};
   for cat, _ in pairs(cb) do
     local bar = self:ResolveBarAlias(cfg, cb[cat]);
-    if (type(bar) == "number") then
+    if (type(bar) == "number" and receiving(cat)) then
       idents[#idents + 1] = cat;
     end
   end
@@ -3542,10 +3593,6 @@ function TFuBag:BuildNodeModelFromLegacy(cfg)
   end);
 
   local nodes = {};
-  local tokenToId = {};
-  for i, cat in ipairs(idents) do
-    tokenToId[cat] = i;
-  end
   for i, cat in ipairs(idents) do
     local bar = self:ResolveBarAlias(cfg, cb[cat]);
     local raw = cb[cat];
@@ -3558,15 +3605,17 @@ function TFuBag:BuildNodeModelFromLegacy(cfg)
       local r, g, b = self:GetColor(cfg, "bkgr_"..bar);
       color = { r, g, b };
     end
-    local children = self:GetNestChildren(cfg, cat);
     nodes[i] = {
       id       = i,
       token    = cat,                       -- stable classification identity (today's I_CAT)
       name     = labels[cat] or cat,        -- condensed display label
-      bar      = bar,                        -- current legacy box (Stage 1 maps node->box)
+      bar      = bar,                        -- legacy box this node renders into (Stage 1 = parity)
       order    = order[cat] or (1000 + i),   -- priority; non-search cats sort after search cats
       origin   = origin,                     -- mat | armor | search | other
-      kind     = (#children > 0) and "both" or "leaf",
+      -- FLAT START: parent left nil, kind leaf. Nesting is owned by the node model and
+      -- rebuilt via the Stage 2 UI -- the legacy cat_nest is NOT imported (it was corrupted
+      -- by the abandoned Stage-3 experiments).
+      kind     = "leaf",
       display  = {
         cols    = self:GetGrp(cfg, self.G_BAR_COLS, bar),
         mincols = self:GetGrp(cfg, self.G_BAR_MINCOLS, bar),
@@ -3577,12 +3626,7 @@ function TFuBag:BuildNodeModelFromLegacy(cfg)
       hidden   = self:GetGrp(cfg, self.G_BAR_HIDE, bar),
       color    = color,
       alias_of = (type(raw) == "string") and raw or nil,  -- this node aliases onto another category's box
-      parent_token = self:GetNestParent(cfg, cat),
     };
-  end
-  -- Resolve parent tokens to parent ids (nil if the parent has no node -- left top-level).
-  for _, n in pairs(nodes) do
-    if (n.parent_token) then n.parent = tokenToId[n.parent_token]; end
   end
 
   cfg.cat_nodes = nodes;
@@ -5433,6 +5477,10 @@ end
 
 function TFuBag:PickBar(cfg, playerid, itm, trade1, trade2)
   local bagtype = self:GetBagType(playerid, itm[self.I_BAG]);
+  -- Clear any node id from a previous categorization (itm tables are reused from the cache);
+  -- the node branch at the end re-sets it when use_node_model is on. Empty/special-bag early
+  -- returns below intentionally leave it nil -- those items are not in the node model.
+  itm.node = nil;
   if (itm[self.I_ITEMLINK] == nil) then
     if (bagtype and type(bagtype) == "number" and bagtype > 0) then
       itm[self.I_CAT] = string.format(L["EMPTY_%s_SLOTS"],self:GetBagTypeName(bagtype));
@@ -5643,13 +5691,15 @@ function TFuBag:PickBar(cfg, playerid, itm, trade1, trade2)
     end
   end
 
-  -- Category nesting (Stage 3): redirect a nested category's items into its ROOT ancestor's
-  -- box as a labelled sub-group (flattened view, reusing the sub-header renderer). Items keep
-  -- their own I_CAT, so the within-box sort (which leads with I_CAT) keeps each nested group
-  -- contiguous; I_SUBGROUP becomes the category's display name, indented by nesting depth.
-  -- Skip items that already carry a sub-group (equipment shelves) -- a nested equipment
-  -- category stays flat for now.
-  if (itm[self.I_CAT] and (itm[self.I_SUBGROUP] == nil or itm[self.I_SUBGROUP] == "")) then
+  -- Category nesting (legacy Stage-3, flag OFF only): redirect a nested category's items into
+  -- its ROOT ancestor's box as a labelled sub-group (flattened view, reusing the sub-header
+  -- renderer). Items keep their own I_CAT, so the within-box sort (which leads with I_CAT)
+  -- keeps each nested group contiguous; I_SUBGROUP becomes the category's display name,
+  -- indented by nesting depth. Skip items that already carry a sub-group (equipment shelves).
+  -- Suppressed under the node model (use_node_model == 1): nesting there is owned by
+  -- cfg.cat_nodes and starts FLAT, so the legacy cat_nest redirect must not fire.
+  if (cfg.use_node_model ~= 1
+      and itm[self.I_CAT] and (itm[self.I_SUBGROUP] == nil or itm[self.I_SUBGROUP] == "")) then
     local parent = self:GetNestParent(cfg, itm[self.I_CAT]);
     if (parent) then
       local rootbar = self:ResolveBarAlias(cfg, self:GetCat(cfg, self:GetNestRoot(cfg, itm[self.I_CAT])));
@@ -5659,6 +5709,22 @@ function TFuBag:PickBar(cfg, playerid, itm, trade1, trade2)
         itm[self.I_BAR] = rootbar;
         itm[self.I_SUBGROUP] = string.rep("   ", self:GetNestDepth(cfg, itm[self.I_CAT]))..label;
       end
+    end
+  end
+
+  -- NODE MODEL (Stage 1, flag ON): the legacy steps above resolved itm[I_CAT] (the category
+  -- token) and a legacy itm[I_BAR]. Re-source the bar from the node record so category->box
+  -- flows through cfg.cat_nodes instead of the CAT_BAR alias chain, and tag itm.node so the
+  -- render/feature layers can key on node identity. node.bar == the seeded legacy bar, so the
+  -- window renders byte-identical (the parity gate). Equipment I_SUBGROUP (set by the armour
+  -- path) is left untouched so the shelf sub-headers still render. A token with no node (clean
+  -- seed dropped it, or a dynamic trade-created cat) keeps its legacy bar -- parity preserved.
+  if (cfg.use_node_model == 1) then
+    self:EnsureNodeModel(cfg);
+    local node = self:GetNodeByToken(cfg, itm[self.I_CAT]);
+    if (node and type(node.bar) == "number") then
+      itm.node = node.id;
+      itm[self.I_BAR] = node.bar;
     end
   end
 

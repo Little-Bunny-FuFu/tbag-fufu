@@ -146,6 +146,30 @@ function TFuBnk_cmd(msg)
     TFuBag:BumpCatGen();
     TFuBnkFrame:UpdateWindow(TFuBag.REQ_MUST);
     TFuBag:Print(TFuBag.SCP.."Bank category nesting cleared.");
+  elseif (cmd == "nodemodel") then
+    -- STAGE 1 dev toggle: flip use_node_model for the BANK and force a full recategorize so
+    -- every slot re-runs PickBar under the new path. ON = node-driven bar assignment (should
+    -- render identical to OFF -- the parity gate).
+    local cfg = TFuBnkFrame.cfg;
+    if (cfg.use_node_model == 1) then
+      cfg.use_node_model = 0;
+      TFuBag:Print(TFuBag.SCP.."Bank node model OFF (legacy placement).");
+    else
+      cfg.use_node_model = 1;
+      TFuBag:EnsureNodeModel(cfg);
+      TFuBag:Print(TFuBag.SCP.."Bank node model ON (node-driven placement).");
+    end
+    TFuBag:BumpCatGen();
+    TFuBnkFrame:UpdateWindow(TFuBag.REQ_MUST);
+  elseif (cmd == "resetnodes") then
+    -- STAGE 1 dev: rebuild cfg.cat_nodes from the live legacy tables and force a recategorize.
+    -- Run this after changing rules/materials/armour while the node model is on, so node.bar
+    -- tracks the current legacy bars.
+    local nodes = TFuBag:BuildNodeModelFromLegacy(TFuBnkFrame.cfg);
+    local n = 0; for _ in pairs(nodes or {}) do n = n + 1; end
+    TFuBag:BumpCatGen();
+    TFuBnkFrame:UpdateWindow(TFuBag.REQ_MUST);
+    TFuBag:Print(TFuBag.SCP.."Bank node model rebuilt from legacy ("..n.." nodes).");
   elseif (cmd == "catdiag") then
     -- TEMP diagnostic: dump a category's rules + bar + live tooltip matches.
     TFuBag:CatDiag("bank", params);
@@ -224,6 +248,30 @@ function TFuInv_cmd(msg)
     TFuBag:BumpCatGen();
     TFuInvFrame:UpdateWindow(TFuBag.REQ_MUST);
     TFuBag:Print(TFuBag.SCP.."Inventory category nesting cleared.");
+  elseif (cmd == "nodemodel") then
+    -- STAGE 1 dev toggle: flip use_node_model for the INVENTORY and force a full recategorize
+    -- so every slot re-runs PickBar under the new path. ON = node-driven bar assignment (should
+    -- render identical to OFF -- the parity gate).
+    local cfg = TFuInvFrame.cfg;
+    if (cfg.use_node_model == 1) then
+      cfg.use_node_model = 0;
+      TFuBag:Print(TFuBag.SCP.."Inventory node model OFF (legacy placement).");
+    else
+      cfg.use_node_model = 1;
+      TFuBag:EnsureNodeModel(cfg);
+      TFuBag:Print(TFuBag.SCP.."Inventory node model ON (node-driven placement).");
+    end
+    TFuBag:BumpCatGen();
+    TFuInvFrame:UpdateWindow(TFuBag.REQ_MUST);
+  elseif (cmd == "resetnodes") then
+    -- STAGE 1 dev: rebuild cfg.cat_nodes from the live legacy tables and force a recategorize.
+    -- Run this after changing rules/materials/armour while the node model is on, so node.bar
+    -- tracks the current legacy bars.
+    local nodes = TFuBag:BuildNodeModelFromLegacy(TFuInvFrame.cfg);
+    local n = 0; for _ in pairs(nodes or {}) do n = n + 1; end
+    TFuBag:BumpCatGen();
+    TFuInvFrame:UpdateWindow(TFuBag.REQ_MUST);
+    TFuBag:Print(TFuBag.SCP.."Inventory node model rebuilt from legacy ("..n.." nodes).");
   elseif (cmd == "catdiag") then
     -- TEMP diagnostic: dump a category's rules + bar + live tooltip matches.
     TFuBag:CatDiag("inv", params);
