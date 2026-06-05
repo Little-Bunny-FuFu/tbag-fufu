@@ -16,8 +16,9 @@
   This file defines the schema constants, the one-shot flat->profiles migration,
   the per-character profile resolver, and the profile engine. By itself it does
   NOT repoint the window-config seams or apply defaults to a profile -- that is
-  the integration phase. Loading this file has no effect until TFuBag:Init()
-  calls the migration/resolver (the file is not yet in the .toc).
+  the integration phase. Loading this file only defines functions; they take effect
+  when TFuBag:Init() calls the migration/resolver and RecordPlayerGUID (this file is
+  loaded via the .toc, before TBag.xml).
 --------------------------------------------------------------------------------]]
 
 local TFuBag = _G.TFuBag
@@ -322,4 +323,75 @@ TFuBag.db.OnProfileChanged = function(addonObject, profile)
     bnk:RebuildTabList()
     bnk:UpdateWindow(TFuBag.REQ_MUST)
   end
+end
+
+-- == Alt-view profile bridge (tbag-specific; NOT part of the DF mirror) =========
+-- The cross-character bag/bank VIEWER is keyed by playerid ("Name|Realm"); the
+-- profile system is keyed by UnitGUID. A character you are not logged into has no
+-- queryable GUID, so the viewer cannot map a cached alt to its profile on its own.
+-- These helpers add the missing playerid->guid bridge and a viewer-side cfg
+-- resolver. They sit OUTSIDE the DF-mirrored engine on purpose: Details-Framework
+-- is GUID-only and has no viewer, so the bridge is ours and survives the DF swap
+-- (it only READS profile_ids/profiles, which DF maintains in the same schema). The
+-- map lives at the SV ROOT (sv.player_guids), never inside the DF-owned profiles /
+-- profile_ids tables, and profile ASSIGNMENT stays solely in profile_ids[guid].
+
+--- Record this character's playerid->guid mapping so the viewer can later resolve a
+--- cached alt's profile. Lazily populated each login (no schema bump). No-op on bad
+--- input. This only adds the reverse lookup DF cannot provide; it never assigns a
+--- profile (that remains ResolveProfileName's job, writing profile_ids[guid]).
+function TFuBag:RecordPlayerGUID(sv, playerid, guid)
+  sv = sv or _G.TFuBagCfg
+  if (type(sv) ~= "table" or type(playerid) ~= "string" or playerid == "" or not guid) then
+    return
+  end
+  sv.player_guids = sv.player_guids or {}
+  sv.player_guids[playerid] = guid
+end
+
+--- The window-config subtree ("Inv"/"Bnk") to render for `playerid`:
+---   * the logged-in character (or an unknown/nil id) -> the LIVE in-use profile
+---     (ActiveCfg) -- same table identity as today, so the self-view keeps editing
+---     its own profile;
+---   * a cached alt -> a write-safe DEEP COPY of that alt's persisted profile
+---     subtree, so a read-only alt view can never mutate another character's saved
+---     profile (Phase C also splices window geometry onto this copy per the
+---     view-mode toggle).
+--- Resolution: playerid -> player_guids[guid] -> profile_ids[name] -> profiles. An
+--- unresolved alt (cached before this feature, or its profile deleted) falls back
+--- to the "default" profile (locked decision), then to the live cfg so a render
+--- read is never nil. The deep copy reuses the DF-table-semantics `deploy`, so the
+--- behavior is identical after a DF swap.
+---
+--- Defaults caveat: an alt's saved profile carries only the SetDef keys that existed
+--- when it last logged out -- the runtime defaults live in the windows' InitDefVals,
+--- NOT in the copied data or the (empty) default template. For an alt saved under the
+--- current build that is the complete set; if a LATER build adds a new cfg key, a
+--- resolved alt can return a copy missing it (the empty-subtree guard below does not
+--- catch a PARTIAL subtree). The fix belongs where the seam is wired (Phase B): run
+--- the consuming window's InitDefVals(0) against the returned copy -- it only fills
+--- missing keys. Until then this resolver has no caller, so there is no live impact.
+function TFuBag:CfgForPlayer(playerid, which)
+  local live = self:ActiveCfg(which)
+  if (not playerid or playerid == self.PLAYERID) then
+    return live
+  end
+
+  local sv = _G.TFuBagCfg
+  local src
+  if (type(sv) == "table") then
+    local guid = sv.player_guids and sv.player_guids[playerid]
+    local name = guid and sv.profile_ids and sv.profile_ids[guid]
+    local prof = name and sv.profiles and sv.profiles[name]
+    src = prof and prof[which]
+    if (not (type(src) == "table" and next(src))) then
+      local def = sv.profiles and sv.profiles[self.DEFAULT_PROFILE]
+      src = def and def[which]
+    end
+  end
+  if (not (type(src) == "table" and next(src))) then
+    src = live   -- ultimate fallback: nothing usable -> a copy of the live cfg
+  end
+
+  return deploy({}, src or {})
 end

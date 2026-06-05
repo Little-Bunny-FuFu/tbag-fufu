@@ -361,6 +361,12 @@ function TFuBag:Init()
   -- Set up the main player arrays
   self.PLAYERID = UnitName("player").."|"..self.REALM;
 
+  -- Alt-view bridge: record the playerid->guid map so the cross-character viewer
+  -- can later resolve a cached alt to its profile (profiles are GUID-keyed; the
+  -- viewer is "Name|Realm"-keyed). Inert until the viewer seams are wired in a
+  -- later phase; lazily populated, no schema bump.
+  self:RecordPlayerGUID(TFuBagCfg, self.PLAYERID, UnitGUID("player"));
+
   if (TFuBagInfo[self.PLAYERID] == nil) then
     self:InitPlayerInfo(self.PLAYERID);
   end
