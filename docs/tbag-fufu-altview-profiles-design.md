@@ -1,10 +1,10 @@
 # tbag-fufu — Cross-character alt-view profile scoping (design / scope)
 
-> **Status:** Design-of-record. **Phases A + B + C landed** — committed and gated in-game
+> **Status:** Design-of-record. **All phases (A–D) landed** — committed and gated in-game
 > 2026-06-05 (alt bank/inv render with the alt's own profile; layout-only default and
 > full-geometry mode both verified; warband stays gated to the live character). the view-mode
-> toggle is in the Profiles options panel). Only the optional Phase D (polish)
-> remains. Extends the
+> toggle is in the Profiles options panel). Phase D (the bag-highlight color
+> seam) is done too. Extends the
 > per-character **profiles** feature (`docs/tbag-fufu-profiles-design.md`) so the
 > cross-character bag/bank **viewer** renders an alt with *that alt's* profile
 > layout instead of the logged-in character's.
@@ -225,8 +225,9 @@ view back to yourself.
 - **C — the toggle UI. DONE (gated in-game 2026-06-05).** The root-setting read and geometry splice already
   landed in B; C adds the `ModernOpt` control to flip `altview_apply_geometry`
   (full mode is reachable via `/script` until then). In-game gate the UI.
-- **D — hardening / polish.** Write-path audit (resize grip, column +/-) to confirm
-  the copy is belt-and-suspenders; optional `GetCfgFromBag` color seam.
+- **D — hardening / polish. DONE (2026-06-05).** Write-path audit confirmed the copy is
+  belt-and-suspenders (claudex Phase B review + gate #3); `GetCfgFromBag` now returns the
+  owning window's cfg so bag-selector / highlight colors follow the viewed character.
 
 Core (A+B) is tiny: ~3 lines in `Init`, a ~12-line resolver, two one-line
 `SetPlayer` edits, plus the copy/defaults helper. The toggle (C) and the in-game

@@ -4226,11 +4226,14 @@ function TFuBag:UpdateBagColors(bag)
 end
 
 function TFuBag:GetCfgFromBag(bag)
-  -- Find the right config
+  -- The owning window's CURRENT cfg, which is the viewed character's profile while an
+  -- alt is shown (Inv/Bank:SetPlayer rebinds frame.cfg), so bag-selector/highlight
+  -- colors and the spotlight follow the viewed character, not the logged-in one. Falls
+  -- back to the live profile if the frame cfg is not bound yet (pre-init).
   if (self:Member(self.Inv_Bags, bag)) then
-    return self:ActiveCfg("Inv");
+    return (TFuInvFrame and TFuInvFrame.cfg) or self:ActiveCfg("Inv");
   elseif (self:Member(self.Bnk_Bags, bag)) then
-    return self:ActiveCfg("Bnk");
+    return (TFuBnkFrame and TFuBnkFrame.cfg) or self:ActiveCfg("Bnk");
   else
     return nil;
   end
