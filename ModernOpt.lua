@@ -1302,6 +1302,26 @@ MO:RegisterSection("profiles", "Profiles", function(sf, MO)
   end))
   y = y + ROW_GAP
 
+  -- Viewing other characters: layout-only (default) vs full window geometry.
+  local geomCB
+  y = select(2, MO:Label(sf, y, "Viewing other characters:"))
+  geomCB, y = MO:Checkbox(sf, y, "Also match the viewed character's window size & position",
+    function() return (TFuBagCfg and TFuBagCfg.altview_apply_geometry or 0) == 1 end,
+    function(v)
+      TFuBagCfg.altview_apply_geometry = v and 1 or 0
+      -- Re-apply to any window currently viewing an alt so the change shows at once.
+      local function reapply(frame)
+        if (frame and frame:IsShown() and frame.playerid and frame.playerid ~= TFuBag.PLAYERID) then
+          frame:SetPlayer(frame.playerid)
+          if (frame.RebuildTabList) then frame:RebuildTabList() end
+          frame:UpdateWindow(TFuBag.REQ_MUST)
+        end
+      end
+      reapply(TFuInvFrame); reapply(TFuBnkFrame)
+    end)
+  track(geomCB)
+  y = y + ROW_GAP
+
   -- Help note.
   local note = sf:CreateFontString(nil, "ARTWORK", "GameFontDisableSmall")
   note:SetPoint("TOPLEFT", sf, "TOPLEFT", PAD, -y)
