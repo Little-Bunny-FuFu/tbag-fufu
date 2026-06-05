@@ -93,6 +93,13 @@ function Inv:SetPlayer(playerid)
      self.CACHE_REQ = TFuBag.REQ_MUST
    end
    self.playerid = playerid;
+   -- Render the viewed character with THEIR profile: the live profile for ourselves,
+   -- a write-safe copy of the alt profile for a cached character. For an alt, finish the
+   -- copy (fill predated defaults + apply the view-mode geometry policy).
+   self.cfg = TFuBag:CfgForPlayer(playerid, "Inv");
+   if (playerid ~= TFuBag.PLAYERID) then
+     self:CompleteAltCfg("Inv");
+   end
    TFuBag.Tokens.Update(TFuInvFrame_TokenFrame)
 end
 

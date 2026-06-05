@@ -86,6 +86,11 @@ function Bank:SetPlayer(playerid)
     self.CACHE_REQ = TFuBag.REQ_MUST
   end
   self.playerid = playerid;
+  -- Render the viewed character with THEIR profile (see Inv:SetPlayer).
+  self.cfg = TFuBag:CfgForPlayer(playerid, "Bnk");
+  if (playerid ~= TFuBag.PLAYERID) then
+    self:CompleteAltCfg("Bnk");
+  end
   TFuBag.Tokens.Update(TFuBnkFrame_TokenFrame)
 end
 

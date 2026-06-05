@@ -86,6 +86,17 @@ end
 -- AUTO-FLOW dynamic reflow: true only when the auto-flow layout should reflow its
 -- columns to the dragged window width. Manual Layout uses stored box coords, so it is
 -- NOT auto-flow-dynamic (the seed pass is handled separately in LayoutWindow).
+-- After self.cfg is bound to an ALT cfg copy (Inv/Bank:SetPlayer), finish it: fill any
+-- defaults that copy predates (InitDefVals at reset=0 only adds MISSING keys, so a
+-- complete profile is untouched), then apply the view-mode geometry policy (layout-only
+-- keeps the live window where it is; full-profile adopts the alt geometry). Self-views
+-- never call this -- their cfg is the live table, edited in place as before.
+function MainFrame:CompleteAltCfg(which)
+  self:InitDefVals(0);
+  TFuBag:ApplyAltGeometry(self.cfg, TFuBag:ActiveCfg(which),
+    (TFuBagCfg and TFuBagCfg.altview_apply_geometry or 0) == 1);
+end
+
 function MainFrame:IsDynamicResize()
   local cfg = self.cfg;
   if (not cfg or cfg.legacy_sizing ~= 0) then return false; end

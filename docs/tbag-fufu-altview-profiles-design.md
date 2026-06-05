@@ -1,6 +1,9 @@
 # tbag-fufu — Cross-character alt-view profile scoping (design / scope)
 
-> **Status:** SCOPE / design-of-record. Not yet implemented. Extends the
+> **Status:** Design-of-record. **Phases A + B landed** — committed and gated in-game
+> 2026-06-05 (alt bank/inv render with the alt's own profile; layout-only default and
+> full-geometry mode both verified; warband stays gated to the live character). Phase C
+> (toggle UI) and D (polish) remain. Extends the
 > per-character **profiles** feature (`docs/tbag-fufu-profiles-design.md`) so the
 > cross-character bag/bank **viewer** renders an alt with *that alt's* profile
 > layout instead of the logged-in character's.
@@ -212,14 +215,15 @@ view back to yourself.
 
 ## 8. Phasing
 
-- **A — model + resolver (no behavior change).** `player_guids` write in `Init`;
+- **A — model + resolver (no behavior change). DONE.** `player_guids` write in `Init`;
   `CfgForPlayer`; the deep-copy + defaults-ensure helper; headless tests. Inert
   until B wires it.
-- **B — wire the seam.** `SetPlayer` re-bind in both windows. Flips the behavior.
+- **B — wire the seam. DONE (gated in-game 2026-06-05).** `SetPlayer` re-bind in both windows. Flips the behavior.
   Run the window's `InitDefVals(0)` against the alt copy so a cfg key added in a
   later build cannot read `nil` (review finding — see §4.4 item 3 caveat). In-game gate.
-- **C — the toggle.** Root setting + geometry splice in the copy + `ModernOpt`
-  control. In-game gate both modes.
+- **C — the toggle UI (NEXT).** The root-setting read and geometry splice already
+  landed in B; C adds the `ModernOpt` control to flip `altview_apply_geometry`
+  (full mode is reachable via `/script` until then). In-game gate the UI.
 - **D — hardening / polish.** Write-path audit (resize grip, column +/-) to confirm
   the copy is belt-and-suspenders; optional `GetCfgFromBag` color seam.
 

@@ -395,3 +395,31 @@ function TFuBag:CfgForPlayer(playerid, which)
 
   return deploy({}, src or {})
 end
+
+--- The window-geometry keys (window size + the four scaled edge coords) that
+--- MainFrame DragStop / OnResizeStopped persist. In "layout only" view mode these
+--- are spliced from the live window onto an alt copy so flipping through alts does
+--- not move/resize the window; in "full profile" mode the alt's own geometry stays.
+TFuBag.ALTVIEW_GEOMETRY_KEYS = { "win_w", "win_h", "frameLEFT", "frameRIGHT", "frameTOP", "frameBOTTOM" }
+
+--- Apply the view-mode geometry policy to an alt cfg COPY `dst`, given the live window
+--- cfg `live`. `legacy_sizing` always follows the live window (it governs the physical
+--- resize behavior, not the alt's layout). When `applyAltGeom` is false (the default
+--- "layout only" mode) the alt's window size/position are overwritten with the live
+--- window's, so only the alt's layout shows; when true ("full profile") the alt's
+--- saved geometry is kept. No-op if either table is missing. Pure (no frame access),
+--- so it is unit-testable; the InitDefVals defaults-fill is the only in-game-only step.
+function TFuBag:ApplyAltGeometry(dst, live, applyAltGeom)
+  if (type(dst) ~= "table" or type(live) ~= "table") then
+    return dst
+  end
+  if (live.legacy_sizing ~= nil) then
+    dst.legacy_sizing = live.legacy_sizing
+  end
+  if (not applyAltGeom) then
+    for _, k in ipairs(self.ALTVIEW_GEOMETRY_KEYS) do
+      dst[k] = live[k]
+    end
+  end
+  return dst
+end
