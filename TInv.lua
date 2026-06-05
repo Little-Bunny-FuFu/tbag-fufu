@@ -139,7 +139,7 @@ function Inv:init(reset)
 
 
   TFuBag:Init();
-  self.cfg = TFuBagCfg["Inv"];
+  self.cfg = TFuBag:ActiveCfg("Inv");
   local cfg = self.cfg
 
   if ( TFuINV_WIPECONFIGONLOAD == 1 ) then

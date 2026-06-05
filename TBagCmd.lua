@@ -84,7 +84,7 @@ function TFuBnk_cmd(msg)
       TFuBag:Print(TFuBag.SCP.."Debugging messages off.");
     end
   elseif (cmd == L["reset"]) then
-    TFuBagCfg["Bnk"] = {};
+    if (TFuBag.db.profile) then TFuBag.db.profile.Bnk = {}; end
     TFuBnkFrame:init(1);
     TFuBnkFrame:CalcButtonSize(TFuBnkFrame.cfg["frameButtonSize"], TFuBnkFrame.cfg["framePad"]);
     TFuBnkFrame:UpdateWindow(TFuBag.REQ_MUST);
@@ -169,7 +169,7 @@ function TFuInv_cmd(msg)
       TFuBag:Print(TFuBag.SCP.."Debugging messages off.");
     end
   elseif (cmd == L["reset"]) then
-    TFuBagCfg["Inv"] = {};
+    if (TFuBag.db.profile) then TFuBag.db.profile.Inv = {}; end
     TFuInvFrame:init(1);
     TFuInvFrame:CalcButtonSize(TFuInvFrame.cfg["frameButtonSize"], TFuInvFrame.cfg["framePad"]);
     TFuInvFrame:UpdateWindow(TFuBag.REQ_MUST);

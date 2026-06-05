@@ -320,9 +320,18 @@ function TFuBag:Init()
   -- Set up the main arrays
   if (TFuBagCfg == nil) then
     TFuBagCfg = {};
-    TFuBagCfg["Bnk"] = {};
-    TFuBagCfg["Inv"] = {};
   end
+  -- Profiles: reshape the flat config into the DF-shaped container (one-shot,
+  -- version-gated), resolve this character's profile, and load it -- BEFORE any
+  -- window reads its cfg (the seams resolve through TFuBag:ActiveCfg). Idempotent
+  -- across the Inv + Bank init calls; db.profile is kept once set so a runtime
+  -- profile switch (Profiles.SetProfile) is not undone by a later re-init.
+  self:MigrateConfig(TFuBagCfg);
+  self:ResolveProfileName(TFuBagCfg);
+  self.db.profile = self.db.profile or self.Profiles.GetProfile(self.db, true);
+  self.db.profile.Inv = self.db.profile.Inv or {};
+  self.db.profile.Bnk = self.db.profile.Bnk or {};
+
   self:RefreshCreations(TFuBagCfg);
   self:RefreshReagents(TFuBagCfg);
 
@@ -667,12 +676,21 @@ end
 function TFuBag:CleanConfig()
   TFuBagCfg["Body"] = nil;
   TFuBagCfg["TFuInv_RegisterHooks"] = nil;
-  TFuBagCfg["Inv"]["show_top_gfx"] = nil;
-  TFuBagCfg["Inv"]["show_blizzard_frames"] = nil;
-  TFuBagCfg["Inv"]["show_top_graphics"] = nil;
-  TFuBagCfg["Bnk"]["show_top_gfx"] = nil;
-  TFuBagCfg["Bnk"]["show_top_graphics"] = nil;
-  TFuBagCfg["Bnk"]["show_blizzard_frames"] = nil;
+  -- Legacy show_* keys now live on the active profile's window subtrees (after the
+  -- profiles migration, TFuBagCfg.Inv/.Bnk no longer exist at the SV root). Guarded
+  -- so this is safe even if the profile is not resolved yet.
+  local cleanInv = self:ActiveCfg("Inv");
+  local cleanBnk = self:ActiveCfg("Bnk");
+  if (cleanInv) then
+    cleanInv["show_top_gfx"] = nil;
+    cleanInv["show_blizzard_frames"] = nil;
+    cleanInv["show_top_graphics"] = nil;
+  end
+  if (cleanBnk) then
+    cleanBnk["show_top_gfx"] = nil;
+    cleanBnk["show_top_graphics"] = nil;
+    cleanBnk["show_blizzard_frames"] = nil;
+  end
   TFuBagCfg[TFuBag.S_SKILLS] = nil;
   TFuBagCfg[TFuBag.S_TRADES] = nil;
   TFuBagCfg[TFuBag.S_SECOND] = nil;
@@ -693,7 +711,8 @@ function TFuBag:CleanConfig()
   -- category a user deliberately moved elsewhere is left untouched. Guarded to run once.
   if (not TFuBagCfg["catbar_split_v2"]) then
     for _, wkey in ipairs({ "Inv", "Bnk" }) do
-      local cb = TFuBagCfg[wkey] and TFuBagCfg[wkey][self.CAT_BAR];
+      local wcfg = self:ActiveCfg(wkey);
+      local cb = wcfg and wcfg[self.CAT_BAR];
       if (cb) then
         if (cb[L["BAG"]] == 29) then cb[L["BAG"]] = 10; end
         if (cb[L["GRAY_ITEMS"]] == 29) then cb[L["GRAY_ITEMS"]] = 9; end
@@ -4203,9 +4222,9 @@ end
 function TFuBag:GetCfgFromBag(bag)
   -- Find the right config
   if (self:Member(self.Inv_Bags, bag)) then
-    return TFuBagCfg["Inv"];
+    return self:ActiveCfg("Inv");
   elseif (self:Member(self.Bnk_Bags, bag)) then
-    return TFuBagCfg["Bnk"];
+    return self:ActiveCfg("Bnk");
   else
     return nil;
   end

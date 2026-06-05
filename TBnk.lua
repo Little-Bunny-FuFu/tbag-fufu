@@ -141,7 +141,7 @@ function Bank:init(reset)
 
   TFuBag:Init();
 
-  self.cfg = TFuBagCfg["Bnk"]
+  self.cfg = TFuBag:ActiveCfg("Bnk")
   local cfg = self.cfg
   self.atbank = 0
   self.physAtBank = 0

@@ -105,6 +105,7 @@ function TFuBag:VARIABLES_LOADED()
   self:RegisterEvent("QUEST_ACCEPTED")
   self:RegisterEvent("UNIT_QUEST_LOG_CHANGED")
   self:RegisterEvent("PLAYER_ENTERING_WORLD")
+  self:RegisterEvent("PLAYER_LOGOUT")
 
   -- Scan equipment on login.
   TFuBag:ScanEquipped()
@@ -170,6 +171,15 @@ end
 function TFuBag:PLAYER_LEAVING_WORLD()
   TFuBagInfo[TFuBag.PLAYERID][TFuBag.G_BASIC][TFuBag.S_HEARTH] = GetBindLocation()
   TFuBagInfo[TFuBag.PLAYERID][TFuBag.G_BASIC][TFuBag.S_LEVEL] = UnitLevel("player")
+end
+
+function TFuBag:PLAYER_LOGOUT()
+  -- Persist the in-use profile (strip values equal to the default template, write
+  -- it back into TFuBagCfg.profiles under this character's id) before WoW flushes
+  -- SavedVariables. Required so a newly created / switched-to profile survives.
+  if (TFuBag.db) then
+    TFuBag.Profiles.SaveProfile(TFuBag.db)
+  end
 end
 
 function TFuBag:BANKFRAME_OPENED()
@@ -323,6 +333,7 @@ local events = {
   ["UNIT_INVENTORY_CHANGED"] = TFuBag.ScanEquipped,
   ["MAIL_INBOX_UPDATE"] = TFuBag.ScanMail,
   ["PLAYER_LEAVING_WORLD"] = TFuBag.PLAYER_LEAVING_WORLD,
+  ["PLAYER_LOGOUT"] = TFuBag.PLAYER_LOGOUT,
   ["BANKFRAME_OPENED"] = TFuBag.BANKFRAME_OPENED,
   ["BANKFRAME_CLOSED"] = TFuBag.BANKFRAME_CLOSED,
   ["BANK_TABS_CHANGED"] = TFuBag.BANK_TABS_CHANGED,
