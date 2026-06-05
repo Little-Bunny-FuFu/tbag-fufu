@@ -1195,6 +1195,123 @@ MO:RegisterSection("filters", "Filters", function(sf, MO)
   sfl.tfuRefresh = rebuild
 end)
 
+-- Confirm before deleting a profile (its saved settings are lost; a character that
+-- used it falls back to "default" on next login). %s = profile name.
+StaticPopupDialogs["TBAG_DELETE_PROFILE"] = {
+  text = "Delete profile \"%s\"?\nIts saved window settings are removed. Any character using it falls back to the default profile on next login.",
+  button1 = YES,
+  button2 = NO,
+  OnAccept = function(_, data)
+    if (data and data.name) then TFuBag.Profiles.DeleteProfile(TFuBag.db, data.name) end
+    if (data and data.after) then data.after() end
+  end,
+  timeout = 0,
+  whileDead = true,
+  hideOnEscape = true,
+}
+
+-- Profiles: switch between, create, and delete per-character config profiles. The
+-- current profile shows in a label (it may be just-created and not yet persisted,
+-- so it is not necessarily in profiles[]); the switch list includes it, delete
+-- excludes it. Lists refresh on show and after every action via sf.controls.
+MO:RegisterSection("profiles", "Profiles", function(sf, MO)
+  local P  = TFuBag.Profiles
+  local db = TFuBag.db
+  if (not (P and db)) then
+    MO:Label(sf, 8, "Profiles are not available."); return
+  end
+  local function track(c) sf.controls[#sf.controls + 1] = c; return c end
+  local function refreshAll()
+    for _, c in ipairs(sf.controls) do if (c.tfuRefresh) then c.tfuRefresh() end end
+  end
+  local function curName() return P.GetCurrentProfileName(db) or TFuBag.DEFAULT_PROFILE end
+
+  local y = 8
+
+  -- Current profile (refreshed on show / after any action).
+  local curFS = sf:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+  curFS:SetPoint("TOPLEFT", sf, "TOPLEFT", PAD, -y)
+  curFS.tfuRefresh = function() curFS:SetText("Current profile:  |cffffd200" .. curName() .. "|r") end
+  track(curFS)
+  y = y + 20 + ROW_GAP
+
+  -- Switch: lists every profile (plus the current even if not yet persisted).
+  local switchOpts = {}
+  local function fillSwitch()
+    wipe(switchOpts)
+    local sv, cur, seen, names = P.GetSavedVariables(db), curName(), {}, {}
+    for name in pairs(sv.profiles) do seen[name] = true; names[#names + 1] = name end
+    if (not seen[cur]) then names[#names + 1] = cur end
+    table.sort(names)
+    for _, n in ipairs(names) do switchOpts[#switchOpts + 1] = { text = n, value = n } end
+  end
+  fillSwitch()
+  local switchDD
+  switchDD, y = MO:Dropdown(sf, y, "Switch to:", 220, switchOpts,
+    function() return curName() end,
+    function(v) if (v ~= curName()) then P.SetProfile(db, v); refreshAll() end end)
+  switchDD.tfuRefresh = function() fillSwitch(); switchDD:GenerateMenu() end
+  track(switchDD)
+  y = y + ROW_GAP
+
+  -- Create a new profile (optionally cloning the current one), then switch to it.
+  y = select(2, MO:Label(sf, y, "Create a new profile:"))
+  local copyFrom = true
+  y = select(2, MO:Checkbox(sf, y, "Copy the current profile's settings into the new one",
+    function() return copyFrom end, function(v) copyFrom = v end))
+  local nameEB
+  nameEB, y = MO:EditBox(sf, y, "Name:", 40, 200, function() return "" end, function() end)
+  y = select(2, MO:Button(sf, y, "Create + switch", 160, function()
+    local name = strtrim(nameEB:GetText() or "")
+    if (name ~= "") then
+      P.SetProfile(db, name, copyFrom)
+      nameEB:SetText("")
+      refreshAll()
+    end
+  end))
+  y = y + ROW_GAP
+
+  -- Delete a profile (never the one in use; confirmed).
+  y = select(2, MO:Label(sf, y, "Delete a profile:"))
+  local selectedToDelete
+  local deleteOpts = {}
+  local function fillDelete()
+    wipe(deleteOpts)
+    local sv, cur, valid = P.GetSavedVariables(db), curName(), false
+    local names = {}
+    for name in pairs(sv.profiles) do if (name ~= cur) then names[#names + 1] = name end end
+    table.sort(names)
+    for _, n in ipairs(names) do
+      deleteOpts[#deleteOpts + 1] = { text = n, value = n }
+      if (n == selectedToDelete) then valid = true end
+    end
+    if (not valid) then selectedToDelete = nil end
+  end
+  fillDelete()
+  local deleteDD
+  deleteDD, y = MO:Dropdown(sf, y, "Delete profile:", 220, deleteOpts,
+    function() return selectedToDelete end,
+    function(v) selectedToDelete = v; deleteDD:GenerateMenu() end)
+  deleteDD.tfuRefresh = function() fillDelete(); deleteDD:GenerateMenu() end
+  track(deleteDD)
+  y = select(2, MO:Button(sf, y, "Delete selected", 160, function()
+    if (selectedToDelete) then
+      StaticPopup_Show("TBAG_DELETE_PROFILE", selectedToDelete, nil,
+        { name = selectedToDelete, after = refreshAll })
+    end
+  end))
+  y = y + ROW_GAP
+
+  -- Help note.
+  local note = sf:CreateFontString(nil, "ARTWORK", "GameFontDisableSmall")
+  note:SetPoint("TOPLEFT", sf, "TOPLEFT", PAD, -y)
+  note:SetWidth(470)
+  note:SetJustifyH("LEFT")
+  note:SetText("Each character remembers which profile it uses. Window layout, columns, "
+    .. "categories, colours and behaviour are per profile; the profession / reagent "
+    .. "database and saved searches are shared across all profiles.")
+end)
+
 -- Temporary opener for testing the new UI before the swap.
 SLASH_TFUMODOPT1 = "/tbmodopts"
 SlashCmdList["TFUMODOPT"] = function() TFuBag.ModernOpt:Toggle() end
