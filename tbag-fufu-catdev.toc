@@ -13,6 +13,7 @@
 ##
 compat-12.lua
 stub.lua
+TBagProfiles.lua
 localization.enUS.lua
 localization.deDE.lua
 localization.ruRU.lua
