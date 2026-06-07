@@ -5365,6 +5365,29 @@ function TFuBag:BumpCatGen()
   self.catGen = (self.catGen or 0) + 1
 end
 
+-- Full reset to factory defaults (account-wide). Wipes the ENTIRE config table -- categories /
+-- search rules / material + armour grouping / manual layouts (cat_layout, cat_layout_free) /
+-- category nesting (cat_nest) / the node model (cat_nodes, use_node_model) / colours / per-bar
+-- sort + display / window position + all options -- then reloads so InitDefVals reseeds clean
+-- defaults. Cached item snapshots (TFuInvItm / TFuBnkItm / ...) are KEPT; the runtime catStamp
+-- is cleared so every slot re-categorizes fresh on the next sort. Two-step: requires the literal
+-- "confirm" arg, so a stray /tinv resetall just prints the warning. Use this to clear stale or
+-- corrupt layout / category data accumulated during node-model testing.
+function TFuBag:ResetAll(confirmed)
+  if (confirmed ~= "confirm") then
+    self:Print(self.SCP.."|cffff5555Reset everything?|r This wipes ALL TBag-fufu settings "
+      .."(categories, search rules, material/armour grouping, manual layouts, category nesting, "
+      .."the node model, colours, sort, window position and options) back to default, account-wide, "
+      .."then reloads. Cached item data is kept. Type |cffffff00/tinv resetall confirm|r to proceed.");
+    return;
+  end
+  TFuBagCfg = {};
+  self.catStamp = {};
+  self.catGen = 0;
+  self:Print(self.SCP.."All settings reset to default. Reloading UI...");
+  ReloadUI();
+end
+
 function TFuBag:GetCatStamp(playerid, bag, slot)
   local p = self.catStamp[playerid]; if (not p) then return nil end
   local b = p[bag]; if (not b) then return nil end
@@ -5426,6 +5449,16 @@ function TFuBag:SortItmCache(cfg, playerid, itmcache, baritm, bagarr)
   local firstBag, firstSlot = nil, nil   -- first free slot anywhere in the view
   local soloBag, soloSlot = nil, nil     -- first free slot in the focused bank tab
 
+  -- NODE MODEL (Stage 2c): boxes are formed by grouping items under their ROOT node's DISPLAY
+  -- NAME, then assigned dense physical bar slots (1..) after the loop. Name-grouping keeps the
+  -- legacy labelled families together (all "BoE" armour slots -> one box with per-slot
+  -- sub-headers; all "Soulbound" -> one box) while splitting categories that legacy merely
+  -- aliased onto a shared bar (Trade Goods vs Consumables -> separate boxes). frame.slotNode
+  -- maps each slot to its representative root node for the render + the nesting menu. Items with
+  -- no node (unmodelled / special bag) fall back to a per-legacy-bar pseudo-group so they draw.
+  local nodeMode = (cfg.use_node_model == 1)
+  local rootItems = nodeMode and {} or nil   -- [gkey] = { items = {..}, rid = repRootId, order = n }
+
   for _, bag in ipairs(bagarr) do
 --    self:PrintDEBUG("TFuBag:MakeBarItm: bag ="..bag);
     if itmcache[bag] == nil then
@@ -5475,7 +5508,37 @@ function TFuBag:SortItmCache(cfg, playerid, itmcache, baritm, bagarr)
               -- pass the active item filter. A filtered-out item gets no slot, so
               -- LayoutWindow reflows the survivors with no gaps.
               if (self:PassesItemFilter(frame, itm)) then
-                table.insert(baritm[destbar], itm);
+                if (nodeMode) then
+                  -- Resolve the item's box by its ROOT node, GROUPED BY DISPLAY NAME so legacy
+                  -- labelled families (every "BoE" armour slot, every "Soulbound" slot) stay ONE
+                  -- box with per-slot sub-headers, while genuinely distinct categories that legacy
+                  -- merely aliased onto one bar (Trade Goods vs Consumables) get their own box.
+                  local n = (itm.node and self:GetNode(cfg, itm.node))
+                            or self:GetNodeByToken(cfg, itm[self.I_CAT]);
+                  if (not n and itm[self.I_ITEMLINK] and itm[self.I_ITEMLINK] ~= "") then
+                    -- A real item resolving to no node -- typically one just moved into a slot
+                    -- that was empty, still carrying the empty slot's stale category before a full
+                    -- recat (which made a transient phantom box). Categorize it now so it lands in
+                    -- its real box instead.
+                    itm = self:PickBar(cfg, playerid, itm, trade1, trade2);
+                    self:SetCatStamp(playerid, bag, slot, self.catGen);
+                    itmcache[bag][slot] = itm;
+                    n = itm.node and self:GetNode(cfg, itm.node);
+                  end
+                  local root = n and self:GetNodeRoot(cfg, n);
+                  local gkey, repId, ord;
+                  if (root) then
+                    gkey = "N:"..(root.name or tostring(root.id)); repId = root.id; ord = root.order or 1e9;
+                  else
+                    gkey = "L:"..tostring(destbar); repId = nil; ord = 1e9;
+                  end
+                  local b = rootItems[gkey];
+                  if (not b) then b = { items = {}, rid = repId, order = ord }; rootItems[gkey] = b;
+                  elseif (root and ord < b.order) then b.order = ord; b.rid = repId; end
+                  table.insert(b.items, itm);
+                else
+                  table.insert(baritm[destbar], itm);
+                end
               end
             end
           end
@@ -5503,13 +5566,45 @@ function TFuBag:SortItmCache(cfg, playerid, itmcache, baritm, bagarr)
     end
   end
 
+  -- NODE MODEL: assign each visible root a dense physical slot, ordered by node.order (node
+  -- roots first, then unmodelled/legacy fallback buckets), and fill baritm. frame.slotNode lets
+  -- the render + menu map a slot back to its node. Capped below EMPTY_BAR so empties keep box 48.
+  if (nodeMode and frame) then
+    frame.slotNode = frame.slotNode or {};
+    for k in pairs(frame.slotNode) do frame.slotNode[k] = nil; end
+    local groups = {};
+    for _, g in pairs(rootItems) do groups[#groups + 1] = g; end
+    -- Order boxes by the group's lowest node.order (so the box sits where its category sat).
+    table.sort(groups, function(a, b)
+      if (a.order ~= b.order) then return a.order < b.order; end
+      return tostring(a.rid) < tostring(b.rid);
+    end);
+    local slot = 0;
+    for _, g in ipairs(groups) do
+      slot = slot + 1;
+      if (slot >= self.EMPTY_BAR) then break; end   -- never overflow the empty-slots box (48)
+      local dst = baritm[slot];
+      for _, itm in ipairs(g.items) do table.insert(dst, itm); end
+      if (g.rid) then frame.slotNode[slot] = g.rid; end   -- representative root node for this box
+    end
+  end
+
   -- sort the cache now
   for barnum = 1, self.BAR_MAX do
     local toggle;
 
-    if (self:GetGrp(cfg, self.G_BAR_SORT, barnum) == self.SORTBY_NORM) then
+    -- In node mode the box's sort comes from its assigned node; legacy boxes (and the empty
+    -- box / unmodelled fallback slots) keep the by-bar G_BAR_SORT.
+    local sortby;
+    if (nodeMode and frame and frame.slotNode[barnum]) then
+      local n = self:GetNode(cfg, frame.slotNode[barnum]);
+      sortby = n and n.sort;
+    else
+      sortby = self:GetGrp(cfg, self.G_BAR_SORT, barnum);
+    end
+    if (sortby == self.SORTBY_NORM) then
       toggle=1;
-    elseif (self:GetGrp(cfg, self.G_BAR_SORT, barnum) == self.SORTBY_REV) then
+    elseif (sortby == self.SORTBY_REV) then
       toggle=2;
     end
 
@@ -7306,7 +7401,22 @@ function TFuBag:PopulateSubCatMenu(frame, level)
   UIDropDownMenu_AddButton({ ["text"] = (labels[cat] or cat),
     ["isTitle"] = 1, ["notClickable"] = 1, ["notCheckable"] = 1 }, level);
   UIDropDownMenu_AddButton({ ["disabled"] = 1, ["notCheckable"] = 1 }, level);
-  if (self:GetNestParent(cfg, cat)) then
+  if (cfg.use_node_model == 1) then
+    -- Node model: resolve this sub-group's category token to its node and offer Un-nest
+    -- (back to the top level) when it actually has a parent.
+    local node = self:GetNodeByToken(cfg, cat);
+    if (node and node.parent) then
+      UIDropDownMenu_AddButton({
+        ["text"] = L["Un-nest"],
+        ["func"] = function()
+          self:SetNodeParent(cfg, node.id, nil);
+          self:BumpCatGen();
+          CloseDropDownMenus();
+          frame:UpdateWindow(self.REQ_MUST);
+        end,
+        }, level);
+    end
+  elseif (self:GetNestParent(cfg, cat)) then
     UIDropDownMenu_AddButton({
       ["text"] = L["Un-nest"],
       ["func"] = function()
@@ -7340,6 +7450,9 @@ end
 -- or un-nest the categories nested into this one. Shared by the inventory and bank bar menus;
 -- call it after BarLayoutMenu.
 function TFuBag:BarNestMenu(frame, bar, level)
+  if (frame.cfg and frame.cfg.use_node_model == 1) then
+    return self:BarNestMenuNodes(frame, bar, level);
+  end
   local cats = frame.BC_LIST and frame.BC_LIST[bar];
   if (not cats or #cats == 0) then return; end
 
@@ -7361,6 +7474,9 @@ end
 -- category token, which produced "BoE" many times), skipping any that would cycle. Picking
 -- one nests this bar's categories under that bar's primary category.
 function TFuBag:BarNestSubmenu(frame, bar, level)
+  if (frame.cfg and frame.cfg.use_node_model == 1) then
+    return self:BarNestSubmenuNodes(frame, bar, level);
+  end
   local cfg = frame.cfg;
   local cats = frame.BC_LIST and frame.BC_LIST[bar];
   if (not cats) then return; end
@@ -7402,6 +7518,9 @@ end
 -- distinct nested categories (Enchanting, Profession Tools) each get their own. Picking one
 -- un-nests just that group; "Un-nest all" clears everything.
 function TFuBag:BarUnnestSubmenu(frame, bar, level)
+  if (frame.cfg and frame.cfg.use_node_model == 1) then
+    return self:BarUnnestSubmenuNodes(frame, bar, level);
+  end
   local cfg = frame.cfg;
   local labels = self:BuildCatLabels();
   local kids = self:NestedIntoBar(frame, bar);
@@ -7434,6 +7553,141 @@ function TFuBag:BarUnnestSubmenu(frame, bar, level)
       ["text"] = groups[ob].display,
       ["func"] = function()
         for _, c in ipairs(toks) do self:SetNestParent(cfg, c, nil); end
+        CloseDropDownMenus();
+        frame:UpdateWindow(self.REQ_MUST);
+      end,
+      }, level);
+  end
+  self:HideMenuChecksExceptToggles(level);
+end
+
+-- ===================================================================================
+-- Node-model nesting menu (Stage 2b). The node-aware counterparts of BarNestMenu /
+-- BarNestSubmenu / BarUnnestSubmenu, dispatched when use_node_model == 1. They operate on
+-- cat_nodes ids instead of BC_LIST tokens + cat_nest: a box (bar) is represented by the
+-- TOP-LEVEL (root) nodes whose items render in it; "Nest under" reparents those roots under
+-- another box's primary root node; "Un-nest" lifts a nested descendant back to the top level.
+-- ===================================================================================
+
+-- The root node rendered in physical slot `bar` (node mode assigns one root node per visible
+-- slot via frame.slotNode -- there is no more bar sharing). Returns a 0- or 1-element list to
+-- keep the menu callers uniform with the old multi-root shape.
+function TFuBag:BoxRootNodes(frame, bar)
+  local cfg = frame.cfg;
+  local out = {};
+  if (not cfg or not cfg.cat_nodes) then return out; end
+  local nid = frame.slotNode and frame.slotNode[bar];
+  local n = nid and self:GetNode(cfg, nid);
+  if (n) then out[#out + 1] = n; end
+  return out;
+end
+
+-- All nodes (any depth) nested INTO the box at physical slot `bar` -- i.e. they have a parent
+-- and their root is the node assigned to this slot. These are what "Un-nest ->" lifts back out.
+function TFuBag:NodesNestedIntoBox(frame, bar)
+  local cfg = frame.cfg;
+  local out = {};
+  if (not cfg.cat_nodes) then return out; end
+  local rootId = frame.slotNode and frame.slotNode[bar];
+  if (not rootId) then return out; end
+  for _, n in pairs(cfg.cat_nodes) do
+    if (n.parent) then
+      local root = self:GetNodeRoot(cfg, n);
+      if (root and root.id == rootId) then out[#out + 1] = n; end
+    end
+  end
+  table.sort(out, function(a, b) return (a.name or "") < (b.name or ""); end);
+  return out;
+end
+
+-- "Nesting:" section of the bar menu (node model). Mirrors BarNestMenu's layout.
+function TFuBag:BarNestMenuNodes(frame, bar, level)
+  local roots = self:BoxRootNodes(frame, bar);
+  if (#roots == 0) then return; end
+
+  local info = { ["disabled"] = 1, ["notCheckable"] = 1 };
+  UIDropDownMenu_AddButton(info, level);
+  info = { ["text"] = L["Nesting:"], ["isTitle"] = 1, ["notClickable"] = 1, ["notCheckable"] = 1 };
+  UIDropDownMenu_AddButton(info, level);
+
+  self:AddSubmenuParent({ ["text"] = L["Nest under"], ["value"] = "bar_nest" }, level);
+
+  if (#self:NodesNestedIntoBox(frame, bar) > 0) then
+    self:AddSubmenuParent({ ["text"] = L["Un-nest"], ["value"] = "bar_unnest" }, level);
+  end
+end
+
+-- Level-2 "Nest under" list (node model): one entry per OTHER drawn box, by its display name,
+-- skipping any whose primary root would cycle with this box's roots. Picking nests ALL of this
+-- box's root nodes under that box's primary root node.
+function TFuBag:BarNestSubmenuNodes(frame, bar, level)
+  local cfg = frame.cfg;
+  local roots = self:BoxRootNodes(frame, bar);
+  if (#roots == 0) then return; end
+
+  local cand = {};
+  for bn = 1, self.BAR_MAX do
+    local pid = (bn ~= bar) and frame.slotNode and frame.slotNode[bn];
+    if (pid) then
+      local parent = self:GetNode(cfg, pid);
+      local items = frame.BARITM and frame.BARITM[bn];
+      if (parent and items and #items > 0) then
+        local ok = true;
+        for _, r in ipairs(roots) do
+          if (self:WouldNodeCycle(cfg, r.id, parent.id)) then ok = false; break; end
+        end
+        if (ok) then
+          cand[#cand + 1] = {
+            name = self:GetBarCategoryName(items, cfg) or (parent.name or ("Bar "..bn)),
+            parentId = parent.id,
+          };
+        end
+      end
+    end
+  end
+  table.sort(cand, function(a, b) return a.name < b.name; end);
+
+  for _, e in ipairs(cand) do
+    local pid = e.parentId;
+    UIDropDownMenu_AddButton({
+      ["text"] = e.name,
+      ["func"] = function()
+        for _, r in ipairs(roots) do self:SetNodeParent(cfg, r.id, pid); end
+        self:BumpCatGen();
+        CloseDropDownMenus();
+        frame:UpdateWindow(self.REQ_MUST);
+      end,
+      }, level);
+  end
+  self:HideMenuChecksExceptToggles(level);
+end
+
+-- Level-2 "Un-nest" list (node model): each node nested into this box, lifted individually,
+-- plus "Un-nest all".
+function TFuBag:BarUnnestSubmenuNodes(frame, bar, level)
+  local cfg = frame.cfg;
+  local kids = self:NodesNestedIntoBox(frame, bar);
+  if (#kids == 0) then return; end
+
+  if (#kids > 1) then
+    UIDropDownMenu_AddButton({
+      ["text"] = L["Un-nest all"],
+      ["func"] = function()
+        for _, n in ipairs(kids) do self:SetNodeParent(cfg, n.id, nil); end
+        self:BumpCatGen();
+        CloseDropDownMenus();
+        frame:UpdateWindow(self.REQ_MUST);
+      end,
+      }, level);
+  end
+
+  for _, n in ipairs(kids) do
+    local nid = n.id;
+    UIDropDownMenu_AddButton({
+      ["text"] = (n.name or tostring(n.id)),
+      ["func"] = function()
+        self:SetNodeParent(cfg, nid, nil);
+        self:BumpCatGen();
         CloseDropDownMenus();
         frame:UpdateWindow(self.REQ_MUST);
       end,
@@ -8332,7 +8586,12 @@ function TFuBag:LayoutWindow(frame)
   -- pass while ml_auto, so an AUTO layout always tracks the current ML-off auto-flow
   -- (same display + stacking) and stale saved coords never survive a category/size
   -- change. A hand-placed layout (ml_auto false, set on the first drag) is left alone.
-  local use_ml = (cfg.manual_layout == 1 and cfg.legacy_edit ~= 1 and frame.playerid == TFuBag.PLAYERID)
+  -- Node model forces the AUTO-FLOW layout: Manual Layout's cat_layout is keyed by physical
+  -- bar number, but node mode assigns those slots dynamically each pass, so a saved ML position
+  -- no longer maps to a stable category. Node-keyed Manual Layout is a later stage; until then
+  -- node mode lays out auto-flow (which also sidesteps the ML-after-nest redraw freeze).
+  local use_ml = (cfg.manual_layout == 1 and cfg.legacy_edit ~= 1 and frame.playerid == TFuBag.PLAYERID
+                  and cfg.use_node_model ~= 1)
   local ml_free = (cfg.ml_freeplace == 1)
   local ml_seeded = false
   if (use_ml) then

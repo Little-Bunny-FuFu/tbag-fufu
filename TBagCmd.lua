@@ -198,6 +198,9 @@ function TFuBnk_cmd(msg)
     else
       TFuBag:Print(TFuBag.SCP.."Un-nest refused (bad id).");
     end
+  elseif (cmd == "resetall") then
+    -- Full factory reset of ALL settings (account-wide) + reload. Requires "confirm".
+    TFuBag:ResetAll(params);
   elseif (cmd == "catdiag") then
     -- TEMP diagnostic: dump a category's rules + bar + live tooltip matches.
     TFuBag:CatDiag("bank", params);
@@ -328,6 +331,9 @@ function TFuInv_cmd(msg)
     else
       TFuBag:Print(TFuBag.SCP.."Un-nest refused (bad id).");
     end
+  elseif (cmd == "resetall") then
+    -- Full factory reset of ALL settings (account-wide) + reload. Requires "confirm".
+    TFuBag:ResetAll(params);
   elseif (cmd == "catdiag") then
     -- TEMP diagnostic: dump a category's rules + bar + live tooltip matches.
     TFuBag:CatDiag("inv", params);
