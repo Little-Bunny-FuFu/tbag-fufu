@@ -1,3 +1,11 @@
+* 12.0.0.08-fufu (2026-06-17)
+  Bugfix: opening bags in combat no longer throws a blocked-action error.
+- Fix: pressing the "open all bags" key (or otherwise refreshing a bag window) while in
+  combat could throw a red "AddOn tried to call the protected function
+  SetPropagateMouseClicks" error, because the game blocks certain mouse-input calls
+  during combat. Those calls are now deferred until combat ends -- bags open cleanly in
+  combat and the affected click/scroll behaviour is reapplied automatically afterwards.
+
 * 12.0.0.07-fufu (2026-06-06)
   Per-character profiles, and viewing other characters with their own layout.
 - Per-character profiles: each character now keeps its own profile. Window layout,
