@@ -3948,6 +3948,41 @@ end
 -- full-width Manual-Layout drag handle beneath, the handle stays grabbable on either side
 -- of the text. One button per bar frame, created once and reused; call with show=false to
 -- hide it when titles are off.
+-- SetPropagateMouseClicks / SetPropagateMouseMotion are protected frame methods: tainted
+-- addon code calling them during combat lockdown raises ADDON_ACTION_BLOCKED (repro: pressing
+-- OPENALLBAGS mid-combat runs the whole bag relayout under lockdown). Apply immediately out of
+-- combat; in combat, queue the call and flush it once on PLAYER_REGEN_ENABLED. The (obj,method)
+-- pair is de-duped so the last queued value wins.
+local TFuPendingInput = {};
+local TFuInputCombatWatcher;
+local function TFuApplyInputProp(obj, method, value)
+  if (not obj) or (type(obj[method]) ~= "function") then return; end
+  if (not InCombatLockdown()) then
+    obj[method](obj, value);
+    return;
+  end
+  for _, q in ipairs(TFuPendingInput) do
+    if (q.obj == obj) and (q.method == method) then
+      q.value = value;
+      return;
+    end
+  end
+  TFuPendingInput[#TFuPendingInput + 1] = { obj = obj, method = method, value = value };
+  if (not TFuInputCombatWatcher) then
+    TFuInputCombatWatcher = CreateFrame("Frame");
+    TFuInputCombatWatcher:RegisterEvent("PLAYER_REGEN_ENABLED");
+    TFuInputCombatWatcher:SetScript("OnEvent", function()
+      local pending = TFuPendingInput;
+      TFuPendingInput = {};
+      for _, q in ipairs(pending) do
+        if (q.obj) and (type(q.obj[q.method]) == "function") then
+          pcall(q.obj[q.method], q.obj, q.value);
+        end
+      end
+    end);
+  end
+end
+
 function TFuBag:WireCatTitleClick(frame, bf, baritmbar, show, barnum)
   if (not bf) then return; end
   local label = bf.CatName;
@@ -3967,7 +4002,7 @@ function TFuBag:WireCatTitleClick(frame, bf, baritmbar, show, barnum)
     -- the title owns the right-click outright and opens the category menu directly in
     -- EVERY mode (no fall-through, no double-toggle). Trade-off: the window/box can no
     -- longer be dragged by grabbing the title text itself -- drag from anywhere else.
-    if (btn.SetPropagateMouseClicks) then btn:SetPropagateMouseClicks(false); end
+    TFuApplyInputProp(btn, "SetPropagateMouseClicks", false);
     btn:SetScript("OnClick", function(self, mouseButton)
       if (mouseButton ~= "RightButton") then return; end
       -- The category ("bar") menu carries the colour / sort / hide / "Print contents
@@ -7851,8 +7886,8 @@ function TFuBag:UpdateScrollViewport(frame, PAD_TOP, PAD_BOTTOM, content_w, cont
     sc:SetScript("OnSizeChanged", nil);
     sb:SetScript("OnSizeChanged", nil);
     if (sb.SetPanExtent) then sb:SetPanExtent(frame.BF_PADHEIGHT or 36); end
-    if (sb.SetPropagateMouseClicks) then sb:SetPropagateMouseClicks(true); end
-    if (sb.SetPropagateMouseMotion) then sb:SetPropagateMouseMotion(true); end
+    TFuApplyInputProp(sb, "SetPropagateMouseClicks", true);
+    TFuApplyInputProp(sb, "SetPropagateMouseMotion", true);
     sb:EnableMouseWheel(true);
 
     -- Both scroll bars draw above any dummy-bag items. Bumping just the bar
