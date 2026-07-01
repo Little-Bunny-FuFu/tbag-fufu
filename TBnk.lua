@@ -5,6 +5,8 @@ local TFuBag = _G.TFuBag
 TFuBag.Bank = {}
 local Bank = TFuBag.Bank
 Bank.PREFIX = "TFuBnk"  -- window short-prefix for _G[...] chrome lookups (Tier 1)
+Bank.DEF_POS = { L = 0.294, R = 0.684, T = 0.83, B = 0.232 }   -- default window pos (fractions of UIParent) (Tier 1)
+Bank.TOPLEFT_BTNS = { "_Button_HighlightToggle", "_Button_ChangeEditMode", "_Button_Reload", "_Button_Filter", "_Button_DepositReagent" }
 
 -- Bank module: 12.0 C_Bank rewrite (Stage 1, read layer). The classic fixed-bank
 -- API (BANK_CONTAINER, REAGENTBANK_CONTAINER, 7 purchasable bag slots) is gone;
@@ -30,15 +32,6 @@ local TFuBnk_WIPECONFIGONLOAD = 0; -- for debugging, test it out on a new config
 
 
 ------------------------
-
-function Bank:SetDefPos(cfg, reset)
-  TFuBag:SetDef(cfg, "frameLEFT", UIParent:GetRight() * UIParent:GetScale() * 0.294, reset, TFuBag.NumFunc);
-  TFuBag:SetDef(cfg, "frameRIGHT", UIParent:GetRight() * UIParent:GetScale() * 0.684, reset, TFuBag.NumFunc);
-  TFuBag:SetDef(cfg, "frameTOP", UIParent:GetTop() * UIParent:GetScale() * 0.83, reset, TFuBag.NumFunc);
-  TFuBag:SetDef(cfg, "frameBOTTOM", UIParent:GetTop() * UIParent:GetScale() * 0.232, reset, TFuBag.NumFunc);
-  TFuBag:SetDef(cfg, "frameXRelativeTo", "LEFT", reset, TFuBag.StrFunc, {"RIGHT","LEFT"} );
-  TFuBag:SetDef(cfg, "frameYRelativeTo", "BOTTOM", reset, TFuBag.StrFunc, {"TOP","BOTTOM"} );
-end
 
 function Bank:InitDefVals(reset)
   local i, key, value;
@@ -1297,48 +1290,6 @@ function Bank.RightClick_SetItemOverride(self)
   HideDropDownMenu(1);
 
   TFuBnkFrame:UpdateWindow(TFuBag.REQ_MUST);
-  end
-end
-
-function Bank:SetTopLeftButton_Anchors()
-  local buttons = {
-    "TFuBnk_Button_HighlightToggle",
-    "TFuBnk_Button_ChangeEditMode",
-    "TFuBnk_Button_Reload",
-    "TFuBnk_Button_Filter",
-    "TFuBnk_Button_DepositReagent",
-  };
-  local button_left = nil;
-
-  -- Handle user dropdown list separately...
-  local dropdown = TFuBnk_UserDropdown;
-  if (dropdown and dropdown:IsVisible()) then
-    dropdown:ClearAllPoints();
-    dropdown:SetPoint("TOPLEFT",TFuBnkFrame,"TOPLEFT",-10,-5);
-    button_left = dropdown;
-  end
-
-  for _,button_name in ipairs(buttons) do
-    local button = _G[button_name];
-    if (button) then
-      TFuBag:TrimButtonIcon(button);
-      button:ClearAllPoints();
-      if (button_left) then
-        if (button_left == dropdown) then
-          -- First button after dropdown
-          button:SetPoint("TOPLEFT",button_left,"TOPRIGHT",15,-3);
-        else
-          -- button following another button
-          button:SetPoint("TOPLEFT",button_left,"TOPRIGHT",2,0);
-        end
-      else
-        -- First button if dropdown is hidden
-        button:SetPoint("TOPLEFT",TFuBnkFrame,"TOPLEFT",9,-8);
-      end
-      if (button:IsVisible()) then
-        button_left = button;
-      end
-    end
   end
 end
 

@@ -5,6 +5,8 @@ local TFuBag = _G.TFuBag
 TFuBag.Inv = {}
 local Inv = TFuBag.Inv
 Inv.PREFIX = "TFuInv"  -- window short-prefix for _G[...] chrome lookups (Tier 1)
+Inv.DEF_POS = { L = 0.73, R = 0.92, T = 0.83, B = 0.232 }   -- default window pos (fractions of UIParent) (Tier 1)
+Inv.TOPLEFT_BTNS = { "_Button_HighlightToggle", "_Button_ChangeEditMode", "_Button_ShowBank", "_Button_Reload", "_Button_Filter" }
 
 -- Localization Support
 local L = TFuBag.LOCALE;
@@ -17,15 +19,6 @@ local TFuINV_WIPECONFIGONLOAD = 0;  -- for debugging, test it out on a new confi
 
 
 ------------------------
-
-function Inv:SetDefPos(cfg, reset)
-  TFuBag:SetDef(cfg, "frameLEFT", UIParent:GetRight() * UIParent:GetScale() * 0.73, reset, TFuBag.NumFunc);
-  TFuBag:SetDef(cfg, "frameRIGHT", UIParent:GetRight() * UIParent:GetScale() * 0.92, reset, TFuBag.NumFunc);
-  TFuBag:SetDef(cfg, "frameTOP", UIParent:GetTop() * UIParent:GetScale() * 0.83, reset, TFuBag.NumFunc);
-  TFuBag:SetDef(cfg, "frameBOTTOM", UIParent:GetTop() * UIParent:GetScale() * 0.232, reset, TFuBag.NumFunc);
-  TFuBag:SetDef(cfg, "frameXRelativeTo", "LEFT", reset, TFuBag.StrFunc, {"RIGHT","LEFT"} );
-  TFuBag:SetDef(cfg, "frameYRelativeTo", "BOTTOM", reset, TFuBag.StrFunc, {"TOP","BOTTOM"} );
-end
 
 -- set reset to 1 to restore all default values
 function Inv:InitDefVals(reset)
@@ -338,48 +331,6 @@ end
 
 -- Glow the filter button while any filter dimension is active, so it is obvious
 -- why items are hidden. Glow texture is created lazily (mirrors the ML button).
-function Inv:SetTopLeftButton_Anchors()
-  local buttons = {
-    "TFuInv_Button_HighlightToggle",
-    "TFuInv_Button_ChangeEditMode",
-    "TFuInv_Button_ShowBank",
-    "TFuInv_Button_Reload",
-    "TFuInv_Button_Filter",
-  };
-  local button_left = nil;
-
-  -- Handle user dropdown list separately...
-  local dropdown = TFuInv_UserDropdown;
-  if (dropdown and dropdown:IsVisible()) then
-    dropdown:ClearAllPoints();
-    dropdown:SetPoint("TOPLEFT",TFuInvFrame,"TOPLEFT",-10,-5);
-    button_left = dropdown;
-  end
-
-  for _,button_name in ipairs(buttons) do
-    local button = _G[button_name];
-    if (button) then
-      TFuBag:TrimButtonIcon(button);
-      button:ClearAllPoints();
-      if (button_left) then
-        if (button_left == dropdown) then
-          -- First button after dropdown
-          button:SetPoint("TOPLEFT",button_left,"TOPRIGHT",15,-3);
-        else
-          -- button following another button
-          button:SetPoint("TOPLEFT",button_left,"TOPRIGHT",2,0);
-        end
-      else
-        -- First button if dropdown is hidden
-        button:SetPoint("TOPLEFT",TFuInvFrame,"TOPLEFT",9,-8);
-      end
-      if (button:IsVisible()) then
-        button_left = button;
-      end
-    end
-  end
-end
-
 function Inv:SetBottomLeftButton_Anchors()
   local buttons = {
     "TFuInvFrame_Total",

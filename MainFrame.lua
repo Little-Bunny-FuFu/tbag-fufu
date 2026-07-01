@@ -626,3 +626,50 @@ function MainFrame:UpdateWindow(resort_req)
   self.WindowIsUpdating = 0;
   if (not ok) then geterrorhandler()(err); end
 end
+
+-- Batch 5: two window methods hoisted; per-window data via self.DEF_POS / self.TOPLEFT_BTNS.
+
+function MainFrame:SetDefPos(cfg, reset)
+  local p = self.DEF_POS;
+  TFuBag:SetDef(cfg, "frameLEFT", UIParent:GetRight() * UIParent:GetScale() * p.L, reset, TFuBag.NumFunc);
+  TFuBag:SetDef(cfg, "frameRIGHT", UIParent:GetRight() * UIParent:GetScale() * p.R, reset, TFuBag.NumFunc);
+  TFuBag:SetDef(cfg, "frameTOP", UIParent:GetTop() * UIParent:GetScale() * p.T, reset, TFuBag.NumFunc);
+  TFuBag:SetDef(cfg, "frameBOTTOM", UIParent:GetTop() * UIParent:GetScale() * p.B, reset, TFuBag.NumFunc);
+  TFuBag:SetDef(cfg, "frameXRelativeTo", "LEFT", reset, TFuBag.StrFunc, {"RIGHT","LEFT"} );
+  TFuBag:SetDef(cfg, "frameYRelativeTo", "BOTTOM", reset, TFuBag.StrFunc, {"TOP","BOTTOM"} );
+end
+
+function MainFrame:SetTopLeftButton_Anchors()
+  local button_left = nil;
+
+  -- Handle user dropdown list separately...
+  local dropdown = _G[self.PREFIX.."_UserDropdown"];
+  if (dropdown and dropdown:IsVisible()) then
+    dropdown:ClearAllPoints();
+    dropdown:SetPoint("TOPLEFT",self,"TOPLEFT",-10,-5);
+    button_left = dropdown;
+  end
+
+  for _,suffix in ipairs(self.TOPLEFT_BTNS) do
+    local button = _G[self.PREFIX..suffix];
+    if (button) then
+      TFuBag:TrimButtonIcon(button);
+      button:ClearAllPoints();
+      if (button_left) then
+        if (button_left == dropdown) then
+          -- First button after dropdown
+          button:SetPoint("TOPLEFT",button_left,"TOPRIGHT",15,-3);
+        else
+          -- button following another button
+          button:SetPoint("TOPLEFT",button_left,"TOPRIGHT",2,0);
+        end
+      else
+        -- First button if dropdown is hidden
+        button:SetPoint("TOPLEFT",self,"TOPLEFT",9,-8);
+      end
+      if (button:IsVisible()) then
+        button_left = button;
+      end
+    end
+  end
+end
