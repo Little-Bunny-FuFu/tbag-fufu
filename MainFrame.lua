@@ -5,6 +5,7 @@
 
 TFuBag.MainFrame = {}
 local MainFrame = TFuBag.MainFrame
+local L = TFuBag.LOCALE   -- localization (hoisted button handlers use L)
 
 function MainFrame:FrameX(width)
   return (width * (self.BF_PADWIDTH + self.cfg.frameXSpace)) + self.cfg.frameXSpace
@@ -486,4 +487,68 @@ function MainFrame:UpdateFilterButton()
   end
   local f = self.itemFilter;
   if (f and f.active) then btn.FilterGlow:Show(); else btn.FilterGlow:Hide(); end
+end
+
+-- Batch 3: window button OnClick handlers hoisted from Inv/Bank. self is the
+-- clicked button; the window frame + short prefix are derived from its name
+-- (TFuInv_Button_X / TFuBnk_Button_X). The buttons' XML OnClick wiring is
+-- unchanged (still TFu<W>Frame.Button_X_OnClick(self,...), resolving here).
+
+function MainFrame.Button_Filter_OnClick(self)
+  local frame = _G[self:GetName():match("^(TFu%a+)_").."Frame"];
+  TFuBag:OpenFilterMenu(frame, self);
+end
+
+function MainFrame.Button_HighlightToggle_OnClick(self)
+  local frame = _G[self:GetName():match("^(TFu%a+)_").."Frame"];
+  PlaySound(PlaySoundKitID and "igMainMenuOptioncheckBoxOn" or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
+  if (TFuBag.SrchText) then
+    TFuBag:ClearSearch();
+    if (GameTooltip:GetOwner() == self) then
+      if (frame.hilight_new == 1) then
+        TFuBag.NewbieTip(self, L["Normal"], 1.0, 1.0, 1.0,
+                                 L["Stop highlighting new items."]);
+      else
+        TFuBag.NewbieTip(self, L["Highlight New"], 1.0, 1.0, 1.0,
+                                 L["Highlight items marked as new."]);
+      end
+    end
+    return;
+  elseif (frame.hilight_new == 0) then
+    frame.hilight_new = 1;
+    if (GameTooltip:GetOwner() == self) then
+      TFuBag.NewbieTip(self, L["Normal"], 1.0, 1.0, 1.0,
+                               L["Stop highlighting new items."]);
+    end
+  else
+    frame.hilight_new = 0;
+    if (GameTooltip:GetOwner() == self) then
+      TFuBag.NewbieTip(self, L["Highlight New"], 1.0, 1.0, 1.0,
+                               L["Highlight items marked as new."]);
+    end
+  end
+  frame:UpdateWindow();
+end
+
+function MainFrame.Button_MoveLockToggle_OnClick(self)
+  local pfx = self:GetName():match("^(TFu%a+)_");
+  local frame = _G[pfx.."Frame"];
+  PlaySound(PlaySoundKitID and "igMainMenuOptioncheckBoxOn" or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
+  if (frame.cfg["moveLock"] == 0) then
+    frame.cfg["moveLock"] = 1;
+    _G[pfx.."LockNorm"]:SetTexture("Interface\\AddOns\\tbag-fufu\\images\\LockButton-Unlocked-Up");
+    _G[pfx.."LockPush"]:SetTexture("Interface\\AddOns\\tbag-fufu\\images\\LockButton-Unlocked-Down");
+    if (GameTooltip:GetOwner() == self) then
+      TFuBag.NewbieTip(self, L["Lock Window"], 1.0, 1.0, 1.0,
+                               L["Prevent window from being moved by dragging it."]);
+    end
+  else
+    frame.cfg["moveLock"] = 0;
+    _G[pfx.."LockNorm"]:SetTexture("Interface\\AddOns\\tbag-fufu\\images\\LockButton-Locked-Up");
+    _G[pfx.."LockPush"]:SetTexture("Interface\\AddOns\\tbag-fufu\\images\\LockButton-Locked-Down");
+    if (GameTooltip:GetOwner() == self) then
+      TFuBag.NewbieTip(self, L["Unlock Window"], 1.0, 1.0, 1.0,
+                               L["Allow window to be moved by dragging it."]);
+    end
+  end
 end

@@ -1218,36 +1218,6 @@ function Bank:InitBagGfx()
 end
 
 
-function Bank.Button_HighlightToggle_OnClick(self)
-  PlaySound(PlaySoundKitID and "igMainMenuOptioncheckBoxOn" or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
-  if (TFuBag.SrchText) then
-    TFuBag:ClearSearch();
-    if (GameTooltip:GetOwner() == TFuBnk_Button_HighlightToggle) then
-      if (TFuBnkFrame.hilight_new == 1) then
-        TFuBag.NewbieTip(self, L["Normal"], 1.0, 1.0, 1.0,
-                                 L["Stop highlighting new items."]);
-      else
-        TFuBag.NewbieTip(self, L["Highlight New"], 1.0, 1.0, 1.0,
-                                 L["Highlight items marked as new."]);
-      end
-    end
-    return;
-  elseif (TFuBnkFrame.hilight_new == 0) then
-    TFuBnkFrame.hilight_new = 1;
-    if (GameTooltip:GetOwner() == TFuBnk_Button_HighlightToggle) then
-      TFuBag.NewbieTip(self, L["Normal"], 1.0, 1.0, 1.0,
-                               L["Stop highlighting new items."]);
-    end
-  else
-    TFuBnkFrame.hilight_new = 0;
-    if (GameTooltip:GetOwner() == TFuBnk_Button_HighlightToggle) then
-      TFuBag.NewbieTip(self, L["Highlight New"], 1.0, 1.0, 1.0,
-                               L["Highlight items marked as new."]);
-    end
-  end
-  TFuBnkFrame:UpdateWindow();
-end
-
 function Bank.Button_ChangeEditMode_OnClick()
   PlaySound(PlaySoundKitID and "igMainMenuOptioncheckBoxOn" or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
   -- Mirror the inventory gear (Inv.Button_ChangeEditMode_OnClick): with Legacy Edit ON
@@ -1304,32 +1274,7 @@ function Bank.Button_DepositReagent_OnClick()
   end
 end
 
-function Bank.Button_Filter_OnClick(self)
-  TFuBag:OpenFilterMenu(TFuBnkFrame, self);
-end
-
 -- Glow the filter button while any filter dimension is active (mirrors Inv).
-function Bank.Button_MoveLockToggle_OnClick(self)
-  PlaySound(PlaySoundKitID and "igMainMenuOptioncheckBoxOn" or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
-  if (TFuBnkFrame.cfg["moveLock"] == 0) then
-    TFuBnkFrame.cfg["moveLock"] = 1;
-    TFuBnkLockNorm:SetTexture("Interface\\AddOns\\tbag-fufu\\images\\LockButton-Unlocked-Up");
-    TFuBnkLockPush:SetTexture("Interface\\AddOns\\tbag-fufu\\images\\LockButton-Unlocked-Down");
-    if (GameTooltip:GetOwner() == TFuBnk_Button_MoveLockToggle) then
-      TFuBag.NewbieTip(self, L["Lock Window"], 1.0, 1.0, 1.0,
-                               L["Prevent window from being moved by dragging it."]);
-    end
-  else
-    TFuBnkFrame.cfg["moveLock"] = 0;
-    TFuBnkLockNorm:SetTexture("Interface\\AddOns\\tbag-fufu\\images\\LockButton-Locked-Up");
-    TFuBnkLockPush:SetTexture("Interface\\AddOns\\tbag-fufu\\images\\LockButton-Locked-Down");
-    if (GameTooltip:GetOwner() == TFuBnk_Button_MoveLockToggle) then
-      TFuBag.NewbieTip(self, L["Unlock Window"], 1.0, 1.0, 1.0,
-                               L["Allow window to be moved by dragging it."]);
-    end
-  end
-end
-
 function Bank.RightClick_DeleteItemOverride(self)
   local bag, slot, itm;
   local this = self or _G.this

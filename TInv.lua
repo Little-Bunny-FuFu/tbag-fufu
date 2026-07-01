@@ -309,36 +309,6 @@ function Inv:UpdateBagGfx()
   TFuBag:SetFreeStr(TFuInvFrame_TotalText, totalfree, totalsize, cfg["show_bag_sizes"]);
 end
 
-function Inv.Button_HighlightToggle_OnClick(self)
-  PlaySound(PlaySoundKitID and "igMainMenuOptioncheckBoxOn" or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
-  if (TFuBag.SrchText) then
-    TFuBag:ClearSearch();
-    if (GameTooltip:GetOwner() == TFuInv_Button_HighlightToggle) then
-      if (TFuInvFrame.hilight_new == 1) then
-        TFuBag.NewbieTip(self, L["Normal"], 1.0, 1.0, 1.0,
-                                 L["Stop highlighting new items."]);
-      else
-        TFuBag.NewbieTip(self, L["Highlight New"], 1.0, 1.0, 1.0,
-                                 L["Highlight items marked as new."]);
-      end
-    end
-    return;
-  elseif (TFuInvFrame.hilight_new == 0) then
-    TFuInvFrame.hilight_new = 1;
-    if (GameTooltip:GetOwner() == TFuInv_Button_HighlightToggle) then
-      TFuBag.NewbieTip(self, L["Normal"], 1.0, 1.0, 1.0,
-                               L["Stop highlighting new items."]);
-    end
-  else
-    TFuInvFrame.hilight_new = 0;
-    if (GameTooltip:GetOwner() == TFuInv_Button_HighlightToggle) then
-      TFuBag.NewbieTip(self, L["Highlight New"], 1.0, 1.0, 1.0,
-                               L["Highlight items marked as new."]);
-    end
-  end
-  TFuInvFrame:UpdateWindow();
-end
-
 -- Edit button. With Legacy Edit ON it toggles the original numbered-bar edit_mode
 -- (click an item's category, click a bar to move it). With Legacy Edit OFF it toggles
 -- Manual Layout (freeform draggable categories). Name kept to avoid XML/menu churn.
@@ -382,33 +352,8 @@ function Inv.Button_ShowBank_OnClick()
   TFuBnkFrame:Toggle()
 end
 
-function Inv.Button_Filter_OnClick(self)
-  TFuBag:OpenFilterMenu(TFuInvFrame, self);
-end
-
 -- Glow the filter button while any filter dimension is active, so it is obvious
 -- why items are hidden. Glow texture is created lazily (mirrors the ML button).
-function Inv.Button_MoveLockToggle_OnClick(self)
-  PlaySound(PlaySoundKitID and "igMainMenuOptioncheckBoxOn" or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
-  if (TFuInvFrame.cfg["moveLock"] == 0) then
-    TFuInvFrame.cfg["moveLock"] = 1;
-    TFuInvLockNorm:SetTexture("Interface\\AddOns\\tbag-fufu\\images\\LockButton-Unlocked-Up");
-    TFuInvLockPush:SetTexture("Interface\\AddOns\\tbag-fufu\\images\\LockButton-Unlocked-Down");
-    if (GameTooltip:GetOwner() == TFuInv_Button_MoveLockToggle) then
-      TFuBag.NewbieTip(self, L["Lock Window"], 1.0, 1.0, 1.0,
-                               L["Prevent window from being moved by dragging it."]);
-    end
-  else
-    TFuInvFrame.cfg["moveLock"] = 0;
-    TFuInvLockNorm:SetTexture("Interface\\AddOns\\tbag-fufu\\images\\LockButton-Locked-Up");
-    TFuInvLockPush:SetTexture("Interface\\AddOns\\tbag-fufu\\images\\LockButton-Locked-Down");
-    if (GameTooltip:GetOwner() == TFuInv_Button_MoveLockToggle) then
-      TFuBag.NewbieTip(self, L["Unlock Window"], 1.0, 1.0, 1.0,
-                               L["Allow window to be moved by dragging it."]);
-    end
-  end
-end
-
 function Inv:SetTopLeftButton_Anchors()
   local buttons = {
     "TFuInv_Button_HighlightToggle",
