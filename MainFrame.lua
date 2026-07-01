@@ -315,3 +315,135 @@ function MainFrame:Toggle()
   return isVisible
 end
 
+-- ===== Shared window chrome (Tier 1 hoist from Inv/Bank) =====================
+-- These were byte-identical (modulo the TFuInv/TFuBnk token) in TInv.lua and
+-- TBnk.lua. self is the window frame; self.PREFIX ("TFuInv"/"TFuBnk") builds the
+-- short-prefixed button globals, and self.PREFIX.."Frame" the frame-prefixed ones.
+
+function MainFrame:SetButton_Anchors()
+  self:SetTopLeftButton_Anchors();
+  self:SetTopRightButton_Anchors();
+  self:SetBottomLeftButton_Anchors();
+  self:SetBottomRightButton_Anchors();
+  TFuBag:LayoutWindow(self)
+end
+
+function MainFrame:Toggle_CloseButton()
+  local cfg = self.cfg;
+  if (cfg["show_closebutton"] == 1) then
+    cfg["show_closebutton"] = 0;
+    _G[self.PREFIX.."_Button_Close"]:Hide();
+  else
+    cfg["show_closebutton"] = 1;
+    _G[self.PREFIX.."_Button_Close"]:Show();
+  end
+  self:SetButton_Anchors();
+end
+
+function MainFrame:Toggle_EditButton()
+  local cfg = self.cfg;
+  if (cfg["show_editbutton"] == 1) then
+    cfg["show_editbutton"] = 0;
+    _G[self.PREFIX.."_Button_ChangeEditMode"]:Hide();
+  else
+    cfg["show_editbutton"] = 1;
+    _G[self.PREFIX.."_Button_ChangeEditMode"]:Show();
+  end
+  self:SetButton_Anchors();
+end
+
+function MainFrame:Toggle_Filter()
+  local cfg = self.cfg;
+  if (cfg["show_filterbutton"] == 1) then
+    cfg["show_filterbutton"] = 0;
+    _G[self.PREFIX.."_Button_Filter"]:Hide();
+  else
+    cfg["show_filterbutton"] = 1;
+    _G[self.PREFIX.."_Button_Filter"]:Show();
+  end
+  self:SetButton_Anchors();
+end
+
+function MainFrame:Toggle_HighlightButton()
+  local cfg = self.cfg;
+  if (cfg["show_hilightbutton"] == 1) then
+    cfg["show_hilightbutton"] = 0;
+    _G[self.PREFIX.."_Button_HighlightToggle"]:Hide();
+  else
+    cfg["show_hilightbutton"] = 1;
+    _G[self.PREFIX.."_Button_HighlightToggle"]:Show();
+  end
+  self:SetButton_Anchors();
+end
+
+function MainFrame:Toggle_LockButton()
+  local cfg = self.cfg;
+  if (cfg["show_lockbutton"] == 1) then
+    cfg["show_lockbutton"] = 0;
+    _G[self.PREFIX.."_Button_MoveLockToggle"]:Hide();
+  else
+    cfg["show_lockbutton"] = 1;
+    _G[self.PREFIX.."_Button_MoveLockToggle"]:Show();
+  end
+  self:SetButton_Anchors();
+end
+
+function MainFrame:Toggle_ReloadButton()
+  local cfg = self.cfg;
+  if (cfg["show_reloadbutton"] == 1) then
+    cfg["show_reloadbutton"] = 0;
+    _G[self.PREFIX.."_Button_Reload"]:Hide();
+  else
+    cfg["show_reloadbutton"] = 1;
+    _G[self.PREFIX.."_Button_Reload"]:Show();
+  end
+  self:SetButton_Anchors();
+end
+
+function MainFrame:Toggle_SearchBox()
+  local cfg = self.cfg;
+  if (cfg["show_searchbox"] == 1) then
+    cfg["show_searchbox"] = 0;
+    _G[self.PREFIX.."_SearchBox"]:Hide();
+  else
+    cfg["show_searchbox"] = 1;
+    _G[self.PREFIX.."_SearchBox"]:Show();
+  end
+  self:SetButton_Anchors();
+end
+
+function MainFrame:Toggle_Token()
+  local cfg = self.cfg;
+  if (cfg["show_tokens"] == 1) then
+    cfg["show_tokens"] = 0;
+    _G[self.PREFIX.."Frame_TokenFrame"]:Hide();
+  else
+    cfg["show_tokens"] = 1;
+    _G[self.PREFIX.."Frame_TokenFrame"]:Show();
+  end
+  self:SetButton_Anchors();
+end
+
+function MainFrame:Toggle_Total()
+  local cfg = self.cfg;
+  if (cfg["show_total"] == 1) then
+    cfg["show_total"] = 0;
+    _G[self.PREFIX.."Frame_Total"]:Hide();
+  else
+    cfg["show_total"] = 1;
+    _G[self.PREFIX.."Frame_Total"]:Show();
+  end
+  self:SetButton_Anchors();
+end
+
+function MainFrame:Toggle_UserDropdown()
+  local cfg = self.cfg;
+  if (cfg["show_userdropdown"] == 1) then
+    cfg["show_userdropdown"] = 0;
+    TFuBag:HideDropDownSilently(_G[self.PREFIX.."_UserDropdown"]);
+  else
+    cfg["show_userdropdown"] = 1;
+    _G[self.PREFIX.."_UserDropdown"]:Show();
+  end
+  self:SetButton_Anchors();
+end

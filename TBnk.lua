@@ -4,6 +4,7 @@ local _G = getfenv(0)
 local TFuBag = _G.TFuBag
 TFuBag.Bank = {}
 local Bank = TFuBag.Bank
+Bank.PREFIX = "TFuBnk"  -- window short-prefix for _G[...] chrome lookups (Tier 1)
 
 -- Bank module: 12.0 C_Bank rewrite (Stage 1, read layer). The classic fixed-bank
 -- API (BANK_CONTAINER, REAGENTBANK_CONTAINER, 7 purchasable bag slots) is gone;
@@ -1547,74 +1548,6 @@ function Bank:SetBottomRightButton_Anchors()
   end
 end
 
-function Bank:SetButton_Anchors()
-  self:SetTopLeftButton_Anchors();
-  self:SetTopRightButton_Anchors();
-  self:SetBottomLeftButton_Anchors();
-  self:SetBottomRightButton_Anchors();
-  TFuBag:LayoutWindow(self)
-end
-
-
-function Bank.Toggle_CloseButton()
-  if (TFuBnkFrame.cfg["show_closebutton"] == 1) then
-    TFuBnkFrame.cfg["show_closebutton"] = 0;
-    TFuBnk_Button_Close:Hide();
-    TFuBnkFrame:SetButton_Anchors();
-  else
-    TFuBnkFrame.cfg["show_closebutton"] = 1;
-    TFuBnk_Button_Close:Show();
-    TFuBnkFrame:SetButton_Anchors();
-  end
-end
-
-function Bank.Toggle_LockButton()
-  if (TFuBnkFrame.cfg["show_lockbutton"] == 1) then
-    TFuBnkFrame.cfg["show_lockbutton"] = 0;
-    TFuBnk_Button_MoveLockToggle:Hide();
-    TFuBnkFrame:SetButton_Anchors();
-  else
-    TFuBnkFrame.cfg["show_lockbutton"] = 1;
-    TFuBnk_Button_MoveLockToggle:Show();
-    TFuBnkFrame:SetButton_Anchors();
-  end
-end
-
-function Bank.Toggle_HighlightButton()
-  if (TFuBnkFrame.cfg["show_hilightbutton"] == 1) then
-    TFuBnkFrame.cfg["show_hilightbutton"] = 0;
-    TFuBnk_Button_HighlightToggle:Hide();
-    TFuBnkFrame:SetButton_Anchors();
-  else
-    TFuBnkFrame.cfg["show_hilightbutton"] = 1;
-    TFuBnk_Button_HighlightToggle:Show();
-    TFuBnkFrame:SetButton_Anchors();
-  end
-end
-
-function Bank.Toggle_EditButton()
-  if (TFuBnkFrame.cfg["show_editbutton"] == 1) then
-    TFuBnkFrame.cfg["show_editbutton"] = 0;
-    TFuBnk_Button_ChangeEditMode:Hide();
-    TFuBnkFrame:SetButton_Anchors();
-  else
-    TFuBnkFrame.cfg["show_editbutton"] = 1;
-    TFuBnk_Button_ChangeEditMode:Show();
-    TFuBnkFrame:SetButton_Anchors();
-  end
-end
-
-function Bank.Toggle_ReloadButton()
-  if (TFuBnkFrame.cfg["show_reloadbutton"] == 1) then
-    TFuBnkFrame.cfg["show_reloadbutton"] = 0;
-    TFuBnk_Button_Reload:Hide();
-    TFuBnkFrame:SetButton_Anchors();
-  else
-    TFuBnkFrame.cfg["show_reloadbutton"] = 1;
-    TFuBnk_Button_Reload:Show();
-    TFuBnkFrame:SetButton_Anchors();
-  end
-end
 
 function Bank.Toggle_DepositReagentButton()
   if (TFuBnkFrame.cfg["show_depositbutton"] == 1) then
@@ -1634,18 +1567,6 @@ function Bank.Toggle_DepositReagentButton()
   end
 end
 
-function Bank.Toggle_UserDropdown()
-  if (TFuBnkFrame.cfg["show_userdropdown"] == 1) then
-    TFuBnkFrame.cfg["show_userdropdown"] = 0;
-    TFuBag:HideDropDownSilently(TFuBnk_UserDropdown);
-    TFuBnkFrame:SetButton_Anchors();
-  else
-    TFuBnkFrame.cfg["show_userdropdown"] = 1;
-    TFuBnk_UserDropdown:Show();
-    TFuBnkFrame:SetButton_Anchors();
-  end
-end
-
 function Bank.Toggle_Money()
   if (TFuBnkFrame.cfg["show_money"] == 1) then
     TFuBnkFrame.cfg["show_money"] = 0;
@@ -1657,18 +1578,6 @@ function Bank.Toggle_Money()
     TFuBnkFrame:SetButton_Anchors();
   end
   TFuBnkFrame:UpdateMoneyControls();
-end
-
-function Bank.Toggle_Token()
-  if (TFuBnkFrame.cfg["show_tokens"] == 1) then
-    TFuBnkFrame.cfg["show_tokens"] = 0;
-    TFuBnkFrame_TokenFrame:Hide();
-    TFuBnkFrame:SetButton_Anchors();
-  else
-    TFuBnkFrame.cfg["show_tokens"] = 1;
-    TFuBnkFrame_TokenFrame:Show();
-    TFuBnkFrame:SetButton_Anchors();
-  end
 end
 
 function Bank.Toggle_BagSlotButtons()
@@ -1683,42 +1592,6 @@ function Bank.Toggle_BagSlotButtons()
   else
     TFuBnkFrame.cfg["show_bagbuttons"] = 1;
     if (TFuBnkFrame.TabStrip) then TFuBnkFrame.TabStrip:Show(); end
-    TFuBnkFrame:SetButton_Anchors();
-  end
-end
-
-function Bank.Toggle_Total()
-  if (TFuBnkFrame.cfg["show_total"] == 1) then
-    TFuBnkFrame.cfg["show_total"] = 0;
-    TFuBnkFrame_Total:Hide();
-    TFuBnkFrame:SetButton_Anchors();
-  else
-    TFuBnkFrame.cfg["show_total"] = 1;
-    TFuBnkFrame_Total:Show();
-    TFuBnkFrame:SetButton_Anchors();
-  end
-end
-
-function Bank.Toggle_Filter()
-  if (TFuBnkFrame.cfg["show_filterbutton"] == 1) then
-    TFuBnkFrame.cfg["show_filterbutton"] = 0;
-    TFuBnk_Button_Filter:Hide();
-    TFuBnkFrame:SetButton_Anchors();
-  else
-    TFuBnkFrame.cfg["show_filterbutton"] = 1;
-    TFuBnk_Button_Filter:Show();
-    TFuBnkFrame:SetButton_Anchors();
-  end
-end
-
-function Bank.Toggle_SearchBox()
-  if (TFuBnkFrame.cfg["show_searchbox"] == 1) then
-    TFuBnkFrame.cfg["show_searchbox"] = 0;
-    TFuBnk_SearchBox:Hide();
-    TFuBnkFrame:SetButton_Anchors();
-  else
-    TFuBnkFrame.cfg["show_searchbox"] = 1;
-    TFuBnk_SearchBox:Show();
     TFuBnkFrame:SetButton_Anchors();
   end
 end
@@ -2192,7 +2065,7 @@ function Bank.RightClickMenu_populate(self, level)
         elseif (UIDROPDOWNMENU_MENU_VALUE["opt"] == "hide_frames") then
           -- Hide toggles, square-box keep-open style (checked when show_* == 0 == hidden).
           local function hideToggle(text, toggleFunc, cfgKey)
-            TFuBag:AddMenuToggle({ ["text"] = text, ["func"] = toggleFunc }, level,
+            TFuBag:AddMenuToggle({ ["text"] = text, ["func"] = function() toggleFunc(TFuBnkFrame) end }, level,
               function() return TFuBnkFrame.cfg[cfgKey] == 0; end);
           end
           hideToggle(L["Hide Player Dropdown"],        TFuBnkFrame.Toggle_UserDropdown,        "show_userdropdown");

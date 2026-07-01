@@ -4,6 +4,7 @@ local _G = getfenv(0)
 local TFuBag = _G.TFuBag
 TFuBag.Inv = {}
 local Inv = TFuBag.Inv
+Inv.PREFIX = "TFuInv"  -- window short-prefix for _G[...] chrome lookups (Tier 1)
 
 -- Localization Support
 local L = TFuBag.LOCALE;
@@ -564,62 +565,6 @@ function Inv:SetBottomRightButton_Anchors()
   end
 end
 
-function Inv:SetButton_Anchors()
-  self:SetTopLeftButton_Anchors();
-  self:SetTopRightButton_Anchors();
-  self:SetBottomLeftButton_Anchors();
-  self:SetBottomRightButton_Anchors();
-  TFuBag:LayoutWindow(self)
-end
-
-function Inv.Toggle_CloseButton()
-  if (TFuInvFrame.cfg["show_closebutton"] == 1) then
-    TFuInvFrame.cfg["show_closebutton"] = 0;
-    TFuInv_Button_Close:Hide();
-    TFuInvFrame:SetButton_Anchors();
-  else
-    TFuInvFrame.cfg["show_closebutton"] = 1;
-    TFuInv_Button_Close:Show();
-    TFuInvFrame:SetButton_Anchors();
-  end
-end
-
-function Inv.Toggle_LockButton()
-  if (TFuInvFrame.cfg["show_lockbutton"] == 1) then
-    TFuInvFrame.cfg["show_lockbutton"] = 0;
-    TFuInv_Button_MoveLockToggle:Hide();
-    TFuInvFrame:SetButton_Anchors();
-  else
-    TFuInvFrame.cfg["show_lockbutton"] = 1;
-    TFuInv_Button_MoveLockToggle:Show();
-    TFuInvFrame:SetButton_Anchors();
-  end
-end
-
-function Inv.Toggle_HighlightButton()
-  if (TFuInvFrame.cfg["show_hilightbutton"] == 1) then
-    TFuInvFrame.cfg["show_hilightbutton"] = 0;
-    TFuInv_Button_HighlightToggle:Hide();
-    TFuInvFrame:SetButton_Anchors();
-  else
-    TFuInvFrame.cfg["show_hilightbutton"] = 1;
-    TFuInv_Button_HighlightToggle:Show();
-    TFuInvFrame:SetButton_Anchors();
-  end
-end
-
-function Inv.Toggle_EditButton()
-  if (TFuInvFrame.cfg["show_editbutton"] == 1) then
-    TFuInvFrame.cfg["show_editbutton"] = 0;
-    TFuInv_Button_ChangeEditMode:Hide();
-    TFuInvFrame:SetButton_Anchors();
-  else
-    TFuInvFrame.cfg["show_editbutton"] = 1;
-    TFuInv_Button_ChangeEditMode:Show();
-    TFuInvFrame:SetButton_Anchors();
-  end
-end
-
 function Inv.Toggle_BankButton()
   if (TFuInvFrame.cfg["show_bankbutton"] == 1) then
     TFuInvFrame.cfg["show_bankbutton"] = 0;
@@ -632,42 +577,6 @@ function Inv.Toggle_BankButton()
   end
 end
 
-function Inv.Toggle_ReloadButton()
-  if (TFuInvFrame.cfg["show_reloadbutton"] == 1) then
-    TFuInvFrame.cfg["show_reloadbutton"] = 0;
-    TFuInv_Button_Reload:Hide();
-    TFuInvFrame:SetButton_Anchors();
-  else
-    TFuInvFrame.cfg["show_reloadbutton"] = 1;
-    TFuInv_Button_Reload:Show();
-    TFuInvFrame:SetButton_Anchors();
-  end
-end
-
-function Inv.Toggle_SearchBox()
-  if (TFuInvFrame.cfg["show_searchbox"] == 1) then
-    TFuInvFrame.cfg["show_searchbox"] = 0;
-    TFuInv_SearchBox:Hide();
-    TFuInvFrame:SetButton_Anchors();
-  else
-    TFuInvFrame.cfg["show_searchbox"] = 1;
-    TFuInv_SearchBox:Show();
-    TFuInvFrame:SetButton_Anchors();
-  end
-end
-
-function Inv.Toggle_UserDropdown()
-  if (TFuInvFrame.cfg["show_userdropdown"] == 1) then
-    TFuInvFrame.cfg["show_userdropdown"] = 0;
-    TFuBag:HideDropDownSilently(TFuInv_UserDropdown);
-    TFuInvFrame:SetButton_Anchors();
-  else
-    TFuInvFrame.cfg["show_userdropdown"] = 1;
-    TFuInv_UserDropdown:Show();
-    TFuInvFrame:SetButton_Anchors();
-  end
-end
-
 function Inv.Toggle_Money()
   if (TFuInvFrame.cfg["show_money"] == 1) then
     TFuInvFrame.cfg["show_money"] = 0;
@@ -676,18 +585,6 @@ function Inv.Toggle_Money()
   else
     TFuInvFrame.cfg["show_money"] = 1;
     TFuInvFrame_MoneyFrame:Show();
-    TFuInvFrame:SetButton_Anchors();
-  end
-end
-
-function Inv.Toggle_Token()
-  if (TFuInvFrame.cfg["show_tokens"] == 1) then
-    TFuInvFrame.cfg["show_tokens"] = 0;
-    TFuInvFrame_TokenFrame:Hide();
-    TFuInvFrame:SetButton_Anchors();
-  else
-    TFuInvFrame.cfg["show_tokens"] = 1;
-    TFuInvFrame_TokenFrame:Show();
     TFuInvFrame:SetButton_Anchors();
   end
 end
@@ -717,30 +614,6 @@ function Inv.Toggle_BagSlotButtons()
     TFuInvingButton:Hide();
     TFuInvFrame:SetButton_Anchors();
    end
-end
-
-function Inv.Toggle_Total()
-  if (TFuInvFrame.cfg["show_total"] == 1) then
-    TFuInvFrame.cfg["show_total"] = 0;
-    TFuInvFrame_Total:Hide();
-    TFuInvFrame:SetButton_Anchors();
-  else
-    TFuInvFrame.cfg["show_total"] = 1;
-    TFuInvFrame_Total:Show();
-    TFuInvFrame:SetButton_Anchors();
-  end
-end
-
-function Inv.Toggle_Filter()
-  if (TFuInvFrame.cfg["show_filterbutton"] == 1) then
-    TFuInvFrame.cfg["show_filterbutton"] = 0;
-    TFuInv_Button_Filter:Hide();
-    TFuInvFrame:SetButton_Anchors();
-  else
-    TFuInvFrame.cfg["show_filterbutton"] = 1;
-    TFuInv_Button_Filter:Show();
-    TFuInvFrame:SetButton_Anchors();
-  end
 end
 
 function Inv.RightClick_DeleteItemOverride(self)
@@ -1268,7 +1141,7 @@ function Inv.RightClickMenu_populate(self, level)
           -- Hide toggles, all in the square-box keep-open style. Each is an independent
           -- on/off (checked when its show_* flag is 0 = hidden).
           local function hideToggle(text, toggleFunc, cfgKey)
-            TFuBag:AddMenuToggle({ ["text"] = text, ["func"] = toggleFunc }, level,
+            TFuBag:AddMenuToggle({ ["text"] = text, ["func"] = function() toggleFunc(TFuInvFrame) end }, level,
               function() return TFuInvFrame.cfg[cfgKey] == 0; end);
           end
           hideToggle(L["Hide Player Dropdown"],  TFuInvFrame.Toggle_UserDropdown,   "show_userdropdown");
