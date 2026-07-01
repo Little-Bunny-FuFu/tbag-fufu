@@ -447,3 +447,43 @@ function MainFrame:Toggle_UserDropdown()
   end
   self:SetButton_Anchors();
 end
+
+-- Batch 2a: two more window-chrome helpers hoisted from Inv/Bank (self.PREFIX).
+
+function MainFrame:SetTopRightButton_Anchors()
+  local buttons = {
+    self.PREFIX.."_Button_Close",
+    self.PREFIX.."_Button_MoveLockToggle",
+  }
+  local button_right = nil;
+
+  for _,button_name in ipairs(buttons) do
+    local button = _G[button_name];
+    if (button) then
+      if (button_right) then
+        button:SetPoint("TOPRIGHT",button_right,"TOPLEFT",10,0);
+      else
+        button:SetPoint("TOPRIGHT",self,"TOPRIGHT",0,0);
+      end
+      if (button:IsVisible()) then
+        button_right = button;
+      end
+    end
+  end
+end
+
+function MainFrame:UpdateFilterButton()
+  local btn = _G[self.PREFIX.."_Button_Filter"];
+  if (not btn) then return; end
+  if (not btn.FilterGlow) then
+    btn.FilterGlow = btn:CreateTexture(nil, "OVERLAY");
+    btn.FilterGlow:SetTexture("Interface\\Buttons\\UI-ActionButton-Border");
+    btn.FilterGlow:SetBlendMode("ADD");
+    btn.FilterGlow:SetVertexColor(0.2, 0.8, 1);  -- light blue
+    btn.FilterGlow:SetPoint("CENTER", btn, "CENTER", 0, 0);
+    local w, h = btn:GetSize();
+    btn.FilterGlow:SetSize((w or 20) * 1.7, (h or 20) * 1.7);
+  end
+  local f = self.itemFilter;
+  if (f and f.active) then btn.FilterGlow:Show(); else btn.FilterGlow:Hide(); end
+end

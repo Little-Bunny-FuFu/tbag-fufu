@@ -1309,22 +1309,6 @@ function Bank.Button_Filter_OnClick(self)
 end
 
 -- Glow the filter button while any filter dimension is active (mirrors Inv).
-function Bank:UpdateFilterButton()
-  local btn = TFuBnk_Button_Filter;
-  if (not btn) then return; end
-  if (not btn.FilterGlow) then
-    btn.FilterGlow = btn:CreateTexture(nil, "OVERLAY");
-    btn.FilterGlow:SetTexture("Interface\\Buttons\\UI-ActionButton-Border");
-    btn.FilterGlow:SetBlendMode("ADD");
-    btn.FilterGlow:SetVertexColor(0.2, 0.8, 1);  -- light blue
-    btn.FilterGlow:SetPoint("CENTER", btn, "CENTER", 0, 0);
-    local w, h = btn:GetSize();
-    btn.FilterGlow:SetSize((w or 20) * 1.7, (h or 20) * 1.7);
-  end
-  local f = self.itemFilter;
-  if (f and f.active) then btn.FilterGlow:Show(); else btn.FilterGlow:Hide(); end
-end
-
 function Bank.Button_MoveLockToggle_OnClick(self)
   PlaySound(PlaySoundKitID and "igMainMenuOptioncheckBoxOn" or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
   if (TFuBnkFrame.cfg["moveLock"] == 0) then
@@ -1425,28 +1409,6 @@ function Bank:SetTopLeftButton_Anchors()
       end
       if (button:IsVisible()) then
         button_left = button;
-      end
-    end
-  end
-end
-
-function Bank:SetTopRightButton_Anchors()
-  local buttons = {
-    "TFuBnk_Button_Close",
-    "TFuBnk_Button_MoveLockToggle",
-  }
-  local button_right = nil;
-
-  for _,button_name in ipairs(buttons) do
-    local button = _G[button_name];
-    if (button) then
-      if (button_right) then
-        button:SetPoint("TOPRIGHT",button_right,"TOPLEFT",10,0);
-      else
-        button:SetPoint("TOPRIGHT",TFuBnkFrame,"TOPRIGHT",0,0);
-      end
-      if (button:IsVisible()) then
-        button_right = button;
       end
     end
   end
