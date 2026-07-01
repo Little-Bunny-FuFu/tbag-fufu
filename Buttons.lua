@@ -363,7 +363,6 @@ function ItemButton.Update(self)
   -- not reliable $parent global names; prefer the parentKey, fall back to global.
   local frame_texture = self.icon or _G[framename.."IconTexture"]
   local frame_font = self.Count or _G[framename.."Count"]
-  local frame_bkgr = _G[framename.."_bkgr"]
   local frame_stock = self.Stock or _G[framename.."Stock"]
   local editFrame = _G[framename.."_EditButton"]
   local questTexture = _G[framename.."IconQuestTexture"]

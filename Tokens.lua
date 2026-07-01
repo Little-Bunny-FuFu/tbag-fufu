@@ -5,22 +5,6 @@ local L = TFuBag.LOCALE
 TFuBag.Tokens = {}
 local Tokens = TFuBag.Tokens
 
-function Tokens.GetItemStringFromCurrencyIndex(index)
-  local tt = TFuBag_tt
-
-  if (not tt) then
-    -- 12.0: inherit GameTooltipTemplate so the Set* methods exist (see TBag.lua).
-    tt = CreateFrame("GameTooltip","TFuBag_tt", nil, "GameTooltipTemplate")
-  end
-  tt:SetOwner(UIParent, "ANCHOR_NONE")  -- this makes sure that tooltip.valid = true
-  tt:ClearLines()
-
-  tt:SetCurrencyToken(index)
-  local _,itemlink = tt:GetItem()
-  local _,itemstring = TFuBag:GetItemID(itemlink)
-  return itemstring
-end
-
 function Tokens.SetItmFromCurrencyIndex(index,itm)
   local name, isHeader, isExpand, isUnused, isWatched, count, icon = GetCurrencyListInfo(index)
 

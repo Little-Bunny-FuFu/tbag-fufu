@@ -732,21 +732,6 @@ function TFuBag:BagSlotToString(bag,slot)
   return bag..":"..slot
 end
 
-function TFuBag:StringToBagSlot(string)
-  local bag,slot = strsplit(':',string)
-  return tonumber(bag),tonumber(slot)
-end
-
-function TFuBag:EscapeNL(str)
-  str = string.gsub(str, "\n", "\\n");
-  return str
-end
-
-function TFuBag:UnEscapeNL(str)
-  str = string.gsub(str, "\\n", "\n");
-  return str
-end
-
 -- Helper function to put an item in the generic bank bags
 -- since Blizzard doesn't provide this.
 local function PutItemInBank(reagent)
@@ -992,9 +977,6 @@ function TFuBag:DisplaySearchResult(aResult, itemlink)
   local total = 0;
   local lines = 0;
 
-  -- Do a quick alphabetic sort
-  table.sort(aResult);
-
   -- First tally up the total across all players
   for playername, places in pairs(aResult) do
     for place, count in pairs(places) do
@@ -1041,12 +1023,6 @@ function TFuBag:DoSearch(srch)
     self:GatherSearchResults(TFuBodyItm, L["body"]);
     self:GatherSearchResults(TFuMailItm, L["mail"]);
     self:GatherSearchResults(TFuTknItm, L["tokens"]);
-
-    -- Sort it alphabetically
-    table.sort(SrchResults);
-    for _, playerarr in pairs(SrchResults) do
-      table.sort(playerarr);
-    end
 
     -- Display all the search results
     for itemlink, aResult in pairs(SrchResults) do
@@ -1705,16 +1681,6 @@ function TFuBag:GetCategoryList()
   return out;
 end
 
-function TFuBag:IsCategoryEnabled(name)
-  local cfg = self:OptCfg();
-  local list = cfg and cfg["item_search_list"];
-  if (not list) then return true; end
-  for _, rule in ipairs(list) do
-    if (rule[1] == name and not rule.off) then return true; end
-  end
-  return false;
-end
-
 -- Enable/disable an entire category: set .off (true / nil) on every rule whose name
 -- matches, in BOTH windows' rule lists (kept in sync like mat_group). The .off key
 -- persists in SavedVariables (only /reset's ResetSorts copy drops it). Triggers a
@@ -1799,24 +1765,6 @@ end
 -- and every mutator here addresses rules by category NAME (recomputing positions
 -- per list), so the two lists cannot drift out of sync. PickBar is first-match-
 -- wins, so a rule's POSITION is its priority -- hence the up/down reorder.
-
--- Distinct category names in first-occurrence (priority) order. Like
--- GetCategoryList it skips the redundant all-empty catch-all rule, but it keeps
--- disabled categories (ordering is independent of the enabled flag).
-function TFuBag:GetCategoryOrderList(cfg)
-  cfg = cfg or self:OptCfg();
-  local out, seen = {}, {};
-  local list = cfg and cfg["item_search_list"];
-  if (not list) then return out; end
-  for _, rule in ipairs(list) do
-    local name = rule[1];
-    local allEmpty = (rule[2] == "" and rule[3] == "" and rule[4] == "" and rule[5] == "");
-    if (name and name ~= "" and not allEmpty and not seen[name]) then
-      seen[name] = true; out[#out + 1] = name;
-    end
-  end
-  return out;
-end
 
 -- Snapshot of one category's rules for the editor: ordered array of
 -- { idx=<pos in item_search_list>, [1..6]=field copies, off=bool }. Reads the
@@ -2962,7 +2910,6 @@ function TFuBag:SetDefLayout(cfg, bagarr, row1offset, reset)
 
   self:SetCatBar(cfg, L["HEARTH"], 1+row1offset, reset);
 
-  table.sort(self:GetCatBar(cfg));
 end
 
 
@@ -3828,16 +3775,6 @@ function TFuBag:GetBagItemButtonName(bag, slot)
   return self:GetDummyBagFrameName(bag).."Item"..slot;
 end
 
-function TFuBag:GetBagIdxName(bag)
-  if (bag == BANK_CONTAINER) then
-    return "Bank";
-  elseif (bag == REAGENTBANK_CONTAINER) then
-    return "ReagentBank";
-  else
-    return tostring(bag);
-  end
-end
-
 function TFuBag:GetBagNumName(bag)
   -- Use the stock frame for the counts on the bag buttons
   return self:GetBagFrameName(bag).."Stock"
@@ -3962,7 +3899,6 @@ end
 function TFuBag:GetSlotInfo(playerid, bag)
   local size = 0;
   local free = 0;
-  local item;
 
   -- Refresh the cache if we are the current player, or at a bank
   if (playerid == self.PLAYERID) then
@@ -3972,13 +3908,10 @@ function TFuBag:GetSlotInfo(playerid, bag)
         -- Game always shows the full size of the ReagentBank even if not unlocked
         size = 0
       end
---    self:Print("b="..bag..", size="..size);
-      for i=1, size do
-        local _
-        _, item = GetContainerItemInfo(bag, i);
-        if (not item) then
-          free = free + 1;
-        end
+      -- Count empty slots via the native free-count API rather than scanning every
+      -- slot with GetContainerItemInfo (one struct allocation per slot).
+      if (size > 0) then
+        free = GetContainerNumFreeSlots(bag) or 0;
       end
       -- Save the info to the cache
       self:SetPlayerBagCfg(playerid, bag, self.I_BAGFREE, free);

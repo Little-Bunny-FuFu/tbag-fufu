@@ -112,10 +112,6 @@ if not DepositReagentBank            then function DepositReagentBank() end end
 if not BankButtonIDToInvSlotID       then function BankButtonIDToInvSlotID() return 0 end end
 if not ReagentBankButtonIDToInvSlotID then function ReagentBankButtonIDToInvSlotID() return 0 end end
 
--- Bag-slot count globals the bank/inventory loops iterate (changed/removed in
--- 12.0). Fallbacks keep `for i=1,NUM_*` loops from erroring on nil.
-NUM_BAG_SLOTS    = NUM_BAG_SLOTS    or NUM_TOTAL_EQUIPPED_BAG_SLOTS or 4
-NUM_BANKBAGSLOTS = NUM_BANKBAGSLOTS or 0
 -- (No CloseBankFrame stub: the bare global was removed in 12.0 and tbag no longer
 -- calls it -- MainFrame:OnHide now calls C_Bank.CloseBankFrame() directly to end the
 -- live session when the bank window closes at a banker. "Session live" is read off

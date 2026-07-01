@@ -11,7 +11,6 @@ local L = TFuBag.LOCALE;
 BINDING_NAME_TFuINV_TOGGLE = L["Toggle Inventory Window"];
 
 -- Constants
-TFuINV_DEBUGMESSAGES = 0;   -- 0 = off, 1 = on
 TFuINV_SHOWITEMDEBUGINFO = 0;
 local TFuINV_WIPECONFIGONLOAD = 0;  -- for debugging, test it out on a new config every load
 
@@ -314,7 +313,7 @@ function Inv.Button_HighlightToggle_OnClick(self)
   if (TFuBag.SrchText) then
     TFuBag:ClearSearch();
     if (GameTooltip:GetOwner() == TFuInv_Button_HighlightToggle) then
-      if (TFuInvFrame.highlight_new == 1) then
+      if (TFuInvFrame.hilight_new == 1) then
         TFuBag.NewbieTip(self, L["Normal"], 1.0, 1.0, 1.0,
                                  L["Stop highlighting new items."]);
       else
@@ -423,22 +422,6 @@ function Inv.Button_MoveLockToggle_OnClick(self)
                                L["Allow window to be moved by dragging it."]);
     end
   end
-end
-
-function Inv.BagSlotButton_OnEnter(self)
-  local bag = self:GetID() - 19;
-  local itemlink = TFuBag:GetPlayerBagCfg(TFuInvFrame.playerid, bag, TFuBag.I_ITEMLINK);
-
-  GameTooltip:SetOwner(self, "ANCHOR_LEFT");
-  GameTooltip:ClearLines();
-
-  if (itemlink and itemlink ~= "") then
-    GameTooltip:SetHyperlink(itemlink);
-  else
-    GameTooltip:AddLine(L["Equip Container"], 1,1,1);
-  end
-
-  GameTooltip:Show();
 end
 
 function Inv:SetTopLeftButton_Anchors()
@@ -1004,7 +987,7 @@ function Inv.RightClickMenu_populate(self, level)
         ["func"] = function(self)
           local this = self or _G.this
           TFuBag:SetGrpDef(TFuInvFrame.cfg, TFuBag.G_BAR_HIDE, this.value[TFuBag.I_BAR], this.value["value"], 1);
-          TFuBnkFrame:UpdateWindow();
+          TFuInvFrame:UpdateWindow(TFuBag.REQ_MUST);
       end,
     };
       TFuBag:AddMenuToggle(info, level, function() return TFuBag:GetGrp(TFuInvFrame.cfg, TFuBag.G_BAR_HIDE, bar) == key; end);

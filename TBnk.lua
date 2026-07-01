@@ -447,14 +447,6 @@ function Bank:SaveWarbandTabSnapshot(tabs, viewable)
   TFuBagCfg["bankTabs_warband"] = snap
 end
 
-function Bank:LoadWarbandTabSnapshot()
-  local snap = TFuBagCfg and TFuBagCfg["bankTabs_warband"]
-  if (not snap) then return nil, false; end
-  local tabs = snap.tabs
-  if (not tabs or #tabs == 0) then tabs = nil; end
-  return tabs, (snap.viewable == true)
-end
-
 -- Fallback for a character that has a persisted bank item cache but no saved tab
 -- snapshot (cached under an older build, before SaveCharTabSnapshot existed). Build a
 -- tab list from whatever tab bags in [lo, hi] actually hold cached slots, so that
@@ -1230,7 +1222,7 @@ function Bank.Button_HighlightToggle_OnClick(self)
   if (TFuBag.SrchText) then
     TFuBag:ClearSearch();
     if (GameTooltip:GetOwner() == TFuBnk_Button_HighlightToggle) then
-      if (TFuBnkFrame.highlight_new == 1) then
+      if (TFuBnkFrame.hilight_new == 1) then
         TFuBag.NewbieTip(self, L["Normal"], 1.0, 1.0, 1.0,
                                  L["Stop highlighting new items."]);
       else
@@ -1350,44 +1342,6 @@ function Bank.Button_MoveLockToggle_OnClick(self)
       TFuBag.NewbieTip(self, L["Unlock Window"], 1.0, 1.0, 1.0,
                                L["Allow window to be moved by dragging it."]);
     end
-  end
-end
-
-function Bank.SlotTargetButton_OnClick(self, button)
-  local bar, tmp;
-
-  if (TFuBnkFrame.edit_mode == 1) then
-  for tmp in string.gmatch(self:GetName(), "TFuBnkFrame_SlotTarget_(%d+)") do
-    bar = tonumber(tmp);
-  end
-
-  if ( (bar == nil) or (bar < 1) or (bar > TFuBag.BAR_MAX) ) then
-    return;
-  end
-
-  if ( button == "LeftButton" ) then
-    if (TFuBnkFrame.edit_selected ~= "") then
-  -- we got a click, and we already had one selected.  let's move the items
-  TFuBag:SetCatBar(TFuBnkFrame.cfg, TFuBnkFrame.edit_selected, bar, 1);
-
-  TFuBnkFrame.edit_selected = "";
-  TFuBnkFrame.edit_hilight = "";
-
-  TFuBag:BuildBarClassList(TFuBnkFrame.BC_LIST, TFuBnkFrame.cfg);
-
-    -- resort will force a window redraw as well
-      TFuBnkFrame:UpdateWindow(TFuBag.REQ_MUST);
-    end
-
-  elseif ( button == "RightButton" ) then
-    HideDropDownMenu(1);
-    TFuBnkFrame.RightClickMenu_mode = "bar";
-    TFuBnkFrame.RightClickMenu_opts = {
-  [TFuBag.I_BAR] = bar
-  };
-    ToggleDropDownMenu(1, nil, TFuBnkFrame_RightClickMenu, self:GetName(), -50, 0);
-
-  end
   end
 end
 

@@ -1,8 +1,12 @@
 -- $Id$
 
--- Test harness don't bother to load if this isn't a dev version.
-if (not string.match(TFuBag.VERSION,"-Alpha") and
-    not string.match(TFuBag.VERSION,"-Beta")) then
+-- Test harness: load only in dev/source checkouts (VERSION is "fufu-dev" there; see
+-- TBag.lua). The @debug@ block in TBag.xml and .pkgmeta already strip this file from
+-- packaged releases, so this guard only prevents the test slash-commands from
+-- registering on a tagged build. Also matches the -Alpha/-Beta pre-release tags.
+if (not string.match(TFuBag.VERSION, "fufu%-dev") and
+    not string.match(TFuBag.VERSION, "%-Alpha") and
+    not string.match(TFuBag.VERSION, "%-Beta")) then
   return
 end
 

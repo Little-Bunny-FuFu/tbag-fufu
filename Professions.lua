@@ -68,14 +68,6 @@ for _,v in pairs(Professions.skills) do
   RL[L[v]] = v
 end
 
-
-function TFuBag:SetItemLink(arr, itemlink)
-  local itemid = TFuBag:GetItemID(itemlink)
-  if itemid ~= "" then
-    arr[itemid] = 1
-  end
-end
-
 function Professions:GetProfessions(playerid)
   local trades = TFuBag:GetPlayerInfo(playerid, TFuBag.S_TRADES)
   if not trades then
