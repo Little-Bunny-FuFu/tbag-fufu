@@ -31,23 +31,6 @@ local TFuBnk_WIPECONFIGONLOAD = 0; -- for debugging, test it out on a new config
 
 ------------------------
 
-function Bank:CalcButtonSize(newsize, pad)
-  local k = "button_size_opts";
-  -- constants
-  self.BF_X_PAD = pad;
-  self.BF_Y_PAD = pad;
-  self.BF_WIDTH = newsize;
-  self.BF_HEIGHT = newsize;
-  self.BF_PADWIDTH = self.BF_WIDTH + (self.BF_X_PAD*2);
-  self.BF_PADHEIGHT = self.BF_HEIGHT + (self.BF_Y_PAD*2);
-  self.BGF_WIDTH = self.BF_WIDTH * 1.6 + (self.BF_X_PAD*2);
-  self.BGF_HEIGHT = self.BF_HEIGHT * 1.6 + (self.BF_Y_PAD*2);
-
-  -- Always ensure a visually appealing fit
-  self.BGF_WIDTH = TFuBag:MakeEven(self.BGF_WIDTH, self.BF_WIDTH);
-  self.BGF_HEIGHT = TFuBag:MakeEven(self.BGF_HEIGHT, self.BF_HEIGHT);
-end
-
 function Bank:SetDefPos(cfg, reset)
   TFuBag:SetDef(cfg, "frameLEFT", UIParent:GetRight() * UIParent:GetScale() * 0.294, reset, TFuBag.NumFunc);
   TFuBag:SetDef(cfg, "frameRIGHT", UIParent:GetRight() * UIParent:GetScale() * 0.684, reset, TFuBag.NumFunc);
@@ -1428,33 +1411,6 @@ function Bank:SetBottomLeftButton_Anchors()
 
 end
 
-function Bank:SetBottomRightButton_Anchors()
-  local buttons = {
-    "TFuBnkFrame_MoneyFrame",
-    "TFuBnkFrame_TokenFrame",
-  }
-  local button_right = nil
-
-  for _, button_name in ipairs(buttons) do
-    local button = _G[button_name]
-    if button then
-      button:ClearAllPoints()
-      if button_right then
-        button:SetPoint("BOTTOMRIGHT",button_right,"TOPRIGHT",0,-5);
-      else
-        local y = 5
-        if self.edit_mode == 1 then
-          y = y + 30
-        end
-        button:SetPoint("BOTTOMRIGHT",TFuBnkFrame,"BOTTOMRIGHT",5,y)
-      end
-      if button:IsVisible() then
-        button_right = button
-      end
-    end
-  end
-end
-
 
 function Bank.Toggle_DepositReagentButton()
   if (TFuBnkFrame.cfg["show_depositbutton"] == 1) then
@@ -1472,19 +1428,6 @@ function Bank.Toggle_DepositReagentButton()
       TFuBnkFrame:SetButton_Anchors();
     end
   end
-end
-
-function Bank.Toggle_Money()
-  if (TFuBnkFrame.cfg["show_money"] == 1) then
-    TFuBnkFrame.cfg["show_money"] = 0;
-    TFuBnkFrame_MoneyFrame:Hide();
-    TFuBnkFrame:SetButton_Anchors();
-  else
-    TFuBnkFrame.cfg["show_money"] = 1;
-    TFuBnkFrame_MoneyFrame:Show();
-    TFuBnkFrame:SetButton_Anchors();
-  end
-  TFuBnkFrame:UpdateMoneyControls();
 end
 
 function Bank.Toggle_BagSlotButtons()
@@ -2001,22 +1944,6 @@ end
 -- Main "right click menu"
 function Bank.RightClickMenu_OnLoad(self)
   UIDropDownMenu_Initialize(self, Bank.RightClickMenu_populate, "MENU");
-end
-
-Bank.WindowIsUpdating = 0;
-
--- Exception-safe reentrancy guard -- see Inv:UpdateWindow. A Lua error in the body
--- (e.g. a transient nil during a tab-set / bank-type transition) must not skip the
--- `WindowIsUpdating = 0` reset and wedge the bank window until /reload.
-function Bank:UpdateWindow(resort_req)
-  TFuBag:PrintDEBUG("Bank:UpdateWindow(): WindowIsUpdating="..Bank.WindowIsUpdating);
-  if (Bank.WindowIsUpdating == 1) then
-    return;
-  end
-  Bank.WindowIsUpdating = 1;
-  local ok, err = pcall(Bank.UpdateWindowBody, self, resort_req);
-  Bank.WindowIsUpdating = 0;
-  if (not ok) then geterrorhandler()(err); end
 end
 
 function Bank:UpdateWindowBody(resort_req)

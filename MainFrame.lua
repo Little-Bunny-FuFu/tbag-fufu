@@ -552,3 +552,77 @@ function MainFrame.Button_MoveLockToggle_OnClick(self)
     end
   end
 end
+
+-- Batch 4: more near-identical window methods hoisted from Inv/Bank.
+
+function MainFrame:CalcButtonSize(newsize, pad)
+  -- constants
+  self.BF_X_PAD = pad;
+  self.BF_Y_PAD = pad;
+  self.BF_WIDTH = newsize;
+  self.BF_HEIGHT = newsize;
+  self.BF_PADWIDTH = self.BF_WIDTH + (self.BF_X_PAD*2);
+  self.BF_PADHEIGHT = self.BF_HEIGHT + (self.BF_Y_PAD*2);
+  self.BGF_WIDTH = self.BF_WIDTH * 1.6 + (self.BF_X_PAD*2);
+  self.BGF_HEIGHT = self.BF_HEIGHT * 1.6 + (self.BF_Y_PAD*2);
+
+  -- Always ensure a visually appealing fit
+  self.BGF_WIDTH = TFuBag:MakeEven(self.BGF_WIDTH, self.BF_WIDTH);
+  self.BGF_HEIGHT = TFuBag:MakeEven(self.BGF_HEIGHT, self.BF_HEIGHT);
+end
+
+function MainFrame:Toggle_Money()
+  local cfg = self.cfg;
+  if (cfg["show_money"] == 1) then
+    cfg["show_money"] = 0;
+    _G[self.PREFIX.."Frame_MoneyFrame"]:Hide();
+  else
+    cfg["show_money"] = 1;
+    _G[self.PREFIX.."Frame_MoneyFrame"]:Show();
+  end
+  self:SetButton_Anchors();
+  -- Bank-only tail (Inv has no UpdateMoneyControls): refresh the deposit/withdraw controls.
+  if (self.UpdateMoneyControls) then self:UpdateMoneyControls(); end
+end
+
+function MainFrame:SetBottomRightButton_Anchors()
+  local buttons = {
+    self.PREFIX.."Frame_MoneyFrame",
+    self.PREFIX.."Frame_TokenFrame",
+  }
+  local button_right = nil
+
+  for _, button_name in ipairs(buttons) do
+    local button = _G[button_name]
+    if button then
+      button:ClearAllPoints()
+      if button_right then
+        button:SetPoint("BOTTOMRIGHT",button_right,"TOPRIGHT",0,-5);
+      else
+        local y = 5
+        if self.edit_mode == 1 then
+          y = y + 30
+        end
+        button:SetPoint("BOTTOMRIGHT",self,"BOTTOMRIGHT",5,y)
+      end
+      if button:IsVisible() then
+        button_right = button
+      end
+    end
+  end
+end
+
+-- Exception-safe reentrancy guard (self-scoped; was Inv/Bank.WindowIsUpdating). The
+-- body runs under pcall so a Lua error (e.g. a transient nil during a bank<->warband
+-- transition) can't skip the reset and wedge the window until /reload; the error is
+-- still surfaced via the standard handler so the cause stays diagnosable.
+function MainFrame:UpdateWindow(resort_req)
+  TFuBag:PrintDEBUG("UpdateWindow: WindowIsUpdating="..tostring(self.WindowIsUpdating));
+  if (self.WindowIsUpdating == 1) then
+    return;
+  end
+  self.WindowIsUpdating = 1;
+  local ok, err = pcall(self.UpdateWindowBody, self, resort_req);
+  self.WindowIsUpdating = 0;
+  if (not ok) then geterrorhandler()(err); end
+end

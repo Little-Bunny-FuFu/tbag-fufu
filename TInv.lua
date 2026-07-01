@@ -18,22 +18,6 @@ local TFuINV_WIPECONFIGONLOAD = 0;  -- for debugging, test it out on a new confi
 
 ------------------------
 
-function Inv:CalcButtonSize(newsize, pad)
-  -- constants
-  self.BF_X_PAD = pad;
-  self.BF_Y_PAD = pad;
-  self.BF_WIDTH = newsize;
-  self.BF_HEIGHT = newsize;
-  self.BF_PADWIDTH = self.BF_WIDTH + (self.BF_X_PAD*2);
-  self.BF_PADHEIGHT = self.BF_HEIGHT + (self.BF_Y_PAD*2);
-  self.BGF_WIDTH = self.BF_WIDTH * 1.6 + (self.BF_X_PAD*2);
-  self.BGF_HEIGHT = self.BF_HEIGHT * 1.6 + (self.BF_Y_PAD*2);
-
-  -- Always ensure a visually appealing fit
-  self.BGF_WIDTH = TFuBag:MakeEven(self.BGF_WIDTH, self.BF_WIDTH);
-  self.BGF_HEIGHT = TFuBag:MakeEven(self.BGF_HEIGHT, self.BF_HEIGHT);
-end
-
 function Inv:SetDefPos(cfg, reset)
   TFuBag:SetDef(cfg, "frameLEFT", UIParent:GetRight() * UIParent:GetScale() * 0.73, reset, TFuBag.NumFunc);
   TFuBag:SetDef(cfg, "frameRIGHT", UIParent:GetRight() * UIParent:GetScale() * 0.92, reset, TFuBag.NumFunc);
@@ -445,33 +429,6 @@ function Inv:SetBottomLeftButton_Anchors()
 
 end
 
-function Inv:SetBottomRightButton_Anchors()
-  local buttons = {
-    "TFuInvFrame_MoneyFrame",
-    "TFuInvFrame_TokenFrame",
-  }
-  local button_right = nil
-
-  for _, button_name in ipairs(buttons) do
-    local button = _G[button_name]
-    if button then
-      button:ClearAllPoints()
-      if button_right then
-        button:SetPoint("BOTTOMRIGHT",button_right,"TOPRIGHT",0,-5);
-      else
-        local y = 5
-        if TFuInvFrame.edit_mode == 1 then
-          y = y + 30
-        end
-        button:SetPoint("BOTTOMRIGHT",TFuInvFrame,"BOTTOMRIGHT",5,y)
-      end
-      if button:IsVisible() then
-        button_right = button
-      end
-    end
-  end
-end
-
 function Inv.Toggle_BankButton()
   if (TFuInvFrame.cfg["show_bankbutton"] == 1) then
     TFuInvFrame.cfg["show_bankbutton"] = 0;
@@ -480,18 +437,6 @@ function Inv.Toggle_BankButton()
   else
     TFuInvFrame.cfg["show_bankbutton"] = 1;
     TFuInv_Button_ShowBank:Show();
-    TFuInvFrame:SetButton_Anchors();
-  end
-end
-
-function Inv.Toggle_Money()
-  if (TFuInvFrame.cfg["show_money"] == 1) then
-    TFuInvFrame.cfg["show_money"] = 0;
-    TFuInvFrame_MoneyFrame:Hide();
-    TFuInvFrame:SetButton_Anchors();
-  else
-    TFuInvFrame.cfg["show_money"] = 1;
-    TFuInvFrame_MoneyFrame:Show();
     TFuInvFrame:SetButton_Anchors();
   end
 end
@@ -1079,25 +1024,6 @@ function Inv:RightClickMenu_OnLoad()
   UIDropDownMenu_Initialize(self, Inv.RightClickMenu_populate, "MENU");
 end
 
-
-Inv.WindowIsUpdating = 0;
-
--- Exception-safe reentrancy guard. The body runs under pcall so a Lua error
--- (e.g. a transient nil during a bank<->warband transition) can no longer skip
--- the `WindowIsUpdating = 0` reset and wedge the window -- the old failure where
--- the inventory froze on a stale render (deposit dim / greyscale stuck as a
--- "cached" view) and every later UpdateWindow no-oped until /reload. The error is
--- still surfaced via the standard handler so the underlying cause stays diagnosable.
-function Inv:UpdateWindow(resort_req)
-  TFuBag:PrintDEBUG("TFuInv_UpdateWindow:  WindowIsUpdating="..Inv.WindowIsUpdating );
-  if (Inv.WindowIsUpdating == 1) then
-    return;
-  end
-  Inv.WindowIsUpdating = 1;
-  local ok, err = pcall(Inv.UpdateWindowBody, self, resort_req);
-  Inv.WindowIsUpdating = 0;
-  if (not ok) then geterrorhandler()(err); end
-end
 
 function Inv:UpdateWindowBody(resort_req)
   local frame = TFuInvFrame;
