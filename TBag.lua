@@ -5114,11 +5114,15 @@ function TFuBag:SortItmCache(cfg, playerid, itmcache, baritm, bagarr)
       local sortkey = {};
       for si = 1, table.getn(bar) do
         local it = bar[si];
+        -- Nil-safe: the collapsed-empty representative (and any not-yet-categorized empty
+        -- slot) has no I_CAT/I_NAME -- MakeEmptySlot never sets them -- and lands alone in
+        -- EMPTY_BAR. The original comparator never ran on a 1-item bar so it never hit this;
+        -- the pre-pass builds a key for every item, so coalesce the fields it concatenates.
         sortkey[it] =
-          it[TFuBag.I_CAT]..
+          (it[TFuBag.I_CAT] or "")..
           TFuBag:SubSortKey(cfg, it)..
-          TFuBag:ReverseString(it[TFuBag.I_NAME],toggle)..
-          string.format("%04s",it[TFuBag.I_COUNT])..string.format("%02s",it[TFuBag.I_SLOT]);
+          TFuBag:ReverseString(it[TFuBag.I_NAME] or "",toggle)..
+          string.format("%04s",it[TFuBag.I_COUNT] or 0)..string.format("%02s",it[TFuBag.I_SLOT] or 0);
       end
       table.sort(bar,
         function(a,b) return sortkey[a] > sortkey[b] end
