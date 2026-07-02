@@ -6075,6 +6075,18 @@ function TFuBag:SeedCatLayout(frame, calc_dat)
   local cat_layout = cfg.cat_layout;
   local colmax = cfg["maxColumns"];
 
+  -- Cheap early-out (perf): if every bar that has items already owns a cat_layout
+  -- record, there is nothing to seed. The optimizer pass below (CalcBarLayout per
+  -- bar-group) only ever WRITES cat_layout[bn] for an unseeded bar that has items,
+  -- and fills the caller's throwaway calc_dat -- LayoutWindowFree (the sole caller)
+  -- discards calc_dat and reads cfg.cat_layout after this returns. So once a layout
+  -- is established this whole function is wasted work on every refresh. Skip it.
+  local needs_seed = false;
+  for bn = 1, self.BAR_MAX do
+    if (table.getn(baritm[bn]) > 0 and not cat_layout[bn]) then needs_seed = true; break; end
+  end
+  if (not needs_seed) then return; end
+
   -- Where does already-placed content end (so new categories append below)?
   local any_placed = false;
   local max_row = 0;
