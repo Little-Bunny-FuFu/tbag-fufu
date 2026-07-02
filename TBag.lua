@@ -5155,6 +5155,42 @@ function TFuBag:SetBarFromClass(cfg, itm)
 end
 
 
+-- True if a search-list rule's keyword / tooltip / itemType / itemSubType conditions all
+-- match this item. Shared by PickBar's main search loop and MatchTradeToolCat so both run
+-- ONE matcher. Caller handles value.off / psplit / all-empty gating and the bar resolution.
+function TFuBag:RuleMatches(itm, tooltip, value)
+  if (value[2] ~= "" and itm[self.I_KEYWORD][value[2]] == nil) then return false; end
+  if (value[3] ~= "") then
+    local hay = (value[6] == "ci") and string.lower(tooltip) or tooltip;
+    local needle = (value[6] == "ci") and string.lower(value[3]) or value[3];
+    if (not string.find(hay, needle)) then return false; end
+  end
+  if (value[4] ~= "" and itm[self.I_TYPE] ~= value[4]) then return false; end
+  if (value[5] ~= "" and itm[self.I_SUBTYPE] ~= value[5]) then return false; end
+  return true;
+end
+
+-- Returns the TRADE_TOOL category if any enabled TRADE_TOOL search rule matches this item,
+-- else nil. Lets PickBar keep equippable trade tools (skinning knives, herbalist gloves,
+-- enchanting rods, profession tools, ...) out of the armor/weapon grouping so they land in
+-- their own category. Only consulted for items the grouping would otherwise claim, so the
+-- extra scan is paid only by equippable gear.
+function TFuBag:MatchTradeToolCat(cfg, itm, tooltip)
+  local list = cfg["item_search_list"];
+  if (not list) then return nil; end
+  local ttlabel = L["TRADE_TOOL"];
+  for i = 1, table.getn(list) do
+    local value = list[i];
+    local allEmpty = (value[2] == "" and value[3] == "" and value[4] == "" and value[5] == "");
+    if (value[1] == ttlabel and not allEmpty and not value.off
+        and not (value[6] == "psplit" and cfg["reagent_split"] ~= 1)
+        and self:RuleMatches(itm, tooltip, value)) then
+      return ttlabel;
+    end
+  end
+  return nil;
+end
+
 function TFuBag:PickBar(cfg, playerid, itm, trade1, trade2)
   local bagtype = self:GetBagType(playerid, itm[self.I_BAG]);
   if (itm[self.I_ITEMLINK] == nil) then
@@ -5301,13 +5337,27 @@ function TFuBag:PickBar(cfg, playerid, itm, trade1, trade2)
   if (itm[self.I_CAT] == nil and cfg.armor_group_enabled == 1 and itm[self.I_RARITY] ~= 0) then
     local eqCat, eqSub = self:EquipCat(cfg, itm);
     if (eqCat) then
-      itm[self.I_CAT] = eqCat;
-      itm[self.I_BAR] = self:GetCat(cfg, eqCat);
-      itm[self.I_BAR] = self:ResolveBarAlias(cfg, itm[self.I_BAR]);
-      if (type(itm[self.I_BAR]) ~= "number") then
-        itm[self.I_CAT] = nil;
-      else
-        itm[self.I_SUBGROUP] = eqSub;
+      -- Trade tools (skinning knives, herbalist gloves, enchanting rods, ...) are
+      -- equippable, so EquipCat would file them as gear. The user wants them in their own
+      -- TRADE_TOOL category, so a matching TRADE_TOOL rule wins over the gear category
+      -- here (only equippable items reach this, so the scan is cheap). Falls back to the
+      -- gear category when TRADE_TOOL has no resolvable bar.
+      local ttCat = self:MatchTradeToolCat(cfg, itm, tooltip);
+      if (ttCat) then
+        itm[self.I_CAT] = ttCat;
+        itm[self.I_BAR] = self:GetCat(cfg, ttCat);
+        itm[self.I_BAR] = self:ResolveBarAlias(cfg, itm[self.I_BAR]);
+        if (type(itm[self.I_BAR]) ~= "number") then itm[self.I_CAT] = nil; end
+      end
+      if (itm[self.I_CAT] == nil) then
+        itm[self.I_CAT] = eqCat;
+        itm[self.I_BAR] = self:GetCat(cfg, eqCat);
+        itm[self.I_BAR] = self:ResolveBarAlias(cfg, itm[self.I_BAR]);
+        if (type(itm[self.I_BAR]) ~= "number") then
+          itm[self.I_CAT] = nil;
+        else
+          itm[self.I_SUBGROUP] = eqSub;
+        end
       end
     end
   end
@@ -5327,33 +5377,9 @@ function TFuBag:PickBar(cfg, playerid, itm, trade1, trade2)
       local allEmpty = (value[2] == "" and value[3] == "" and value[4] == "" and value[5] == "");
       if (value[1] ~= "" and not allEmpty and not value.off
           and not (value[6] == "psplit" and cfg["reagent_split"] ~= 1)) then
-        local found = 1;
-
-        -- value[1] == category to place it in
-
-        -- check keywords
-        if ( (value[2] ~= "") and (itm[self.I_KEYWORD][value[2]] == nil) ) then
-          found = nil;
-        end
-        -- check tooltip. value[6]=="ci" (user-added categories) matches case-insensitively
-        -- by lowering both sides; built-in rules keep their exact case-sensitive patterns.
-        if (value[3] ~= "") then
-          local hay = (value[6] == "ci") and string.lower(tooltip) or tooltip;
-          local needle = (value[6] == "ci") and string.lower(value[3]) or value[3];
-          if (not string.find(hay, needle)) then
-            found = nil;
-          end
-        end
-        -- check itemType
-        if ( (value[4] ~= "") and (itm[self.I_TYPE] ~= value[4]) ) then
-          found = nil;
-        end
-        -- check itemSubType
-        if ( (value[5] ~= "") and (itm[self.I_SUBTYPE] ~= value[5]) ) then
-          found = nil;
-        end
-
-        if (found) then
+        -- value[1] == category to place it in. RuleMatches applies the keyword / tooltip /
+        -- itemType / itemSubType conditions (shared with MatchTradeToolCat).
+        if (self:RuleMatches(itm, tooltip, value)) then
           itm[self.I_CAT] = value[1];
           itm[self.I_BAR] = self:GetCat(cfg, itm[self.I_CAT]);
           itm[self.I_BAR] = self:ResolveBarAlias(cfg, itm[self.I_BAR]);
