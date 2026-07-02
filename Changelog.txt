@@ -1,3 +1,16 @@
+* 12.0.0.09-fufu (2026-07-02)
+  New Profession Tools category for equippable trade tools, plus a broad performance pass.
+- New: equippable trade tools -- skinning knives, mining picks, blacksmith hammers,
+  Herbalist's Gloves, enchanting rods and the like -- now sort into their own "Profession
+  Tools" category instead of being filed in with your weapons and armor. (Applies when
+  armor/weapon grouping is on; non-equippable profession tools already sorted here.)
+- Performance: a broad optimization pass over the hot paths that run on every bag-window
+  refresh -- item sorting, categorization, per-button highlight updates and window-chrome
+  layout -- so opening and refreshing bags does less work each time. Most noticeable with
+  full bags/bank or on lower-end machines. No behaviour change.
+- Fix: opening bags no longer prints a one-time "Please localize" developer notice for
+  Herbalism/Skinning trade goods on 12.0.
+
 * 12.0.0.08-fufu (2026-06-17)
   Bugfix: opening bags in combat no longer throws a blocked-action error.
 - Fix: pressing the "open all bags" key (or otherwise refreshing a bag window) while in
