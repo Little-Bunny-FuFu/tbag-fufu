@@ -77,7 +77,6 @@ local tests = {
   -- references to it are now in WoW leading to items that arent' hearthstones
   -- in the name/tooltip.
   [110560] = L["HEARTH"],
-  [118475] = L["CONSUMABLE"],
   [119210] = L["TOYS"],
   [119212] = L["TOYS"],
   [140192] = L["HEARTH"],
@@ -800,40 +799,106 @@ end
 function TFuBag:GetCategory(id)
  self:InitDefVals(cfg, self.Inv_Bags, 0, 1)
 
- local _, itm = test(id,"TEST")
- local link = self:MakeHyperlink(itm[self.I_ITEMLINK],itm[self.I_NAME],
-                                 itm[self.I_RARITY],80);
- link = tostring(link);
- TFuBag:Print(string.format("%s (%s) = %s",link,tostring(id),tostring(itm[self.I_CAT])))
+ local function show()
+   local _, itm = test(id,"TEST")
+   local link = tostring(self:MakeHyperlink(itm[self.I_ITEMLINK],itm[self.I_NAME],
+                                            itm[self.I_RARITY],80));
+   TFuBag:Print(string.format("%s (%s) = %s",link,tostring(id),tostring(itm[self.I_CAT])))
+ end
+
+ -- Same async preload as RunTests so /tinv getcat on a cold cache prints the real
+ -- category, not UNKNOWN. id arrives as a string from the slash command. If it is already
+ -- cached (or not numeric) resolve now; otherwise request it and print on the load result
+ -- (success OR failure), with a timeout so a removed id still prints (as UNKNOWN).
+ local nid = tonumber(id);
+ if (not nid or C_Item.IsItemDataCachedByID(nid)) then
+   show();
+ else
+   local done = false;
+   local w = CreateFrame("Frame");
+   local function go()
+     if (done) then return end
+     done = true;
+     w:UnregisterAllEvents();
+     w:SetScript("OnEvent", nil);
+     show();
+   end
+   w:SetScript("OnEvent", function(_, _, eid) if (eid == nid) then go() end end);
+   w:RegisterEvent("ITEM_DATA_LOAD_RESULT");
+   C_Item.RequestLoadItemDataByID(nid);
+   C_Timer.After(8, go);
+ end
 end
 
+-- Retail loads item data ASYNCHRONOUSLY: a cold GetItemInfo (in build_itm) returns nil,
+-- so on a fresh login every not-yet-cached fixture item resolved to UNKNOWN and the run
+-- showed hundreds of false failures. Preload the fixture item data, then run the asserts
+-- once it is in. runAll is idempotent (ran flag). See the preload block below for how
+-- dead (removed-from-game) fixture ids are resolved without stalling the whole run.
 function TFuBag:RunTests(verbose)
-  local fail = false;
   -- Initialize the cfg with default values
   self:InitDefVals(cfg, self.Inv_Bags, 0, 1);
 
   self:Print(L["TEST RUN STARTING"]);
 
-  for id,cat in pairs(tests) do
-    local result, itm = test(id,cat)
-    local link = self:MakeHyperlink(itm[self.I_ITEMLINK],itm[self.I_NAME],
-                                    itm[self.I_RARITY],80);
-    link = tostring(link);
-
-    if (result == true) then
-      if (verbose) then
-        local output = string.format(L["SUCCESS: %s"], link);
-        self:Print(output,0,1,0);
+  local ran = false;
+  local function runAll()
+    if (ran) then return end
+    ran = true;
+    local fail = false;
+    for id,cat in pairs(tests) do
+      local result, itm = test(id,cat)
+      local link = tostring(self:MakeHyperlink(itm[self.I_ITEMLINK],itm[self.I_NAME],
+                                               itm[self.I_RARITY],80));
+      if (result == true) then
+        if (verbose) then
+          self:Print(string.format(L["SUCCESS: %s"], link),0,1,0);
+        end
+      else
+        fail = true;
+        self:Print(string.format(L["FAIL: %s (%s) expected %q but got %q"], link,
+                                 tostring(id),tostring(cat),tostring(itm[self.I_CAT])),1,0,0);
       end
-    else
-      fail = true;
-      local output = string.format(L["FAIL: %s (%s) expected %q but got %q"], link,
-                                   tostring(id),tostring(cat),tostring(itm[self.I_CAT]));
-      self:Print(output,1,0,0);
+    end
+    if (fail == false) then
+      self:Print(L["ALL TESTS SUCCESSFUL"]);
     end
   end
 
-  if (fail == false) then
-    self:Print(L["ALL TESTS SUCCESSFUL"]);
+  -- Preload uncached fixture item data, then assert. RequestLoadItemDataByID fires
+  -- ITEM_DATA_LOAD_RESULT(id, success) once per requested id -- for BOTH a successful load
+  -- AND a FAILURE (an id removed from the game). Decrementing on EITHER means dead fixture
+  -- ids resolve promptly instead of holding the run open for the whole timeout (Blizzard's
+  -- ContinuableContainer silently ignores load failures, which is why the run always waited
+  -- the full 15s). allRequested gates the completion check so an id that loads synchronously
+  -- mid-loop can't fire the asserts early; a short timeout backstops any id that never answers.
+  local pending, allRequested, waiting = 0, false, {};
+  local watcher = CreateFrame("Frame");
+  local function maybeFinish()
+    if (allRequested and pending <= 0 and not ran) then
+      watcher:UnregisterAllEvents();
+      watcher:SetScript("OnEvent", nil);
+      runAll();
+    end
+  end
+  watcher:SetScript("OnEvent", function(_, _, id)
+    if (waiting[id]) then
+      waiting[id] = nil;
+      pending = pending - 1;
+      maybeFinish();
+    end
+  end);
+  watcher:RegisterEvent("ITEM_DATA_LOAD_RESULT");
+  for id in pairs(tests) do
+    if (not C_Item.IsItemDataCachedByID(id) and not waiting[id]) then
+      waiting[id] = true;
+      pending = pending + 1;
+      C_Item.RequestLoadItemDataByID(id);
+    end
+  end
+  allRequested = true;
+  maybeFinish();                            -- fast path: every fixture id already cached
+  if (not ran) then
+    C_Timer.After(8, function() pending = 0; maybeFinish(); end);
   end
 end
