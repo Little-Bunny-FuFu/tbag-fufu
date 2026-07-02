@@ -8234,12 +8234,22 @@ function TFuBag:Stack(where, itmcache, sa, ca)
     -- Sort the list of slots with the item in it by how
     -- big the stack is in descending order give
     -- precedence to items in special bags.
+    -- Memoize the loop-invariant bag type: the tie-break called GetBagType for BOTH
+    -- operands on every comparison (O(n log n)) though it is per-bag-constant. bt()
+    -- computes it at most once per bag, and only for bags actually compared in a tie
+    -- (same trigger as before). GetBagType's cache writes are idempotent, so calling it
+    -- fewer times yields the identical bag-type values and thus the identical sort order.
+    local bagtypeOf = {};
+    local function bt(bag)
+      local v = bagtypeOf[bag];
+      if (v == nil) then v = (TFuBag:GetBagType(TFuBag.PLAYERID, bag) or 0); bagtypeOf[bag] = v; end
+      return v;
+    end
     table.sort(itms,
       function(a,b)
         if (a[TFuBag.I_COUNT] == b[TFuBag.I_COUNT]) then
           -- We only ever stack when on the current player so this is ok.
-          return (TFuBag:GetBagType(TFuBag.PLAYERID,a[TFuBag.I_BAG]) or 0) >
-                 (TFuBag:GetBagType(TFuBag.PLAYERID,b[TFuBag.I_BAG]) or 0)
+          return bt(a[TFuBag.I_BAG]) > bt(b[TFuBag.I_BAG]);
         else
           return a[TFuBag.I_COUNT] > b[TFuBag.I_COUNT];
         end
@@ -8305,6 +8315,9 @@ function TFuBag:Stack(where, itmcache, sa, ca)
         local emptyslot = emptyitm[self.I_SLOT]
         -- Is it really empty, and not a bag the user just asked to empty?
         if (emptyitm[self.I_ITEMLINK] == nil and not self:IsBagEmptyGuarded(emptybag)) then
+          -- Bag type depends only on the empty slot's bag -- loop-invariant across the
+          -- inner candidate scan below (was recomputed per candidate item). Compute once.
+          local bagtype = self:GetBagType(self.PLAYERID, emptybag);
           for item = 1, items_size do
             if (itms[item]) then
               local itemitm = itms[item];
@@ -8313,7 +8326,6 @@ function TFuBag:Stack(where, itmcache, sa, ca)
               if (itemitm[self.I_ITEMLINK] and
                 not self:GetCompSkip(emptybag,emptyslot) and
                 not self:GetCompSkip(itembag,itemslot)) then
-                local bagtype = self:GetBagType(self.PLAYERID, emptyitm[self.I_BAG]);
                 local itmfam = 0;
                 if (itemitm[self.I_TYPE] ~= L["Container"]) then
                   itmfam = GetItemFamily(itemitm[self.I_ITEMLINK]);
