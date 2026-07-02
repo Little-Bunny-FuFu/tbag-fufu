@@ -17,7 +17,17 @@ local function do_nothing()
   return
 end
 
-local TradeCreations = {
+-- Tier 3: the two seed tables below are wrapped in builder functions so their ~17.5k
+-- entries are CONSTRUCTED only when a first-time seed or a version/S_UPDATE merge is
+-- actually needed -- not built and discarded on every login for returning users. The
+-- sentinels are hoisted to these cheap constants so RefreshCreations/RefreshReagents
+-- can take the common returning-user path (data already current in SavedVariables)
+-- WITHOUT building either table. The builders still return tables carrying
+-- [S_UPDATE]/[S_VERSION], so the seeded SavedVariables shape is unchanged.
+local SEED_UPDATE  = "1504086123"
+local SEED_VERSION = 3
+
+local function BuildTradeCreations() return {
 		[TFuBag.S_UPDATE] = "1504086123",
 		[TFuBag.S_VERSION] = 3,
 		["Alchemy"] = {
@@ -5042,10 +5052,10 @@ local TradeCreations = {
 			["151790"] = 1,
 			["151792"] = 1,
 		},
-};
+} end
 
 
-local Reagents = {
+local function BuildReagents() return {
 		[TFuBag.S_UPDATE] = "1504086123",
 		[TFuBag.S_VERSION] = 3,
 		["118"] = {
@@ -24277,7 +24287,7 @@ local Reagents = {
 				["151878"] =1,
 			},
 		},
-};
+} end
 
 
 
@@ -24303,17 +24313,16 @@ function TFuBag:MergeCreations(TFuBagCfg,tradetype,new)
 end
 
 function TFuBag:RefreshCreations(TFuBagCfg)
-  if (TFuBagCfg[self.S_CREATED] == nil or TFuBagCfg[self.S_CREATED][self.S_VERSION] ~= 3) then
-    TFuBagCfg[self.S_CREATED] = TradeCreations;
+  if (TFuBagCfg[self.S_CREATED] == nil or TFuBagCfg[self.S_CREATED][self.S_VERSION] ~= SEED_VERSION) then
+    TFuBagCfg[self.S_CREATED] = BuildTradeCreations();
   elseif (TFuBagCfg[self.S_CREATED][self.S_UPDATE] == nil or
-          TFuBagCfg[self.S_CREATED][self.S_UPDATE] < TradeCreations[self.S_UPDATE]) then
-    self:MergeCreations(TFuBagCfg,self.S_CREATED,TradeCreations);
+          TFuBagCfg[self.S_CREATED][self.S_UPDATE] < SEED_UPDATE) then
+    self:MergeCreations(TFuBagCfg,self.S_CREATED,BuildTradeCreations());
   end
-  -- Replace this function with a noop and remove the data and the merge function
-  -- that only needs to be here the first time.
+  -- Replace this function with a noop and drop the merge helper (only needed the first
+  -- time). The data table is now built on demand, so there is nothing to nil here.
   TFuBag.RefreshCreations = do_nothing
   TFuBag.MergeCreations = nil
-  TradeCreations = nil
 end
 
 function TFuBag:MergeReagents(TFuBagCfg,new)
@@ -24340,15 +24349,14 @@ function TFuBag:MergeReagents(TFuBagCfg,new)
 end
 
 function TFuBag:RefreshReagents(TFuBagCfg)
-  if (TFuBagCfg[self.S_REAGENT] == nil or TFuBagCfg[self.S_REAGENT][self.S_VERSION] ~= 3) then
-    TFuBagCfg[self.S_REAGENT] = Reagents;
+  if (TFuBagCfg[self.S_REAGENT] == nil or TFuBagCfg[self.S_REAGENT][self.S_VERSION] ~= SEED_VERSION) then
+    TFuBagCfg[self.S_REAGENT] = BuildReagents();
   elseif (TFuBagCfg[self.S_REAGENT][self.S_UPDATE] == nil or
-          TFuBagCfg[self.S_REAGENT][self.S_UPDATE] < Reagents[self.S_UPDATE]) then
-    self:MergeReagents(TFuBagCfg,Reagents);
+          TFuBagCfg[self.S_REAGENT][self.S_UPDATE] < SEED_UPDATE) then
+    self:MergeReagents(TFuBagCfg,BuildReagents());
   end
-  -- Replace this function with a noop and remove the data and the merge function
-  -- that only needs to be here the first time.
+  -- Replace this function with a noop and drop the merge helper (only needed the first
+  -- time). The data table is now built on demand, so there is nothing to nil here.
   TFuBag.RefreshReagents = do_nothing
   TFuBag.MergeReagents = nil
-  Reagents = nil
 end
