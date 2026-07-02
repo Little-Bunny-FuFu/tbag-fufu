@@ -66,7 +66,11 @@ function TFuBag:VARIABLES_LOADED()
   self:RegisterEvent("BAG_UPDATE")
   self:RegisterEvent("BAG_UPDATE_COOLDOWN")
   self:RegisterEvent("ITEM_LOCK_CHANGED")
-  self:RegisterEvent("UNIT_INVENTORY_CHANGED")
+  -- Unit-filter to the player: ScanEquipped only ever rescans the PLAYER's own
+  -- equipment (GetInventoryItemLink("player",...)) and ignores the event's unit arg,
+  -- so a plain RegisterEvent made every party/target/arena unit's gear change trigger
+  -- a full pointless player rescan. RegisterUnitEvent fires only for "player".
+  self:RegisterUnitEvent("UNIT_INVENTORY_CHANGED", "player")
   self:RegisterEvent("PLAYER_LEAVING_WORLD")
   self:RegisterEvent("MAIL_INBOX_UPDATE")
   self:RegisterEvent("TRADE_SKILL_SHOW")
