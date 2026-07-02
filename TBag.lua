@@ -4209,15 +4209,11 @@ end
 
 function TFuBag:UpdateButtonHighlights()
   local isopen = {};
-  local bag, buttonname, itm;
+  local buttonname, itm;
   local texture;
 
-  -- Record each bag's physical open state (used below to auto-show highlights
-  -- for bags that are open). The highlight COLOR is resolved per-button from the
-  -- bag's owning window cfg (GetCfgFromBag), not a shared bag-indexed table: bag 5
-  -- (the reagent bag) is a member of BOTH Inv_Bags and Bnk_Bags, so a single
-  -- bag->color table would let the bank's bag_5 color clobber the inventory's
-  -- (and vice versa), painting the wrong highlight color.
+  -- Record each bag's physical open state (used below to auto-show highlights for
+  -- bags that are open).
   for _, bag in ipairs(TFuBag.Inv_Bags) do
     isopen[bag] = IsBagOpen(bag);
   end
@@ -4225,20 +4221,38 @@ function TFuBag:UpdateButtonHighlights()
     isopen[bag] = IsBagOpen(bag);
   end
 
+  -- Per-bag memo (perf): the highlight COLOR and the show/hide decision depend only on
+  -- the bag -- its owning-window cfg (GetCfgFromBag), its selector frame's checked state,
+  -- isopen[bag], and cfg.spotlight_open -- never on the individual button. A busy window
+  -- has hundreds of item buttons but only ~a dozen bags, and RecolorWindow re-runs this
+  -- on every color-picker DRAG tick, so resolving once per bag (not per button) is the
+  -- win. Keyed by bag but SAFE re: the bag-5 note (bag 5 is in both Inv_Bags and Bnk_Bags):
+  -- GetCfgFromBag checks Inv_Bags first, so it resolves bag 5 DETERMINISTICALLY (always the
+  -- Inv cfg) -- exactly what the per-button code did -- so there is no cross-window clobber.
+  -- GetColor's cfg[COLORS] lazy-init is idempotent, so calling it once per bag is identical.
+  local perBag = {};
+  local function resolve(bag)
+    local e = perBag[bag];
+    if (e == nil) then
+      local cfg = self:GetCfgFromBag(bag);
+      local cr, cg, cb, ca = self:GetColor(cfg, "bag_"..bag);
+      local bagframe = self:GetBagFrame(bag);
+      local show = (((bagframe and bagframe:GetChecked()) or isopen[bag])
+                    and cfg and cfg["spotlight_open"] == 1) and true or false;
+      e = { cr, cg, cb, ca, show };
+      perBag[bag] = e;
+    end
+    return e;
+  end
+
   -- Then cycle through all the buttons
   for buttonname, itm in pairs(self.BUTTONS) do
     texture = _G[buttonname.."HighlightFrameTexture"];
     if (texture) then
       if (itm and next(itm)) then
-        bag = itm[self.I_BAG];
-        local cfg = self:GetCfgFromBag(bag);
-        local cr, cg, cb, ca = self:GetColor(cfg, "bag_"..bag);
-        texture:SetVertexColor(cr, cg, cb, ca);
-
-        local bagframe = self:GetBagFrame(bag)
-        if (((bagframe and bagframe:GetChecked()) or isopen[bag]) and (cfg)
-          and (cfg["spotlight_open"] == 1)) then
-          --and (cfg["show_Bag"..bag] == 1) then
+        local e = resolve(itm[self.I_BAG]);
+        texture:SetVertexColor(e[1], e[2], e[3], e[4]);
+        if (e[5]) then
           texture:Show();
         else
           texture:Hide();
