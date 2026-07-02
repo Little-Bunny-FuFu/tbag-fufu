@@ -4687,6 +4687,25 @@ function TFuBag:UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, compar
     return self.REQ_NONE;
   end
 
+  -- Tooltip reuse cache (Tier 2): UpdateItmCache scans a CHANGED item's tooltip
+  -- (soulbound / account-bound / crafting-reagent); PickBar then re-scans the SAME
+  -- tooltip for keyword matching in the very next SortItmCache of this refresh. Stash
+  -- each freshly-scanned tooltip (further below) so PickBar reuses it instead of a
+  -- second identical scan on the item-changed path (Deposit All / moves). Keyed by
+  -- bag/slot + the item's link and suffix so PickBar can reject a stale entry.
+  --
+  -- WIPE PLACEMENT IS LOAD-BEARING: it runs for EVERY live-player pass, BEFORE the
+  -- at-bank early-return below. A tooltip built at the bank (SetBagItem) differs from
+  -- one built away from it (SetHyperlink -- no bind/charge/durability lines); an
+  -- at-bank entry surviving into a later away-from-bank REQ_MUST bank resort (which
+  -- still runs SortItmCache->PickBar even though UpdateItmCache early-returns here)
+  -- would categorize from the wrong-condition tooltip. Wiping now guarantees the cache
+  -- only ever holds entries from the CURRENT pass's scan condition. (Alt views miss
+  -- via PickBar's playerid guard and never populate, so their stale entries are moot.)
+  local ttc = self.ttCache;
+  if (not ttc) then ttc = {}; self.ttCache = ttc; end
+  for b, _ in pairs(ttc) do ttc[b] = nil; end
+
   -- Don't update if we aren't at the bank
   if (atbank) and (atbank ~= 1) then
     return self.REQ_NONE;
@@ -4855,6 +4874,13 @@ function TFuBag:UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, compar
             self:ResetNew(itm);
           end
 
+          -- Cache this slot's freshly-scanned tooltip for PickBar to reuse (see the
+          -- cache note at the top of this function). Only set when a scan happened.
+          if (tooltip) then
+            local tb = ttc[bag]; if (not tb) then tb = {}; ttc[bag] = tb; end
+            tb[slot] = { link = itm[self.I_ITEMLINK], suffix = itm[self.I_LINKSUFFIX], tt = tooltip };
+          end
+
           -- wipe old keys first
           for k,_ in pairs(itmcache[bag][slot]) do
             itmcache[bag][slot][k] = nil;
@@ -4911,6 +4937,7 @@ end
 -- (NOT saved) so it can never collide with a value persisted from a past session.
 TFuBag.catGen = TFuBag.catGen or 0
 TFuBag.catStamp = TFuBag.catStamp or {}
+TFuBag.ttCache = TFuBag.ttCache or {}   -- Tier 2: per-refresh tooltip reuse cache (UpdateItmCache -> PickBar)
 
 function TFuBag:BumpCatGen()
   self.catGen = (self.catGen or 0) + 1
@@ -5201,7 +5228,18 @@ function TFuBag:PickBar(cfg, playerid, itm, trade1, trade2)
   -- (EQUIPPED keyword wiring removed with the EQUIPPED_* categories.)
 
   -- Load tooltip
-  tooltip = self:MakeToolTipStr(playerid, itm[self.I_ITEMLINK], itm[self.I_BAG], itm[self.I_SLOT], itm[self.I_LINKSUFFIX]);
+  -- Reuse the tooltip UpdateItmCache already scanned for this slot THIS refresh (live
+  -- player only), sparing a second identical MakeToolTipStr scan on the item-changed
+  -- path. The link+suffix guard means a stale entry (same slot, different item) is
+  -- never served; alt views (playerid ~= self.PLAYERID) always miss and scan live.
+  local tc = self.ttCache;
+  local ce = tc and (playerid == self.PLAYERID) and tc[itm[self.I_BAG]]
+             and tc[itm[self.I_BAG]][itm[self.I_SLOT]];
+  if (ce and ce.link == itm[self.I_ITEMLINK] and ce.suffix == itm[self.I_LINKSUFFIX]) then
+    tooltip = ce.tt;
+  else
+    tooltip = self:MakeToolTipStr(playerid, itm[self.I_ITEMLINK], itm[self.I_BAG], itm[self.I_SLOT], itm[self.I_LINKSUFFIX]);
+  end
 
   -- self:PrintDEBUG("Tooltip Text: "..tooltip);
 
