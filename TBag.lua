@@ -5065,19 +5065,25 @@ function TFuBag:SortItmCache(cfg, playerid, itmcache, baritm, bagarr)
     end
 
     if (toggle==1 or toggle==2) then
-      table.sort(baritm[barnum],
-        function(a,b) return
-          a[TFuBag.I_CAT]..
-          TFuBag:SubSortKey(cfg, a)..
-          TFuBag:ReverseString(a[TFuBag.I_NAME],toggle)..
-          string.format("%04s",a[TFuBag.I_COUNT])..string.format("%02s",a[TFuBag.I_SLOT])
-
-          >
-          b[TFuBag.I_CAT]..
-          TFuBag:SubSortKey(cfg, b)..
-          TFuBag:ReverseString(b[TFuBag.I_NAME],toggle)..
-          string.format("%04s",b[TFuBag.I_COUNT])..string.format("%02s",b[TFuBag.I_SLOT])
-        end
+      -- Decorate-sort-undecorate (Tier 2 perf): the original comparator rebuilt BOTH
+      -- operands' sort keys (SubSortKey + ReverseString + two string.format) on EVERY
+      -- comparison (~2*n*log n heavy builds per bar). Precompute each item's key ONCE
+      -- into a transient side table keyed by the itm table itself -- NEVER written onto
+      -- itm (its refs are persisted SavedVariables) -- then compare the cached strings.
+      -- Ordering is byte-identical: SubSortKey/ReverseString are pure, and equal keys
+      -- still compare false both ways (table.sort stays consistent).
+      local bar = baritm[barnum];
+      local sortkey = {};
+      for si = 1, table.getn(bar) do
+        local it = bar[si];
+        sortkey[it] =
+          it[TFuBag.I_CAT]..
+          TFuBag:SubSortKey(cfg, it)..
+          TFuBag:ReverseString(it[TFuBag.I_NAME],toggle)..
+          string.format("%04s",it[TFuBag.I_COUNT])..string.format("%02s",it[TFuBag.I_SLOT]);
+      end
+      table.sort(bar,
+        function(a,b) return sortkey[a] > sortkey[b] end
       );
     end
   end
