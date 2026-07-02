@@ -409,9 +409,6 @@ function TFuBag:Init()
 
   -- Cleanout old trash
   self:CleanConfig();
-
-  -- And reset the keybinding, if need be
-  LoadAddOn("Blizzard_BindingUI");
 end
 
 -----------------------------------------------------------------------
