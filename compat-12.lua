@@ -116,3 +116,17 @@ if not ReagentBankButtonIDToInvSlotID then function ReagentBankButtonIDToInvSlot
 -- calls it -- MainFrame:OnHide now calls C_Bank.CloseBankFrame() directly to end the
 -- live session when the bank window closes at a banker. "Session live" is read off
 -- BankFrame:IsShown() (Bank:IsBankSessionLive).)
+
+-- ---------------------------------------------------------------------------
+-- Spell API -> C_Spell (11.0). The bare global GetSpellInfo was removed; the
+-- deDE/ruRU locale files (and localization.template.lua) call it 16x each at
+-- file scope for localized profession names and consume only return value 1
+-- (the name). Without this shim those clients get a load-time Lua error and
+-- lose all translations. C_Spell.GetSpellName returns exactly the name
+-- (SpellDocumentation.lua:439).
+-- ---------------------------------------------------------------------------
+if not GetSpellInfo and C_Spell and C_Spell.GetSpellName then
+  function GetSpellInfo(spellID)
+    return C_Spell.GetSpellName(spellID)
+  end
+end
