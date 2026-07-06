@@ -85,7 +85,13 @@ end
 -- ---------------------------------------------------------------------------
 if C_CurrencyInfo then
   GetCurrencyListSize = C_CurrencyInfo.GetCurrencyListSize
-  ExpandCurrencyList  = C_CurrencyInfo.ExpandCurrencyList
+  -- The modern expand argument is a bool (CurrencyInfoDocumentation.lua:59) and
+  -- the Legion contract the callers were written against is numeric 0/1. Lua 0
+  -- is truthy, so a raw alias turned "collapse (0)" into expand, force-expanding
+  -- the player's Blizzard currency-list headers on every Tokens.Scan. Coerce.
+  function ExpandCurrencyList(index, expand)
+    C_CurrencyInfo.ExpandCurrencyList(index, expand == 1 or expand == true)
+  end
   function GetCurrencyListInfo(index)
     local i = C_CurrencyInfo.GetCurrencyListInfo(index)
     if not i then return nil end

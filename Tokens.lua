@@ -108,6 +108,7 @@ function Tokens.Update(frame)
   for _,itm in pairs(TFuTknItm[mainFrame.playerid][TFuBag.D_BAG]) do
     if itm[TFuBag.I_WATCH] then
       local watchButton = _G[framename.."Token"..i]
+      if not watchButton then break end -- Tokens.xml defines 3 buttons; never index past them
       Tokens.UpdateTokenButtonFromItm(watchButton,itm, mainFrame.playerid)
       frame:Show()
       i = i + 1
@@ -153,4 +154,6 @@ end
 if TokenFramePopupBackpackCheckBoxText then
   TokenFramePopupBackpackCheckBoxText:SetText(L["Show on TBag"])
 end
-TOKEN_SHOW_ON_BACKPACK = L["Checking this option will allow you to track this currency type in TBag for this character.\n\nYou can also Shift-click a currency to add or remove it from being tracked in TBag."]
+-- Do NOT overwrite the global TOKEN_SHOW_ON_BACKPACK string: Blizzard still
+-- reads it on 12.0 (Blizzard_TokenUI.lua:576 puts it in the Token-panel
+-- tooltip), and the tbag tracking feature the old text described is inert.
