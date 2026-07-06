@@ -430,34 +430,37 @@ end
 -- Returns the ScrollFrame; its .controls list is re-synced on show.
 function MO:GeneralContent(parent, x, y, w, h, frame)
   local sfl, child = self:ScrollList(parent, x, y, w, h)
-  local cfg = frame.cfg
+  -- Do NOT capture frame.cfg here: a profile switch REASSIGNS it (init ->
+  -- ActiveCfg), and these controls live for the session -- a captured table
+  -- keeps displaying and EDITING the pre-switch profile (2026-07-06 review F2).
+  local function C() return frame.cfg end
   local controls = {}
   sfl.controls = controls
   local function track(c) controls[#controls + 1] = c; return c end
   local function force() frame:UpdateWindow(TFuBag.REQ_MUST) end
   local function resize()
-    frame:CalcButtonSize(cfg.frameButtonSize, cfg.framePad)
+    frame:CalcButtonSize(C().frameButtonSize, C().framePad)
     frame:UpdateWindow(TFuBag.REQ_MUST)
   end
   local yy = 6
 
   local function chk(label, key, apply)
     local c, ny = self:Checkbox(child, yy, label,
-      function() return cfg[key] == 1 end,
-      function(v) cfg[key] = v and 1 or 0; (apply or force)() end)
+      function() return C()[key] == 1 end,
+      function(v) C()[key] = v and 1 or 0; (apply or force)() end)
     track(c); yy = ny
   end
   local function sld(label, key, mn, mx, st, apply)
     local c, ny = self:Slider(child, yy, label, mn, mx, st,
-      function() return cfg[key] or mn end,
-      function(v) cfg[key] = v; (apply or force)() end)
+      function() return C()[key] or mn end,
+      function(v) C()[key] = v; (apply or force)() end)
     track(c); yy = ny
     return c
   end
   local function edit(label, key, maxlen, apply)
     local c, ny = self:EditBox(child, yy, label, maxlen, 90,
-      function() return cfg[key] end,
-      function(v) cfg[key] = v; (apply or force)() end)
+      function() return C()[key] end,
+      function(v) C()[key] = v; (apply or force)() end)
     track(c); yy = ny
     return c
   end
@@ -470,7 +473,7 @@ function MO:GeneralContent(parent, x, y, w, h, frame)
   -- (greyed). [Stage 1: the toggle + gating; the resize grip + reflow follow.]
   local colSlider, barSlider
   local function gateSliders()
-    local on = (cfg.legacy_sizing == 1)
+    local on = (C().legacy_sizing == 1)
     for _, s in ipairs({ colSlider, barSlider }) do
       if (s) then
         if (s.SetEnabled) then s:SetEnabled(on) end
@@ -480,8 +483,8 @@ function MO:GeneralContent(parent, x, y, w, h, frame)
   end
   local lc; lc, ny = self:Checkbox(child, yy,
     "Legacy column/row sizing (off = resizable, auto-arranged window)",
-    function() return cfg.legacy_sizing == 1 end,
-    function(v) cfg.legacy_sizing = v and 1 or 0; gateSliders(); force() end)
+    function() return C().legacy_sizing == 1 end,
+    function(v) C().legacy_sizing = v and 1 or 0; gateSliders(); force() end)
   track(lc); yy = ny
 
   colSlider = sld("Item Columns", "maxColumns", TFuBag.NUMCOL_MIN, TFuBag.NUMCOL_MAX, 1)
@@ -490,8 +493,8 @@ function MO:GeneralContent(parent, x, y, w, h, frame)
   track({ tfuRefresh = gateSliders })  -- re-grey the sliders whenever the panel is shown
   do  -- scale is stored 0-1; expose as a 10-100% slider
     local c; c, ny = self:Slider(child, yy, "Window Scale (%)", 10, 100, 5,
-      function() return math.floor((cfg.scale or 1) * 100 + 0.5) end,
-      function(v) cfg.scale = v / 100; force() end)
+      function() return math.floor((C().scale or 1) * 100 + 0.5) end,
+      function(v) C().scale = v / 100; force() end)
     track(c); yy = ny
   end
   sld("Item Button Size", "frameButtonSize", TFuBag.N_BUTTON_MIN, TFuBag.N_BUTTON_MAX, 1, resize)
@@ -535,30 +538,30 @@ function MO:GeneralContent(parent, x, y, w, h, frame)
   -- Placement" (ml_freeplace) only when manual layout is active. Greying enforces this.
   local manualChk, freeplaceChk
   local function gateManual()
-    local dragMode = (cfg.legacy_edit ~= 1)
+    local dragMode = (C().legacy_edit ~= 1)
     if (manualChk) then
       if (manualChk.SetEnabled) then manualChk:SetEnabled(dragMode) end
       manualChk:SetAlpha(dragMode and 1 or 0.4)
     end
     if (freeplaceChk) then
-      local on = dragMode and (cfg.manual_layout == 1)
+      local on = dragMode and (C().manual_layout == 1)
       if (freeplaceChk.SetEnabled) then freeplaceChk:SetEnabled(on) end
       freeplaceChk:SetAlpha(on and 1 or 0.4)
     end
   end
   do
     local c, ny = self:Checkbox(child, yy, "Drag to arrange categories (off = legacy click editing)",
-      function() return cfg.legacy_edit ~= 1 end,
-      function(v) cfg.legacy_edit = v and 0 or 1; gateManual(); force() end)
+      function() return C().legacy_edit ~= 1 end,
+      function(v) C().legacy_edit = v and 0 or 1; gateManual(); force() end)
     track(c); yy = ny
   end
   do
     -- The gear toggles edit/unlock; this is the persistent on/off for whether the
     -- arranged layout is used at all. Turning it off returns to auto-flow and locks.
     local c, ny = self:Checkbox(child, yy, "Use Manual Layout (off = auto-arrange categories)",
-      function() return cfg.manual_layout == 1 end,
+      function() return C().manual_layout == 1 end,
       function(v)
-        cfg.manual_layout = v and 1 or 0
+        C().manual_layout = v and 1 or 0
         if (not v) then frame.ml_edit = 0 end  -- leaving manual layout: lock
         gateManual(); force()
       end)
@@ -566,8 +569,8 @@ function MO:GeneralContent(parent, x, y, w, h, frame)
   end
   do
     local c, ny = self:Checkbox(child, yy, "Free Placement within Manual Layout (off = snap to grid)",
-      function() return cfg.ml_freeplace == 1 end,
-      function(v) cfg.ml_freeplace = v and 1 or 0; force() end)
+      function() return C().ml_freeplace == 1 end,
+      function(v) C().ml_freeplace = v and 1 or 0; force() end)
     freeplaceChk = c; track(c); yy = ny
   end
   gateManual()
