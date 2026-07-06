@@ -217,9 +217,6 @@ function Inv:init(reset)
   if (cfg["show_editbutton"] == 0) then
     TFuInv_Button_ChangeEditMode:Hide();
   end
-  if (cfg["show_editbutton"] == 0) then
-    TFuInv_Button_ChangeEditMode:Hide();
-  end
   if (cfg["show_hilightbutton"] == 0) then
     TFuInv_Button_HighlightToggle:Hide();
   end

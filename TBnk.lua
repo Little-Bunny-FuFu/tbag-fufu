@@ -1926,7 +1926,7 @@ function Bank:UpdateWindowBody(resort_req)
   if (TFuBagCfg["trades_changed"] == 1) then
     resort_req = TFuBag.REQ_MUST;
   end
-  TFuBagCfg["trades_changed"] = 0;
+  TFuBagCfg["trades_changed"] = nil;  -- match TInv: nil keeps the SV root clean
 
   -- See Inv:UpdateWindow: full recat only when categorization inputs changed.
   local force_full = (resort_req >= TFuBag.REQ_MUST)

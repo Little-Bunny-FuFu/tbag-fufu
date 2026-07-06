@@ -210,29 +210,4 @@
     </Scripts>
   </Button>
 
-  <Button name="TFuBag_MoveLockTemplate" virtual="true">
-    <Size><AbsDimension x="34" y="34"/></Size>
-    <NormalTexture name="$parent_NormTexture"/>
-    <PushedTexture name="$parent_PushTexture"/>
-    <HighlightTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Highlight" alphaMode="ADD"/>
-    <Scripts>
-      <OnClick>
-        self:GetParent():Button_MoveLockToggle_OnClick(button, down)
-      </OnClick>
-      <OnEnter>
-        if self:GetParent().cfg.moveLock == 0 then
-          TFuBag.NewbieTip(self, TFuBag.LOCALE["Unlock Window"], 1.0, 1.0, 1.0,
-            TFuBag.LOCALE["Allow window to be moved by dragging it."])
-        else
-          TFuBag.NewbieTip(self, TFuBag.LOCALE["Lock Window"], 1.0, 1.0, 1.0,
-            TFuBag.LOCALE["Prevent window from being moved by dragging it."])
-        end
-      </OnEnter>
-      <OnLeave>
-        GameTooltip:Hide();
-        ResetCursor();
-      </OnLeave>
-    </Scripts>
-  </Button>
-
 </Ui>

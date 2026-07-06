@@ -13,3 +13,4 @@ ignore:
   - bug-reports
   - ToDo.txt
   - .github
+  - localization.template.lua

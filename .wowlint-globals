@@ -25,6 +25,7 @@ SplitContainerItem
 UseContainerItem
 ContainerIDToInventoryID
 ShowContainerSellCursor
+GetSpellInfo
 MAX_CONTAINER_ITEMS
 LE_ITEM_QUALITY_POOR
 LoadAddOn

@@ -18,7 +18,11 @@ Hooks.funcs = {
   "CloseBackpack",
   "ToggleBackpack",
   "ToggleAllBags",
-  "ContainerFrameItemButton_OnModifiedClick",
+  -- ContainerFrameItemButton_OnModifiedClick was dropped from this list: the
+  -- global was removed in the 10.x mixin rework (modified clicks route through
+  -- ContainerFrameItemButtonMixin:OnModifiedClick), so the replacement was
+  -- never called on 12.0 -- and installing a fake global whose fall-through
+  -- calls a nil saved original was a latent trap for any third-party caller.
 }
 
 Hooks.scripts = {
@@ -251,83 +255,6 @@ function Hooks.ToggleAllBags()
   end
 
   TFuBag:UpdateButtonHighlights()
-end
-
-function Hooks.ContainerFrameItemButton_OnModifiedClick(self, button, ...)
-  TFuBag:PrintDEBUG("event: ItemButton_OnModifiedClick self="..self:GetName())
-
-  -- Original func
-  local func = Hooks.savedfuncs["ContainerFrameItemButton_OnModifiedClick"]
-
-  -- Get the itm and ultimately know if it's one of our buttons
-  local itm = TFuBag:GetItmFromFrame(TFuBag.BUTTONS, self)
-  if not itm then return func(self, button, ...) end
-  local mainFrame = TFuBag:GetButtonMainFrame(self)
-
-  if TFuBag:IsLive(mainFrame) then
-    -- Manage Alt+Click Auto Trade/Auction
-    if IsAltKeyDown() then
-      local alt_pickup = TFuInvFrame.cfg.alt_pickup == 1
-      local alt_panel = TFuInvFrame.cfg.alt_panel == 1
-
-      if TradeFrame and TradeFrame:IsShown() then
-        if alt_pickup  then
-          local tradeslot = TradeFrame_GetAvailableSlot()
-          if tradeslot then
-            PickupContainerItem(itm[TFuBag.I_BAG], itm[TFuBag.I_SLOT])
-            ClickTradeButton(tradeslot)
-            ClearCursor()
-            return
-          end
-        end
-      elseif AuctionFrame and AuctionFrame:IsShown() then
-        if alt_panel then
-          this = AuctionFrameTab3 -- Workaround for AucAdvanced Apraiser module
-          AuctionFrameTab_OnClick(AuctionFrameTab3)
-        end
-        -- If we have auctioneer do not auto pickup let auctioneer do it.
-        if not AuctionFramePost then
-          if alt_pickup and PanelTemplates_GetSelectedTab(AuctionFrame) == 3 then
-            PickupContainerItem(itm[TFuBag.I_BAG], itm[TFuBag.I_SLOT])
-            ClickAuctionSellItemButton()
-            ClearCursor()
-            return
-          end
-        end
-      elseif MailFrame and MailFrame:IsShown() then
-        if alt_panel then
-          MailFrameTab_OnClick(MailFrameTab2)
-        end
-        if alt_pickup and PanelTemplates_GetSelectedTab(MailFrame) == 2 then
-          PickupContainerItem(itm[TFuBag.I_BAG], itm[TFuBag.I_SLOT])
-          ClickSendMailItemButton()
-          ClearCursor()
-          return
-        end
-      end
-    end
-  else
-    -- not a live frame
-    if itm[TFuBag.I_ITEMLINK] then
-      if IsModifiedClick("CHATLINK") then
-        local hl = TFuBag:MakeHyperlink(itm[TFuBag.I_ITEMLINK], itm[TFuBag.I_NAME],
-                                      itm[TFuBag.I_RARITY],
-                                      TFuBag:GetPlayerInfo(mainFrame.playerid,TFuBag.G_BASIC)[TFuBag.S_LEVEL] or UnitLevel("player"),
-                                      itm[TFuBag.I_LINKSUFFIX])
-        ChatEdit_InsertLink(hl)
-        return
-      elseif IsModifiedClick("DRESSUP") then
-        DressUpItemLink(itm[TFuBag.I_ITEMLINK])
-        return
-      elseif IsModifiedClick("SPLITSTACK") then
-        -- Can't split something in a non live frame
-        return
-      end
-    end
-  end
-
-  -- Fall through to the original code
-  return func(self, button, ...)
 end
 
 function Hooks.MerchantFrame_OnHide(...)

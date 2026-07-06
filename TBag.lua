@@ -5191,6 +5191,20 @@ function TFuBag:MatchTradeToolCat(cfg, itm, tooltip)
   return nil;
 end
 
+-- Resolve cat -> bar for itm, honoring bar aliases; on failure clear I_CAT so
+-- the next categorization step gets a turn. One definition replaces the five
+-- hand-rolled copies PickBar had accumulated (which had already drifted).
+function TFuBag:ResolveCatBar(cfg, itm, cat)
+  itm[self.I_CAT] = cat;
+  itm[self.I_BAR] = self:GetCat(cfg, cat);
+  itm[self.I_BAR] = self:ResolveBarAlias(cfg, itm[self.I_BAR]);
+  if (type(itm[self.I_BAR]) ~= "number") then
+    itm[self.I_CAT] = nil;
+    return false;
+  end
+  return true;
+end
+
 function TFuBag:PickBar(cfg, playerid, itm, trade1, trade2)
   local bagtype = self:GetBagType(playerid, itm[self.I_BAG]);
   if (itm[self.I_ITEMLINK] == nil) then
@@ -5199,8 +5213,6 @@ function TFuBag:PickBar(cfg, playerid, itm, trade1, trade2)
     elseif (bagtype and type(bagtype) == "string" and bagtype ~= "") then
       -- Support old style string bagtypes since our cache may still have some.
       itm[self.I_CAT] = string.format(L["EMPTY_%s_SLOTS"],bagtype);
-    elseif (bagtype and type(bagtype) == "string" and bagtype ~= "") then
-
     else
       itm[self.I_CAT] = string.format(L["EMPTY_%s_SLOTS"],
                                       self:GetBagPosName(itm[self.I_BAG]));
@@ -5210,9 +5222,6 @@ function TFuBag:PickBar(cfg, playerid, itm, trade1, trade2)
   else
   -- vars used in tooltip creation
   local tooltip;
-  -- vars used in array loops
-  local key, value;
-  local found;
 
   -- Fetch the items id
   local itemid = self:GetItemID(itm[self.I_ITEMLINK]);
@@ -5298,13 +5307,9 @@ function TFuBag:PickBar(cfg, playerid, itm, trade1, trade2)
   itm[self.I_SUBGROUP] = nil;
 
   -- step 1, check item overrides
-  itm[self.I_CAT] = cfg["item_overrides"][itemid];
-  if (itm[self.I_CAT] ~= nil) then
-    itm[self.I_BAR] = self:GetCat(cfg, itm[self.I_CAT]);
-    itm[self.I_BAR] = self:ResolveBarAlias(cfg, itm[self.I_BAR]);
-    if (type(itm[self.I_BAR]) ~= "number") then
-    itm[self.I_CAT] = nil;
-    end
+  local override = cfg["item_overrides"][itemid];
+  if (override ~= nil) then
+    self:ResolveCatBar(cfg, itm, override);
   end
 
   -- step 1.5, configurable material grouping. Trade goods route to the group
@@ -5316,10 +5321,7 @@ function TFuBag:PickBar(cfg, playerid, itm, trade1, trade2)
   if (itm[self.I_CAT] == nil and cfg.mat_group and itm[self.I_TYPE] == self.LOCALE["Tradeskill"]) then
     local grp = cfg.mat_group[itm[self.I_SUBTYPE]];
     if (grp and grp ~= "") then
-      itm[self.I_CAT] = grp;
-      itm[self.I_BAR] = self:GetCat(cfg, grp);
-      itm[self.I_BAR] = self:ResolveBarAlias(cfg, itm[self.I_BAR]);
-      if (type(itm[self.I_BAR]) ~= "number") then itm[self.I_CAT] = nil; end
+      self:ResolveCatBar(cfg, itm, grp);
     end
   end
 
@@ -5344,18 +5346,10 @@ function TFuBag:PickBar(cfg, playerid, itm, trade1, trade2)
       -- gear category when TRADE_TOOL has no resolvable bar.
       local ttCat = self:MatchTradeToolCat(cfg, itm, tooltip);
       if (ttCat) then
-        itm[self.I_CAT] = ttCat;
-        itm[self.I_BAR] = self:GetCat(cfg, ttCat);
-        itm[self.I_BAR] = self:ResolveBarAlias(cfg, itm[self.I_BAR]);
-        if (type(itm[self.I_BAR]) ~= "number") then itm[self.I_CAT] = nil; end
+        self:ResolveCatBar(cfg, itm, ttCat);
       end
       if (itm[self.I_CAT] == nil) then
-        itm[self.I_CAT] = eqCat;
-        itm[self.I_BAR] = self:GetCat(cfg, eqCat);
-        itm[self.I_BAR] = self:ResolveBarAlias(cfg, itm[self.I_BAR]);
-        if (type(itm[self.I_BAR]) ~= "number") then
-          itm[self.I_CAT] = nil;
-        else
+        if (self:ResolveCatBar(cfg, itm, eqCat)) then
           itm[self.I_SUBGROUP] = eqSub;
         end
       end
@@ -5380,13 +5374,8 @@ function TFuBag:PickBar(cfg, playerid, itm, trade1, trade2)
         -- value[1] == category to place it in. RuleMatches applies the keyword / tooltip /
         -- itemType / itemSubType conditions (shared with MatchTradeToolCat).
         if (self:RuleMatches(itm, tooltip, value)) then
-          itm[self.I_CAT] = value[1];
-          itm[self.I_BAR] = self:GetCat(cfg, itm[self.I_CAT]);
-          itm[self.I_BAR] = self:ResolveBarAlias(cfg, itm[self.I_BAR]);
-          if (type(itm[self.I_BAR]) == "number") then
+          if (self:ResolveCatBar(cfg, itm, value[1])) then
             break;
-          else
-            itm[self.I_CAT] = nil;
           end
         end
       end
@@ -5394,13 +5383,10 @@ function TFuBag:PickBar(cfg, playerid, itm, trade1, trade2)
   end
 
   if (itm[self.I_CAT] == nil) then
-    itm[self.I_CAT] = L["UNKNOWN"];
-
-    itm[self.I_BAR] = self:GetCat(cfg, itm[self.I_CAT]);
-    itm[self.I_BAR] = self:ResolveBarAlias(cfg, itm[self.I_BAR]);
-    if (type(itm[self.I_BAR]) ~= "number") then
-    itm[self.I_CAT] = L["UNKNOWN"];
-    itm[self.I_BAR] = 1;
+    if (not self:ResolveCatBar(cfg, itm, L["UNKNOWN"])) then
+      -- UNKNOWN has no bar of its own: hard-fall to bar 1.
+      itm[self.I_CAT] = L["UNKNOWN"];
+      itm[self.I_BAR] = 1;
     end
   end
 
