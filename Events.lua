@@ -106,6 +106,8 @@ function TFuBag:VARIABLES_LOADED()
   end
   self:RegisterEvent("PLAYER_LEVEL_UP")
   self:RegisterEvent("SKILL_LINES_CHANGED")
+  -- Invalidates the recipe-scan session memo (Professions.scan_counts).
+  self:RegisterEvent("NEW_RECIPE_LEARNED")
   self:RegisterEvent("QUEST_ACCEPTED")
   self:RegisterEvent("UNIT_QUEST_LOG_CHANGED")
   self:RegisterEvent("PLAYER_ENTERING_WORLD")
@@ -119,6 +121,12 @@ end
 
 function TFuBag:SKILL_LINES_CHANGED()
   TFuBag.Professions:ScanAllTradeRanks()
+end
+
+function TFuBag:NEW_RECIPE_LEARNED()
+  -- A new recipe was learned: clear the recipe-scan session memo so the next
+  -- TRADE_SKILL_LIST_UPDATE walk records it.
+  table.wipe(TFuBag.Professions.scan_counts)
 end
 
 function TFuBag:BAG_UPDATE(event, bag)
@@ -348,6 +356,7 @@ local events = {
   ["PLAYERBANKBAGSLOTS_CHANGED"] = TFuBag.PLAYERBANKBAGSLOTS_CHANGED,
   ["PLAYER_LEVEL_UP"] = TFuBag.PLAYER_LEVEL_UP,
   ["SKILL_LINES_CHANGED"] = TFuBag.SKILL_LINES_CHANGED,
+  ["NEW_RECIPE_LEARNED"] = TFuBag.NEW_RECIPE_LEARNED,
   ["QUEST_ACCEPTED"] = TFuBag.QUEST_ACCEPTED,
   ["UNIT_QUEST_LOG_CHANGED"] = TFuBag.UNIT_QUEST_LOG_CHANGED,
   ["PLAYER_ENTERING_WORLD"] = TFuBag.PLAYER_ENTERING_WORLD,
@@ -362,4 +371,5 @@ function TFuBag:OnEvent(event, ...)
 end
 
 TFuBag:SetScript("OnEvent",TFuBag.OnEvent)
-TFuBag:SetScript("OnUpdate",TFuBag.OnUpdate)
+-- OnUpdate (the ItemMover pump) is armed on demand by TFuBag:ItemMover /
+-- TFuBag:Stack and disarms itself when idle -- no permanent per-frame work.

@@ -12,9 +12,19 @@ TFuBag.S_CREATED = "created"
 TFuBag.S_REAGENT = "reagent"
 TFuBag.S_UPDATE  = "update_reference"
 TFuBag.S_VERSION = "version"
+TFuBag.S_TRADE_ORDER = "trade_order"  -- per-player: the two professions in slot order
 
 TFuBag.Professions = {}
 local Professions = TFuBag.Professions
+
+-- Session memo: [professionID] = recipe count at the last completed ScanRecipes
+-- walk. TRADE_SKILL_LIST_UPDATE re-fires throughout a profession session and the
+-- walk is hundreds of GetRecipeSchematic allocs, so skip it while the recipe
+-- list is unchanged. Filter changes alter the count (re-walk); learning a recipe
+-- wipes the memo via NEW_RECIPE_LEARNED (Events.lua). Note GetAllRecipeIDs is
+-- absent on retail 12.0, so the walk source is the FILTERED list (see
+-- .wowlint-globals); the count key keeps that conservative.
+Professions.scan_counts = {}
 
 -- Current DB Version. MUST match TBagItemInfo.lua's S_VERSION (currently 3): the
 -- installer (RefreshCreations/RefreshReagents) overwrites the whole DB when the stored
@@ -79,6 +89,20 @@ end
 
 function Professions:GetTwoProfessions(playerid)
   local trades = self:GetProfessions(playerid)
+
+  -- Prefer the recorded profession-slot order (see ScanAllTradeRanks): the
+  -- pairs() fallback below assigns TRADE1/TRADE2 by hash order, which is
+  -- stable but arbitrary. Alts cached before the order key existed (or with a
+  -- stale order) fall through to the old behavior.
+  local order = TFuBag:GetPlayerInfo(playerid, TFuBag.S_TRADE_ORDER)
+  if order then
+    local t1 = (order[1] and trades[order[1]]) and order[1] or ""
+    local t2 = (order[2] and trades[order[2]]) and order[2] or ""
+    if (t1 ~= "" or t2 ~= "") then
+      return t1, t2
+    end
+  end
+
   local TRADE1 = ""
   local TRADE2 = ""
 
@@ -139,6 +163,10 @@ function Professions:ScanAllTradeRanks()
       TFuBagCfg["trades_changed"] = 1
     end
   end
+
+  -- Record the profession-slot order so TRADE1/TRADE2 aliases are deterministic
+  -- (GetTwoProfessions used to derive them from pairs() hash order).
+  player[TFuBag.S_TRADE_ORDER] = { prof1_name, prof2_name }
 
   -- Secondary skills
   if arch then
@@ -205,6 +233,9 @@ function Professions.ScanRecipes()
                     or C_TradeSkillUI.GetFilteredRecipeIDs()
   if not recipeIDs then return end
 
+  local profID = info.professionID or 0
+  if (Professions.scan_counts[profID] == #recipeIDs) then return end
+
   -- Track whether this scan actually learned anything new. The created/reagent
   -- caches persist in SavedVariables, so re-scanning a known profession adds
   -- nothing -> no relayout churn. Only a genuinely new recipe flips `changed`,
@@ -241,6 +272,8 @@ function Professions.ScanRecipes()
       end
     end
   end
+
+  Professions.scan_counts[profID] = #recipeIDs
 
   -- New recipe data won't reach already-cached bag items on its own: PickBar only
   -- re-runs when catGen advances. Bump it and repaint any open window so the fresh

@@ -8269,6 +8269,11 @@ function TFuBag:Stack(where, itmcache, sa, ca)
 
   -- Set the mutex
   TFuBag.ISSTACKING[where] = 1;
+  -- Arm the mover pump even when this pass enqueues nothing: the coroutine's
+  -- done-branch is what clears the mutex, and with an on-demand OnUpdate a
+  -- zero-move pass would otherwise leave IsStacking stuck (which suppresses
+  -- stack_once in Events.lua forever).
+  TFuBag:SetScript("OnUpdate", TFuBag.OnUpdate);
 
   -- Iterate the list of items that can be stacked
   for itemid,itms in pairs(sa) do
@@ -8330,11 +8335,14 @@ function TFuBag:Stack(where, itmcache, sa, ca)
           destitm[self.I_BAG], destitm[self.I_SLOT],
           destitm[self.I_NEED]);
 
-          -- Update counts
+          -- Update counts. Save the moved amount FIRST: the old code zeroed
+          -- destitm[I_NEED] and then read it back three times (all zeros), so
+          -- a partial fill left every count stale until the next rescan.
+          local moved = destitm[self.I_NEED];
           destitm[self.I_NEED] = 0;
-          destitm[self.I_COUNT] = destitm[self.I_COUNT] + destitm[self.I_NEED];
-          srcitm[self.I_NEED] = srcitm[self.I_NEED] + destitm[self.I_NEED];
-          srcitm[self.I_NEED] = srcitm[self.I_COUNT] - destitm[self.I_NEED];
+          destitm[self.I_COUNT] = destitm[self.I_COUNT] + moved;
+          srcitm[self.I_COUNT] = srcitm[self.I_COUNT] - moved;
+          srcitm[self.I_NEED] = srcitm[self.I_NEED] + moved;
         end
         -- Destination full move to the next one.
         if (destitm[self.I_NEED] == 0) then
@@ -8348,6 +8356,25 @@ function TFuBag:Stack(where, itmcache, sa, ca)
     local itms = ca[self.COMP_ITEM];
     local empty_size = table.getn(epts);
     local items_size = table.getn(itms);
+
+    -- Item family is per-item constant across the whole compress pass; the old
+    -- code recomputed GetItemFamily per (empty x item) pair. Memoize lazily by
+    -- item table. false records "API returned nil" so the eligibility guard
+    -- below keeps its exact nil semantics.
+    local famOf = {};
+    local function itemFam(itemitm)
+      local v = famOf[itemitm];
+      if (v == nil) then
+        if (itemitm[self.I_TYPE] ~= L["Container"]) then
+          v = GetItemFamily(itemitm[self.I_ITEMLINK]) or false;
+        else
+          v = 0;
+        end
+        famOf[itemitm] = v;
+      end
+      if (v == false) then return nil; end
+      return v;
+    end
 
     for empty = 1, empty_size do
       if (epts[empty]) then
@@ -8367,10 +8394,7 @@ function TFuBag:Stack(where, itmcache, sa, ca)
               if (itemitm[self.I_ITEMLINK] and
                 not self:GetCompSkip(emptybag,emptyslot) and
                 not self:GetCompSkip(itembag,itemslot)) then
-                local itmfam = 0;
-                if (itemitm[self.I_TYPE] ~= L["Container"]) then
-                  itmfam = GetItemFamily(itemitm[self.I_ITEMLINK]);
-                end
+                local itmfam = itemFam(itemitm);
 
                 -- Does the item go into this bag type?
                 if (bagtype and itmfam) and
@@ -8507,6 +8531,7 @@ function TFuBag:ItemMover(bag1, slot1, bag2, slot2, count)
     ["count"] = count
   };
   table.insert(ItemMover__instructions,1,inst);
+  self:SetScript("OnUpdate", self.OnUpdate);  -- arm the mover pump
 end
 
 -- Main function for the mover coroutine.  This is an infinite loop
@@ -8553,13 +8578,23 @@ local ItemMover__co = coroutine.create(ItemMover__main);
 -- resume the coroutine
 local function ItemMover_Resume()
   if (coroutine.status(ItemMover__co) == "suspended") then
-    local _
-    _,instructions = coroutine.resume(ItemMover__co,ItemMover__instructions);
+    -- The coroutine re-adopts ItemMover__instructions each cycle, so the yield
+    -- value is the same table; the old capture here wrote a GLOBAL named
+    -- "instructions" every frame. Don't capture.
+    coroutine.resume(ItemMover__co, ItemMover__instructions);
   end
 end
 
+-- The mover pump. Armed on demand (TFuBag:ItemMover / TFuBag:Stack) and
+-- disarmed here once the queue is drained and the stacking mutexes are clear,
+-- so the addon does no per-frame work while idle.
 function TFuBag:OnUpdate()
   ItemMover_Resume();
+  if (table.getn(ItemMover__instructions) == 0
+      and not TFuBag.ISSTACKING[TFuBag.STACK_BNK]
+      and not TFuBag.ISSTACKING[TFuBag.STACK_INV]) then
+    TFuBag:SetScript("OnUpdate", nil);
+  end
 end
 
 
