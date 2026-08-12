@@ -40,7 +40,7 @@ function Hooks.Register(reg)
 
       if ourfunc then
         savedfuncs[funcname] = _G[funcname]
-        setglobal(funcname, ourfunc)
+        _G[funcname] = ourfunc
         TFuBag:PrintDEBUG("Hook function for '"..funcname.." installed.")
       else
         TFuBag:PrintDEBUG("** Hook function for '"..funcname.." SKIPPED **")
@@ -65,7 +65,7 @@ function Hooks.Register(reg)
       local ourfunc = Hooks[funcname]
 
       if ourfunc and savedfuncs[funcname] then
-        setglobal(funcname, savedfuncs[funcname])
+        _G[funcname] = savedfuncs[funcname]
         savedfuncs[funcname] = nil
         TFuBag:PrintDEBUG("Hook function for '"..funcname.." removed.")
       end

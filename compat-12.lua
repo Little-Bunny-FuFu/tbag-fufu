@@ -120,3 +120,14 @@ NUM_BANKBAGSLOTS = NUM_BANKBAGSLOTS or 0
 -- calls it -- MainFrame:OnHide now calls C_Bank.CloseBankFrame() directly to end the
 -- live session when the bank window closes at a banker. "Session live" is read off
 -- BankFrame:IsShown() (Bank:IsBankSessionLive).)
+
+-- ---------------------------------------------------------------------------
+-- PaperDoll API -> C_PaperDollInfo (12.1). The bare global GetInventorySlotInfo
+-- was removed in 12.1.0; TBag.lua's TFuBody equipped-gear scan calls it per
+-- Body_Slots entry and consumes only return 1 (the inventory slot id). The
+-- C_PaperDollInfo replacement returns the same values in the same order
+-- (invSlot, slotTexture, checkRelic), so a 1:1 alias suffices.
+-- ---------------------------------------------------------------------------
+if not GetInventorySlotInfo and C_PaperDollInfo and C_PaperDollInfo.GetInventorySlotInfo then
+  GetInventorySlotInfo = C_PaperDollInfo.GetInventorySlotInfo
+end

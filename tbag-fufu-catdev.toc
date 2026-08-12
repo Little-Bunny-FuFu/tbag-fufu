@@ -1,4 +1,4 @@
-## Interface: 120005,120007
+## Interface: 120005,120007,120100
 ## Version: @project-version@
 ## Title: TBag-fufu |cff66ccff(Cat-dev)|r
 ## Notes: Category node-model DEV build (branch category-system). Enable INSTEAD of TBag-fufu -- they share globals/slash commands and SavedVariables and cannot both be enabled at once.
