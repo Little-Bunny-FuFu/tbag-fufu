@@ -1,3 +1,29 @@
+* 12.1.0.01-fufu (2026-08-12)
+  WoW Patch 12.1 compatibility, plus locale repair for deDE/ruRU, token-list fixes and
+  another performance pass.
+- 12.1: updated for Patch 12.1.0 (Interface 120100). The patch removed the API used to
+  resolve equipment slots for the equipped-gear view; TBag now uses the modern
+  replacement automatically (with the old one as fallback on 12.0 clients). Also
+  migrated off a deprecated global-assignment API. The addon no longer shows as out of
+  date on 12.1.
+- Fix: German and Russian clients no longer hit a guaranteed load-time error that
+  dropped all translations (the locale files depended on an API removed in 12.0). The
+  two Russian "on/off" option strings also display their separator again.
+- Fix: logging in (or switching profiles) no longer force-expands the currency headers
+  you had collapsed in Blizzard's Token panel, and the token cache no longer
+  double-counts expanded children on that first scan. TBag also stops overwriting a
+  label Blizzard shows in its own Token-panel tooltip.
+- Fix: after switching profiles, the options window's General panel kept editing the
+  profile you had just switched away from (silently changing it on disk) while the
+  visible controls looked unresponsive. It now always reads and writes the active
+  profile.
+- Performance: the addon's only every-frame work (the item-mover pump behind
+  auto-stacking) now runs only while moves are actually queued; auto-stack partial
+  fills complete in one pass instead of needing a second rescan; profession-book
+  rescans and item-family lookups are memoized. Also removes a stray global write that
+  happened every frame.
+- Internal: dead-code and packaging cleanup; no behaviour change.
+
 * 12.0.0.09-fufu (2026-07-02)
   New Profession Tools category for equippable trade tools, plus a broad performance pass.
 - New: equippable trade tools -- skinning knives, mining picks, blacksmith hammers,
