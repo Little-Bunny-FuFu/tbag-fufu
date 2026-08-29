@@ -315,6 +315,7 @@ L["SOULBOUND"] = false
 L["ACCOUNTBOUND"] = false
 L["EQUIPPED"] = false
 L["CRAFTINGREAGENT"] = false
+L["KEYSTONE"] = false
 
 -----------------------------------------------------------------------
 -- CHAT STRINGS

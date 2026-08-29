@@ -634,7 +634,15 @@ end
 
 function TFuBag:GetItemInfo(itemid)
   if itemid then
-    if tostring(itemid):sub(1,10) ~= "battlepet:" then
+    local keyid = self:KeystoneItemID(itemid);
+    if keyid then
+      -- Mythic+ keystone. GetItemInfo takes an item id / itemstring / item
+      -- link, not a keystone hyperlink: resolve the underlying Mythic Keystone
+      -- item by id and hand the keystone string back as the link so tooltips
+      -- and chat links stay dungeon- and level-specific.
+      local itemName, _, itemRarity, _, _, itemType, itemSubType, itemStackCount, _, _, _, _, _, bindType, expacID = GetItemInfo(keyid);
+      return itemName, itemType, itemSubType, itemRarity, itemid, itemStackCount, bindType, expacID;
+    elseif tostring(itemid):sub(1,10) ~= "battlepet:" then
       local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, iconFileDataID, sellPrice, classID, subclassID, bindType, expacID = GetItemInfo(itemid);
       -- bindType / expacID appended for the item filter; existing callers that
       -- capture only the first six returns are unaffected.
@@ -663,9 +671,31 @@ function TFuBag:GetItemID(itemlink)
       local itemstring = string.join(":","battlepet",a,b,c,d,e,f,g)
       return -1, itemstring, nil, a
     end
+    -- Mythic+ keystones use their own hyperlink type:
+    --   keystone:<itemID>:<challengeModeID>:<level>:<affix1>:<affix2>:<affix3>:<affix4>
+    -- The id is the underlying Mythic Keystone item (shared by every keystone);
+    -- the itemstring keeps the whole keystone payload. Without this branch the
+    -- slot's link collapsed to "" and every render path treated the keystone
+    -- as an EMPTY slot (search still found it by name).
+    local keystone = itemlink:match("keystone:%d+[%d:]*")
+    if keystone then
+      return keystone:match("^keystone:(%d+)"), keystone, nil
+    end
   end
 
   return "", ""
+end
+
+-- Numeric item id behind a keystone itemstring / link, nil for anything else.
+-- The C_Item lookups (GetItemInfo, GetItemInfoInstant via GetItemIcon) take an
+-- item id / itemstring / item link, not a keystone hyperlink; callers resolve
+-- keystones through this id.
+function TFuBag:KeystoneItemID(itemlink)
+  if itemlink and type(itemlink) == "string" then
+    local id = itemlink:match("keystone:(%d+)")
+    return id and tonumber(id)
+  end
+  return nil
 end
 
 function TFuBag:GetItemName(itemlink)
@@ -2981,6 +3011,22 @@ function TFuBag:SetDefColors(cfg, reset)
   self:GenCatColors(cfg, (reset == 1 or migrate) and 1 or nil);
 end
 
+-- One-time: lists created before the Mythic+ keystone rule existed in
+-- DefaultSearchList get it inserted right after their KEY_QUEST rule (appended
+-- if that rule is gone). Guarded by cfg.keystone_rule_seeded so a user who
+-- deletes the rule afterwards is not re-seeded on every load.
+function TFuBag:SeedKeystoneRule(cfg)
+  local list = cfg["item_search_list"];
+  if (type(list) ~= "table" or cfg.keystone_rule_seeded == 1) then return; end
+  cfg.keystone_rule_seeded = 1;
+  local at = table.getn(list) + 1;
+  for i, row in ipairs(list) do
+    if (row[2] == L["KEYSTONE"]) then return; end
+    if (row[1] == L["KEY_QUEST"]) then at = i + 1; end
+  end
+  table.insert(list, at, { L["KEY_QUEST"], L["KEYSTONE"], L[""], L[""], L[""] });
+end
+
 function TFuBag:ResetSorts(cfg)
   cfg["item_overrides"] = {};
   -- Deep-copy DefaultSearchList. The old code assigned by reference, which
@@ -3177,6 +3223,7 @@ function TFuBag:InitDefVals(cfg, bagarr, row1offset, reset)
     self:ResetSorts(cfg);
     cfg["itemoverride_loaddefaults"] = 0;
   end
+  self:SeedKeystoneRule(cfg);
 
   -- default sort views / default "allow new items in bar" settings
   if (reset ~= 1) then
@@ -4521,7 +4568,8 @@ function TFuBag:SetInventoryItem(tt, playerid, itemlink, bag, slot, suffix)
       end
     else
       -- otherwise, just set a link.  Not as good, but safe
-      if itemlink and itemlink ~= "" then
+      -- Keystone strings are complete as-is (no linker level / suffix).
+      if itemlink and itemlink ~= "" and not self:KeystoneItemID(itemlink) then
         local level = TFuBag:GetPlayerInfo(playerid,TFuBag.G_BASIC)[TFuBag.S_LEVEL] or
                     UnitLevel("player")
 
@@ -4532,7 +4580,8 @@ function TFuBag:SetInventoryItem(tt, playerid, itemlink, bag, slot, suffix)
     end
   else
     -- Always just set links for other players
-    if itemlink and itemlink ~= "" then
+    -- Keystone strings are complete as-is (no linker level / suffix).
+    if itemlink and itemlink ~= "" and not self:KeystoneItemID(itemlink) then
       local level = TFuBag:GetPlayerInfo(playerid,TFuBag.G_BASIC)[TFuBag.S_LEVEL] or
                     UnitLevel("player")
       itemlink = itemlink..":"..level..(suffix and ":" or "")..(suffix or "")
@@ -4574,8 +4623,11 @@ function TFuBag:MakeToolTipStr(playerid, itemlink, bag, slot, mailitem, attach, 
   elseif (itemlink) and (mailitem) and (attach) then
     tt:SetInboxItem(mailitem, attach);
   elseif (itemlink) then
-    local level = UnitLevel("player")
-    itemlink = itemlink..":"..level..(suffix and ":" or "")..(suffix and suffix or "")
+    -- Keystone strings are complete as-is (no linker level / suffix).
+    if (not self:KeystoneItemID(itemlink)) then
+      local level = UnitLevel("player")
+      itemlink = itemlink..":"..level..(suffix and ":" or "")..(suffix and suffix or "")
+    end
     tt:SetHyperlink(itemlink);
   end
 
@@ -5283,6 +5335,12 @@ function TFuBag:PickBar(cfg, playerid, itm, trade1, trade2)
 
   if (itm[self.I_CRAFTINGREAGENT] == 1) then
     itm[self.I_KEYWORD][L["CRAFTINGREAGENT"]] = 1;
+  end
+
+  -- Mythic+ keystone: keyword-matched (DefaultSearchList KEY_QUEST rule) so the
+  -- placement is independent of the keystone item's class / subclass strings.
+  if (self:KeystoneItemID(itm[self.I_ITEMLINK])) then
+    itm[self.I_KEYWORD][L["KEYSTONE"]] = 1;
   end
 
   -- (EQUIPPED keyword wiring removed with the EQUIPPED_* categories.)

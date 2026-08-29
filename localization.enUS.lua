@@ -381,6 +381,7 @@ L["SOULBOUND"] = true
 L["ACCOUNTBOUND"] = true
 L["EQUIPPED"] = true
 L["CRAFTINGREAGENT"] = true
+L["KEYSTONE"] = true
 
 -----------------------------------------------------------------------
 -- CHAT STRINGS

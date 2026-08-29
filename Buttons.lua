@@ -383,6 +383,8 @@ function ItemButton.Update(self)
     frame_texture:SetAlpha(1)
     if itemlink:sub(1,5) == "item:" then
       texture = GetItemIcon(itm[TFuBag.I_ITEMLINK])
+    elseif itemlink:sub(1,9) == "keystone:" then
+      texture = GetItemIcon(TFuBag:KeystoneItemID(itemlink))
     elseif itemlink:sub(1,10) == "battlepet:" then
       local _, _, _, speciesID = TFuBag:GetItemID(itemlink)
       _, texture = C_PetJournal.GetPetInfoBySpeciesID(speciesID)

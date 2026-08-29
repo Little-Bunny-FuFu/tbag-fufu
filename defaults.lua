@@ -342,6 +342,8 @@ TFuBag.DefaultSearchList = {
   { L["BUFF"], L[""], L["Flame Cap"], L["Tradeskill"], L[""]},
   { L["BUFF"], L[""], L["[AG][li][lv][oe]w?s the [Ii]mbiber "], L["Consumable"], L[""]},
   { L["KEY_QUEST"], L[""], L[" Key"], L["Key"], L[""] },
+  -- Mythic+ keystones (keyword set in PickBar from the keystone: link type).
+  { L["KEY_QUEST"], L["KEYSTONE"], L[""], L[""], L[""] },
 
 
 -- 12.0 per-material trade-goods categories (category uplift). Match Trade Goods
