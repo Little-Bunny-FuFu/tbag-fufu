@@ -1,3 +1,15 @@
+* 12.1.0.02-fufu (2026-08-29)
+  Bugfix: Mythic+ keystones show up in your bags again.
+- Fix: Mythic Keystones were invisible in TBag -- the slot rendered as empty (or was
+  folded into the free-slot count) even though search could still find the key. The
+  game links keystones with their own link type rather than a normal item link, which
+  TBag did not recognise. Keystones now display with their icon, sort into the Keys
+  category, show the dungeon / level / affix tooltip, and shift-click into chat as a
+  proper keystone link.
+- The Keys rule for keystones is added to your existing category lists automatically
+  (once); if you would rather file them elsewhere, edit or delete that rule in the
+  Categories panel as usual.
+
 * 12.1.0.01-fufu (2026-08-12)
   WoW Patch 12.1 compatibility, plus locale repair for deDE/ruRU, token-list fixes and
   another performance pass.
