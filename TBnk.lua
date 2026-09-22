@@ -497,7 +497,7 @@ function Bank:RebuildTabList()
     -- build (before tab snapshotting existed).
     charTabs, charViewable = self:LoadCharTabSnapshot(self.playerid)
     if (charTabs == nil) then
-      charTabs = self:DeriveTabsFromCache(self.playerid, 6, 11)
+      charTabs = self:DeriveTabsFromCache(self.playerid, TFuBag.CHARBANK_FIRST, TFuBag.CHARBANK_LAST)
       if (charTabs ~= nil) then charViewable = true; end
     end
   end

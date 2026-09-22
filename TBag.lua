@@ -230,11 +230,26 @@ local L = TFuBag.LOCALE;
 -----------------------------------------------------------------------
 
 TFuBag.BAGMIN = REAGENTBANK_CONTAINER;
--- BAGMAX raised from 11 to 16 for the 12.0 bank rewrite: character bank tabs are
--- Enum.BagIndex.CharacterBankTab_1..6 (6-11) and warband/account tabs are
--- AccountBankTab_1..5 (12-16). Every bank helper bounds-checks against BAGMAX,
--- so warband tab ids must be inside it.
-TFuBag.BAGMAX = 16;
+-- Bank tab container ids come from Enum.BagIndex and differ per client: live 12.1
+-- has CharacterBankTab_1..6 = 6-11 and AccountBankTab_1..5 = 12-16, while WoW
+-- Forever (1.60) has CharacterBankTab_1..9 = 6-14 and AccountBankTab_1..9 = 15-23.
+-- Derive the ranges so IsBankTab, the GetBagName label fallback and the cache-derived
+-- tab list (TBnk.lua DeriveTabsFromCache) follow the running client. Every bank helper
+-- bounds-checks against BAGMAX, so the highest account tab id must be inside it.
+do
+  local BI = (Enum and Enum.BagIndex) or {};
+  TFuBag.CHARBANK_FIRST = BI.CharacterBankTab_1 or 6;
+  TFuBag.ACCTBANK_FIRST = BI.AccountBankTab_1 or 12;
+  TFuBag.CHARBANK_LAST  = TFuBag.ACCTBANK_FIRST - 1;
+  local last = BI.AccountBankTab_1 or 16;
+  for i = 2, 32 do
+    local id = BI["AccountBankTab_"..i];
+    if (id == nil) then break; end
+    last = id;
+  end
+  TFuBag.ACCTBANK_LAST = last;
+end
+TFuBag.BAGMAX = TFuBag.ACCTBANK_LAST;
 TFuBag.MAX_REAGENTBANK_ITEMS = 98 -- has to be a constant since game can't tell us in time
 TFuBag.MAX_BANKTAB_ITEMS = 98 -- 12.0 bank tabs hold 98 slots; CreateDummyBag/GetBagMaxItems need this (not the 50-slot bag cap)
 -- Reagent bag (Enum.BagIndex.ReagentBag = 5, added 10.0) appended last so the
@@ -248,9 +263,10 @@ TFuBag.Inv_Bags = { BACKPACK_CONTAINER, 4, 3, 2, 1, 5 };
 -- until then so nothing routes to dead classic ids before the first BANKFRAME_OPENED.
 TFuBag.Bnk_Bags = {};
 
--- A bank tab is any container id in the character (6-11) or warband (12-16) range.
+-- A bank tab is any container id in the character or warband range (see CHARBANK_FIRST
+-- / ACCTBANK_LAST above: 6-16 on live 12.1, 6-23 on WoW Forever).
 function TFuBag:IsBankTab(bag)
-  return bag and bag >= 6 and bag <= 16;
+  return bag and bag >= self.CHARBANK_FIRST and bag <= self.ACCTBANK_LAST;
 end
 
 -- True when a LIVE bank session is open and the item at bag/slot is NOT allowed in the
@@ -2140,8 +2156,9 @@ function TFuBag:PassesItemFilter(frame, itm)
   if (f.curExp) then
     -- 15th return of GetItemInfo = expansionID; nil when the item is not yet in
     -- the client cache -- treat unknown as "do not hide".
+    local cur = LE_EXPANSION_LEVEL_CURRENT or GetExpansionLevel();
     local exp = select(15, GetItemInfo(link));
-    if (exp ~= nil and exp ~= LE_EXPANSION_LEVEL_CURRENT) then return false; end
+    if (cur ~= nil and exp ~= nil and exp ~= cur) then return false; end
   end
 
   return true;
@@ -3650,8 +3667,8 @@ function TFuBag:GetBagDispName(bag)
   if (self:IsBankTab(bag)) then
     local td = TFuBnkFrame and TFuBnkFrame.tabData and TFuBnkFrame.tabData[bag];
     if (td and td.name and td.name ~= "") then return td.name; end
-    if (bag <= 11) then return L["Bank"].." "..(bag - 5); end
-    return L["Warband"].." "..(bag - 11);
+    if (bag <= self.CHARBANK_LAST) then return L["Bank"].." "..(bag - self.CHARBANK_FIRST + 1); end
+    return L["Warband"].." "..(bag - self.ACCTBANK_FIRST + 1);
   end
 end
 
