@@ -1,4 +1,4 @@
-## Interface: 120005,120007,120100,16001
+## Interface: 120005,120007,120100,120105,120107,16001
 ## Version: @project-version@
 ## Title: TBag-fufu
 ## Notes: The last bag addon you'll ever need.  Autosorting, viewable anywhere, easy to use yet amazingly configurable.
