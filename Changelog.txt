@@ -1,3 +1,16 @@
+* 12.1.5.01-fufu (2026-10-27)
+  WoW Patch 12.1.5 compatibility, plus support for the WoW Forever (1.60) beta client.
+- 12.1.5: updated for Patch 12.1.5 (Interface 120105; the 12.1.7 test-realm interface is
+  listed as well). The patch changed none of the container, bank, item, currency or UI
+  template APIs TBag relies on, so this release is a compatibility declaration with no
+  behaviour change on live: the addon simply no longer shows as out of date on 12.1.5.
+  Checked against the 12.1.5 (build 70575) client UI source.
+- WoW Forever (1.60.1 beta): the addon now loads on the Forever client (Interface 16001).
+  Bank-tab container ranges are derived from the game's own bag-index enum instead of
+  hardcoded live values (Forever has 9 character and 9 account bank tabs, live has 6 and
+  5), and the expansion filter no longer hides every item on a client that reports no
+  current expansion level.
+
 * 12.1.0.02-fufu (2026-08-29)
   Bugfix: Mythic+ keystones show up in your bags again.
 - Fix: Mythic Keystones were invisible in TBag -- the slot rendered as empty (or was
