@@ -1,3 +1,15 @@
+* 12.1.5.02-fufu (2026-11-06)
+  Bugfix: the sort now moves crafting reagents into the reagent bag (live 12.x and WoW Forever).
+- Fix: the compress pass never filled the reagent bag. The game reports bag family 0 for the
+  reagent bag (unlike profession bags), so TBag treated it as a plain bag: its empty slots
+  were never compress targets, reagents (family 0) were never compress candidates, and the
+  move rule never matched. The reagent bag is now matched by its container id; reagents
+  sitting in general bags move into its free slots on sort, and "Empty this bag" no longer
+  tries to park non-reagents there.
+- Fix: the crafting-reagent flag now comes from the game's own isCraftingReagent item flag
+  (tooltip text is only a fallback) and survives cache rebuilds, so the Crafting Reagent
+  keyword and the reagent-bag rule see every reagent, not just freshly looted ones.
+
 * 12.1.5.01-fufu (2026-10-27)
   WoW Patch 12.1.5 compatibility, plus support for the WoW Forever (1.60) beta client.
 - 12.1.5: updated for Patch 12.1.5 (Interface 120105; the 12.1.7 test-realm interface is

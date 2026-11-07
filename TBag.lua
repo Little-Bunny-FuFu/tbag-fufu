@@ -256,6 +256,10 @@ TFuBag.MAX_BANKTAB_ITEMS = 98 -- 12.0 bank tabs hold 98 slots; CreateDummyBag/Ge
 -- existing bag layout order is unchanged; GetContainerNumSlots(5) is 0 when no
 -- reagent bag is equipped, so the section degrades to empty/hidden cleanly.
 TFuBag.Inv_Bags = { BACKPACK_CONTAINER, 4, 3, 2, 1, 5 };
+-- Live reagent bag container id (Enum.BagIndex.ReagentBag = 5 on 12.x and WoW Forever).
+-- GetContainerNumFreeSlots reports bag family 0 for it on both clients, so the cached
+-- bag type stays 0 (general) and the compress / EmptyBag paths match it by id instead.
+TFuBag.REAGENTBAG_ID = (Enum and Enum.BagIndex and Enum.BagIndex.ReagentBag) or 5;
 
 -- 12.0: the classic fixed bank model (BANK_CONTAINER, REAGENTBANK_CONTAINER, 7
 -- purchasable bag slots) is gone. Bnk_Bags is now built dynamically on bank open
@@ -659,10 +663,11 @@ function TFuBag:GetItemInfo(itemid)
       local itemName, _, itemRarity, _, _, itemType, itemSubType, itemStackCount, _, _, _, _, _, bindType, expacID = GetItemInfo(keyid);
       return itemName, itemType, itemSubType, itemRarity, itemid, itemStackCount, bindType, expacID;
     elseif tostring(itemid):sub(1,10) ~= "battlepet:" then
-      local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, iconFileDataID, sellPrice, classID, subclassID, bindType, expacID = GetItemInfo(itemid);
-      -- bindType / expacID appended for the item filter; existing callers that
-      -- capture only the first six returns are unaffected.
-      return itemName, itemType, itemSubType, itemRarity, itemLink, itemStackCount, bindType, expacID;
+      local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, iconFileDataID, sellPrice, classID, subclassID, bindType, expacID, _, isCraftingReagent = GetItemInfo(itemid);
+      -- bindType / expacID appended for the item filter, isCraftingReagent (the game's
+      -- own reagent-bag flag, 17th GetItemInfo return) for the reagent-bag compress;
+      -- existing callers that capture only the first six returns are unaffected.
+      return itemName, itemType, itemSubType, itemRarity, itemLink, itemStackCount, bindType, expacID, isCraftingReagent;
     else
       local _,species,_,quality = strsplit(":", itemid)
       local itemName = C_PetJournal.GetPetInfoBySpeciesID(species)
@@ -829,6 +834,7 @@ function TFuBag:EmptyBag(bag)
   for _, b in ipairs(TFuInvFrame.bags) do
     if (b ~= bag and pcache[b]) then
       local fam = self:GetBagType(self.PLAYERID, b) or 0;
+      if (b == self.REAGENTBAG_ID) then fam = 2048; end -- reports family 0; reagents only
       for s = 1, self:GetBagMaxItems(b) do
         local fitm = pcache[b][s];
         if (fitm and (not fitm[self.I_ITEMLINK] or fitm[self.I_ITEMLINK] == "")) then
@@ -4688,7 +4694,8 @@ function TFuBag:InsertEmptyInCompArr(ca,itm)
   -- player it's true since we only update the itmcache and stack
   -- when on the current player.
   local bagtype = self:GetBagType(self.PLAYERID, itm[self.I_BAG]);
-  if (bagtype and bagtype > 0) then
+  -- The live reagent bag reports family 0 (see REAGENTBAG_ID); its empties are targets too.
+  if ((bagtype and bagtype > 0) or itm[self.I_BAG] == self.REAGENTBAG_ID) then
     table.insert(ca[self.COMP_EMPTY], itm);
   end
 end
@@ -4711,6 +4718,10 @@ function TFuBag:InsertItemInCompArr(ca,itm,id)
     -- up being nil.  Assume the item can not go in any special
     -- bags if it's nil then.
     if (itmfam and itmfam > 0) then
+      table.insert(ca[self.COMP_ITEM], itm);
+    elseif (itm[self.I_CRAFTINGREAGENT] == true and itm[self.I_BAG] ~= self.REAGENTBAG_ID) then
+      -- Crafting reagents have family 0 but belong in the reagent bag (family 0 too);
+      -- a reagent still in a general bag is a candidate for it.
       table.insert(ca[self.COMP_ITEM], itm);
     end
   end
@@ -4817,6 +4828,7 @@ function TFuBag:UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, compar
             itmcache[bag][slot] = { [self.I_KEYWORD] = {} };
           end
           local tooltip = nil;
+          local isReagent = nil;
 
           itm = self:CreateItm();
 
@@ -4840,6 +4852,7 @@ function TFuBag:UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, compar
           itm[self.I_SOULBOUND] = itmcache[bag][slot][self.I_SOULBOUND];
           itm[self.I_CHARGES] = itmcache[bag][slot][self.I_CHARGES];
           itm[self.I_ACCTBOUND] = itmcache[bag][slot][self.I_ACCTBOUND];
+          itm[self.I_CRAFTINGREAGENT] = itmcache[bag][slot][self.I_CRAFTINGREAGENT];
           itm[self.I_LINKSUFFIX] = itmcache[bag][slot][self.I_LINKSUFFIX];
 
           if (itm[self.I_ITEMLINK] ~= nil) then
@@ -4849,7 +4862,7 @@ function TFuBag:UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, compar
 
 
             local stacksize;
-            _, itm[self.I_TYPE], itm[self.I_SUBTYPE], _, _, stacksize, itm[self.I_BINDTYPE], itm[self.I_EXPANSION] = self:GetItemInfo(itm[self.I_ITEMLINK]);
+            _, itm[self.I_TYPE], itm[self.I_SUBTYPE], _, _, stacksize, itm[self.I_BINDTYPE], itm[self.I_EXPANSION], isReagent = self:GetItemInfo(itm[self.I_ITEMLINK]);
             -- hasNoValue is the 9th positional return of the compat-12 shim
             -- (iconFileID, stackCount, isLocked, quality, isReadable, hasLoot,
             -- hyperlink, isFiltered, hasNoValue, ...). Reading position 8 here bound
@@ -4929,14 +4942,16 @@ function TFuBag:UpdateItmCache(cfg, playerid, itmcache, bagarr, stackarr, compar
             else
               itm[self.I_ACCTBOUND] = false
             end
-            -- PROFESSIONS_USED_IN_COOKING resolves to "Crafting Reagent" in English
-            -- It's a strange name for the constant but it used to be "Cooking Ingredenient" and
-            -- they broadended it without changing the constant name.
-            if (string.find(tooltip, PROFESSIONS_USED_IN_COOKING)) then
-              itm[self.I_CRAFTINGREAGENT] = true
-            else
-              itm[self.I_CRAFTINGREAGENT] = false
+            -- Crafting reagent = the game's own isCraftingReagent flag (17th GetItemInfo
+            -- return, captured above); this is what Blizzard's reagent-bag filter uses and
+            -- it exists on 12.x and WoW Forever alike. Fall back to the tooltip line only
+            -- when the item info is not cached yet. PROFESSIONS_USED_IN_COOKING resolves
+            -- to "Crafting Reagent" in English (it used to be "Cooking Ingredient" and was
+            -- broadened without renaming the constant); guard it, it may be absent.
+            if (isReagent == nil and PROFESSIONS_USED_IN_COOKING) then
+              isReagent = (string.find(tooltip, PROFESSIONS_USED_IN_COOKING) ~= nil);
             end
+            itm[self.I_CRAFTINGREAGENT] = (isReagent == true);
             itm[self.I_CHARGES] = self:GetItmCharges(tooltip);
           else
             -- item has not changed, maybe the count did?
@@ -5350,7 +5365,7 @@ function TFuBag:PickBar(cfg, playerid, itm, trade1, trade2)
     itm[self.I_KEYWORD][L["ACCOUNTBOUND"]] = 1;
   end
 
-  if (itm[self.I_CRAFTINGREAGENT] == 1) then
+  if (itm[self.I_CRAFTINGREAGENT] == true or itm[self.I_CRAFTINGREAGENT] == 1) then
     itm[self.I_KEYWORD][L["CRAFTINGREAGENT"]] = 1;
   end
 
@@ -8458,9 +8473,9 @@ function TFuBag:Stack(where, itmcache, sa, ca)
                 local itmfam = itemFam(itemitm);
 
                 -- Does the item go into this bag type?
-                if (bagtype and itmfam) and
-                    ((bagtype == 2048 and itemitm[self.I_CRAFTINGREAGENT]) or
-                     (bit.band(bagtype,itmfam) ~= 0)) then
+                -- Reagent bag: matched by id (its family is 0); 2048 is the legacy reagent-bank squat.
+                if (((bagtype == 2048 or (emptybag == self.REAGENTBAG_ID and itembag ~= emptybag)) and itemitm[self.I_CRAFTINGREAGENT] == true) or
+                    (bagtype and itmfam and bagtype ~= 0 and bit.band(bagtype,itmfam) ~= 0)) then
                   -- Drop one onto the other
                   self:ItemMover(itembag,itemslot,emptybag,emptyslot);
 
