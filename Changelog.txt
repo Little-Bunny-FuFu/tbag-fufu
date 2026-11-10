@@ -1,3 +1,10 @@
+* 12.1.5.03-fufu (2026-11-10)
+  Bugfix: no more empty box beside the bag buttons on WoW Forever.
+- Fix: on the WoW Forever client an empty button appeared to the right of the bag icons at
+  the bottom of the inventory window, with the tooltip "The Bank". It was the leftover
+  keyring button from the original TBag, which only hid itself on newer interface numbers
+  than Forever reports. It is now hidden on every client. No change on live 12.x.
+
 * 12.1.5.02-fufu (2026-11-06)
   Bugfix: the sort now moves crafting reagents into the reagent bag (live 12.x and WoW Forever).
 - Fix: the compress pass never filled the reagent bag. The game reports bag family 0 for the
