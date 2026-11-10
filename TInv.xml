@@ -279,7 +279,7 @@
         </Anchors>
       </CheckButton>
 
-      <CheckButton name="TFuInvingButton" hidden="false" inherits="TFuBag_BagButtonTemplate">
+      <CheckButton name="TFuInvingButton" hidden="true" inherits="TFuBag_BagButtonTemplate">
         <Anchors>
           <Anchor point="BOTTOMLEFT" relativeTo="TFuInvMenuBarBackpackButton" relativePoint="BOTTOMRIGHT">
             <Offset>
@@ -289,12 +289,7 @@
         </Anchors>
         <Scripts>
           <OnLoad>
-            if (select(4,GetBuildInfo()) &gt;= 40200) then 
-              self:Hide()
-              return
-            end
-            TFuBag.BagButton.OnLoad(self)
-            self:SetID(KEYRING_CONTAINER)
+            self:Hide()
           </OnLoad>
         </Scripts>
       </CheckButton>
